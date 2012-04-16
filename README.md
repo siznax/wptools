@@ -1,4 +1,4 @@
-**wp_info** - get Infobox text of a Wikipedia article
+**wp_info** - get the Infobox text of a Wikipedia article
 
     $ python wp_info.py Neuromancer
     {{Infobox book
@@ -22,7 +22,7 @@
     | followed_by = [[Count Zero]]
     }}
 
-**wp_image** - look for Wikipedia image file
+**wp_image** - look for a Wikipedia File/Image
 
     $ wp_image.py "Image:Neuromancer (Book).jpg" en
     http://upload.wikimedia.org/wikipedia/en/4/4b/Neuromancer_(Book).jpg
