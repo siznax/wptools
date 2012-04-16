@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # siznax 2012
 
 class wp_info:
