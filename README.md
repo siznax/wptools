@@ -21,3 +21,9 @@
     | preceded_by = "[[Burning Chrome]]"
     | followed_by = [[Count Zero]]
     }}
+
+**wp_image** - look for Wikipedia image file
+
+    $ wp_image.py "Image:Neuromancer (Book).jpg" en
+    http://upload.wikimedia.org/wikipedia/en/4/4b/Neuromancer_(Book).jpg
+    200 OK
