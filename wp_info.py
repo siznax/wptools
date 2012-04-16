@@ -11,21 +11,23 @@ class wp_info:
     def infobox(txt):
         '''extract Infobox from Mediawiki API text output'''
         # format=txt output is predictable PHP print_r() 
-        start = False
+        infobox = False
         ignore = 0
         import re
         for line in txt:
             if re.search(r'{{Infobox',line):
-                start = True
-            if start:
+                infobox = True
+            if infobox:
                 print line
-                if re.search(r'{{[^Infobox]',line):
+                # ignore enclosed multiline braces
+                if re.search(r'{{',line) and not re.search(r'{{Infobox',line):
                     ignore += 1
                 if re.search(r'}}',line):
-                    if not ignore: 
-                        break
-                    else:
-                        ignore -= 1
+                    # ignore enclosed double-braces
+                    if not re.search(r'{{',line):
+                        if not ignore:
+                            break 
+                    ignore -= 1
 
 
 if __name__=="__main__":
