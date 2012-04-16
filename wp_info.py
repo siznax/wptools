@@ -9,7 +9,7 @@ class wp_info:
 
     @staticmethod
     def infobox(txt):
-        '''extract Infobox from Mediawiki API text output'''
+        '''leak Infobox from Mediawiki API text output'''
         # format=txt output is predictable PHP print_r() 
         infobox = False
         ignore = 0
@@ -19,14 +19,14 @@ class wp_info:
                 infobox = True
             if infobox:
                 print line
-                # ignore enclosed multiline braces
+                # ignore enclosed multiline double-braces
                 if re.search(r'{{',line) and not re.search(r'{{Infobox',line):
                     ignore += 1
                 if re.search(r'}}',line):
-                    # ignore enclosed double-braces
                     if not re.search(r'{{',line):
                         if not ignore:
                             break 
+                    # ignore enclosed single-line double-braces
                     ignore -= 1
 
 
