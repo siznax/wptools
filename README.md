@@ -1,28 +1,23 @@
-**wp_info** - get the Infobox text of a Wikipedia article
+**wp_info** - get Infobox text of a Wikipedia article
 
-    $ python wp_info.py A_Tale_of_Two_Cities
-
-    {{Infobox book| <!-- See Wikipedia:WikiProject_Novels...
-    | name          = A Tale of Two Cities
-    | title_orig    =
-    | translator    =
-    | image         = [[File:Tales serial.jpg|200px]]
-    | image_caption = Cover of serial Vol. V, [[1859]]
-    | author        = [[Charles Dickens]]
-    | illustrator   = [[Hablot Knight Browne]]  ([[Phiz]])
-    | cover_artist  = [[Hablot Knight Browne]]  ([[Phiz]])
-    | country       = United Kingdom
-    | language      = English
-    | series        = Weekly: 30 April 1859 - 26 November 1859 ...
-    | genre         = [[Novel]]<br>[[Historical novel|Historical]]...
-    | publisher     = [[London]]: [[Chapman & Hall]]
-    | pub_date      = 1859
-    | media_type    = Print ([[Serial (literature)|Serial]], ...
-    | pages         =
-    | isbn          = N/A
-    | dewey= 823/.8 20
-    | congress= PR4571.A2 S56 1990
-    | oclc= 21196349
-    | preceded_by   = [[Little Dorrit]]
-    | followed_by   = [[Great Expectations]]
+    $ python wp_info.py Neuromancer
+    {{Infobox book
+    | name = Neuromancer
+    | image = [[Image:Neuromancer (Book).jpg|300x300px]]
+    | image_caption =First edition paperback cover<br />(Ace ...
+    | author = [[William Gibson]]
+    | cover_artist = [[James Warhola]]
+    | series = [[Sprawl trilogy]]
+    | genre = science fiction, [[cyberpunk]]
+    | subject =
+    | pub_date = July 1, 1984
+    | publisher = [[Ace Books|Ace]]
+    | media_type = print (paperback and hardback)
+    | pages = 271
+    | isbn = 0-441-56956-0
+    | oclc = 10980207
+    | dewey =
+    | congress =
+    | preceded_by = "[[Burning Chrome]]"
+    | followed_by = [[Count Zero]]
     }}
