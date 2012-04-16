@@ -33,11 +33,11 @@ class wp_query:
 
 if __name__=="__main__":
     import sys
-    if len(sys.argv) > 1:
-        if len(sys.argv) > 2:
-            q = wp_query(sys.argv[1],sys.argv[2])
-        else:
-            q = wp_query(sys.argv[1])
+    if len(sys.argv) > 2:
+        q = wp_query(sys.argv[1],sys.argv[2])
+        print q.get()
+    elif len(sys.argv) > 1:
+        q = wp_query(sys.argv[1])
         print q.get()
     else:
         import os
