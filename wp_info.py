@@ -23,9 +23,11 @@ class wp_info:
 
 if __name__=="__main__":
     import sys,os
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 1:
+        print "%s title" % (os.path.basename(__file__))
+        exit(1)
+    if len(sys.argv) == 2:
         import wp_query
         q = wp_query.wp_query(sys.argv[1])
         wp_info.infobox(q.get().split("\n"))
-    else:
-        print "%s title" % (os.path.basename(__file__))
+        exit(0)

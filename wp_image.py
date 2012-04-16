@@ -45,13 +45,11 @@ class wp_image:
 
 if __name__=="__main__":
     import sys,os
-    if len(sys.argv) > 2:
-        infile = sys.argv[1]
-        ns = sys.argv[2]
-        wp_image.head(wp_image.url(infile,ns))
-    elif len(sys.argv) > 1:
-        infile = sys.argv[1]
-        wp_image.head(wp_image.url(infile))
-    else:
-        # wp_image.head(wp_image.url())
+    if len(sys.argv) == 1:
         print "%s wp_file [namespace]" % (os.path.basename(__file__))
+        exit(1)
+    if len(sys.argv) == 2:
+        wp_image.head(wp_image.url(sys.argv[1]))
+    if len(sys.argv) == 3:
+        wp_image.head(wp_image.url(sys.argv[1],sys.argv[2]))
+    exit(0)

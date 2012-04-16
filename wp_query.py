@@ -28,15 +28,15 @@ class wp_query:
         return dl.open(self.url).read()
 
 if __name__=="__main__":
-    import sys
-    if len(sys.argv) ==  1:
-        import os
+    import sys,os
+    if len(sys.argv) == 1:
         print "%s title format" % (os.path.basename(__file__))
         exit(1)
-    if   len(sys.argv) > 3:
-        q = wp_query(sys.argv[1],sys.argv[2],sys.argv[3])
-    elif len(sys.argv) > 2:
-        q = wp_query(sys.argv[1],sys.argv[2])
-    elif len(sys.argv) > 1:
+    if len(sys.argv) == 2:
         q = wp_query(sys.argv[1])
+    if len(sys.argv) == 3:
+        q = wp_query(sys.argv[1],sys.argv[2])
+    if len(sys.argv) == 4:
+        q = wp_query(sys.argv[1],sys.argv[2],sys.argv[3])
     print q.get()
+    exit(0)
