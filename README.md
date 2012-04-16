@@ -1,6 +1,6 @@
-**wp_info**
+**wp_info** - get the Infobox text of a Wikipedia article
 
-<tt>python wp_info.py A_Tale_of_Two_Cities</tt>
+    $ python wp_info.py A_Tale_of_Two_Cities
 
     {{Infobox book| <!-- See Wikipedia:WikiProject_Novels...
     | name          = A Tale of Two Cities
