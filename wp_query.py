@@ -18,7 +18,7 @@ class wp_query:
             % (self.API,urllib.quote(titles),fmt)
         self.dl = self.downloader()
     
-    def downloader(self,user_agent='WikipediaQuery/0.0'):
+    def downloader(self,user_agent='wp_query/0.0'):
         '''setup URL opener'''
         import urllib2
         dl = urllib2.build_opener()
