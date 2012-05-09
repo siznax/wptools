@@ -40,6 +40,7 @@ class wp_image:
         c = httplib.HTTPConnection(u.netloc)
         c.request("HEAD",u.path)
         r = c.getresponse()
+        c.close()
         
         print r.status, r.reason
 
