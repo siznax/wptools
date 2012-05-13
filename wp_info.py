@@ -38,6 +38,6 @@ if __name__=="__main__":
         exit(1)
     if len(sys.argv) == 2:
         import wp_query
-        q = wp_query.wp_query(sys.argv[1])
+        q = wp_query.wp_query(sys.argv[1].title())
         wp_info.infobox(q.get().split("\n"))
         exit(0)
