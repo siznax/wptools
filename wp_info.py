@@ -15,12 +15,13 @@ class wp_info:
         ignore = 0
         import re
         for line in txt:
-            if re.search(r'{{Infobox',line):
+            match = re.search(r'{{Infobox',line,flags=re.IGNORECASE)
+            if match:
                 infobox = True
             if infobox:
                 print line
                 # ignore enclosed multiline double-braces
-                if re.search(r'{{',line) and not re.search(r'{{Infobox',line):
+                if re.search(r'{{',line) and not match:
                     ignore += 1
                 if re.search(r'}}',line):
                     if not re.search(r'{{',line):
