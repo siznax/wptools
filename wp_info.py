@@ -8,28 +8,40 @@ class wp_info:
         pass
 
     @staticmethod
-    def infobox(txt):
+    def infobox(txt,DEBUG=True):
         '''leak Infobox from Mediawiki API text output'''
         # format=txt output is predictable PHP print_r() 
-        infobox = False
+        infobox = 0
         ignore = 0
         import re
         for line in txt:
             match = re.search(r'{{Infobox',line,flags=re.IGNORECASE)
             if match:
-                infobox = True
+                infobox += 1
+                if DEBUG: print ">>>> infobox %d" % (infobox) 
             if infobox:
-                print line
-                # ignore enclosed multiline double-braces
+                print line.lstrip()
                 if re.search(r'{{',line) and not match:
+                    # non-Infobox opening double-braces
                     ignore += 1
+                    if DEBUG: print ">>>> ignore %d" % (ignore)
                 if re.search(r'}}',line):
-                    if not re.search(r'{{',line):
-                        if not ignore:
+                    if re.search(r'{{',line):
+                        # non-Infobox opening/closing double-braces
+                        ignore -= 1
+                        if DEBUG: print "<<<< ignore %d" % (ignore)
+                    else:
+                        if ignore <= 0:
+                            if DEBUG: print "---- break"
                             break 
-                    # ignore enclosed single-line double-braces
+                    # non-Infobox closing double-braces
                     ignore -= 1
+                    if DEBUG: print "<<<< ignore %d" % (ignore)
 
+# test cases
+# Aerocar (nested Infoboxes)
+# GitHub (non-title-case redirect)
+# Stack Overflow (embedded multi-line double braces)
 
 if __name__=="__main__":
     import sys,os
