@@ -9,39 +9,27 @@ class wp_info:
 
     def infobox(self,txt,DEBUG=False):
         '''leak Infobox from Mediawiki API text output'''
-        # format=txt output is predictable PHP print_r() 
-        infobox = 0
-        ignore = 0
+        infobox = False
+        braces = 0
         import re
         for line in txt:
             match = re.search(r'{{Infobox',line,flags=re.IGNORECASE)
+            braces += len(re.findall(r'{{',line))
+            braces -= len(re.findall(r'}}',line))
             if match:
-                infobox += 1
-                if DEBUG: print ">>>> infobox %d" % (infobox) 
+                infobox = True
+                line = re.sub(r'.*{{Infobox','{{Infobox',line)
             if infobox:
-                if DEBUG: print line.lstrip()
+                if DEBUG: print "[%d] %s" % (braces,line.lstrip())
                 self.info += line.lstrip() + "\n"
-                if re.search(r'{{',line) and not match:
-                    # non-Infobox opening double-braces
-                    ignore += 1
-                    if DEBUG: print ">>>> ignore %d" % (ignore)
-                if re.search(r'}}',line):
-                    if re.search(r'{{',line):
-                        # non-Infobox opening/closing double-braces
-                        ignore -= 1
-                        if DEBUG: print "<<<< ignore %d" % (ignore)
-                    else:
-                        if ignore <= 0:
-                            if DEBUG: print "---- break"
-                            break 
-                    # non-Infobox closing double-braces
-                    ignore -= 1
-                    if DEBUG: print "<<<< ignore %d" % (ignore)
+                if braces == 0:
+                    break
 
-# test cases
-# Aerocar (nested Infoboxes)
-# GitHub (non-title-case redirect)
-# Stack Overflow (embedded multi-line double braces)
+# test cases TBD
+#   Aerocar
+#   GitHub
+#   Heroku
+#   Stack Overflow 
 
 if __name__=="__main__":
     import sys,os
