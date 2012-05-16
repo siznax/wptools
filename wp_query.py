@@ -16,7 +16,7 @@ class wp_query:
             "&action=query"\
             "&prop=revisions"\
             "&rvprop=content"\
-            "&redirect"\
+            "&redirects"\
             % (self.API,urllib.quote(title),fmt)
         self.user_agent = user_agent
     
@@ -39,4 +39,5 @@ if __name__=="__main__":
     if len(sys.argv) == 4:
         q = wp_query(sys.argv[1],sys.argv[2],sys.argv[3])
     print q.get()
+    print q.url
     exit(0)
