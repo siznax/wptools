@@ -5,10 +5,9 @@
 class wp_info:
 
     def __init__(self):
-        pass
+        self.info = ''
 
-    @staticmethod
-    def infobox(txt,DEBUG=True):
+    def infobox(self,txt,DEBUG=False):
         '''leak Infobox from Mediawiki API text output'''
         # format=txt output is predictable PHP print_r() 
         infobox = 0
@@ -20,7 +19,8 @@ class wp_info:
                 infobox += 1
                 if DEBUG: print ">>>> infobox %d" % (infobox) 
             if infobox:
-                print line.lstrip()
+                if DEBUG: print line.lstrip()
+                self.info += line.lstrip() + "\n"
                 if re.search(r'{{',line) and not match:
                     # non-Infobox opening double-braces
                     ignore += 1
@@ -50,6 +50,16 @@ if __name__=="__main__":
         exit(1)
     if len(sys.argv) == 2:
         import wp_query
-        q = wp_query.wp_query(sys.argv[1].title())
-        wp_info.infobox(q.get().split("\n"))
-        exit(0)
+        q = wp_query.wp_query(sys.argv[1])
+        i = wp_info()
+        i.infobox(q.get().split("\n"))
+        if not i.info:
+            # try title case
+            q = wp_query.wp_query(sys.argv[1].title())
+            i.infobox(q.get().split("\n"))
+            print i.info,
+            exit(0)
+        else:
+            print i.info,
+            exit(0)
+
