@@ -1,6 +1,6 @@
-#!/usr/bin/python
-
-# siznax 2012
+__author__ = "siznax"
+__version__ = 2012
+__credits__ = 'https://www.mediawiki.org/wiki/API:Main_page'
 
 class wp_info:
 

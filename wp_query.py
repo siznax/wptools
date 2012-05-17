@@ -1,15 +1,18 @@
-#!/usr/bin/python
+__author__ = "siznax"
+__version__ = 2012
+__credits__ = 'https://www.mediawiki.org/wiki/API:Main_page'
 
-# siznax 2012
+import urllib2
+import urllib
+import sys
+import os
 
 class wp_query:
 
-    # https://www.mediawiki.org/wiki/API:Main_page
     API="http://en.wikipedia.org/w/api.php"
 
-    def __init__(self,title,fmt="txt",user_agent='wp_query/0.0'):
+    def __init__(self,title,fmt="txt"):
         '''simple Mediawiki API query'''
-        import urllib
         self.url = "%s?"\
             "&titles=%s"\
             "&format=%s"\
@@ -18,17 +21,15 @@ class wp_query:
             "&rvprop=content"\
             "&redirects"\
             % (self.API,urllib.quote(title),fmt)
-        self.user_agent = user_agent
     
     def get(self):
         '''dump Wikipedia article'''
-        import urllib2
+        user_agent = "python-urllib2/"+sys.version.split()[0]
         dl = urllib2.build_opener()
         dl.addheaders = [('User-agent', self.user_agent)]
         return dl.open(self.url).read()
 
 if __name__=="__main__":
-    import sys,os
     if len(sys.argv) == 1:
         print "%s title format" % (os.path.basename(__file__))
         exit(1)
