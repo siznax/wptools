@@ -2,10 +2,10 @@ __author__ = "siznax"
 __version__ = 2012
 __credits__ = 'https://www.mediawiki.org/wiki/API:Main_page'
 
-import urllib2
-import urllib
-import sys
 import os
+import sys
+import urllib
+import urllib2
 
 class wp_query:
 
@@ -26,7 +26,7 @@ class wp_query:
         '''dump Wikipedia article'''
         user_agent = "python-urllib2/"+sys.version.split()[0]
         dl = urllib2.build_opener()
-        dl.addheaders = [('User-agent', self.user_agent)]
+        dl.addheaders = [('User-agent', user_agent)]
         return dl.open(self.url).read()
 
 if __name__=="__main__":

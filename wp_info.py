@@ -2,6 +2,11 @@ __author__ = "siznax"
 __version__ = 2012
 __credits__ = 'https://www.mediawiki.org/wiki/API:Main_page'
 
+import os
+import re
+import sys
+import wp_query
+
 class wp_info:
 
     def __init__(self):
@@ -11,7 +16,6 @@ class wp_info:
         '''leak Infobox from Mediawiki API text output'''
         infobox = False
         braces = 0
-        import re
         for line in txt:
             match = re.search(r'{{Infobox',line,flags=re.IGNORECASE)
             braces += len(re.findall(r'{{',line))
@@ -32,12 +36,10 @@ class wp_info:
 #   Stack Overflow 
 
 if __name__=="__main__":
-    import sys,os
     if len(sys.argv) == 1:
         print "%s title" % (os.path.basename(__file__))
         exit(1)
     if len(sys.argv) == 2:
-        import wp_query
         q = wp_query.wp_query(sys.argv[1])
         i = wp_info()
         i.infobox(q.get().split("\n"))
