@@ -20,6 +20,8 @@ class wp_image:
         m = re.search(r'^(File|Image):',f)
         if m:
             f = f[:m.start()] + f[m.end():]
+        else:
+            ns = 'en' # not sure if this always works
 
         import hashlib
         h = hashlib.md5()
