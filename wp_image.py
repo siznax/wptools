@@ -1,7 +1,7 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 """
-Compute Wikipedia File/Image URL from File/Image name and give HTTP
-status. Inspired by AzaToth's "wikimgrab.pl"
+Compute Wikipedia File/Image URL from File/Image name and optionally
+give HTTP status. Inspired by AzaToth's "wikimgrab.pl"
 <https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl>
 """
 
@@ -10,9 +10,8 @@ __date__ = 2014
 
 import argparse
 import hashlib
-import httplib
 import re
-import urlparse
+import requests
 
 API = "http://upload.wikimedia.org/wikipedia"
 
@@ -21,24 +20,17 @@ def url(fname, namespace='commons'):
     """
     return Wikimedia File/Image URL from File/Image name
     """
-    name = fname.replace(' ', '_')
-    name = re.sub(r'^(File|Image):', '', name)
-    _hash = hashlib.md5(name)
-    digest = _hash.hexdigest()
-    return "/".join([API, namespace, digest[:1],
-                     digest[:2], name])
+    name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
+    digest = hashlib.md5(name).hexdigest()
+    return "/".join([API, namespace, digest[:1], digest[:2], name])
 
 
 def head(url):
     """
     return HTTP response code from candidate URL
     """
-    u = urlparse.urlparse(url)
-    c = httplib.HTTPConnection(u.netloc)
-    c.request("HEAD", u.path)
-    r = c.getresponse()
-    c.close()
-    return "%d %s" % (r.status, r.reason)
+    r = requests.head(url)
+    return r.status_code
 
 
 if __name__ == "__main__":
@@ -62,4 +54,6 @@ if __name__ == "__main__":
 
 
 # test cases TBD
+#
 # "File:Battery Park City 8952.JPG"
+# "Image:Neuromancer (Book).jpg" (need -ns "en")
