@@ -1,58 +1,65 @@
-#!/usr/bin/python
-#
-# siznax 2012
-#
-# https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl
+#!/usr/bin/env python2.7
+"""
+Compute Wikipedia File/Image URL from File/Image name and give HTTP
+status. Inspired by AzaToth's "wikimgrab.pl"
+<https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl>
+"""
 
-class wp_image:
+__author__ = "siznax"
+__date__ = 2014
 
-    API="http://upload.wikimedia.org/wikipedia"
+import argparse
+import hashlib
+import httplib
+import re
+import urlparse
 
-    def __init__(self):
-        pass
+API = "http://upload.wikimedia.org/wikipedia"
 
-    @staticmethod
-    def url(infile='File:Battery Park City 8952.JPG',ns='commons'):
-        '''return Wikimedia File/Image URL from File/Image name'''
 
-        import re
-        f = infile.replace(' ','_')
-        m = re.search(r'^(File|Image):',f)
-        if m:
-            f = f[:m.start()] + f[m.end():]
-        else:
-            ns = 'en' # not sure if this always works
+def url(fname, namespace='commons'):
+    """
+    return Wikimedia File/Image URL from File/Image name
+    """
+    name = fname.replace(' ', '_')
+    name = re.sub(r'^(File|Image):', '', name)
+    _hash = hashlib.md5(name)
+    digest = _hash.hexdigest()
+    return "/".join([API, namespace, digest[:1],
+                     digest[:2], name])
 
-        import hashlib
-        h = hashlib.md5()
-        h.update(f)
-        d = h.hexdigest()
 
-        return "%s/%s/%s/%s/%s" % (wp_image.API,ns,d[0:1],d[0:2],f)
+def head(url):
+    """
+    return HTTP response code from candidate URL
+    """
+    u = urlparse.urlparse(url)
+    c = httplib.HTTPConnection(u.netloc)
+    c.request("HEAD", u.path)
+    r = c.getresponse()
+    c.close()
+    return "%d %s" % (r.status, r.reason)
 
-    @staticmethod
-    def head(url):
-        '''return response code from HEAD of Wikimedia File/Image URL'''
 
-        import urlparse
-        u = urlparse.urlparse(url)
-        print u.geturl()
+if __name__ == "__main__":
+    desc = "return Wikipedia File/Image URL from File/Image name."
+    argp = argparse.ArgumentParser(description=(desc))
+    argp.add_argument("filename")
+    argp.add_argument("-ns", "--namespace",
+                      help="try namespace (if not in commons)")
+    argp.add_argument("-s", "--get_status", action="store_true",
+                      help="get HTTP status.")
+    args = argp.parse_args()
 
-        import httplib
-        c = httplib.HTTPConnection(u.netloc)
-        c.request("HEAD",u.path)
-        r = c.getresponse()
-        c.close()
-        
-        print r.status, r.reason
+    if args.namespace:
+        image = url(args.filename, args.namespace)
+    else:
+        image = url(args.filename)
+    print image
 
-if __name__=="__main__":
-    import sys,os
-    if len(sys.argv) == 1:
-        print "%s wp_file [namespace]" % (os.path.basename(__file__))
-        exit(1)
-    if len(sys.argv) == 2:
-        wp_image.head(wp_image.url(sys.argv[1]))
-    if len(sys.argv) == 3:
-        wp_image.head(wp_image.url(sys.argv[1],sys.argv[2]))
-    exit(0)
+    if args.get_status:
+        print head(image)
+
+
+# test cases TBD
+# "File:Battery Park City 8952.JPG"

@@ -1,3 +1,5 @@
+#!/usr/bin/env python2.7
+
 __author__ = "siznax"
 __version__ = 2012
 __credits__ = 'https://www.mediawiki.org/wiki/API:Main_page'
