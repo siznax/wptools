@@ -2,9 +2,9 @@
 
 **wp_image** look for a Wikipedia [File/Image](https://en.wikipedia.org/wiki/Help:Files)
 
-    $ wp_image.py "Image:Neuromancer (Book).jpg" en
+    $ wp_image.py "Image:Neuromancer (Book).jpg" -ns "en"
     http://upload.wikimedia.org/wikipedia/en/4/4b/Neuromancer_(Book).jpg
-    200 OK
+    200
 
 **wp_info** get the [Infobox](https://en.wikipedia.org/wiki/Help:Infobox) text of a Wikipedia article
 
