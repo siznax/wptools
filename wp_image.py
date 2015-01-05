@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Compute Wikipedia File/Image URL from File/Image name and optionally
-give HTTP status. Inspired by AzaToth's "wikimgrab.pl"
+Compute Wikipedia File/Image URL from File/Image name and show HTTP
+status. Inspired by AzaToth's "wikimgrab.pl"
 <https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl>
 """
 
@@ -16,7 +16,7 @@ import requests
 API = "http://upload.wikimedia.org/wikipedia"
 
 
-def url(fname, namespace='commons'):
+def url(fname, namespace):
     """
     return Wikimedia File/Image URL from File/Image name
     """
@@ -25,32 +25,19 @@ def url(fname, namespace='commons'):
     return "/".join([API, namespace, digest[:1], digest[:2], name])
 
 
-def head(url):
-    """
-    return HTTP response code from candidate URL
-    """
-    r = requests.head(url)
-    return r.status_code
+def main(args):
+    img_url = url(args.filename, args.namespace)
+    print img_url
+    print requests.head(img_url).status_code
 
 
 if __name__ == "__main__":
-    desc = "return Wikipedia File/Image URL from File/Image name."
-    argp = argparse.ArgumentParser(description=(desc))
+    desc = "URL and HTTP status from Wikipedia File/Image name."
+    argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("filename")
-    argp.add_argument("-ns", "--namespace",
-                      help="try namespace (if not in commons)")
-    argp.add_argument("-s", "--get_status", action="store_true",
-                      help="get HTTP status.")
-    args = argp.parse_args()
-
-    if args.namespace:
-        image = url(args.filename, args.namespace)
-    else:
-        image = url(args.filename)
-    print image
-
-    if args.get_status:
-        print head(image)
+    argp.add_argument("-ns", "--namespace", default='commons',
+                      help="namespace (default=commons)")
+    main(argp.parse_args())
 
 
 # test cases TBD
