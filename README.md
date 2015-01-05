@@ -1,18 +1,35 @@
 ### Wikipedia Article Tools
 
-**wp_image** look for a Wikipedia [File/Image](https://en.wikipedia.org/wiki/Help:Files)
+**wp_article** dump Wikipedia article
 
-    $ wp_image.py "Image:Neuromancer (Book).jpg" -ns "en"
+    $ wp_article.py "Neuromancer"
+        [query] => Array
+            (
+                [pages] => Array
+                    (
+                        [21725] => Array
+                            (
+                                [pageid] => 21725
+                                [ns] => 0
+                                [title] => Neuromancer
+                                [revisions] => Array
+                                    (
+
+
+**wp_image** find Wikipedia [File/Image](https://en.wikipedia.org/wiki/Help:Files) URL and show status
+
+    $ wp_image.py "Image:Neuromancer (Book).jpg" --namespace en
     http://upload.wikimedia.org/wikipedia/en/4/4b/Neuromancer_(Book).jpg
     200
 
-**wp_info** get the [Infobox](https://en.wikipedia.org/wiki/Help:Infobox) text of a Wikipedia article
 
-    $ wp_info.py Neuromancer
+**wp_info** dump the [Infobox](https://en.wikipedia.org/wiki/Help:Infobox) text of a Wikipedia article
+
+    $ wp_info.py "Neuromancer"
     {{Infobox book
     | name = Neuromancer
-    | image = [[Image:Neuromancer (Book).jpg|300x300px]]
-    | image_caption =First edition paperback cover<br />(Ace ...
+    | image = File:Neuromancer (Book).jpg
+    | caption = First edition
     | author = [[William Gibson]]
     | cover_artist = [[James Warhola]]
     | series = [[Sprawl trilogy]]
@@ -29,4 +46,3 @@
     | preceded_by = "[[Burning Chrome]]"
     | followed_by = [[Count Zero]]
     }}
-
