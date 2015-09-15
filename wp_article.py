@@ -51,7 +51,7 @@ def query(titles, _format):
         titles = [titles]
     titles = "|".join([urllib.quote(t) for t in titles])
     qry = QUERY.substitute(API=ENDPOINT, titles=titles, _format=_format)
-    stderr("query: " + qry.replace('?', "\n\t?").replace('&', "\n\t&"))
+    stderr("query: " + qry)
     return qry
 
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     argp.add_argument("-format", choices=FORMATS, default=DEFAULT,
                       help="output format (default=%s)" % DEFAULT)
     args = argp.parse_args()
-
+    start = time.time()
     main(args.title, args.format)
+    stderr("%5.3f seconds" % (time.time() - start))
 
-    stderr("%5.3f seconds" % time.clock())
