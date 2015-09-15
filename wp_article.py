@@ -1,23 +1,44 @@
 #!/usr/bin/env python
 """
-dump Wikipedia article(s) via Mediawiki API
+Dump Wikipedia article(s) via Mediawiki API
+
+INPUT
+    title   "fuzzy" Wiki title
+    format  see FORMATS
+
+OUTPUT
+    article in format selected
+
+References
+    https://www.mediawiki.org/wiki/API:Main_page
+    https://www.mediawiki.org/wiki/API:Tutorial
 """
 
+from __future__ import print_function
+
 __author__ = "siznax"
-__date__ = 2014
+__version__ = 2014
 
 import argparse
 import requests
+import sys
+import time
 import urllib
 
 from string import Template
 
-API_EN = "http://en.wikipedia.org/w/api.php"
-DEFAULT = "txt"  # TODO: txt is deprecated in favor of json
+DEFAULT = "json"
+ENDPOINT = "http://en.wikipedia.org/w/api.php"
 FORMATS = ['json', 'php', 'wddx', 'xml', 'yaml', 'jsonfm', 'txt',
            'dbg', 'dump']
 QUERY = Template("${API}?titles=${titles}&format=${_format}&action=query"
                  "&prop=revisions&rvprop=content&redirects&continue=")
+
+
+def stderr(msg):
+    print(msg, file=sys.stderr)
+    sys.stderr.flush()
+    sys.stdout.flush()
 
 
 def query(titles, _format):
@@ -25,26 +46,36 @@ def query(titles, _format):
     if isinstance(titles, str):
         titles = [titles]
     titles = "|".join([urllib.quote(t) for t in titles])
-    return QUERY.substitute(API=API_EN, titles=titles, _format=_format)
+    qry = QUERY.substitute(API=ENDPOINT, titles=titles, _format=_format)
+    stderr("query: " + qry.replace('?', "\n\t?").replace('&', "\n\t&"))
+    return qry
 
 
 def dump(title, _format=DEFAULT):
     """dump Wikipedia article(s) given title(s), format."""
     url = query(title, _format)
     user_agent = "python-requests/" + requests.__version__
-    result = requests.get(url, headers={'User-Agent': user_agent})
+    headers = {'User-Agent': user_agent}
+    stderr("request headers: " + str(headers))
+    result = requests.get(url, headers=headers)
+    stderr("status code: " + str(result.status_code))
     return result.text.encode('utf8')
 
 
-def main(args):
-    print dump(args.title, args.format)
+def main(title, fmt):
+    print(dump(title, fmt))
 
 
 if __name__ == "__main__":
-    argp = argparse.ArgumentParser(description="")
+    desc = ("Dump Wikipedia article(s) via Mediawiki API\n"
+            "https://www.mediawiki.org/wiki/API:Main_page")
+    argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title", nargs='+',
                       help="one or more article titles")
-    argp.add_argument("-fmt", "--format", choices=FORMATS, default=DEFAULT,
-                      help="output format (default=dump)")
+    argp.add_argument("-format", choices=FORMATS, default=DEFAULT,
+                      help="output format (default=%s)" % DEFAULT)
     args = argp.parse_args()
-    main(args)
+
+    main(args.title, args.format)
+
+    stderr("%5.3f seconds" % time.clock())
