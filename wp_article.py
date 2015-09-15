@@ -29,11 +29,15 @@ from string import Template
 
 DEFAULT = "json"
 ENDPOINT = "http://en.wikipedia.org/w/api.php"
-FORMATS = ['json', 'php', 'wddx', 'xml', 'yaml', 'jsonfm', 'txt',
-           'dbg', 'dump']
-QUERY = Template("${API}?titles=${titles}&format=${_format}&action=query"
-                 "&prop=revisions&rvprop=content&redirects&continue=")
-
+FORMATS = ['json', 'php', 'xml', 'jsonfm']
+QUERY = Template(("${API}?titles=${titles}"
+                  "&format=${_format}"
+                  "&formatversion=2"
+                  "&action=query"
+                  "&prop=revisions"
+                  "&rvprop=content"
+                  "&redirects"
+                  "&continue="))
 
 def stderr(msg):
     print(msg, file=sys.stderr)
