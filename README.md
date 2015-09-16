@@ -1,8 +1,8 @@
 ### Wikipedia Tools
 
-Some random tools for to fetch articles and whatnot. Each can be
-imported into your python env or run from the command line. See
-``<module.py> -h`` or ``pydoc <module>`` for more info.
+Some random tools for to fetch articles and whatnot. Import into your
+python env or run from the command line. See ``<module.py> -h`` or
+``pydoc <module>`` for more info.
 
 
 **wp_article** - Dump Wikipedia article(s) via Mediawiki API
