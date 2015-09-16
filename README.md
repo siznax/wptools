@@ -64,10 +64,10 @@ from python:
 from shell (with list of titles):
 
 ```shell
-$ wp_infobox.py aardvark abba accordion -format json | jsonlint | grep title
-    "title": "Aardvark"
-    "title": "ABBA"
-    "title": "Accordion"
+$ wp_infobox.py aardvark abba accordion | grep image[^_]
+| image = Porc formiguer.JPG
+|image           =ABBA - TopPop 1974 5.png
+|image=A convertor free-bass piano-accordion and a Russian bayan.jpg
 ```
 
 
