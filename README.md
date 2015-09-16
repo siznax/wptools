@@ -42,7 +42,8 @@ Title: Aardvark {{speciesbox
 | range_map_caption = Aardvark range
 | subdivision_ranks = [[Subspecies]]
 | subdivision = See Text
-}}```
+}}
+```
 
 from python:
 
@@ -78,7 +79,8 @@ $ wp_infobox.py aardvark abba accordion -format json | jsonlint | grep title
 ```shell
 $ wp_file.py "Porc formiguer.JPG"
 https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG
-200```
+200
+```
 
 
 **wp_vae** - Extract Wikipedia Vital Articles Extended
