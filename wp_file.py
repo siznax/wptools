@@ -1,19 +1,20 @@
 #!/usr/bin/env python
 """
-Compute Wikipedia File/Image URL from File/Image name and show HTTP
-status. Inspired by AzaToth's "wikimgrab.pl"
-<https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl>
+URL and HTTP status from Wikipedia File/Image name.
+
+Inspired by AzaToth's "wikimgrab.pl"
+https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl
 """
 
-__author__ = "siznax"
-__date__ = 2014
+__author__ = "@siznax"
+__version__ = "15 Sep 2015"
 
 import argparse
 import hashlib
 import re
 import requests
 
-API = "http://upload.wikimedia.org/wikipedia"
+API = "https://upload.wikimedia.org/wikipedia"
 
 
 def url(fname, namespace):
