@@ -1,48 +1,81 @@
-### Wikipedia Article Tools
+### Wikipedia Tools
 
-**wp_article** dump Wikipedia article
-
-    $ wp_article.py "Neuromancer"
-        [query] => Array
-            (
-                [pages] => Array
-                    (
-                        [21725] => Array
-                            (
-                                [pageid] => 21725
-                                [ns] => 0
-                                [title] => Neuromancer
-                                [revisions] => Array
-                                    (
+Some random tools for to fetch articles and whatnot. Each can be
+imported into your python env or run from the command line. See
+``<module.py> -h`` or ``pydoc <module>`` for more info.
 
 
-**wp_image** find Wikipedia [File/Image](https://en.wikipedia.org/wiki/Help:Files) URL and show status
+**wp_article** - Dump Wikipedia article(s) via Mediawiki API
 
-    $ wp_image.py "Image:Neuromancer (Book).jpg" --namespace en
-    http://upload.wikimedia.org/wikipedia/en/4/4b/Neuromancer_(Book).jpg
-    200
+```shell
+$ ./wp_article.py "Dung beetle" | jsonlint | fold | head -16
+{
+  "batchcomplete": true,
+  "query": {
+    "pages": [
+      {
+        "pageid": 630020,
+        "ns": 0,
+        "title": "Dung beetle",
+        "revisions": [
+          {
+            "contentformat": "text/x-wiki",
+            "contentmodel": "wikitext",
+            "content": "{{other uses}}\n{{Taxobox\n| name = Dung beetle\n| image
+ = Scarabaeus viettei 01.jpg\n| image_width = 250px\n| image_caption = ''Scaraba
+eus viettei'' (syn. Madateuchus viettei, Scarabaeidae) in [[Madagascar spiny thi
+ckets|dry spiny forest]] close to Mangily, western Madagascar\n| regnum = [[Anim
+```
 
 
-**wp_info** dump the [Infobox](https://en.wikipedia.org/wiki/Help:Infobox) text of a Wikipedia article
+**wp_infobox** - Dump Wikipedia article(s) Infobox wiki-text
 
-    $ wp_info.py "Neuromancer"
-    {{Infobox book
-    | name = Neuromancer
-    | image = File:Neuromancer (Book).jpg
-    | caption = First edition
-    | author = [[William Gibson]]
-    | cover_artist = [[James Warhola]]
-    | series = [[Sprawl trilogy]]
-    | genre = science fiction, [[cyberpunk]]
-    | subject =
-    | pub_date = July 1, 1984
-    | publisher = [[Ace Books|Ace]]
-    | media_type = print (paperback and hardback)
-    | pages = 271
-    | isbn = 0-441-56956-0
-    | oclc = 10980207
-    | dewey =
-    | congress =
-    | preceded_by = "[[Burning Chrome]]"
-    | followed_by = [[Count Zero]]
-    }}
+```shell
+$ ./wp_infobox.py "Dung beetle"
+{{Taxobox
+| name = Dung beetle
+| image = Scarabaeus viettei 01.jpg
+| image_width = 250px
+| image_caption = ''Scarabaeus viettei'' (syn. Madateuchus viettei, Scarabaeidae) in [[Madagascar spiny thickets|dry spiny forest]] close to Mangily, western Madagascar
+| regnum = [[Animal]]ia
+| phylum = [[Arthropod]]a
+| classis = [[Insect]]a
+| ordo = [[beetle|Coleoptera]]
+| subordo = [[Polyphaga]]
+| superfamilia = [[Scarabaeoidea]] (in part)
+| familia = ''Scarabidae''
+}}
+```
+
+
+**wp_file** - URL and HTTP status from Wikipedia File/Image name
+
+```shell
+$ ./wp_file.py "Scarabaeus viettei 01.jpg"
+https://upload.wikimedia.org/wikipedia/commons/c/cc/Scarabaeus_viettei_01.jpg
+200
+```
+
+<img 
+ href="https://upload.wikimedia.org/wikipedia/commons/c/cc/Scarabaeus_viettei_01.jpg"
+ width=320>
+
+
+**wp_vae** - Extract Wikipedia Vital Articles Extended
+
+```shell
+./wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
+    ...
+/wiki/Amount_of_substance
+/wiki/Mole_(unit)
+/wiki/Byte
+/wiki/Bit
+/wiki/Atmosphere_(unit)
+found (10359) links
+    #: 417
+    /: 9942
+8.088 seconds
+```
+
+
+@siznax
