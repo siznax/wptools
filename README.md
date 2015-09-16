@@ -5,56 +5,82 @@ python env or run from the command line. See ``pydoc <module>`` or
 ``<module.py> -h`` for more info.
 
 
-**wp_article** - Dump Wikipedia article(s) via Mediawiki API
+**wp_article** - Wikipedia article(s) from title(s) via MediaWiki API
 
 ```shell
-$ ./wp_article.py "Dung beetle" | jsonlint | fold | head -16
-{
-  "batchcomplete": true,
-  "query": {
-    "pages": [
-      {
-        "pageid": 630020,
-        "ns": 0,
-        "title": "Dung beetle",
-        "revisions": [
-          {
-            "contentformat": "text/x-wiki",
-            "contentmodel": "wikitext",
-            "content": "{{other uses}}\n{{Taxobox\n| name = Dung beetle\n| image
- = Scarabaeus viettei 01.jpg\n| image_width = 250px\n| image_caption = ''Scaraba
-eus viettei'' (syn. Madateuchus viettei, Scarabaeidae) in [[Madagascar spiny thi
-ckets|dry spiny forest]] close to Mangily, western Madagascar\n| regnum = [[Anim
+$ wp_article.py aardvark abba accordion | jsonlint | grep \"title
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+2.300 seconds
+        "title": "Aardvark",
+        "title": "ABBA",
+        "title": "Accordion",
 ```
 
 
-**wp_infobox** - Dump Wikipedia article(s) Infobox wiki-text
+**wp_infobox** - Infobox wiki-text from titles (via API) or file
 
 ```shell
-$ wp_infobox.py "Dung beetle"
-{{Taxobox
-| name = Dung beetle
-| image = Scarabaeus viettei 01.jpg
-| image_width = 250px
-| image_caption = ''Scarabaeus viettei'' (syn. Madateuchus viettei, Scarabaeidae) in [[Madagascar spiny thickets|dry spiny forest]] close to Mangily, western Madagascar
-| regnum = [[Animal]]ia
-| phylum = [[Arthropod]]a
-| classis = [[Insect]]a
-| ordo = [[beetle|Coleoptera]]
-| subordo = [[Polyphaga]]
-| superfamilia = [[Scarabaeoidea]] (in part)
-| familia = ''Scarabidae''
-}}
+$ wp_infobox.py aardvark
+Title: Aardvark {{speciesbox
+| genus = Orycteropus
+| species = afer
+| name = Aardvark
+| fossil_range = {{Fossil range|5|0}}<small>Early [[Pliocene]] – Recent</small>
+| status = LC
+| status_system = iucn3.1
+| status_ref = <ref name="iucn">{{harvnb|Lindsey|Cilliers|Griffin|Taylor|2008}}</ref>
+| trend = unknown
+| image = Porc formiguer.JPG
+| image_caption =
+| display_parents = 4
+| greatgrandparent_authority = [[Thomas Henry Huxley|Huxley]], 1872
+| grandparent_authority = [[John Edward Gray|Gray]], 1821
+| parent_authority = [[Georges Cuvier|G. Cuvier]], 1798
+| binomial_authority = ([[Peter Simon Pallas|Pallas]], 1766)
+| range_map = Aardvark area.png
+| range_map_caption = Aardvark range
+| subdivision_ranks = [[Subspecies]]
+| subdivision = See Text
+}}```
+
+from python:
+
+```python
+>>> import wp_infobox
+>>> d = wp_infobox.from_api(['aardvark', 'abba', 'accordion'], 'dict')
+query: http://en.wikipedia.org/w/api.php?titles=aardvark%7Cabba%7Caccordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+>>> [x['title'] for x in d]
+[u'Aardvark',
+ u'ABBA',
+ u'Accordion']
+>>> [x['image'] for x in d]
+[u' Porc formiguer.JPG',
+ u'ABBA - TopPop 1974 5.png',
+ u'A convertor free-bass piano-accordion and a Russian bayan.jpg']
+>>>
+```
+
+from shell (with list of titles):
+
+```shell
+$ wp_infobox.py aardvark abba accordion -format json | jsonlint | grep title
+    "title": "Aardvark"
+    "title": "ABBA"
+    "title": "Accordion"
 ```
 
 
 **wp_file** - URL and HTTP status from Wikipedia File/Image name
 
 ```shell
-$ wp_file.py "Scarabaeus viettei 01.jpg"
-https://upload.wikimedia.org/wikipedia/commons/c/cc/Scarabaeus_viettei_01.jpg
-200
-```
+$ wp_file.py "Porc formiguer.JPG"
+https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG
+200```
+
 
 **wp_vae** - Extract Wikipedia Vital Articles Extended
 
