@@ -1,11 +1,13 @@
-### Wikipedia Tools
+## Wikipedia Tools
 
-Some random tools for to fetch articles and whatnot. Import into your
-python env or run from the command line. See ``pydoc <module>`` or
-``<module.py> -h`` for more info.
+Some fun and helpful tools for to fetch articles, infoboxen, and
+files from **python** or the command line! See ``pydoc <module>`` or
+``<module.py> -h`` for more info. 
 
 
-**wp_article** - Wikipedia article(s) from title(s) via MediaWiki API
+### wp_article
+
+Wikipedia article(s) from title(s) via MediaWiki API
 
 ```shell
 $ wp_article.py aardvark abba accordion | jsonlint | grep \"title
@@ -18,7 +20,9 @@ status code: 200
 ```
 
 
-**wp_infobox** - Infobox wiki-text from titles (via API) or file
+### wp_infobox
+
+Infobox wiki-text from titles (via API) or file
 
 ```shell
 $ wp_infobox.py aardvark
@@ -71,7 +75,9 @@ $ wp_infobox.py aardvark abba accordion | grep image[^_]
 ```
 
 
-**wp_file** - URL and HTTP status from Wikipedia File/Image name
+### wp_file
+
+URL and HTTP status from Wikipedia File/Image name
 
 ```shell
 $ wp_file.py "Porc formiguer.JPG"
@@ -79,7 +85,9 @@ https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG 200
 ```
 
 
-**wp_vae** - Extract Wikipedia Vital Articles Extended
+### wp_vae
+
+Extract Wikipedia Vital Articles Expanded (WP:VA/E)
 
 ```shell
 $ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
