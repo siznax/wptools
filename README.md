@@ -1,7 +1,7 @@
 ## Wikipedia Tools
 
-Some fun and helpful tools for to fetch articles, infoboxen, and
-files from **python** or the command line! See ``pydoc <module>`` or
+Some fun and helpful tools for to fetch Wikipedia articles, infoboxen,
+and files via the MediaWiki API from **python** or the command line! See ``pydoc <module>`` or
 ``<module.py> -h`` for more info. 
 
 
