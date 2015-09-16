@@ -4,7 +4,7 @@ Dump Wikipedia article(s) via Mediawiki API
 
 INPUT
     title   "fuzzy" Wiki title
-    format  see FORMATS
+    format  see FORMATS (default=json)
 
 OUTPUT
     article in format selected
@@ -16,8 +16,8 @@ References
 
 from __future__ import print_function
 
-__author__ = "siznax"
-__version__ = 2014
+__author__ = "@siznax"
+__version__ = "15 Sep 2015"
 
 import argparse
 import requests
@@ -38,6 +38,7 @@ QUERY = Template(("${API}?titles=${titles}"
                   "&rvprop=content"
                   "&redirects"
                   "&continue="))
+
 
 def stderr(msg):
     print(msg, file=sys.stderr)
@@ -82,4 +83,3 @@ if __name__ == "__main__":
     start = time.time()
     main(args.title, args.format)
     stderr("%5.3f seconds" % (time.time() - start))
-
