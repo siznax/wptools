@@ -31,7 +31,7 @@ ckets|dry spiny forest]] close to Mangily, western Madagascar\n| regnum = [[Anim
 **wp_infobox** - Dump Wikipedia article(s) Infobox wiki-text
 
 ```shell
-$ ./wp_infobox.py "Dung beetle"
+$ wp_infobox.py "Dung beetle"
 {{Taxobox
 | name = Dung beetle
 | image = Scarabaeus viettei 01.jpg
@@ -51,20 +51,15 @@ $ ./wp_infobox.py "Dung beetle"
 **wp_file** - URL and HTTP status from Wikipedia File/Image name
 
 ```shell
-$ ./wp_file.py "Scarabaeus viettei 01.jpg"
+$ wp_file.py "Scarabaeus viettei 01.jpg"
 https://upload.wikimedia.org/wikipedia/commons/c/cc/Scarabaeus_viettei_01.jpg
 200
 ```
 
-<img 
- href="https://upload.wikimedia.org/wikipedia/commons/c/cc/Scarabaeus_viettei_01.jpg"
- width=320>
-
-
 **wp_vae** - Extract Wikipedia Vital Articles Extended
 
 ```shell
-./wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
+$ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
     ...
 /wiki/Amount_of_substance
 /wiki/Mole_(unit)
