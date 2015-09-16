@@ -98,8 +98,8 @@ A convertor free-bass piano-accordion and a Russian bayan.jpg
 URL and HTTP status from Wikipedia File/Image name
 
 ```shell
-$ wp_file.py "Porc formiguer.JPG"
-https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG 200
+$ ./wp_file.py "ABBA - TopPop 1974 5.png"
+https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 ```
 
 
