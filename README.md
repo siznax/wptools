@@ -28,10 +28,10 @@ query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=j
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
 >>> j = json.loads(r)
->>> j['query']['pages'][2]['title']
-u'Accordion'
 >>> [x['title'] for x in j['query']['pages']]
 [u'Aardvark', u'ABBA', u'Accordion']
+>>> j['query']['pages'][2]['title']
+u'Accordion'
 >>> j['query']['pages'][2]['revisions'][0]['content'][:256]
 u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
 >>> 
