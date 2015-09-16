@@ -9,6 +9,16 @@ line! See ``pydoc <module>`` or ``<module.py> -h`` for more info.
 
 Wikipedia article(s) from title(s) via MediaWiki API
 
+```shell
+$ wp_article.py aardvark abba accordion | jsonlint | grep \"title
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+        "title": "Aardvark",
+        "title": "ABBA",
+        "title": "Accordion",
+```
+
 from python:
 
 ```python
@@ -21,18 +31,6 @@ status code: 200
 >>> j['query']['pages'][2]['revisions'][0]['content'][:256]
 u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
 >>> 
-```
-
-from shell:
-
-```shell
-$ wp_article.py aardvark abba accordion | jsonlint | grep \"title
-query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
-request headers: {'User-Agent': 'python-requests/2.7.0'}
-status code: 200
-        "title": "Aardvark",
-        "title": "ABBA",
-        "title": "Accordion",
 ```
 
 
