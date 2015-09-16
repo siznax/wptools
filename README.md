@@ -12,7 +12,6 @@ $ wp_article.py aardvark abba accordion | jsonlint | grep \"title
 query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
-2.300 seconds
         "title": "Aardvark",
         "title": "ABBA",
         "title": "Accordion",
@@ -58,7 +57,7 @@ status code: 200
  u'ABBA',
  u'Accordion']
 >>> [x['image'] for x in d]
-[u' Porc formiguer.JPG',
+[u'Porc formiguer.JPG',
  u'ABBA - TopPop 1974 5.png',
  u'A convertor free-bass piano-accordion and a Russian bayan.jpg']
 >>>
