@@ -1,18 +1,22 @@
 #!/usr/bin/env python
 """
-Extract Wikipedia Vital Articles Extended
+Extract Wikipedia Vital Articles Expanded
 
 INPUT
 
-    HTML from https://simple.wikipedia.org/wiki/\
-Wikipedia:List_of_articles_all_languages_should_have/Expanded
+    HTML from https://simple.wikipedia.org/wiki/Wikipedia:VAE
     xpath like //div[@id=\"mw-content-text\"]//li//@href
 
 OUTPUT
 
     STDOUT list of vital articles
     STDERR summary
+
+See also
+    https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Expanded
 """
+
+# TODO: compare https://en.wikipedia.org/wiki/Wikipedia:VA/E
 
 from __future__ import print_function
 
