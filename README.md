@@ -86,10 +86,10 @@ from python:
 from shell (with list of titles):
 
 ```shell
-$ wp_infobox.py aardvark abba accordion | grep image[^_]
-| image = Porc formiguer.JPG
-|image           =ABBA - TopPop 1974 5.png
-|image=A convertor free-bass piano-accordion and a Russian bayan.jpg
+$ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'
+Porc formiguer.JPG
+ABBA - TopPop 1974 5.png
+A convertor free-bass piano-accordion and a Russian bayan.jpg
 ```
 
 
