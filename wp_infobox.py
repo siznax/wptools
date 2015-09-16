@@ -30,6 +30,7 @@ from collections import defaultdict
 
 FORMATS = ['dict', 'json', 'text']
 
+
 def from_api(titles, _format='text'):
     """returns Infoboxen from api"""
     return _output(_parse(_articles(titles)), _format)
@@ -59,7 +60,7 @@ def _boxes_to_dict(boxes):
             _dict['title'] = box['title']
             if '=' in line:
                 terms = line.split('=')
-                key = terms[0].replace(' ','').replace('|','')
+                key = terms[0].replace(' ', '').replace('|', '')
                 _dict[key] = terms[1].strip()
         boxes[i] = dict(_dict)
     return boxes
@@ -75,7 +76,7 @@ def _boxes_to_text(boxes):
 
 
 def _parse(api_json):
-    """returns [{title, box}] from API JSON"""
+    """returns [{title, box}, ...] from API JSON"""
     output = []
     # print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
     try:
@@ -91,8 +92,9 @@ def _parse(api_json):
 def _infobox(text):
     """returns Infobox wiki-text from text blob"""
     #
-    # TODO: consider returning LIST Of infoboxen (see Abba article)
-    #       instead of the break below...
+    # TODO: consider returning LIST of infoboxen from each article
+    # instead of the break below. (see Abba article, which also has a
+    # {{Navbox)
     #
     output = []
     region = False
