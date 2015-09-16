@@ -1,13 +1,29 @@
 ## Wikipedia Tools
 
 Some fun and helpful tools for to fetch Wikipedia articles, infoboxen,
-and files via the MediaWiki API from **python** or the command line!
-See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
+files, and more via the MediaWiki API from **python** or the command
+line! See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
 
 
 ### wp_article
 
 Wikipedia article(s) from title(s) via MediaWiki API
+
+from python:
+
+```python
+>>> import wp_article
+>>> r = wp_article.dump(['aardvark', 'abba', 'accordion'])
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+>>> j = json.loads(r)
+>>> j['query']['pages'][2]['revisions'][0]['content'][:256]
+u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
+>>> 
+```
+
+from shell:
 
 ```shell
 $ wp_article.py aardvark abba accordion | jsonlint | grep \"title
