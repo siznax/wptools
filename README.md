@@ -50,9 +50,6 @@ from python:
 ```python
 >>> import wp_infobox
 >>> d = wp_infobox.from_api(['aardvark', 'abba', 'accordion'], 'dict')
-query: http://en.wikipedia.org/w/api.php?titles=aardvark%7Cabba%7Caccordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
-request headers: {'User-Agent': 'python-requests/2.7.0'}
-status code: 200
 >>> [x['title'] for x in d]
 [u'Aardvark',
  u'ABBA',
@@ -78,8 +75,7 @@ $ wp_infobox.py aardvark abba accordion -format json | jsonlint | grep title
 
 ```shell
 $ wp_file.py "Porc formiguer.JPG"
-https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG
-200
+https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG 200
 ```
 
 
