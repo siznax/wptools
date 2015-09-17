@@ -14,6 +14,8 @@ $ wp_article.py aardvark abba accordion | jsonlint | grep \"title
 query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
+bytes: 181931
+1.881 seconds
         "title": "Aardvark",
         "title": "ABBA",
         "title": "Accordion",

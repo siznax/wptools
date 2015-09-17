@@ -61,10 +61,12 @@ def dump(title, _format=DEFAULT):
     url = query(title, _format)
     user_agent = "python-requests/" + requests.__version__
     headers = {'User-Agent': user_agent}
-    _stderr("request headers: " + str(headers))
+    _stderr("request headers: %s" % headers)
     result = requests.get(url, headers=headers)
-    _stderr("status code: " + str(result.status_code))
-    return result.text.encode('utf8')
+    _stderr("status code: %d" % result.status_code)
+    text = result.text.encode('utf8')
+    _stderr("bytes: %d" % isys.getsizeof(text))
+    return text
 
 
 def _main(titles, fmt):
