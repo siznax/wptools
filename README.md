@@ -67,7 +67,8 @@ For example, get the _Aardvark_ article infobox (Speciesbox):
 
 ```shell
 $ wp_infobox.py aardvark
-Title: Aardvark {{speciesbox
+= Aardvark =
+{{speciesbox
 | genus = Orycteropus
 | species = afer
 | name = Aardvark
