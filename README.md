@@ -107,7 +107,7 @@ From python:
 >>>
 ```
 
-Get images from several articles infoboxes:
+Get images from several infoboxes:
 
 ```shell
 $ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'
