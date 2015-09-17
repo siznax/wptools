@@ -63,6 +63,8 @@ u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=
 
 Infobox wiki-text from titles (via API) or file
 
+For example, get the _Aardvark_ article infobox (Speciesbox):
+
 ```shell
 $ wp_infobox.py aardvark
 Title: Aardvark {{speciesbox
@@ -104,7 +106,7 @@ From python:
 >>>
 ```
 
-From shell (with list of titles):
+Get images from several articles infoboxes:
 
 ```shell
 $ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'
