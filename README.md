@@ -71,7 +71,7 @@ from python:
 
 ```python
 >>> import wp_infobox
->>> d = wp_infobox.from_api(['aardvark', 'abba', 'accordion'], 'dict')
+>>> d = wp_infobox.from_api(['aardvark', 'abba', 'accordion'])
 >>> [x['title'] for x in d]
 [u'Aardvark',
  u'ABBA',

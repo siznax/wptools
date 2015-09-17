@@ -28,15 +28,16 @@ import wp_article
 
 from collections import defaultdict
 
+DEFAULT = 'dict'
 FORMATS = ['dict', 'json', 'text']
 
 
-def from_api(titles, _format='text'):
+def from_api(titles, _format=DEFAULT):
     """returns Infoboxen from api"""
     return _output(_parse(_articles(titles)), _format)
 
 
-def from_file(fname, _format='text'):
+def from_file(fname, _format=DEFAULT):
     """returns Infoboxen from input file"""
     with open(fname) as fh:
         return _output(_parse(json.loads(fh.read())), _format)
@@ -58,6 +59,7 @@ def _boxes_to_dict(boxes):
         _dict = defaultdict(str)
         for line in box['wikitext'].split("\n"):
             _dict['title'] = box['title']
+            _dict['wikitext'] = box['wikitext']
             if '=' in line:
                 terms = line.split('=')
                 key = terms[0].replace(' ', '').replace('|', '')
