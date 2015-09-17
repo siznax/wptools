@@ -48,7 +48,9 @@ request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
 >>> j = json.loads(r)
 >>> [x['title'] for x in j['query']['pages']]
-[u'Aardvark', u'ABBA', u'Accordion']
+[u'Aardvark',
+ u'ABBA',
+ u'Accordion']
 >>> j['query']['pages'][2]['title']
 u'Accordion'
 >>> j['query']['pages'][2]['revisions'][0]['content'][:256]
