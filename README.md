@@ -7,7 +7,9 @@ line! See ``pydoc <module>`` or ``<module.py> -h`` for more info.
 
 ### wp_article
 
-Wikipedia article(s) from title(s) via MediaWiki API
+Wikipedia articles from titles via MediaWiki API
+
+For example, get articles as ``json``:
 
 ```shell
 $ wp_article.py aardvark abba accordion | jsonlint | grep \"title
@@ -21,7 +23,22 @@ bytes: 181931
         "title": "Accordion",
 ```
 
-from python:
+Get articles as ``wikitext``:
+
+```shell
+$ wp_article.py aardvark abba accordion -format wikitext | grep ^=[^=]
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+bytes: 76459
+1.114 seconds
+= Aardvark =
+= Accordion =
+= Abba =
+```
+
+
+From python:
 
 ```python
 >>> import wp_article
@@ -69,7 +86,7 @@ Title: Aardvark {{speciesbox
 }}
 ```
 
-from python:
+From python:
 
 ```python
 >>> import wp_infobox
@@ -85,7 +102,7 @@ from python:
 >>>
 ```
 
-from shell (with list of titles):
+From shell (with list of titles):
 
 ```shell
 $ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'

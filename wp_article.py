@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Wikipedia article(s) from title(s) via MediaWiki API
+Wikipedia articles from titles via MediaWiki API
 
 INPUT
     titles  "fuzzy" Wiki titles
