@@ -38,7 +38,7 @@ QUERY = Template(("${API}?titles=${titles}"
                   "&action=query"
                   "&prop=revisions"  # latest revision
                   "&rvprop=content"  # content of latest revision
-                  # "&redirects"
+                  "&redirects"
                   "&continue="))
 
 
