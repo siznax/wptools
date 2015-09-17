@@ -69,26 +69,28 @@ def _boxes_to_dict(boxes):
 
 
 def _boxes_to_text(boxes):
-    """return string from list of infoboxes"""
+    """return wikitext from list of infoboxes"""
     text = ""
     for box in boxes:
-        text += "Title: %s " % box['title']
+        text += "\n= %s =\n" % box['title']
         text += box['wikitext'] + "\n"
     return text
 
 
 def _parse(api_json):
     """returns [{title, box}, ...] from API JSON"""
-    output = []
+    boxes = []
     # print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
     try:
-        for page in api_json["query"]['pages']:
-            wikitext = page['revisions'][0]["content"]
-            output.append({'title': page['title'],
-                           'wikitext': _infobox(wikitext)})
+        for page in api_json["query"]["pages"]:
+            wikitext = page["revisions"][0]["content"]
+            infobox = _infobox(wikitext)
+            if infobox:
+                boxes.append({'title': page["title"],
+                              'wikitext': infobox})
     except:
         raise RuntimeError("Unable to parse result! Check your API query.")
-    return output
+    return boxes
 
 
 def _infobox(text):
