@@ -127,7 +127,7 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 ```
 
 
-### wp_summary
+### wp_summary (experimental)
 
 Query MediaWiki API for wiki-text before first heading
 
