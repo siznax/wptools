@@ -5,14 +5,14 @@ files, and more via the MediaWiki API from **python** or the command
 line! See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
 
 
-### wp_article
+### wp_query
 
-Wikipedia articles from titles via MediaWiki API
+Query MediaWiki API given titles, format
 
 For example, get articles as ``json``:
 
 ```shell
-$ wp_article.py aardvark abba accordion | jsonlint | grep \"title
+$ wp_query.py aardvark abba accordion | jsonlint | grep \"title
 query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
@@ -26,7 +26,7 @@ bytes: 181931
 Get articles as ``wikitext``:
 
 ```shell
-$ wp_article.py aardvark abba accordion -format wikitext | grep ^=[^=]
+$ wp_query.py aardvark abba accordion -format wikitext | grep ^=[^=]
 query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&continue=
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200
@@ -41,8 +41,8 @@ bytes: 76459
 From python:
 
 ```python
->>> import wp_article
->>> r = wp_article.dump(['aardvark', 'abba', 'accordion'])
+>>> import wp_query
+>>> r = wp_query.data(['aardvark', 'abba', 'accordion'])
 query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
 request headers: {'User-Agent': 'python-requests/2.7.0'}
 status code: 200

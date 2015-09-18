@@ -24,7 +24,7 @@ import os
 import re
 import sys
 import time
-import wp_article
+import wp_query
 
 from collections import defaultdict
 
@@ -89,6 +89,7 @@ def _parse(api_json):
                 boxes.append({'title': page["title"],
                               'wikitext': infobox})
     except:
+        print(page)
         raise RuntimeError("Unable to parse result! Check your API query.")
     return boxes
 
@@ -126,7 +127,7 @@ def _articles(titles):
     """returns JSON object from list of titles"""
     if isinstance(titles, str):
         titles = [titles]
-    return json.loads(wp_article.dump("|".join(titles)))
+    return json.loads(wp_query.data("|".join(titles)))
 
 
 def _main(titles, _format):
@@ -139,7 +140,7 @@ def _main(titles, _format):
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Wikipedia article Infobox(es) wiki-text from title(s)")
+        description="Wikipedia article Infobox(es) wiki-text from titles")
     argp.add_argument("titles", nargs='+',
                       help="article titles (optionally, local filename)")
     argp.add_argument("-format", choices={'text', 'json'}, default='text',

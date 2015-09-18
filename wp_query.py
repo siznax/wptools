@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Wikipedia articles from titles via MediaWiki API
+Query MediaWiki API given titles, format
 
 INPUT
     titles  "fuzzy" Wiki titles
@@ -59,11 +59,11 @@ def _wikitext(_json):
     for page in json.loads(_json)["query"]["pages"]:
         text += "\n= %s =\n" % page["title"]
         text += page["revisions"][0]["content"]
-    return text.encode('utf-8')
+    return text
 
 
 def query(titles, _format):
-    """returns Mediawiki API query given title(s), format."""
+    """returns MW/API query formed given titles, format"""
     if isinstance(titles, str):
         titles = [titles]
     titles = "|".join([urllib.quote(t) for t in titles])
@@ -71,8 +71,8 @@ def query(titles, _format):
     return qry
 
 
-def dump(title, _format=DEFAULT):
-    """dump Wikipedia article(s) given title(s), format."""
+def data(title, _format=DEFAULT):
+    """returns data from MW/API given titles, format"""
 
     r_format = _format
     if r_format == 'wikitext':
@@ -87,7 +87,7 @@ def dump(title, _format=DEFAULT):
     result = requests.get(url, headers=headers)
     _stderr("status code: %d" % result.status_code)
 
-    text = result.text.encode('utf8')
+    text = result.text
     _stderr("bytes: %d" % sys.getsizeof(text))
 
     if r_format == 'wikitext':
@@ -97,11 +97,11 @@ def dump(title, _format=DEFAULT):
 
 
 def _main(titles, fmt):
-    print(dump(titles, fmt))
+    print(data(titles, fmt).encode('utf8'))
 
 
 if __name__ == "__main__":
-    desc = ("Dump Wikipedia article(s) via Mediawiki API\n"
+    desc = ("Query MediaWiki API given titles, format\n"
             "https://www.mediawiki.org/wiki/API:Main_page")
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("titles", nargs='+',
