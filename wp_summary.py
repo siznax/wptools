@@ -22,7 +22,6 @@ import argparse
 import json
 import os
 import re
-import sys
 import time
 import wp_query
 
@@ -78,6 +77,7 @@ def _summaries_to_text(summaries):
 
 
 def _rm_html(wikitext):
+    """returns wikitext with HTML tags removed"""
     html = r'<[^>]*>'
     found = re.findall(html, wikitext)
     print("\n<html> to be removed: %s" % found)
@@ -85,6 +85,7 @@ def _rm_html(wikitext):
 
 
 def _rm_refs(wikitext):
+    """returns wikitext with <ref> tags removed"""
     refs = r'<ref[^>]*>[^<]*</ref>'
     found = re.findall(refs, wikitext)
     print("\n<refs> to be removed: %s" % found)
@@ -92,7 +93,7 @@ def _rm_refs(wikitext):
 
 
 def _disposition(char, dispo, last):
-    """returns the wikitext tag disposition of the current character"""
+    """returns the MediaWiki markup disposition of the current character"""
     tags = ["[", "]", "{", "}"]
     if char in tags:
         if not dispo:
@@ -105,7 +106,7 @@ def _disposition(char, dispo, last):
         if dispo == "open":
             if last == char:
                 dispo = "open"
-    if not char in tags:
+    if char not in tags:
         if dispo == "open":
             dispo = "enclosed"
         if dispo == "close":
@@ -114,6 +115,7 @@ def _disposition(char, dispo, last):
 
 
 def _clean_markup(wikitext):
+    """returns wikitext without Mediawiki markup"""
     clean = ""
     markup = ""
     markup_found = []
@@ -139,6 +141,7 @@ def _clean_markup(wikitext):
 
 
 def _clean(wikitext):
+    """returns wikitext without MediaWiki markup, <ref> tags, or other HTML"""
     clean = _clean_markup(wikitext)
     clean = _rm_refs(clean)
     clean = _rm_html(clean)
@@ -146,6 +149,7 @@ def _clean(wikitext):
 
 
 def _summary(wikitext):
+    """returns wikitext after templates and before first heading"""
     output = []
     temple = False
     braces = 0
@@ -180,7 +184,7 @@ def _summary(wikitext):
         if mark == ">":
             output.append(line.lstrip())
 
-        print("[%s] %s" % (mark, line.encode('utf-8')))
+        # print("[%s] %s" % (mark, line.encode('utf-8')))
 
     return "\n".join(output)
 
