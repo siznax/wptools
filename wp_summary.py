@@ -77,6 +77,74 @@ def _summaries_to_text(summaries):
     return text
 
 
+def _rm_html(wikitext):
+    html = r'<[^>]*>'
+    found = re.findall(html, wikitext)
+    print("\n<html> to be removed: %s" % found)
+    return re.sub(html, '', wikitext)
+
+
+def _rm_refs(wikitext):
+    refs = r'<ref[^>]*>[^<]*</ref>'
+    found = re.findall(refs, wikitext)
+    print("\n<refs> to be removed: %s" % found)
+    return re.sub(refs, '', wikitext)
+
+
+def _disposition(char, dispo, last):
+    """returns the wikitext tag disposition of the current character"""
+    tags = ["[", "]", "{", "}"]
+    if char in tags:
+        if not dispo:
+            dispo = "open"
+        if dispo == "enclosed":
+            dispo = "close"
+        if dispo == "close":
+            if last == char:
+                dispo = "close"
+        if dispo == "open":
+            if last == char:
+                dispo = "open"
+    if not char in tags:
+        if dispo == "open":
+            dispo = "enclosed"
+        if dispo == "close":
+            dispo = ""
+    return dispo
+
+
+def _clean_markup(wikitext):
+    clean = ""
+    markup = ""
+    markup_found = []
+    dispo = ""
+    last_dispo = ""
+    for i, char in enumerate(wikitext):
+        char = char.encode('utf-8')
+        dispo = _disposition(char, dispo, wikitext[i-1])
+        if dispo:
+            markup += char
+            last_dispo = dispo
+        else:
+            if last_dispo and markup:
+                markup_found.append(markup)
+            markup = ""
+        if markup:
+            clean += "_"
+        else:
+            clean += char
+        # print("[%d] %s %s %s" % (i, char, dispo, markup))
+    print("markup to be cleaned: %s" % markup_found)
+    return clean
+
+
+def _clean(wikitext):
+    clean = _clean_markup(wikitext)
+    clean = _rm_refs(clean)
+    clean = _rm_html(clean)
+    return clean.decode('utf-8')
+
+
 def _summary(wikitext):
     output = []
     temple = False
@@ -112,7 +180,7 @@ def _summary(wikitext):
         if mark == ">":
             output.append(line.lstrip())
 
-        # print("[%s] %s" % (mark, line.encode('utf-8')))
+        print("[%s] %s" % (mark, line.encode('utf-8')))
 
     return "\n".join(output)
 
@@ -121,16 +189,12 @@ def _parse(api_json):
     """returns [{title, summary}, ...] from JSON"""
     summaries = []
     # print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
-    try:
-        for page in api_json["query"]["pages"]:
-            wikitext = page["revisions"][0]["content"]
-            summary = _summary(wikitext)
-            if summary:
-                summaries.append({'title': page["title"],
-                                  'wikitext': summary})
-    except:
-        print(page)
-        raise RuntimeError("Unable to parse result! Check your API query.")
+    for page in api_json["query"]["pages"]:
+        wikitext = page["revisions"][0]["content"]
+        summary = _clean(_summary(wikitext))
+        if summary:
+            summaries.append({'title': page["title"],
+                              'wikitext': summary})
     return summaries
 
 
@@ -154,10 +218,11 @@ if __name__ == "__main__":
         description="Wikipedia article summaries given titles, format")
     argp.add_argument("titles", nargs='+',
                       help="article titles (optionally, local filename)")
-    argp.add_argument("-format", choices={'text', 'json'}, default='text',
+    argp.add_argument("-format", choices={'text', 'json', 'clean'},
+                      default='text',
                       help="output format (default=text)")
     args = argp.parse_args()
 
     start = time.time()
     print(_main(args.titles, args.format).encode('utf-8'))
-    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    # print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
