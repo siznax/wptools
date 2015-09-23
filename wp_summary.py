@@ -27,6 +27,7 @@ import wp_query
 
 from collections import defaultdict
 
+DEBUG = False
 DEFAULT = 'text'
 FORMATS = ['dict', 'json', 'text']
 
@@ -80,7 +81,8 @@ def _rm_html(wikitext):
     """returns wikitext with HTML tags removed"""
     html = r'<[^>]*>'
     found = re.findall(html, wikitext)
-    print("\n<html> to be removed: %s" % found)
+    if DEBUG:
+        print("\n<html> to be removed: %s" % found)
     return re.sub(html, '', wikitext)
 
 
@@ -88,7 +90,8 @@ def _rm_refs(wikitext):
     """returns wikitext with <ref> tags removed"""
     refs = r'<ref[^>]*>[^<]*</ref>'
     found = re.findall(refs, wikitext)
-    print("\n<refs> to be removed: %s" % found)
+    if DEBUG:
+        print("\n<refs> to be removed: %s" % found)
     return re.sub(refs, '', wikitext)
 
 
@@ -136,7 +139,8 @@ def _clean_markup(wikitext):
         else:
             clean += char
         # print("[%d] %s %s %s" % (i, char, dispo, markup))
-    print("markup to be cleaned: %s" % markup_found)
+    if DEBUG:
+        print("markup to be cleaned: %s" % markup_found)
     return clean
 
 
