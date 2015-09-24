@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import re
+import sys
 import time
 import wp_query
 
@@ -191,9 +192,9 @@ def _clean_markup(wikitext):
     if DEBUG:
         print("markup to be cleaned:")
     for term in markup_found:
+        clean = _replace_markup(term, clean)
         if DEBUG:
             print("  %s" % term)
-        clean = _replace_markup(term, clean)
     clean = re.sub(r"'+", "'", clean)
     return clean
 
@@ -208,7 +209,8 @@ def _clean(wikitext):
 
 def _ignores(line):
     """returns of list of matching patterns to ignore in a line"""
-    ignore = [re.search(r'^{{.*}}$', line),
+    ignore = [re.search(r'^{.*}$', line),
+              re.search(r'^{{.*}}$', line),
               re.search(r'^\[\[.*\]\]$', line),
               re.search(r'^<!--.*-->$', line)]
     return [x for x in ignore if x]
@@ -255,13 +257,14 @@ def _parse(api_json):
     """returns [{title, summary}, ...] from JSON"""
     summaries = []
     if DEBUG:
-        print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
+        print("pages: %d" % len(api_json["query"]['pages']))
     for page in api_json["query"]["pages"]:
         wikitext = page["revisions"][0]["content"]
         summary = _clean(_summary(wikitext))
         if summary:
             summaries.append({'title': page["title"],
-                              'wikitext': summary})
+                              'wikitext': wikitext,
+                              'summary': summary})
     return summaries
 
 
@@ -288,8 +291,11 @@ if __name__ == "__main__":
     argp.add_argument("-format", choices={'text', 'json', 'clean'},
                       default='text',
                       help="output format (default=text)")
+    argp.add_argument("-d", "-debug", action='store_true',
+                      help="emit debug messages")
     args = argp.parse_args()
-
+    if args.d:
+        DEBUG = True
     start = time.time()
     print(_main(args.titles, args.format).encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
