@@ -72,9 +72,11 @@ def _summaries_to_dict(summaries):
 def _summaries_to_text(summaries):
     """return wikitext from list of infosummaries"""
     text = ""
+    prefix = "https://en.wikipedia.org/wiki"
     for summary in summaries:
         text += "\n= %s =\n\n" % summary['title']
-        text += summary['wikitext'] + "\n"
+        text += summary['summary'] + "\n"
+        text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
     return text
 
 
@@ -208,11 +210,11 @@ def _clean(wikitext):
 
 
 def _ignores(line):
-    """returns of list of matching patterns to ignore in a line"""
-    ignore = [re.search(r'^{.*}$', line),
-              re.search(r'^{{.*}}$', line),
-              re.search(r'^\[\[.*\]\]$', line),
-              re.search(r'^<!--.*-->$', line)]
+    """returns of list of matching patterns to ignore in summary lines"""
+    ignore = [re.search(r'^\W+$', line),  # only non-word characters
+              re.search(r'^{.*}$', line),  # begins/ends with braces
+              re.search(r'^\[.*\]$', line),  # begins/ends with brackets
+              re.search(r'^<!--.*-->$', line)]  # HTML comments
     return [x for x in ignore if x]
 
 
