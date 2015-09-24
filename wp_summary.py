@@ -82,7 +82,10 @@ def _rm_html(wikitext):
     html = r'<[^>]*>'
     found = re.findall(html, wikitext)
     if DEBUG:
-        print("\n<html> to be removed: %s" % found)
+        if found:
+            print("\n<html> to be removed:")
+            for term in found:
+                print("  %s" % term)
     return re.sub(html, '', wikitext)
 
 
@@ -91,8 +94,24 @@ def _rm_refs(wikitext):
     refs = r'<ref[^>]*>[^<]*</ref>'
     found = re.findall(refs, wikitext)
     if DEBUG:
-        print("\n<refs> to be removed: %s" % found)
+        print("\n<refs> to be removed:")
+        for term in found:
+            print("  %s" % term)
     return re.sub(refs, '', wikitext)
+
+
+def _replace_markup(term, wikitext):
+    """replaces MediaWiki markup with pidgin markup"""
+    new = term
+    if term.startswith("[["):
+        if "|" in term:
+            match = term.split("|")
+            new = "[" + match[1].replace("]]", "]")
+        else:
+            new = term.replace("[[", "[").replace("]]", "]")
+        if DEBUG:
+            print("  '-> %s" % new)
+    return wikitext.replace(term, new)
 
 
 def _disposition(char, dispo, last):
@@ -135,12 +154,18 @@ def _clean_markup(wikitext):
                 markup_found.append(markup)
             markup = ""
         if markup:
-            clean += "_"
+            # clean += "_"
+            clean += char
         else:
             clean += char
         # print("[%d] %s %s %s" % (i, char, dispo, markup))
     if DEBUG:
-        print("markup to be cleaned: %s" % markup_found)
+        print("markup to be cleaned:")
+    for term in markup_found:
+        if DEBUG:
+            print("  %s" % term)
+        clean = _replace_markup(term, clean)
+    clean = re.sub(r"'+", "'", clean)
     return clean
 
 
