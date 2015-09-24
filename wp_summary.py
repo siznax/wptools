@@ -31,6 +31,7 @@ from collections import defaultdict
 DEBUG = False
 DEFAULT = 'text'
 FORMATS = ['dict', 'json', 'text']
+RELATED = []
 
 
 def from_api(titles, _format=DEFAULT):
@@ -76,6 +77,9 @@ def _summaries_to_text(summaries):
     for summary in summaries:
         text += "\n= %s =\n\n" % summary['title']
         text += summary['summary'] + "\n"
+        if summary['related']:
+          text += "Related terms:\n"
+          text += "\n".join(summary['related']) + "\n\n"
         text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
     return text
 
@@ -104,12 +108,15 @@ def _rm_refs(wikitext):
 
 
 def _pidgin_brackets(term):
+    term = term.replace("[[", "").replace("]]", "")
+    terms = term.split("|")
     new = ""
-    if "|" in term:
-        match = term.split("|")
-        new = "[" + match[-1].replace("]]", "]")
-    else:
-        new = term.replace("[[", "[").replace("]]", "]")
+    if len(terms) == 1:
+        new = terms[0]
+    if len(terms) > 1:
+        new = terms[-1]
+    article = terms[0].split("#")[0].decode('utf-8')
+    RELATED.append(" * %s" % article)
     if DEBUG:
         print("    > %s" % new)
     return new
@@ -117,20 +124,16 @@ def _pidgin_brackets(term):
 
 def _pidgin_braces(term):
     new = ""
-    ignore = False
     if term.lower().startswith("{{cit"):
-        ignore = True
         new = "ignored"
-    if not ignore:
+    else:
+        term = term.replace("{{", "").replace("}}", "")
         if "|" in term:
-            if "audio=" in term:
-                new = "{" + "|".join(term.split("|")[2:]).replace("}}", "}")
-            else:
-                new = "{" + "|".join(term.split("|")[1:]).replace("}}", "}")
+            new = "{%s}" % "|".join(term.split("|")[1:])
         else:
-            new = term.replace("{{", "{").replace("}}", "}")
+            new = term
     if DEBUG:
-        print("    > %s" % new)
+        print("    + %s" % new)
     return new
 
 
@@ -194,9 +197,9 @@ def _clean_markup(wikitext):
     if DEBUG:
         print("markup to be cleaned:")
     for term in markup_found:
-        clean = _replace_markup(term, clean)
         if DEBUG:
             print("  %s" % term)
+        clean = _replace_markup(term, clean)
     clean = re.sub(r"'+", "'", clean)
     return clean
 
@@ -266,6 +269,7 @@ def _parse(api_json):
         if summary:
             summaries.append({'title': page["title"],
                               'wikitext': wikitext,
+                              'related': sorted(RELATED),
                               'summary': summary})
     return summaries
 
