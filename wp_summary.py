@@ -108,18 +108,26 @@ def _pidgin_brackets(term):
     else:
         new = term.replace("[[", "[").replace("]]", "]")
     if DEBUG:
-        print("  '-> %s" % new)
+        print("    > %s" % new)
     return new
 
 
 def _pidgin_braces(term):
     new = ""
-    if "|" in term:
-        new = "{" + "|".join(term.split("|")[1:]).replace("}}", "}")
-    else:
-        new = term.replace("{{", "{").replace("}}", "}")
+    ignore = False
+    if term.lower().startswith("{{cit"):
+        ignore = True
+        new = "ignored"
+    if not ignore:
+        if "|" in term:
+            if "audio=" in term:
+                new = "{" + "|".join(term.split("|")[2:]).replace("}}", "}")
+            else:
+                new = "{" + "|".join(term.split("|")[1:]).replace("}}", "}")
+        else:
+            new = term.replace("{{", "{").replace("}}", "}")
     if DEBUG:
-        print("  '-> %s" % new)
+        print("    > %s" % new)
     return new
 
 
@@ -198,51 +206,56 @@ def _clean(wikitext):
     return clean.decode('utf-8')
 
 
+def _ignores(line):
+    """returns of list of matching patterns to ignore in a line"""
+    ignore = [re.search(r'^{{.*}}$', line),
+              re.search(r'^\[\[.*\]\]$', line),
+              re.search(r'^<!--.*-->$', line)]
+    return [x for x in ignore if x]
+
+
+def _set_mark(ignores, braces, exited):
+    """returns summary mark based on line processing status"""
+    if exited or braces > 0:
+        return str(braces)
+    if ignores:
+        return "*"
+    return ">"
+
+
 def _summary(wikitext):
-    """returns wikitext after templates and before first heading"""
-    output = []
-    temple = False
+    """returns wikitext AFTER templates and BEFORE first heading"""
+    summary = []
     braces = 0
-    mark = " "
-    lines = wikitext.split("\n")
-    for line in lines:
+    template = False
+    exited = False
+    for line in wikitext.split("\n"):
         if line.startswith("="):
             break
-
-        fence = re.search(r'^{{.*}}$', line)
-        fence1 = re.search(r'^\[\[.*\]\]$', line)
-        fence2 = re.search(r'^<!--.*-->$', line)
-
+        ignores = _ignores(line)
         braces += len(re.findall(r'{{', line))
         braces -= len(re.findall(r'}}', line))
-
         exited = False
         if braces > 0:
-            temple = True
-        if temple and braces == 0:
-            temple = False
+            template = True
+        if template and braces == 0:
+            template = False
             exited = True
-
-        mark = ">"
-        if fence or fence1 or fence2:
-            mark = "*"
-        elif braces > 0:
-            mark = str(braces)
+        mark = _set_mark(ignores, braces, exited)
         if exited:
-            mark = "0"
-
+            exited = False
+        if DEBUG:
+            print("[%s] %s" % (mark, line.encode('utf-8')))
         if mark == ">":
-            output.append(line.lstrip())
-
-        # print("[%s] %s" % (mark, line.encode('utf-8')))
-
-    return "\n".join(output)
+            summary.append(line.lstrip())
+    return "\n".join(summary)
 
 
 def _parse(api_json):
     """returns [{title, summary}, ...] from JSON"""
     summaries = []
-    # print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
+    if DEBUG:
+        print("pages: %d" % len(api_json["query"]['pages']), file=sys.stderr)
     for page in api_json["query"]["pages"]:
         wikitext = page["revisions"][0]["content"]
         summary = _clean(_summary(wikitext))
@@ -279,4 +292,4 @@ if __name__ == "__main__":
 
     start = time.time()
     print(_main(args.titles, args.format).encode('utf-8'))
-    # print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
