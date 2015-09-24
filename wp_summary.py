@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Query MediaWiki API for wiki-text before first heading
+Get (pidgin) wikitext after templates and before first heading.
 
 INPUT
     Wikipedia article title(s) (or filename)

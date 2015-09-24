@@ -129,7 +129,7 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 
 ### wp_summary (experimental)
 
-Query MediaWiki API for wiki-text before first heading
+Get article (pidgin) wikitext after templates and before first heading.
 
 ```shell
 $ wp_summary.py aardvark | fold -s
