@@ -100,18 +100,39 @@ def _rm_refs(wikitext):
     return re.sub(refs, '', wikitext)
 
 
+def _pidgin_brackets(term):
+    new = ""
+    if "|" in term:
+        match = term.split("|")
+        new = "[" + match[-1].replace("]]", "]")
+    else:
+        new = term.replace("[[", "[").replace("]]", "]")
+    if DEBUG:
+        print("  '-> %s" % new)
+    return new
+
+
+def _pidgin_braces(term):
+    new = ""
+    if "|" in term:
+        new = "{" + "|".join(term.split("|")[1:]).replace("}}", "}")
+    else:
+        new = term.replace("{{", "{").replace("}}", "}")
+    if DEBUG:
+        print("  '-> %s" % new)
+    return new
+
+
 def _replace_markup(term, wikitext):
     """replaces MediaWiki markup with pidgin markup"""
     new = term
+    if term.startswith("{{"):
+        new = _pidgin_braces(term)
     if term.startswith("[["):
-        if "|" in term:
-            match = term.split("|")
-            new = "[" + match[1].replace("]]", "]")
-        else:
-            new = term.replace("[[", "[").replace("]]", "]")
-        if DEBUG:
-            print("  '-> %s" % new)
-    return wikitext.replace(term, new)
+        new = _pidgin_brackets(term)
+    if new != term:
+        wikitext = wikitext.replace(term, new)
+    return wikitext
 
 
 def _disposition(char, dispo, last):
