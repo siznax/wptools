@@ -17,7 +17,7 @@ References
 
 from __future__ import print_function
 
-__author__ = "@siznax"
+__author__ = "siznax"
 __version__ = "15 Sep 2015"
 
 import argparse
@@ -40,6 +40,9 @@ QUERY = Template(("${API}?titles=${titles}"
                   "&rvprop=content"  # content of latest revision
                   "&redirects"
                   "&continue="))
+UA_NAME = "wptools.wp_query"
+UA_URL = "https://github.com/siznax/wptools"
+UA_VERSION = "0.0.1"
 
 
 def _stderr(msg):
@@ -49,9 +52,8 @@ def _stderr(msg):
 
 
 def _user_agent():
-    # MyCoolTool/1.1 (https://example.org/MyCoolTool/; \
-    # MyCoolTool@example.org) BasedOnSuperLib/1.4
-    return "python-requests/" + requests.__version__
+    # get this from env in web app context
+    return "%s/%s (+%s)" % (UA_NAME, UA_VERSION, UA_URL)
 
 
 def _wikitext(_json):
