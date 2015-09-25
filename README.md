@@ -159,21 +159,37 @@ https://en.wikipedia.org/wiki/Aardvark
 
 ### wp_vae
 
-Extract 10,000 Vital Articles titles
+Extract Vital Articles Expanded (10K) titles
 
 ```shell
-$ curl -o WP_VAE.html https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded
-$ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
-    ...
-/wiki/Amount_of_substance
-/wiki/Mole_(unit)
-/wiki/Byte
-/wiki/Bit
-/wiki/Atmosphere_(unit)
-found (10359) links
-    #: 417
-    /: 9942
-8.088 seconds
+$ curl -o WP_VAE.html <https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded>
+$ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//div//li//a' > wp_vae.txt
+  found 9966 titles
+  5.132 seconds
+
+$ head wp_vae.txt
+  Harold Lloyd
+  Lillian Gish
+  Buster Keaton
+  Mary Pickford
+  Gloria Swanson
+  Asta Nielsen
+  Fred Astaire
+  Sarah Bernhardt
+  Humphrey Bogart
+  Marlon Brando
+
+$ tail wp_vae.txt
+  Standard deviation
+  Standard error
+  Statistical hypothesis testing
+  Student's t-test
+  Variance
+  Design of experiments
+  Randomized controlled trial
+  Survey methodology
+  Statistical population
+  Sampling (statistics)
 ```
 
 

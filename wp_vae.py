@@ -1,22 +1,21 @@
 #!/usr/bin/env python
 """
-Extract Wikipedia Vital Articles Expanded
+Extract Vital Articles Expanded (10K) titles
 
 INPUT
 
-    HTML from https://simple.wikipedia.org/wiki/Wikipedia:VAE
-    xpath like //div[@id=\"mw-content-text\"]//li//@href
+    HTML  from <https://meta.wikimedia.org/wiki/\
+List_of_articles_every_Wikipedia_should_have/Expanded>
+    xpath like '//div[@id="mw-content-text"]//div//li//a'
 
 OUTPUT
 
-    STDOUT list of vital articles
-    STDERR summary
+    list of vital articles
 
 See also
     https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Expanded
+    https://meta.wikimedia.org/wiki/Essentialpedia
 """
-
-# TODO: compare https://en.wikipedia.org/wiki/Wikipedia:VA/E
 
 from __future__ import print_function
 
@@ -28,62 +27,35 @@ import html5lib
 import sys
 import time
 
-from collections import defaultdict
+DEFAULT_XPATH = '//div[@id="mw-content-text"]//div//li//a'
 
 
-class WP_VAE:
-    """parse and count hrefs found"""
-
-    found = 0
-
-    def __init__(self):
-        pass
-
-    def parse(self, html, xpath):
-        """robustly parse MediaWiki HTML, group results"""
-        output = defaultdict(list)
-        etree = html5lib.parse(html,
-                               treebuilder='lxml',
-                               namespaceHTMLElements=False)
-        result = etree.xpath(xpath)
-        for item in result:
-            self.found += 1
-            fitem = _filter(item)
-            print(fitem)
-            output[item[0]].append(fitem)
-        return output
+def parse(html, xpath):
+    count = 0
+    etree = html5lib.parse(html,
+                           treebuilder='lxml',
+                           namespaceHTMLElements=False)
+    for item in etree.xpath(xpath):
+        if item.text:
+            count += 1
+            print(item.text.encode('utf-8'))
+            sys.stdout.flush()
+    return count
 
 
-def _filter(item):
-    """normalize wiki links"""
-    if 'redlink' in item:
-        return '/wiki/' + item.split('&')[0].split('=')[1]
-    return item
-
-
-def read(fname):
+def main(fname, xpath=DEFAULT_XPATH):
     with open(fname) as fh:
-        return fh.read()
-
-
-def main(html, xpath):
-    vae = WP_VAE()
-    links = vae.parse(read(html), xpath)
-    print("found (%d) links" % vae.found, file=sys.stderr)
-    for item in links:
-        print("    %s: %d" % (item, len(links[item])), file=sys.stderr)
-    print("%5.3f seconds" % time.clock(), file=sys.stderr)
-
+        found = parse(fh.read().decode('utf-8'), xpath)
+        print("found %s titles" % found, file=sys.stderr)
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Extract Wikipedia Vital Articles Extended")
-    argp.add_argument(
-        "html",
-        help="e.g. https://simple.wikipedia.org/wiki/Wikipedia:VAE")
-    argp.add_argument(
-        "xpath",
-        help="e.g. //div[@id=\"mw-content-text\"]//li//@href")
+        description="Extract Vital Articles Expanded (10K) titles")
+    argp.add_argument("fname", help="HTML filename")
+    argp.add_argument("-xpath", default=DEFAULT_XPATH,
+                      help="xpath expression (default=%s)" % DEFAULT_XPATH)
     args = argp.parse_args()
 
-    main(args.html, args.xpath)
+    start = time.time()
+    main(args.fname, args.xpath)
+    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
