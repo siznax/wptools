@@ -36,6 +36,8 @@ def _emit_titles(data):
 
 
 def _main(fname, title, verbose, scan):
+    if not title:
+        scan = True
     if scan:
         title = None
         verbose = True

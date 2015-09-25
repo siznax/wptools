@@ -209,7 +209,7 @@ from python:
 Extract <a href="https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded">Vital Articles Expanded</a> (10K) titles
 
 ```shell
-$ curl -o WP_VAE.html <https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded>
+$ curl -o WP_VAE.html https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded
 $ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//div//li//a' > wp_vae.txt
   found 9966 titles
   5.132 seconds

@@ -28,6 +28,7 @@ import sys
 import time
 
 DEFAULT_XPATH = '//div[@id="mw-content-text"]//div//li//a'
+VAE_URL = "https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded"
 
 
 def parse(html, xpath):

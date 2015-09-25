@@ -152,17 +152,22 @@ def _replace_markup(term, wikitext):
 
 
 def _disposition(char, dispo, last):
-    """returns the MediaWiki markup disposition of the current character"""
-    tags = ["[", "]", "{", "}"]
+    """returns the markup disposition of the current character"""
+    _open = ["[", "{"]
+    _close = ["]", "}"]
+    tags = _open + _close
     if char in tags:
-        if not dispo:
+        if not dispo and char in _open:
             dispo = "open"
         if dispo == "enclosed":
-            dispo = "close"
-        if dispo == "close":
+            if char in _open:
+                dispo = "open"
+            if char in _close:
+                dispo = "close"
+        if dispo == "close" and char in _close:
             if last == char:
                 dispo = "close"
-        if dispo == "open":
+        if dispo == "open" and char in _open:
             if last == char:
                 dispo = "open"
     if char not in tags:
@@ -195,7 +200,8 @@ def _clean_markup(wikitext):
             clean += char
         else:
             clean += char
-        # print("[%d] %s %s %s" % (i, char, dispo, markup))
+        if DEBUG:
+            print("[%d] %s %s %s" % (i, char, dispo, markup))
     if DEBUG:
         print("markup to be cleaned:")
     for term in markup_found:
@@ -242,8 +248,9 @@ def _summary(wikitext):
         if line.startswith("="):
             break
         ignores = _ignores(line)
-        braces += len(re.findall(r'{{', line))
-        braces -= len(re.findall(r'}}', line))
+        if line.startswith("{") or line.startswith("}"):
+            braces += len(re.findall(r'{{', line))
+            braces -= len(re.findall(r'}}', line))
         exited = False
         if braces > 0:
             template = True
