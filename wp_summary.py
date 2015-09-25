@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Get plain text of article's lead section
+Get plain text of article's lead section from titles or file
 
 INPUT
     Wikipedia article titles or filename

@@ -137,9 +137,9 @@ def _main(titles, _format):
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Wikipedia article Infobox(es) wiki-text from titles")
+        description="Get article Infoboxes from titles or filename")
     argp.add_argument("titles", nargs='+',
-                      help="article titles (optionally, local filename)")
+                      help="article titles or filename")
     argp.add_argument("-format", choices={'text', 'json'}, default='text',
                       help="output format (default=text)")
     args = argp.parse_args()

@@ -25,7 +25,7 @@ GET Wikipedia article content from URL or filename
 
 ### wp_infobox
 
-Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext for an article.
+Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext from titles or file
 
 ```shell
 $ wp_infobox.py aardvark
@@ -135,7 +135,7 @@ u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=
 
 ### wp_summary
 
-Get plain text of article's <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section">lead section</a>.
+Get plain text of article's <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section">lead section</a> from titles or file
 
 ```shell
 $ wp_summary.py aardvark | fold -s
