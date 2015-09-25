@@ -206,7 +206,7 @@ from python:
 
 ### wp_vae
 
-Extract Vital Articles Expanded (10K) titles
+Extract <a href="https://en.wikipedia.org/wiki/Wikipedia:Vital_articles/Expanded">Vital Articles Expanded</a> (10K) titles
 
 ```shell
 $ curl -o WP_VAE.html <https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded>
