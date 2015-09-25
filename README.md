@@ -12,7 +12,7 @@ Get article from Wikipedia <a href="https://en.wikipedia.org/wiki/Wikipedia:Data
 *This expects to operate on the (currently ~12GB) latest/enwiki-latest-pages-articles.xml.bz2*
 
 ```shell
-$ wp_dump.py enwiki-latest-pages-articles.xml.bz2 -t Aardvark | head
+$ wp_dump.py enwiki-latest-pages-articles.xml.bz2 -t Aardvark
 <page>
     <title>Aardvark</title>
     <ns>0</ns>
@@ -61,7 +61,7 @@ GET Wikipedia article content from URL or filename
 Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext from titles or file
 
 ```shell
-$ wp_infobox.py aardvark
+$ wp_infobox.py Aardvark
 = Aardvark =
 {{speciesbox
 | genus = Orycteropus
