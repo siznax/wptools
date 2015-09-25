@@ -101,7 +101,7 @@ From python:
 >>>
 ```
 
-Get images from several infoboxes:
+Another example, get images from several infoboxes from the shell:
 
 ```shell
 $ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'
