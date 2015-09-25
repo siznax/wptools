@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Get (pidgin) wikitext after templates and before first heading.
+Get plain text of article's lead section
 
 INPUT
     Wikipedia article title(s) (or filename)
@@ -78,10 +78,10 @@ def _summaries_to_text(summaries):
         text += "\n= %s =\n\n" % summary['title']
         text += summary['summary'] + "\n"
         if summary['related']:
-          text += "Related terms:\n"
+          text += "\nRelated terms:\n"
           text += "\n".join(summary['related']) + "\n\n"
         text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
-    return text
+    return re.sub(r'\n{3,}', "\n\n", text)
 
 
 def _rm_html(wikitext):
@@ -278,7 +278,7 @@ def _articles(titles):
     """returns JSON object from list of titles"""
     if isinstance(titles, str):
         titles = [titles]
-    return json.loads(wp_query.data("|".join(titles)))
+    return json.loads(wp_query.data("|".join(titles), lead=True))
 
 
 def _main(titles, _format):
@@ -291,7 +291,7 @@ def _main(titles, _format):
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Wikipedia article summaries given titles, format")
+        description="Plain text of article(s) lead section")
     argp.add_argument("titles", nargs='+',
                       help="article titles (optionally, local filename)")
     argp.add_argument("-format", choices={'text', 'json', 'clean'},

@@ -64,23 +64,25 @@ def _wikitext(_json):
     return text
 
 
-def query(titles, _format):
+def query(titles, _format, lead):
     """returns MW/API query formed given titles, format"""
     if isinstance(titles, str):
         titles = [titles]
     titles = "|".join([urllib.quote(t) for t in titles])
     qry = QUERY.substitute(API=ENDPOINT, titles=titles, _format=_format)
+    if lead:
+        qry += "&rvsection=0"
     return qry
 
 
-def data(title, _format=DEFAULT):
+def data(title, _format=DEFAULT, lead=False):
     """returns data from MW/API given titles, format"""
 
     r_format = _format
     if r_format == 'wikitext':
         _format = 'json'
 
-    url = query(title, _format)
+    url = query(title, _format, lead)
     _stderr("query: " + url)
 
     headers = {'User-Agent': _user_agent()}
@@ -98,8 +100,8 @@ def data(title, _format=DEFAULT):
     return text
 
 
-def _main(titles, fmt):
-    print(data(titles, fmt).encode('utf8'))
+def _main(titles, fmt, lead):
+    print(data(titles, fmt, lead).encode('utf8'))
 
 
 if __name__ == "__main__":
@@ -108,10 +110,12 @@ if __name__ == "__main__":
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("titles", nargs='+',
                       help="one or more article titles")
-    argp.add_argument("-format", choices=FORMATS, default=DEFAULT,
+    argp.add_argument("-f", "-format", choices=FORMATS, default=DEFAULT,
                       help="output format (default=%s)" % DEFAULT)
+    argp.add_argument("-l", "-lead", action='store_true',
+                      help="only 'lead' section (rvsection=0)")
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.titles, args.format)
+    _main(args.titles, args.f, args.l)
     _stderr("%5.3f seconds" % (time.time() - start))

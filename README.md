@@ -127,34 +127,42 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 ```
 
 
-### wp_summary (experimental)
+### wp_summary
 
-Get article (pidgin) wikitext after templates and before first heading.
+Get plain text of article lead section.
 
 ```shell
 $ wp_summary.py aardvark | fold -s
 = Aardvark =
 
 The 'aardvark' ({ˈ|ɑr|d|.|v|ɑr|k|} {ARD|vark}; 'Orycteropus afer') is a
-medium-sized, burrowing, [nocturnal] mammal native to [Africa]. It is the only
-living species of the order [Tubulidentata], although other prehistoric species
-and genera of Tubulidentata are known. Unlike other [insectivore]s, it has a
-long pig-like snout, which is used to sniff out food. It roams over most of the
+medium-sized, burrowing, nocturnal mammal native to Africa. It is the only
+living species of the order Tubulidentata, although other prehistoric species
+and genera of Tubulidentata are known. Unlike other insectivores, it has a long
+pig-like snout, which is used to sniff out food. It roams over most of the
 southern two-thirds of the African continent, avoiding mainly rocky areas. A
 nocturnal feeder, it subsists on ants and termites, which it will dig out of
 their hills using its sharp claws and powerful legs. It also digs to create
 burrows in which to live and rear its young. It receives a "least concern"
-rating from the [IUCN]; although its numbers seem to be decreasing.
-```
+rating from the IUCN; although its numbers seem to be decreasing.
 
-From python: _TBD_
+Related terms:
+ * Africa
+ * IUCN
+ * Tubulidentata
+ * insectivore
+ * nocturnal
+
+https://en.wikipedia.org/wiki/Aardvark
+```
 
 
 ### wp_vae
 
-Extract Wikipedia Vital Articles Expanded (WP:VA/E)
+Extract 10,000 Vital Articles titles
 
 ```shell
+$ curl -o WP_VAE.html https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded
 $ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//li//@href'
     ...
 /wiki/Amount_of_substance
