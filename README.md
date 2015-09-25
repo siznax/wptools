@@ -5,6 +5,39 @@ files, and more via the MediaWiki API from **python** or the command
 line! See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
 
 
+### wp_dump
+
+Get article from Wikipedia <a href="https://en.wikipedia.org/wiki/Wikipedia:Database_download">XML Dump</a> in streaming fashion
+
+*This expects to operate on the (currently ~12GB) latest/enwiki-latest-pages-articles.xml.bz2*
+
+```shell
+$ wp_dump.py enwiki-latest-pages-articles.xml.bz2 -t Aardvark | head
+<page>
+    <title>Aardvark</title>
+    <ns>0</ns>
+    <id>680</id>
+    <revision>
+      <id>677062948</id>
+      <parentid>677062792</parentid>
+      <timestamp>2015-08-20T21:57:54Z</timestamp>
+      <contributor>
+...
+[[Category:Mammals of Africa]]
+[[Category:Myrmecophagous mammals]]
+[[Category:Living fossils]]
+[[Category:Megafauna of Africa]]
+[[Category:Animals described in 1766]]
+[[Category:Pliocene first
+appearances]]</text>
+      <sha1>1gxa6ifmfibynhk22gtpdevqzc4wsew</sha1>
+    </revision>
+  </page>
+7125314560 bytes read
+0.377 seconds
+```
+
+
 ### wp_file
 
 Get URL and HTTP status from Wikipedia File/Image name
