@@ -5,58 +5,22 @@ files, and more via the MediaWiki API from **python** or the command
 line! See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
 
 
-### wp_query
+### wp_file
 
-Get articles via MediaWiki API given titles, format
-
-For example, get articles as ``json``:
+Get URL and HTTP status from Wikipedia File/Image name
 
 ```shell
-$ wp_query.py aardvark abba accordion | jsonlint | grep \"title
-query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
-request headers: {'User-Agent': 'python-requests/2.7.0'}
-status code: 200
-bytes: 181931
-1.881 seconds
-        "title": "Aardvark",
-        "title": "ABBA",
-        "title": "Accordion",
-```
-
-Get articles as ``wikitext``:
-
-```shell
-$ wp_query.py aardvark abba accordion -format wikitext | grep ^=[^=]
-query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&continue=
-request headers: {'User-Agent': 'python-requests/2.7.0'}
-status code: 200
-bytes: 76459
-1.114 seconds
-= Aardvark =
-= Accordion =
-= Abba =
+$ wp_file.py "ABBA - TopPop 1974 5.png"
+https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 ```
 
 
-From python:
+### wp_get
 
-```python
->>> import wp_query
->>> r = wp_query.data(['aardvark', 'abba', 'accordion'])
-query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
-request headers: {'User-Agent': 'python-requests/2.7.0'}
-status code: 200
->>> j = json.loads(r)
->>> [x['title'] for x in j['query']['pages']]
-[u'Aardvark',
- u'ABBA',
- u'Accordion']
->>> j['query']['pages'][2]['title']
-u'Accordion'
->>> j['query']['pages'][2]['revisions'][0]['content'][:256]
-u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
->>> 
-```
+GET Wikipedia article content from URL or filename
+
+*This is basically an alternative path to article content outside of the MediaWiki API, which is often quite slow. The problem is that you don't get ``wikitext``, but you can get raw HTML or Markdown text. It's not entirely deprecated, but ``wp_query`` and ``wp_summary`` are recommended for bulk processing.* 
+
 
 
 ### wp_infobox
@@ -115,13 +79,57 @@ A convertor free-bass piano-accordion and a Russian bayan.jpg
 ```
 
 
-### wp_file
+### wp_query
 
-Get URL and HTTP status from Wikipedia File/Image name
+Get articles via MediaWiki API given titles, format
+
+For example, get articles as ``json``:
 
 ```shell
-$ wp_file.py "ABBA - TopPop 1974 5.png"
-https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
+$ wp_query.py aardvark abba accordion | jsonlint | grep \"title
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+bytes: 181931
+1.881 seconds
+        "title": "Aardvark",
+        "title": "ABBA",
+        "title": "Accordion",
+```
+
+Get articles as ``wikitext``:
+
+```shell
+$ wp_query.py aardvark abba accordion -format wikitext | grep ^=[^=]
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+bytes: 76459
+1.114 seconds
+= Aardvark =
+= Accordion =
+= Abba =
+```
+
+
+From python:
+
+```python
+>>> import wp_query
+>>> r = wp_query.data(['aardvark', 'abba', 'accordion'])
+query: http://en.wikipedia.org/w/api.php?titles=aardvark|abba|accordion&format=json&formatversion=2&action=query&prop=revisions&rvprop=content&redirects&continue=
+request headers: {'User-Agent': 'python-requests/2.7.0'}
+status code: 200
+>>> j = json.loads(r)
+>>> [x['title'] for x in j['query']['pages']]
+[u'Aardvark',
+ u'ABBA',
+ u'Accordion']
+>>> j['query']['pages'][2]['title']
+u'Accordion'
+>>> j['query']['pages'][2]['revisions'][0]['content'][:256]
+u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
+>>> 
 ```
 
 
