@@ -127,7 +127,7 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 
 ### wp_summary
 
-Get plain text of article lead section.
+Get plain text of article's <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section">lead section</a>.
 
 ```shell
 $ wp_summary.py aardvark | fold -s

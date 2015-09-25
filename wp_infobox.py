@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 """
-Get Infobox wikitext from titles (via API) or file
+Get Infobox wikitext from titles or file
 
 INPUT
-    Wikipedia article titles (or filename)
+    Wikipedia article titles or filename
+    input file expected to be JSON from Mediawiki API
 
 OUTPUT
-    Infoboxes as wiki-text, dict, or json
+    Infoboxes as wikitext, dict, or json
 
 References
     https://en.wikipedia.org/wiki/Help:Infobox
     https://www.mediawiki.org/wiki/API:Main_page
+    https://meta.wikimedia.org/wiki/Wiki_syntax
 """
 
 from __future__ import print_function

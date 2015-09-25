@@ -3,14 +3,16 @@
 Get plain text of article's lead section
 
 INPUT
-    Wikipedia article title(s) (or filename)
+    Wikipedia article titles or filename
+    input file expected to be JSON from Mediawiki API
 
 OUTPUT
-    Summary(es) as wiki-text, dict, or json
+    Summary as wikitext, dict, or json
 
 References
-    https://en.wikipedia.org/wiki/Help:Summary
+    https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
     https://www.mediawiki.org/wiki/API:Main_page
+    https://meta.wikimedia.org/wiki/Wiki_syntax
 """
 
 from __future__ import print_function
@@ -291,9 +293,9 @@ def _main(titles, _format):
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
-        description="Plain text of article(s) lead section")
+        description="Get plain text of article's lead section")
     argp.add_argument("titles", nargs='+',
-                      help="article titles (or filename)")
+                      help="article titles or filename")
     argp.add_argument("-f", "-format", choices={'text', 'json'},
                       default='text',
                       help="output format (default=text)")
