@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
-Infobox wiki-text from titles (via API) or file
+Get Infobox wikitext from titles (via API) or file
 
 INPUT
-    Wikipedia article title(s) (or filename)
+    Wikipedia article titles (or filename)
 
 OUTPUT
-    Infobox(es) as wiki-text, dict, or json
+    Infoboxes as wiki-text, dict, or json
 
 References
     https://en.wikipedia.org/wiki/Help:Infobox
@@ -95,12 +95,7 @@ def _parse(api_json):
 
 
 def _infobox(text):
-    """returns Infobox wiki-text from text blob"""
-    #
-    # TODO: consider returning LIST of infoboxen from each article
-    # instead of the break below. (see Abba article, which also has a
-    # {{Navbox)
-    #
+    """returns Infobox wikitext from text blob"""
     output = []
     region = False
     braces = 0

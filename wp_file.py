@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-URL and HTTP status from Wikipedia File/Image name.
+Get URL and HTTP status from Wikipedia File/Image name
 
 Inspired by AzaToth's "wikimgrab.pl"
-https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl
+<https://commons.wikimedia.org/wiki/User:AzaToth/wikimgrab.pl>
 """
 
 __author__ = "@siznax"

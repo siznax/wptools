@@ -7,7 +7,7 @@ line! See ``pydoc <module>`` or ``<module.py> -h`` for more info.
 
 ### wp_query
 
-Query MediaWiki API given titles, format
+Get articles via MediaWiki API given titles, format
 
 For example, get articles as ``json``:
 
@@ -61,9 +61,7 @@ u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=
 
 ### wp_infobox
 
-Infobox wiki-text from titles (via API) or file
-
-For example, get the _Aardvark_ article infobox (Speciesbox):
+Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext for an article.
 
 ```shell
 $ wp_infobox.py aardvark
@@ -119,7 +117,7 @@ A convertor free-bass piano-accordion and a Russian bayan.jpg
 
 ### wp_file
 
-URL and HTTP status from Wikipedia File/Image name
+Get URL and HTTP status from Wikipedia File/Image name
 
 ```shell
 $ wp_file.py "ABBA - TopPop 1974 5.png"

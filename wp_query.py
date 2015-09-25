@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """
-Query MediaWiki API given titles, format
+Get articles via MediaWiki API given titles, format
 
 INPUT
-    titles  "fuzzy" Wiki titles
-    format  see FORMATS (default=json)
+    titles  "fuzzy" titles
+    format  default=json (see FORMATS)
 
 OUTPUT
     articles in format selected
@@ -105,8 +105,7 @@ def _main(titles, fmt, lead):
 
 
 if __name__ == "__main__":
-    desc = ("Query MediaWiki API given titles, format\n"
-            "https://www.mediawiki.org/wiki/API:Main_page")
+    desc = "Get articles via MediaWiki API given titles, format"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("titles", nargs='+',
                       help="one or more article titles")
