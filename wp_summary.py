@@ -78,8 +78,8 @@ def _summaries_to_text(summaries):
         text += "\n= %s =\n\n" % summary['title']
         text += summary['summary'] + "\n"
         if summary['related']:
-          text += "\nRelated terms:\n"
-          text += "\n".join(summary['related']) + "\n\n"
+            text += "\nRelated terms:\n"
+            text += "\n".join(summary['related']) + "\n\n"
         text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
     return re.sub(r'\n{3,}', "\n\n", text)
 
