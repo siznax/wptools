@@ -154,6 +154,15 @@ Related terms:
 https://en.wikipedia.org/wiki/Aardvark
 ```
 
+from python:
+
+```python
+>>> import wp_summary, json
+>>> j = json.loads(wp_summary.from_file('Aardvark.json', 'json'))
+>>> j[0].keys()
+[u'wikitext', u'title', u'related', u'summary']
+```
+
 
 ### wp_vae
 
