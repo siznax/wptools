@@ -293,8 +293,8 @@ if __name__ == "__main__":
     argp = argparse.ArgumentParser(
         description="Plain text of article(s) lead section")
     argp.add_argument("titles", nargs='+',
-                      help="article titles (optionally, local filename)")
-    argp.add_argument("-format", choices={'text', 'json', 'clean'},
+                      help="article titles (or filename)")
+    argp.add_argument("-f", "-format", choices={'text', 'json'},
                       default='text',
                       help="output format (default=text)")
     argp.add_argument("-d", "-debug", action='store_true',
@@ -303,5 +303,5 @@ if __name__ == "__main__":
     if args.d:
         DEBUG = True
     start = time.time()
-    print(_main(args.titles, args.format).encode('utf-8'))
+    print(_main(args.titles, args.f).encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
