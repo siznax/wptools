@@ -26,19 +26,26 @@ def url(fname, namespace):
     return "/".join([API, namespace, digest[:1], digest[:2], name])
 
 
-def main(args):
-    img_url = url(args.filename, args.namespace)
-    print img_url
-    print requests.head(img_url).status_code
+def main(filename, namespace, check):
+    img_url = url(filename, namespace)
+    if check:
+        print img_url,
+        print requests.head(img_url).status_code
+    else:
+        print img_url
 
 
 if __name__ == "__main__":
     desc = "URL and HTTP status from Wikipedia File/Image name."
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("filename")
-    argp.add_argument("-ns", "--namespace", default='commons',
+    argp.add_argument("-n", "-namespace", choices={'commons', 'en'},
+                      default='commons',
                       help="namespace (default=commons)")
-    main(argp.parse_args())
+    argp.add_argument("-c", "-check", action='store_true',
+                      help="check HTTP status of computed URL")
+    args = argp.parse_args()
+    main(args.filename, args.n, args.c)
 
 
 # test cases TBD
