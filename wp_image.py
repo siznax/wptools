@@ -42,8 +42,8 @@ def _walk(data):
 
 
 def _main(titles):
-    if os.path.exists(titles):
-        fname = titles
+    if os.path.exists(titles[0]):
+        fname = titles[0]
         ftype = mimetypes.guess_type(fname)[0]
         if ftype != 'application/json':
             raise ValueError("invalid file type: %s" % ftype)
@@ -60,6 +60,7 @@ def _main(titles):
 if __name__ == "__main__":
     desc = "Get image file from article if extant"
     argp = argparse.ArgumentParser(description=desc)
-    argp.add_argument("titles", help="article titles or filename")
+    argp.add_argument("titles", nargs='+',
+                      help="article titles or filename")
     args = argp.parse_args()
     _main(args.titles)
