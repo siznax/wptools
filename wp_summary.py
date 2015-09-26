@@ -229,8 +229,10 @@ def _ignores(line):
     return [x for x in ignore if x]
 
 
-def _set_mark(ignores, braces, exited):
+def _set_mark(ignores, braces, exited, article_started):
     """returns summary mark based on line processing status"""
+    if article_started:
+        return ">"
     if exited or braces > 0:
         return str(braces)
     if ignores:
@@ -244,26 +246,36 @@ def _summary(wikitext):
     braces = 0
     template = False
     exited = False
+    article_started = False
     for line in wikitext.split("\n"):
         if line.startswith("="):
             break
         ignores = _ignores(line)
-        if line.startswith("{") or line.startswith("}"):
-            braces += len(re.findall(r'{{', line))
-            braces -= len(re.findall(r'}}', line))
+
+        if braces == 0 and line.startswith("'''"):
+            article_started = True
+
+        braces += len(re.findall(r'{', line))
+        braces -= len(re.findall(r'}', line))
+
         exited = False
         if braces > 0:
             template = True
         if template and braces == 0:
             template = False
             exited = True
-        mark = _set_mark(ignores, braces, exited)
+
+        mark = _set_mark(ignores, braces, exited, article_started)
+
         if exited:
             exited = False
+
         if DEBUG:
             print("[%s] %s" % (mark, line.encode('utf-8')))
+
         if mark == ">":
             summary.append(line.lstrip())
+
     return "\n".join(summary)
 
 
