@@ -51,8 +51,24 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 
 GET Wikipedia article content from URL or filename
 
-*This is basically an alternative path to article content outside of the MediaWiki API, which is often quite slow. The problem is that you don't get ``wikitext``, but you can get raw HTML or Markdown text. It's not entirely deprecated, but ``wp_query`` and ``wp_summary`` are recommended for bulk processing.* 
+*This is basically an alternative path to article content outside of
+the MediaWiki API, which is often quite slow. The problem is that you
+don't get ``wikitext``, but you can get raw HTML or Markdown
+text. It's not entirely deprecated, but ``wp_query`` and
+``wp_summary`` are recommended for bulk processing.*
 
+
+### wp_image
+
+Get images from articles (just file names or expanded URLs)
+
+```shell
+$ wp_image.py "Van_Gogh" -expand
+https://upload.wikimedia.org/wikipedia/commons/4/4c/Vincent_van_Gogh_-_Self-Portrait_-_Google_Art_Project_(454045).jpg
+https://upload.wikimedia.org/wikipedia/commons/7/74/VincentVanGoghFoto.jpg
+https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
+(+ many more...)
+```
 
 
 ### wp_infobox
@@ -99,15 +115,6 @@ From python:
  u'ABBA - TopPop 1974 5.png',
  u'A convertor free-bass piano-accordion and a Russian bayan.jpg']
 >>>
-```
-
-Another example, get images from several infoboxes from the shell:
-
-```shell
-$ wp_infobox.py aardvark abba accordion | grep image[^_] | cut -d '=' -f 2 | sed -e 's/^ *//'
-Porc formiguer.JPG
-ABBA - TopPop 1974 5.png
-A convertor free-bass piano-accordion and a Russian bayan.jpg
 ```
 
 
