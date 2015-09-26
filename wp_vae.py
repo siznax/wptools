@@ -24,11 +24,13 @@ __version__ = "15 Sep 2015"
 
 import argparse
 import html5lib
+import mimetypes
 import sys
 import time
 
 DEFAULT_XPATH = '//div[@id="mw-content-text"]//div//li//a'
-VAE_URL = "https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded"
+VAE_URL = ("https://meta.wikimedia.org/wiki/"
+           "List_of_articles_every_Wikipedia_should_have/Expanded")
 
 
 def parse(html, xpath):
@@ -45,9 +47,13 @@ def parse(html, xpath):
 
 
 def main(fname, xpath=DEFAULT_XPATH):
+    ftype = mimetypes.guess_type(fname)[0]
+    if ftype != 'text/html':
+        raise ValueError("invalid file type: %s" % ftype)
     with open(fname) as fh:
         found = parse(fh.read().decode('utf-8'), xpath)
         print("found %s titles" % found, file=sys.stderr)
+
 
 if __name__ == "__main__":
     argp = argparse.ArgumentParser(
