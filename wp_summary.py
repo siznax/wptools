@@ -80,9 +80,9 @@ def _summaries_to_text(summaries, noterms):
         text += summary['summary'] + "\n"
         if summary['related'] and not noterms:
             related = (" * %s" % x for x in summary['related'])
-            text += "\nRelated terms:\n"
+            text += "\nRelated terms:\n\n"
             text += "\n".join(related).decode('utf-8') + "\n\n"
-        text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
+        text += "<%s/%s>\n" % (prefix, summary['title'].replace(" ", "_"))
     return re.sub(r'\n{3,}', "\n\n", text)
 
 
