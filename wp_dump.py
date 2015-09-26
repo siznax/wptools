@@ -21,6 +21,7 @@ from __future__ import print_function
 import argparse
 import bz2
 import re
+import mimetypes
 import sys
 import time
 
@@ -36,6 +37,9 @@ def _emit_titles(data):
 
 
 def _main(fname, title, verbose, scan):
+    ftype = mimetypes.guess_type(fname)[1]
+    if ftype != 'bzip2':
+        raise ValueError("invalid file type: %s" % ftype)
     if not title:
         scan = True
     if scan:
