@@ -12,7 +12,7 @@ OUTPUT
 References
     https://en.wikipedia.org/wiki/Wikipedia:Database_download
 
-This expects to operate on the (currently ~12GB) 
+This expects to operate on the (currently ~12GB)
 latest/enwiki-latest-pages-articles.xml.bz2
 """
 
@@ -67,7 +67,7 @@ def _main(fname, title, verbose, scan):
                 _emit_titles(data)
         print("\n".join(article))
         print("%d bytes read" % total, file=sys.stderr)
-            
+
 
 if __name__ == "__main__":
     desc = "Dump article from Wikipedia XML dump by title"

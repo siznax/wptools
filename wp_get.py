@@ -7,7 +7,7 @@ INPUT
     input file expected to be Wikipedia HTML
 
 OUTPUT
-    full article (sans boilerplate) or summary only 
+    full article (sans boilerplate) or summary only
     as HTML or Markdown text
 
 References
