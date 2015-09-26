@@ -33,28 +33,27 @@ from collections import defaultdict
 DEBUG = False
 DEFAULT = 'text'
 FORMATS = ['dict', 'json', 'text']
-RELATED = []
 
 
-def from_api(titles, _format=DEFAULT):
+def from_api(titles, _format=DEFAULT, noterms=False):
     """returns Summaries from api"""
-    return _output(_parse(_articles(titles)), _format)
+    return _output(_parse(_articles(titles)), _format, noterms)
 
 
-def from_file(fname, _format=DEFAULT):
+def from_file(fname, _format=DEFAULT, noterms=False):
     """returns Summaries from input file"""
     with open(fname) as fh:
-        return _output(_parse(json.loads(fh.read())), _format)
+        return _output(_parse(json.loads(fh.read())), _format, noterms)
 
 
-def _output(summaries, _format):
+def _output(summaries, _format, noterms):
     """returns Summaries as text, dict, or json"""
     if _format == 'dict':
         return _summaries_to_dict(summaries)
     if _format == 'json':
         return json.dumps(summaries)
     if _format == 'text':
-        return _summaries_to_text(summaries)
+        return _summaries_to_text(summaries, noterms)
 
 
 def _summaries_to_dict(summaries):
@@ -72,16 +71,17 @@ def _summaries_to_dict(summaries):
     return summaries
 
 
-def _summaries_to_text(summaries):
+def _summaries_to_text(summaries, noterms):
     """return wikitext from list of infosummaries"""
     text = ""
     prefix = "https://en.wikipedia.org/wiki"
     for summary in summaries:
         text += "\n= %s =\n\n" % summary['title']
         text += summary['summary'] + "\n"
-        if summary['related']:
+        if summary['related'] and not noterms:
+            related = (" * %s" % x for x in summary['related'])
             text += "\nRelated terms:\n"
-            text += "\n".join(summary['related']) + "\n\n"
+            text += "\n".join(related).decode('utf-8') + "\n\n"
         text += "%s/%s\n" % (prefix, summary['title'].replace(" ", "_"))
     return re.sub(r'\n{3,}', "\n\n", text)
 
@@ -117,8 +117,6 @@ def _pidgin_brackets(term):
         new = terms[0]
     if len(terms) > 1:
         new = terms[-1]
-    article = terms[0].split("#")[0].decode('utf-8')
-    RELATED.append(" * %s" % article)
     if DEBUG:
         print("    > %s" % new)
     return new
@@ -279,6 +277,21 @@ def _summary(wikitext):
     return "\n".join(summary)
 
 
+def _related_terms(summary):
+    """returns list of wikitext linked terms from summary wikitext"""
+    terms = set()
+    for term in re.findall(r"\[\[([^]]*)\]\]", summary):
+        term = term.encode('utf-8')
+        if "|" in term:
+            term = term.split("|")[0]
+        if "#" in term:
+            term = term.split("#")[0]
+        if DEBUG:
+            print("related_term >>> %s" % term)
+        terms.add(term)
+    return sorted(terms)
+
+
 def _parse(api_json):
     """returns [{title, summary}, ...] from JSON"""
     summaries = []
@@ -286,12 +299,14 @@ def _parse(api_json):
         print("pages: %d" % len(api_json["query"]['pages']))
     for page in api_json["query"]["pages"]:
         wikitext = page["revisions"][0]["content"]
-        summary = _clean(_summary(wikitext))
+        sumtext = _summary(wikitext)
+        summary = _clean(sumtext)
+        related = _related_terms(sumtext)
         if summary:
             summaries.append({'title': page["title"],
                               'wikitext': wikitext,
-                              'related': sorted(RELATED),
-                              'summary': summary})
+                              'summary': summary,
+                              'related': related})
     return summaries
 
 
@@ -302,12 +317,12 @@ def _articles(titles):
     return json.loads(wp_query.data("|".join(titles), lead=True))
 
 
-def _main(titles, _format):
+def _main(titles, _format, noterms):
     """emits Summaries from api or local file"""
     if os.path.exists(titles[0]):
-        return from_file(titles[0], _format)
+        return from_file(titles[0], _format, noterms)
     else:
-        return from_api(titles, _format)
+        return from_api(titles, _format, noterms)
 
 
 if __name__ == "__main__":
@@ -320,9 +335,11 @@ if __name__ == "__main__":
                       help="output format (default=text)")
     argp.add_argument("-d", "-debug", action='store_true',
                       help="emit debug messages")
+    argp.add_argument("-n", "-noterms", action='store_true',
+                      help="do not show related terms")
     args = argp.parse_args()
     if args.d:
         DEBUG = True
     start = time.time()
-    print(_main(args.titles, args.f).encode('utf-8'))
+    print(_main(args.titles, args.f, args.n).encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
