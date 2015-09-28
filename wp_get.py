@@ -88,12 +88,14 @@ def _main(url, epedia, lead, markdown, strip):
         with open(url) as fh:
             output = _process(fh, XPATH, lead, strip, epedia)
     else:
-        if not args.url.startswith('http'):
+        if not url.startswith('http'):
             base = "https://en.wikipedia.org/wiki"
             url = "%s/%s" % (base, url.replace(" ", "_"))
         print("GET %s " % url, end="", file=sys.stderr)
         r = requests.get(url, headers={'user-agent': _user_agent()})
         print(r.status_code, file=sys.stderr)
+        if r.status_code != 200:
+            raise ValueError
         output = _process(r.content, XPATH, lead, strip, epedia)
     if markdown:
         print(html2text.html2text(output).encode('utf-8'))
