@@ -2,6 +2,9 @@
 """
 Get article from Wikipedia XML Dump in streaming fashion
 
+This expects to operate on the (currently ~12GB)
+latest/enwiki-latest-pages-articles.xml.bz2 or a section of it.
+
 INPUT
     fname  XML Dump filename (bz2)
     title  (optional) article title to fetch
@@ -11,9 +14,6 @@ OUTPUT
 
 References
     https://en.wikipedia.org/wiki/Wikipedia:Database_download
-
-This expects to operate on the (currently ~12GB)
-latest/enwiki-latest-pages-articles.xml.bz2
 """
 
 from __future__ import print_function

@@ -2,6 +2,11 @@
 """
 GET Wikipedia article content from title, URL or filename
 
+This is basically an alternative path to article content outside of
+the MediaWiki API, which is often quite slow. The problem is that you
+don't get ``wikitext``. But you can get raw HTML or Markdown text
+(versus Wiki syntax) which can give good lead/summary output.
+
 INPUT
     Wikipedia title, URL or filename
     input file expected to be Wikipedia HTML
@@ -10,15 +15,13 @@ OUTPUT
     full article (sans boilerplate) or summary (lead_section) only
     as HTML or Markdown text
 
+See also
+    wp_query
+    wp_summary
+
 References
     https://pypi.python.org/pypi/html2text
     https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
-
-This is basically an alternative path to article content outside of
-the MediaWiki API, which is often quite slow. The problem is that you
-don't get ``wikitext``, but you can get raw HTML or Markdown
-text. It's not entirely deprecated, but ``wp_query`` and
-``wp_summary`` are recommended for bulk processing.
 """
 
 from __future__ import print_function

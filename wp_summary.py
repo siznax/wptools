@@ -21,8 +21,8 @@ languages" in the IPA template.
         ``lxml.etree.tostring(elem, method="text", encoding="utf-8")``
 
 INPUT
-    Wikipedia article titles or filename
-    input file expected to be JSON from Mediawiki API
+    Article titles or filename (input file expected to be JSON from
+    Mediawiki API)
 
 OUTPUT
     Summary as wikitext, dict, or json

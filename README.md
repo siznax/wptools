@@ -8,7 +8,7 @@ See ``pydoc <module>`` or ``<module.py> -h`` for more info.
 
 Get article from Wikipedia <a href="https://en.wikipedia.org/wiki/Wikipedia:Database_download">XML Dump</a> in streaming fashion
 
-*This expects to operate on the (currently ~12GB) latest/enwiki-latest-pages-articles.xml.bz2*
+*This expects to operate on the (currently ~12GB) latest/enwiki-latest-pages-articles.xml.bz2 or a part of it*
 
 ```shell
 $ wp_dump.py enwiki-latest-pages-articles.xml.bz2 -t Aardvark
