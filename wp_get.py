@@ -37,7 +37,7 @@ __author__ = "siznax"
 __version__ = "24 Sep 2015"
 
 XPATH = '//*[@id="mw-content-text"]'
-
+TIMEOUT = 30
 
 def _user_agent():
     return ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) "
@@ -62,6 +62,7 @@ def _epedia(content):
 
 def _process(html, xpath, lead=False, strip_tags=False, epedia=False):
     if epedia:
+        lead = True
         strip_tags = True
     content = []
     etree = html5lib.parse(html,
@@ -82,31 +83,37 @@ def _process(html, xpath, lead=False, strip_tags=False, epedia=False):
     return content
 
 
-def _main(url, epedia, lead, markdown, strip):
+def article(title, epedia, lead, markdown, strip):
+    """returns article as string. raises ValueError."""
     output = ""
-    if os.path.exists(url):
-        with open(url) as fh:
+    if os.path.exists(title):
+        with open(title) as fh:
             output = _process(fh, XPATH, lead, strip, epedia)
     else:
-        if not url.startswith('http'):
+        if not title.startswith('http'):
             base = "https://en.wikipedia.org/wiki"
-            url = "%s/%s" % (base, url.replace(" ", "_"))
-        print("GET %s " % url, end="", file=sys.stderr)
-        r = requests.get(url, headers={'user-agent': _user_agent()})
+            title = "%s/%s" % (base, title.replace(" ", "_"))
+        print("GET %s " % title, end="", file=sys.stderr)
+        r = requests.get(title, headers={'user-agent': _user_agent()},
+                         timeout=TIMEOUT)
         print(r.status_code, file=sys.stderr)
         if r.status_code != 200:
-            raise ValueError
+            raise ValueError("HTTP status code = %d" % r.status_code)
         output = _process(r.content, XPATH, lead, strip, epedia)
     if markdown:
-        print(html2text.html2text(output).encode('utf-8'))
-    else:
-        print(output)
+        output = html2text.html2text(output).encode('utf-8')
+    return output
+
+
+def _main(title, epedia, lead, markdown, strip):
+    """prints Wikipedia article requested"""
+    print(article(title, epedia, lead, markdown, strip))
 
 
 if __name__ == "__main__":
     desc = "GET Wikipedia article from title, URL or filename via HTTP"
     argp = argparse.ArgumentParser(description=desc)
-    argp.add_argument("url", help="article title, URL or filename")
+    argp.add_argument("title", help="article title, URL or filename")
     argp.add_argument("-e", "-pedia", action='store_true',
                       help="Epedia format")
     argp.add_argument("-l", "-lead", action='store_true',
@@ -118,5 +125,5 @@ if __name__ == "__main__":
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.url, args.e, args.l, args.m, args.s)
+    _main(args.title, args.e, args.l, args.m, args.s)
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
