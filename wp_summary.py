@@ -5,9 +5,10 @@ Get plain text of article's lead section from titles or file
 This script has two major features:
 
     1) Get the article wikitext and extract just the paragraphs in the
-       so-called "lead section", and
-    2) Clean (as well as possible) the wiki syntax and raw HTML from
-       the lead section paragraphs
+       so-called "lead section" (ignoring templates), and
+    2) clean (as well as possible) the wiki syntax and raw HTML from
+       the lead section paragraphs (while keeping track of linked wiki
+       titles, we're calling "related terms").
 
 Currently, an attempt is made to "clean" wikitext (see _pidgin methods
 below), but this doesn't give us the best result. We'll need to run
@@ -16,7 +17,7 @@ lxml to strip tags. We'll probably still need to do some cleanup after
 that for linked phrases that are no longer relevent, e.g. "in other
 languages" in the IPA template.
 
-    lxml strip_tags() or
+    lxml ``etree.strip_tags()`` or
         ``lxml.etree.tostring(elem, method="text", encoding="utf-8")``
 
 INPUT
