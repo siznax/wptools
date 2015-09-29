@@ -2,6 +2,23 @@
 """
 Get plain text of article's lead section from titles or file
 
+This script has two major features:
+
+    1) Get the article wikitext and extract just the paragraphs in the
+       so-called "lead section", and
+    2) Clean (as well as possible) the wiki syntax and raw HTML from
+       the lead section paragraphs
+
+Currently, an attempt is made to "clean" wikitext (see _pidgin methods
+below), but this doesn't give us the best result. We'll need to run
+the wikitext through a MediaWiki instance (or script) and then use
+lxml to strip tags. We'll probably still need to do some cleanup after
+that for linked phrases that are no longer relevent, e.g. "in other
+languages" in the IPA template.
+
+    lxml strip_tags() or
+        ``lxml.etree.tostring(elem, method="text", encoding="utf-8")``
+
 INPUT
     Wikipedia article titles or filename
     input file expected to be JSON from Mediawiki API
