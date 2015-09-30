@@ -93,11 +93,7 @@ class SplitParser(WPParser):
                 print("- close %s %d" % (path, tell))
 
     def process(self, elem):
-        m = re.search(r"<title>([^<]*)<", elem)
-        if not m:
-            print(elem[:64])
-            raise ValueError("title not found!")
-        title = m.group(1)
+        title = page_title(elem)
         title_start = self.offset + self.byte_count - len(elem)
         if not self.title:
             self.first_title = title
@@ -113,6 +109,14 @@ class SplitParser(WPParser):
             _file.write(bz2.compress(elem))
         else:
             print("ORPHAN %s" % title)
+
+
+def page_title(page):
+    m = re.search(r"<title>([^<]*)<", page)
+    if not m:
+        print(page[:64])
+        raise ValueError("title not found!")
+    return m.group(1)
 
 
 def ascii_bin(title):
