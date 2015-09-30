@@ -173,7 +173,8 @@ $ wp_split.py data/enwiki-latest-pages-articles.xml.bz2
   Bluescreen 69966270
   British public houses 70873946
   Birds 71896368
-^Cpages found: 2730
+(KeyboardInterrupt)
+pages found: 2730
 titles processed: 2729
 first: AccessibleComputing 2911
 last: Balmoral Castle 72508055
