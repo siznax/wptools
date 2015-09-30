@@ -42,6 +42,7 @@ __version__ = "24 Sep 2015"
 XPATH = '//*[@id="mw-content-text"]'
 TIMEOUT = 30
 
+
 def _user_agent():
     return ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
