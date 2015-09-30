@@ -160,9 +160,9 @@ u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=
 
 ### [wp_split](https://github.com/siznax/wptools/blob/master/wp_split.py)
 
-Split the huge [Wikipedia XML
+Split the [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-megafile (currently ~12GB) into alphabetical ``bzip2`` files. This can
+(currently ~12GB) into alphabetical ``bzip2`` files. This can
 be useful for speeding up extracting a single article. 
 
 It's interruptable...
