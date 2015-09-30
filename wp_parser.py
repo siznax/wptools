@@ -1,5 +1,5 @@
 """
-parse data from huge Wikipedia XML Dump
+parse data (naive & wreckless) from huge Wikipedia XML Dump
 """
 
 __author__ = "siznax"
@@ -51,7 +51,7 @@ class WPParser:
                 if self._found_start:
                     raise RuntimeError("already found start!")
                 self._found_start = True
-                self.elem = self.start + "\n"
+                self.elem = "  " + self.start + "\n"
                 self.elems_found += 1
                 # print self._sbfr
             self._sbfr = ""
