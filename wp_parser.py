@@ -13,6 +13,7 @@ class WPParser:
     _found_end = False
     _found_start = False
     _sbfr = ""
+    byte_count = 0
     elem = ""
     elems_found = 0
     elems_processed = 0
@@ -31,6 +32,7 @@ class WPParser:
             print self.elem[:1024]
             raise RuntimeError("elem grew too big!")
         for char in chunk:
+            self.byte_count += 1
             self._scan(char)
 
     def _scan(self, char):
