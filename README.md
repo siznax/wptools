@@ -85,6 +85,23 @@ From python:
 ```
 
 
+### wp_parser
+
+Parse the huge (currently ~12GB) Wikipedia "XML Dump". This is a naive
+parser, just to get things going. You'll need to override
+``WPParser.process``: 
+
+```python
+class MyParser(WPParser):
+
+    def __init__(self):
+        WPParser.__init__(self)
+
+    def process(self, elem):
+        """fancy processing here"""
+```
+
+
 ### wp_query
 
 Get articles via MediaWiki API given titles, format
