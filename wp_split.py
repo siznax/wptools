@@ -106,11 +106,19 @@ class SplitParser(WPParser):
         if not self.dest:
             # print("%s %s" % (title, len(elem)))
             return
-        if title[0] in self._files:
+        char = ascii_bin(title)
+        if char in self._files:
             _file = self._files[title[0]]
             _file.write(bz2.compress(elem))
         else:
             print("ORPHAN %s" % title)
+
+
+def ascii_bin(title):
+    try:
+        return [x for x in title.upper() if 64 < ord(x) < 91][0]
+    except:
+        return title
 
 
 def _setup(dest, offset):
