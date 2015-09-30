@@ -45,10 +45,15 @@ __version__ = "29 Sep 2015"
 
 import argparse
 import bz2
+import os
+import re
 import sys
+import string
 import time
 
-CHUNK_SIZE = 1024
+DEFAULT_CHUNK_KB = 1
+ONE_KB = 1000
+ONE_MB = 1000**2
 MAX_MEGABYTES = 10
 
 from wp_parser import WPParser
@@ -56,45 +61,117 @@ from wp_parser import WPParser
 
 class SplitParser(WPParser):
 
-    def __init__(self):
+    def __init__(self, dest, offset):
         WPParser.__init__(self)
+        self._files = dict()
+        self.bytes_read = 0
+        self.dest = dest
+        self.first_title = ""
+        self.first_title_start = 0
+        self.offset = offset
+        self.tell = 0
+        self.title = ""
+        self.title_start = 0
+
+    def open_files(self):
+        if not self.dest:
+            return
+        os.mkdir(self.dest)
+        for ltr in string.ascii_uppercase:
+            path = "%s/%s" % (self.dest, ltr)
+            print("+ open %s" % path)
+            self._files[ltr] = open(path, 'a')
+
+    def close_files(self):
+        if not self.dest:
+            return
+        for path, handle in self._files.iteritems():
+            tell = handle.tell()
+            handle.close()
+            if tell:
+                print("- close %s %d" % (path, tell))
 
     def process(self, elem):
-        title = elem.split("\n")[1]
-        if "<title>" not in title:
+        m = re.search(r"<title>([^<]*)<", elem)
+        if not m:
             print(elem[:64])
-            raise ValueError("process elem failed!")
-        print("%s %d" % (title, len(elem)))
-        sys.stdout.flush()
+            raise ValueError("title not found!")
+        title = m.group(1)
+        title_start = self.offset + self.byte_count - len(elem)
+        if not self.title:
+            self.first_title = title
+            self.first_title_start = title_start
+        self.title = title
+        self.title_start = title_start
+        if not self.dest:
+            # print("%s %s" % (title, len(elem)))
+            return
+        if title[0] in self._files:
+            _file = self._files[title[0]]
+            _file.write(bz2.compress(elem))
+        else:
+            print("ORPHAN %s" % title)
 
 
-def _main(fname, max_mb, chunk_size):
-    max_bytes = 1024**2 * max_mb
-    sp = SplitParser()
-    tell = 0
+def _setup(dest, offset):
+    if os.path.exists(dest):
+        print("Destination exists: %s" % dest, file=sys.stderr)
+        sys.exit(os.EX_IOERR)
+    sp = SplitParser(dest, offset)
+    sp.open_files()
+    return sp
+
+
+def _gobble(sp, fname, chunk_size, max_mb, offset):
+    chunk_size = ONE_KB * chunk_size
+    max_bytes = ONE_MB * max_mb
     with bz2.BZ2File(fname, 'r') as zh:
-        while zh.tell() < max_bytes:
-            try:
+        zh.seek(offset)
+        try:
+            while sp.bytes_read < max_bytes:
                 sp.parse(zh.read(chunk_size))
-            except:
-                print("Exception at byte position: %d" % zh.tell())
-                raise
-        tell = zh.tell()
-    print("%d bytes read" % tell)
-    print("%d elems found" % sp.elems_found)
-    print("%d elems processed" % sp.elems_processed)
+                sp.tell = zh.tell()
+                sp.bytes_read = sp.tell - offset
+                if sp.tell % ONE_MB*10 == 0:
+                    print("  %s %d" % (sp.title, sp.title_start))
+        except KeyboardInterrupt:
+            _teardown(sp)
+            sys.exit(os.EX_SOFTWARE)
+        except Exception as detail:
+            print("Exception at byte position: %d" % zh.tell())
+            print(detail)
+
+
+def _teardown(sp):
+    sp.close_files()
+    print("elems found: %d" % sp.elems_found)
+    print("titles processed: %d" % sp.elems_processed)
+    print("first: %s %d" % (sp.first_title, sp.first_title_start))
+    print("last: %s %d" % (sp.title, sp.title_start))
+    print("read: %d MB" % (sp.bytes_read / ONE_MB))
+    print("tell: %s" % sp.tell)
+
+
+def _main(fname, max_mb, chunk_size, dest, offset):
+    sp = _setup(dest, offset)
+    _gobble(sp, fname, chunk_size, max_mb, offset)
+    _teardown(sp)
 
 
 if __name__ == "__main__":
     desc = "Split Wikipedia XML Dump into alphabetical bz2 files"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("fname", help="Wikipedia XML Dump bz2 filename")
-    argp.add_argument("-m", "-megabytes", type=int, default=MAX_MEGABYTES,
-                      help="max MB to parse (default=%d)" % MAX_MEGABYTES)
-    argp.add_argument("-c", "-chunksize", type=int, default=CHUNK_SIZE,
-                      help="chunk size to read (default=%d)" % CHUNK_SIZE)
+    argp.add_argument("-c", "-chunksize", type=int, default=DEFAULT_CHUNK_KB,
+                      help="chunk size in KB (default=%d)" % DEFAULT_CHUNK_KB)
+    argp.add_argument("-d", "-dest", default="",
+                      help="write results to dest (dir)")
+    argp.add_argument("-m", "-maxbytes", type=int, default=MAX_MEGABYTES,
+                      help="max bytes in MB (default=%d)" % MAX_MEGABYTES)
+    argp.add_argument("-o", "-offset", type=int, default=0,
+                      help="seek to byte offset")
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.fname, args.m, args.c)
+    _main(args.fname, args.m, args.c, args.d, args.o)
     print("%5.3f seconds" % (time.time() - start))
