@@ -152,7 +152,7 @@ def gobble(sp, fname, chunk_size, max_mb, offset):
         except KeyboardInterrupt:
             teardown(sp)
             sys.exit(os.EX_SOFTWARE)
-        except Exception as detail:
+        except Exception:
             print("Exception at byte position: %d" % zh.tell())
             traceback.print_exc()
 
