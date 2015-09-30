@@ -104,7 +104,7 @@ class MyParser(WPParser):
 See `wp_split` for example.
 
 
-### wp_query
+### [wp_query](https://github.com/siznax/wptools/blob/master/wp_query.py)
 
 Get articles via MediaWiki API given titles, format
 
