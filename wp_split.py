@@ -50,6 +50,7 @@ import re
 import sys
 import string
 import time
+import traceback
 
 DEFAULT_CHUNK_KB = 1
 ONE_KB = 1000
@@ -106,22 +107,23 @@ class SplitParser(WPParser):
         if not self.dest:
             # print("%s %s" % (title, len(elem)))
             return
-        char = ascii_bin(title)
-        if char in self._files:
-            _file = self._files[title[0]]
+        first_char = ascii_bin(title)
+        if first_char in self._files:
+            _file = self._files[first_char]
             _file.write(bz2.compress(elem))
         else:
             print("ORPHAN %s" % title)
 
 
 def ascii_bin(title):
+    """returns first A-Z ascii character in title"""
     try:
         return [x for x in title.upper() if 64 < ord(x) < 91][0]
     except:
         return title
 
 
-def _setup(dest, offset):
+def setup(dest, offset):
     if os.path.exists(dest):
         print("Destination exists: %s" % dest, file=sys.stderr)
         sys.exit(os.EX_IOERR)
@@ -130,7 +132,7 @@ def _setup(dest, offset):
     return sp
 
 
-def _gobble(sp, fname, chunk_size, max_mb, offset):
+def gobble(sp, fname, chunk_size, max_mb, offset):
     chunk_size = ONE_KB * chunk_size
     max_bytes = ONE_MB * max_mb
     with bz2.BZ2File(fname, 'r') as zh:
@@ -143,14 +145,14 @@ def _gobble(sp, fname, chunk_size, max_mb, offset):
                 if sp.tell % ONE_MB*10 == 0:
                     print("  %s %d" % (sp.title, sp.title_start))
         except KeyboardInterrupt:
-            _teardown(sp)
+            teardown(sp)
             sys.exit(os.EX_SOFTWARE)
         except Exception as detail:
             print("Exception at byte position: %d" % zh.tell())
-            print(detail)
+            traceback.print_exc()
 
 
-def _teardown(sp):
+def teardown(sp):
     sp.close_files()
     print("pages found: %d" % sp.elems_found)
     print("titles processed: %d" % sp.elems_processed)
@@ -161,9 +163,9 @@ def _teardown(sp):
 
 
 def _main(fname, max_mb, chunk_size, dest, offset):
-    sp = _setup(dest, offset)
-    _gobble(sp, fname, chunk_size, max_mb, offset)
-    _teardown(sp)
+    sp = setup(dest, offset)
+    gobble(sp, fname, chunk_size, max_mb, offset)
+    teardown(sp)
 
 
 if __name__ == "__main__":
