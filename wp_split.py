@@ -78,10 +78,10 @@ class SplitParser(WPParser):
         if not self.dest:
             return
         os.mkdir(self.dest)
-        for ltr in string.ascii_uppercase:
-            path = "%s/%s" % (self.dest, ltr)
+        for char in string.digits + string.ascii_uppercase:
+            path = "%s/%s" % (self.dest, char)
             print("+ open %s" % path)
-            self._files[ltr] = open(path, 'a')
+            self._files[char] = open(path, 'a')
 
     def close_files(self):
         if not self.dest:
@@ -116,9 +116,10 @@ class SplitParser(WPParser):
 
 
 def ascii_bin(title):
-    """returns first A-Z ascii character in title"""
+    """returns first 0-9 or A-Z character in upper(title)"""
     try:
-        return [x for x in title.upper() if 64 < ord(x) < 91][0]
+        return [x for x in title.upper()
+                if 47 < ord(x) < 58 or 64 < ord(x) < 91][0]
     except:
         return title
 
