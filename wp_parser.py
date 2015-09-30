@@ -1,5 +1,5 @@
 """
-parse data from huge Wikpedia XML Dump
+parse data from huge Wikipedia XML Dump
 """
 
 __author__ = "siznax"
