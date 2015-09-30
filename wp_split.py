@@ -144,7 +144,7 @@ def _gobble(sp, fname, chunk_size, max_mb, offset):
 
 def _teardown(sp):
     sp.close_files()
-    print("elems found: %d" % sp.elems_found)
+    print("pages found: %d" % sp.elems_found)
     print("titles processed: %d" % sp.elems_processed)
     print("first: %s %d" % (sp.first_title, sp.first_title_start))
     print("last: %s %d" % (sp.title, sp.title_start))

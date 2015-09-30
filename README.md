@@ -4,7 +4,7 @@ Some fun and helpful python tools you can also run from the cmdline.
 See ``pydoc <module>`` or ``<module.py> -h`` for more info. 
 
 
-### wp_file
+### [wp_file](https://github.com/siznax/wptools/blob/master/wp_file.py)
 
 Get URL and HTTP status from Wikipedia File/Image name
 
@@ -14,7 +14,7 @@ https://upload.wikimedia.org/wikipedia/commons/c/cb/ABBA_-_TopPop_1974_5.png 200
 ```
 
 
-### wp_get
+### [wp_get](https://github.com/siznax/wptools/blob/master/wp_get.py)
 
 GET Wikipedia article content from URL or filename
 
@@ -25,7 +25,7 @@ text. It's not entirely deprecated, but ``wp_query`` and
 ``wp_summary`` are recommended for bulk processing.*
 
 
-### wp_image
+### [wp_image](https://github.com/siznax/wptools/blob/master/wp_image.py)
 
 Get images from articles (just file names or expanded URLs)
 
@@ -38,7 +38,7 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 ```
 
 
-### wp_infobox
+### [wp_infobox](https://github.com/siznax/wptools/blob/master/wp_infobox.py)
 
 Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext from titles or file
 
@@ -85,7 +85,7 @@ From python:
 ```
 
 
-### wp_parser
+### [wp_parser](https://github.com/siznax/wptools/blob/master/wp_parser.py)
 
 Parse the huge (currently ~12GB) Wikipedia "XML Dump". This is a naive
 parser, just to get things going. You'll need to override
@@ -100,6 +100,8 @@ class MyParser(WPParser):
     def process(self, elem):
         """fancy processing here"""
 ```
+
+See `wp_split` for example.
 
 
 ### wp_query
@@ -156,7 +158,46 @@ u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=
 ```
 
 
-### wp_summary
+### [wp_split](https://github.com/siznax/wptools/blob/master/wp_split.py)
+
+Split the huge [Wikipedia XML
+Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
+megafile (currently ~12GB) into alphabetical "<page>.*</page>"
+``bzip2`` files. This can be useful for speeding up extracting a
+single article. 
+
+It's interruptable...
+
+```shell
+$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2
+  ...
+  Bluescreen 69966270
+  British public houses 70873946
+  Birds 71896368
+^Cpages found: 2730
+titles processed: 2729
+first: AccessibleComputing 2911
+last: Balmoral Castle 72508055
+read: 72 MB
+tell: 72574000
+```
+
+and restartable:
+
+```shell
+$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2 -m 1 -o 72508055
+pages found: 27
+titles processed: 26
+first: Balmoral Castle 72508055
+last: B-tree 73395052
+read: 1 MB
+tell: 73508055
+```
+
+``bzip2`` files can be safely concatenated, if necessary.
+
+
+### [wp_summary](https://github.com/siznax/wptools/blob/master/wp_summary.py)
 
 Get plain text of article's <a href="https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section">lead section</a> from titles or file
 
@@ -195,7 +236,7 @@ from python:
 ```
 
 
-### wp_vae
+### [wp_vae](https://github.com/siznax/wptools/blob/master/wp_vae.py)
 
 Extract <a href="https://meta.wikimedia.org/wiki/List_of_articles_every_Wikipedia_should_have/Expanded">Vital Articles Expanded</a> (10K) titles
 
