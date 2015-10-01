@@ -38,6 +38,47 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 ```
 
 
+### [wp_index](https://github.com/siznax/wptools/blob/master/wp_index.py)
+
+Index the [Wikipedia XML
+Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
+(currently ~12GB) into alphabetical ``bzip2`` files. This can
+be useful for speeding up extracting a single article. 
+
+It's interruptable...
+
+```shell
+$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2
+  ...
+  Bluescreen 69966270
+  British public houses 70873946
+  Birds 71896368
+
+(KeyboardInterrupt)
+
+pages found: 2730
+titles processed: 2729
+first: AccessibleComputing 2911
+last: Balmoral Castle 72508055
+read: 72 MB
+tell: 72574000
+```
+
+and restartable:
+
+```shell
+$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2 -m 1 -o 72508055
+pages found: 27
+titles processed: 26
+first: Balmoral Castle 72508055
+last: B-tree 73395052
+read: 1 MB
+tell: 73508055
+```
+
+``bzip2`` files can be safely concatenated, if necessary.
+
+
 ### [wp_infobox](https://github.com/siznax/wptools/blob/master/wp_infobox.py)
 
 Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext from titles or file
@@ -156,45 +197,6 @@ u'Accordion'
 u"{{other uses}}\n{{Use dmy dates|date=July 2013}}\n{{Infobox instrument\n|name=Accordion\n|names=* [[Bosnian language|Bosnian]]: ''Harmonika''\n* [[Danish language|Danish]] ([[free-bass system|free-bass]]): ''Accordeon''\n* [[Hungarian language|Hungarian]] & [[Ic"
 >>> 
 ```
-
-
-### [wp_split](https://github.com/siznax/wptools/blob/master/wp_split.py)
-
-Split the [Wikipedia XML
-Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-(currently ~12GB) into alphabetical ``bzip2`` files. This can
-be useful for speeding up extracting a single article. 
-
-It's interruptable...
-
-```shell
-$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2
-  ...
-  Bluescreen 69966270
-  British public houses 70873946
-  Birds 71896368
-(KeyboardInterrupt)
-pages found: 2730
-titles processed: 2729
-first: AccessibleComputing 2911
-last: Balmoral Castle 72508055
-read: 72 MB
-tell: 72574000
-```
-
-and restartable:
-
-```shell
-$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2 -m 1 -o 72508055
-pages found: 27
-titles processed: 26
-first: Balmoral Castle 72508055
-last: B-tree 73395052
-read: 1 MB
-tell: 73508055
-```
-
-``bzip2`` files can be safely concatenated, if necessary.
 
 
 ### [wp_summary](https://github.com/siznax/wptools/blob/master/wp_summary.py)

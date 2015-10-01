@@ -1,30 +1,16 @@
 #!/usr/bin/env python
 """
-Split Wikipedia XML Dump into alphabetical bz2 files
+Index Wikipedia XML Dump into alphabetical bz2 files
 
-This expects to operate on the (currently ~12GB)...
+This expects to operate on the (currently ~12GB)
 latest/enwiki-latest-pages-articles.xml.bz2
+The process is interruptable and restartable.
 
-The goal here is to speed extracting an article from the so-called
-"XML Dump" by splitting it up alphabetically.
+INPUT
+   fname  XML Dump filename
 
-It may be feasible to simply index the Dump, e.g.
-
-    A <byte position>
-    B <byte position>
-    C <byte position>
-
-But it looks like the Dump is not strictly sorted:
-
-    500 <title>Augustus</title>
-    501 <title>Geography of Antarctica</title>
-    502 <title>Economy of Antarctica</title>
-    503 <title>Government of Antarctica</title>
-    504 <title>Transport in Antarctica</title>
-    505 <title>Military of Antarctica</title>
-    506 <title>Geography of Alabama</title>
-    507 <title>List of Governors of Alabama</title>
-    508 <title>Apocrypha</title>
+OUTPUT
+   index files: dest/[0-9], dest/[A-Z]
 
 To be resolved:
 
@@ -41,7 +27,7 @@ References
 from __future__ import print_function
 
 __author__ = "siznax"
-__version__ = "29 Sep 2015"
+__version__ = "1 Oct 2015"
 
 import argparse
 import bz2
@@ -60,7 +46,7 @@ MAX_MEGABYTES = 10
 from wp_parser import WPParser
 
 
-class SplitParser(WPParser):
+class IndexParser(WPParser):
 
     def __init__(self, dest, offset):
         WPParser.__init__(self)
@@ -106,12 +92,13 @@ class SplitParser(WPParser):
         first_char = ascii_bin(title)
         if first_char in self._files:
             _file = self._files[first_char]
-            _file.write(elem)
+            _file.write("%s %s\n" % (title, title_start))
         else:
             print("ORPHAN %s" % title)
 
 
 def page_title(page):
+    """returns title from XML Dump <page>"""
     m = re.search(r"<title>([^<]*)<", page)
     if not m:
         print(page[:64])
@@ -132,51 +119,51 @@ def setup(dest, offset):
     if os.path.exists(dest):
         print("Destination exists: %s" % dest, file=sys.stderr)
         sys.exit(os.EX_IOERR)
-    sp = SplitParser(dest, offset)
-    sp.open_files()
-    return sp
+    ip = IndexParser(dest, offset)
+    ip.open_files()
+    return ip
 
 
-def gobble(sp, fname, chunk_size, max_mb, offset):
+def gobble(ip, fname, chunk_size, max_mb, offset):
     chunk_size = ONE_KB * chunk_size
     max_bytes = ONE_MB * max_mb
     with bz2.BZ2File(fname, 'r') as zh:
         zh.seek(offset)
         try:
-            while sp.bytes_read < max_bytes:
-                sp.parse(zh.read(chunk_size))
-                sp.tell = zh.tell()
-                sp.bytes_read = sp.tell - offset
-                if sp.tell % ONE_MB*10 == 0:
-                    print("  %s %d" % (sp.title, sp.title_start))
+            while ip.bytes_read < max_bytes:
+                ip.parse(zh.read(chunk_size))
+                ip.tell = zh.tell()
+                ip.bytes_read = ip.tell - offset
+                if ip.tell % ONE_MB*10 == 0:
+                    print("  %s %d" % (ip.title, ip.title_start))
         except KeyboardInterrupt:
-            teardown(sp)
+            teardown(ip)
             sys.exit(os.EX_SOFTWARE)
         except Exception:
             print("Exception at byte position: %d" % zh.tell())
             traceback.print_exc()
 
 
-def teardown(sp):
-    sp.close_files()
-    print("pages found: %d" % sp.elems_found)
-    print("titles processed: %d" % sp.elems_processed)
-    print("first: %s %d" % (sp.first_title, sp.first_title_start))
-    print("last: %s %d" % (sp.title, sp.title_start))
-    print("read: %d MB" % (sp.bytes_read / ONE_MB))
-    print("tell: %s" % sp.tell)
+def teardown(ip):
+    ip.close_files()
+    print("pages found: %d" % ip.elems_found)
+    print("titles processed: %d" % ip.elems_processed)
+    print("first: %s %d" % (ip.first_title, ip.first_title_start))
+    print("last: %s %d" % (ip.title, ip.title_start))
+    print("read: %d MB" % (ip.bytes_read / ONE_MB))
+    print("tell: %s" % ip.tell)
 
 
 def _main(fname, max_mb, chunk_size, dest, offset):
-    sp = setup(dest, offset)
-    gobble(sp, fname, chunk_size, max_mb, offset)
-    teardown(sp)
+    ip = setup(dest, offset)
+    gobble(ip, fname, chunk_size, max_mb, offset)
+    teardown(ip)
 
 
 if __name__ == "__main__":
-    desc = "Split Wikipedia XML Dump into alphabetical bz2 files"
+    desc = "Index Wikipedia XML Dump into alphabetical bz2 files"
     argp = argparse.ArgumentParser(description=desc)
-    argp.add_argument("fname", help="Wikipedia XML Dump bz2 filename")
+    argp.add_argument("fname", help="XML Dump bz2 filename")
     argp.add_argument("-c", "-chunksize", type=int, default=DEFAULT_CHUNK_KB,
                       help="chunk size in KB (default=%d)" % DEFAULT_CHUNK_KB)
     argp.add_argument("-d", "-dest", default="",
