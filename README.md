@@ -48,7 +48,7 @@ be useful for speeding up extracting a single article.
 It's interruptable...
 
 ```shell
-$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2
+$ wp_index.py data/enwiki-latest-pages-articles.xml.bz2
   ...
   Bluescreen 69966270
   British public houses 70873946
@@ -67,7 +67,7 @@ tell: 72574000
 and restartable:
 
 ```shell
-$ wp_split.py data/enwiki-latest-pages-articles.xml.bz2 -m 1 -o 72508055
+$ wp_index.py data/enwiki-latest-pages-articles.xml.bz2 -m 1 -o 72508055
 pages found: 27
 titles processed: 26
 first: Balmoral Castle 72508055
@@ -128,9 +128,10 @@ From python:
 
 ### [wp_parser](https://github.com/siznax/wptools/blob/master/wp_parser.py)
 
-Parse the huge (currently ~12GB) Wikipedia "XML Dump". This is a naive
-parser, just to get things going. You'll need to override
-``WPParser.process``: 
+Parse a [Wikipedia XML
+Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download),
+naive and reckless. You'll need to override ``WPParser.process``. See
+``wp_index`` for example.  
 
 ```python
 class MyParser(WPParser):
@@ -141,8 +142,6 @@ class MyParser(WPParser):
     def process(self, elem):
         """fancy processing here"""
 ```
-
-See `wp_split` for example.
 
 
 ### [wp_query](https://github.com/siznax/wptools/blob/master/wp_query.py)
