@@ -81,7 +81,7 @@ class SplitParser(WPParser):
         for char in string.digits + string.ascii_uppercase:
             path = "%s/%s" % (self.dest, char)
             print("+ open %s" % path)
-            self._files[char] = open(path, 'a')
+            self._files[char] = bz2.BZ2File(path, 'w')
 
     def close_files(self):
         if not self.dest:
@@ -106,7 +106,7 @@ class SplitParser(WPParser):
         first_char = ascii_bin(title)
         if first_char in self._files:
             _file = self._files[first_char]
-            _file.write(bz2.compress(elem))
+            _file.write(elem)
         else:
             print("ORPHAN %s" % title)
 
