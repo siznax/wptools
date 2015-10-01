@@ -48,7 +48,7 @@ from wp_parser import WPParser
 
 class IndexParser(WPParser):
 
-    def __init__(self, dest, offset):
+    def __init__(self, dest, offset, split):
         WPParser.__init__(self)
         self._files = dict()
         self.bytes_read = 0
@@ -56,6 +56,7 @@ class IndexParser(WPParser):
         self.first_title = ""
         self.first_title_start = 0
         self.offset = offset
+        self.split = split
         self.tell = 0
         self.title = ""
         self.title_start = 0
@@ -92,7 +93,10 @@ class IndexParser(WPParser):
         first_char = ascii_bin(title)
         if first_char in self._files:
             _file = self._files[first_char]
-            _file.write("%s %s\n" % (title, title_start))
+            if self.split:
+                _file.write(elem)
+            else:
+                _file.write("%s %s\n" % (title, title_start))
         else:
             print("ORPHAN %s" % title)
 
@@ -115,11 +119,11 @@ def ascii_bin(title):
         return title
 
 
-def setup(dest, offset):
+def setup(dest, offset, split):
     if os.path.exists(dest):
         print("Destination exists: %s" % dest, file=sys.stderr)
         sys.exit(os.EX_IOERR)
-    ip = IndexParser(dest, offset)
+    ip = IndexParser(dest, offset, split)
     ip.open_files()
     return ip
 
@@ -154,8 +158,8 @@ def teardown(ip):
     print("tell: %s" % ip.tell)
 
 
-def _main(fname, max_mb, chunk_size, dest, offset):
-    ip = setup(dest, offset)
+def _main(fname, max_mb, chunk_size, dest, offset, split):
+    ip = setup(dest, offset, split)
     gobble(ip, fname, chunk_size, max_mb, offset)
     teardown(ip)
 
@@ -172,8 +176,10 @@ if __name__ == "__main__":
                       help="max bytes in MB (default=%d)" % MAX_MEGABYTES)
     argp.add_argument("-o", "-offset", type=int, default=0,
                       help="seek to byte offset")
+    argp.add_argument("-s", "-split", action='store_true',
+                      help="split (instead of index) into files")
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.fname, args.m, args.c, args.d, args.o)
+    _main(args.fname, args.m, args.c, args.d, args.o, args.s)
     print("%5.3f seconds" % (time.time() - start))
