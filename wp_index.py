@@ -67,7 +67,7 @@ class IndexParser(WPLineParser):
         self._files[key] = file(path, 'w')
         self._paths[key] = path
 
-    def open_files(self):
+    def open_files(self, titles=False):
         if not self.dest:
             return
         os.mkdir(self.dest)
@@ -76,7 +76,7 @@ class IndexParser(WPLineParser):
             print("+ open %s" % path)
             self._files[char] = gzip.open(path, 'wb')
             self._paths[char] = path
-        if self.titles:
+        if titles:
             self.add_file("titles_found")
             self.add_file("titles_left")
 
@@ -145,7 +145,7 @@ def setup(dest, offset, split, titles):
         print("Destination exists: %s" % dest, file=sys.stderr)
         sys.exit(os.EX_IOERR)
     ip = IndexParser(dest, offset, split)
-    ip.open_files()
+    ip.open_files(titles)
     if titles:
         with open(titles) as fh:
             ip.titles = set(fh.read().split("\n"))
@@ -169,6 +169,7 @@ def gobble(ip, fname, chunk_size, max_mb, offset):
                 est_bytes_read += chunk_size
                 if est_bytes_read % ONE_MB * 10 == 0:
                     print("  %s %d" % (ip.title, ip.title_start))
+                    sys.stdout.flush()
         except KeyboardInterrupt:
             teardown(ip)
             sys.exit(os.EX_SOFTWARE)
