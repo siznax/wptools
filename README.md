@@ -49,10 +49,10 @@ speeding up extracting a single article.
 $ wp_index.py -h
 usage: wp_index.py [-h] [-c C] [-d D] [-m M] [-o O] [-s] [-t T] fname
 
-Index or split Wikipedia XML Dump into alphabetical bzip2 files
+Index or split Wikipedia XML Dump into alphabetical (gz) files
 
 positional arguments:
-  fname               XML Dump bz2 filename
+  fname               XML Dump (bz2) filename
 
 optional arguments:
   -h, --help          show this help message and exit
