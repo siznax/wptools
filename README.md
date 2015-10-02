@@ -165,24 +165,6 @@ $ wp_pull.py Aristotle split/A
 ```
 
 
-### [wp_parser](https://github.com/siznax/wptools/blob/master/wp_parser.py)
-
-Parse a [Wikipedia XML
-Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download),
-naive and reckless. You'll need to override ``WPParser.process``. See
-``wp_index`` for example.  
-
-```python
-class MyParser(WPParser):
-
-    def __init__(self):
-        WPParser.__init__(self)
-
-    def process(self, elem):
-        """fancy processing here"""
-```
-
-
 ### [wp_query](https://github.com/siznax/wptools/blob/master/wp_query.py)
 
 Get articles via MediaWiki API given titles, format
