@@ -27,29 +27,14 @@ import os
 import sys
 import time
 
-from wp_parser import WPParser
-from wp_parser_line import WPLineParser
+from wp_parser import WPLineParser
 from wp_index import page_title
 
 CHUNK_SIZE = 1024
-MAX_READ = 1024**2
+MAX_READ = 1024**2 * 10  # 10 MiB
 
 
-class PullParser(WPParser):
-
-    def __init__(self, title):
-        WPParser.__init__(self)
-        self.title = title
-        self.found_article = False
-
-    def process(self, elem):
-        title = page_title(elem)
-        if title == self.title:
-            print(elem)
-            self.found_article = True
-
-
-class PullLineParser(WPLineParser):
+class PullParser(WPLineParser):
 
     def __init__(self, title):
         WPLineParser.__init__(self)
@@ -102,19 +87,19 @@ def _read_bz2(title, dump, index, offset):
             print("seek %d" % pos, file=sys.stderr)
             zh.seek(pos)
         while not pp.found_article:
-            data = zh.read(CHUNK_SIZE)
+            data = zh.readlines(CHUNK_SIZE)
             bread += CHUNK_SIZE
-        if not data:
-            print("reached EOF %d" % zh.tell())
-            sys.exit(os.EOF)
-        if bread >= MAX_READ:
-            print("reached MAX_READ %d" % bread)
-            sys.exit(os.EX_UNAVAILABLE)
+            if not data:
+                print("reached EOF %d" % zh.tell())
+                sys.exit(os.EOF)
             pp.parse(data)
+            if bread >= MAX_READ:
+                print("reached MAX_READ %d" % bread)
+                sys.exit(os.EX_UNAVAILABLE)
 
 
 def _read_gz(title, dump):
-    lp = PullLineParser(title)
+    lp = PullParser(title)
     with gzip.open(dump, 'rb') as gz:
         for line in gz:
             lp.parse(line)
