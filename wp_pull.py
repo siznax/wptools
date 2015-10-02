@@ -24,7 +24,6 @@ import argparse
 import bz2
 import gzip
 import os
-import re
 import sys
 import time
 
@@ -34,6 +33,7 @@ from wp_index import page_title
 
 CHUNK_SIZE = 1024
 MAX_READ = 1024**2
+
 
 class PullParser(WPParser):
 
@@ -47,6 +47,7 @@ class PullParser(WPParser):
         if title == self.title:
             print(elem)
             self.found_article = True
+
 
 class PullLineParser(WPLineParser):
 
