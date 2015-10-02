@@ -42,8 +42,7 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 
 Index the [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-(currently ~12GB) into alphabetical files. This can be useful for
-speeding up extracting a single article.  
+(currently ~12GB) into alphabetical files.
 
 ```shell
 $ wp_index.py -h
@@ -95,9 +94,6 @@ last: B-tree 73395052
 read: 1 MB
 tell: 73508055
 ```
-
-``bzip2`` files can be safely concatenated, if necessary.
-
 
 ### [wp_infobox](https://github.com/siznax/wptools/blob/master/wp_infobox.py)
 
