@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Index Wikipedia XML Dump into alphabetical bz2 files
+Index or split Wikipedia XML Dump into alphabetical bz2 files
 
 This expects to operate on the (currently ~12GB)
 latest/enwiki-latest-pages-articles.xml.bz2
@@ -8,15 +8,10 @@ The process is interruptable and restartable.
 
 INPUT
    fname  XML Dump filename
+          see -h for options
 
 OUTPUT
-   index files: dest/[0-9], dest/[A-Z]
-
-To be resolved:
-
- * Is it sorted well enough to extract Vital Articles?
- * Is it feasible to use a streaming parser on this huge file,
-   like cElementTree?
+   index or split files to dest/[0-9], dest/[A-Z]
 
 References
     https://en.wikipedia.org/wiki/Wikipedia:Database_download
@@ -195,7 +190,7 @@ def _main(fname, max_mb, chunk_size, dest, offset, split, titles):
 
 
 if __name__ == "__main__":
-    desc = "Index Wikipedia XML Dump into alphabetical bz2 files"
+    desc = "Index or split Wikipedia XML Dump into alphabetical bz2 files"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("fname", help="XML Dump bz2 filename")
     argp.add_argument("-c", "-chunksize", type=int, default=DEFAULT_CHUNK_KB,
@@ -206,7 +201,7 @@ if __name__ == "__main__":
     argp.add_argument("-o", "-offset", type=int, default=0,
                       help="seek to byte offset")
     argp.add_argument("-s", "-split", action='store_true',
-                      help="split (instead of index) into files")
+                      help="split (versus index) into files")
     argp.add_argument("-t", "-titles", help="flat file of titles to pull")
     args = argp.parse_args()
 

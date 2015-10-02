@@ -42,8 +42,28 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 
 Index the [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-(currently ~12GB) into alphabetical ``bzip2`` files. This can
-be useful for speeding up extracting a single article. 
+(currently ~12GB) into alphabetical files. This can be useful for
+speeding up extracting a single article.  
+
+```shell
+$ wp_index.py -h
+usage: wp_index.py [-h] [-c C] [-d D] [-m M] [-o O] [-s] [-t T] fname
+
+Index or split Wikipedia XML Dump into alphabetical bzip2 files
+
+positional arguments:
+  fname               XML Dump bz2 filename
+
+optional arguments:
+  -h, --help          show this help message and exit
+  -c C, -chunksize C  chunk size in KB (default=1)
+  -d D, -dest D       write results to dest (dir)
+  -m M, -maxbytes M   max bytes in MB (default=10)
+  -o O, -offset O     seek to byte offset
+  -s, -split          split (versus index) into files
+  -t T, -titles T     flat file of titles to pull
+```
+
 
 It's interruptable...
 
