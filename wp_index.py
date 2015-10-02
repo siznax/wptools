@@ -26,6 +26,7 @@ __version__ = "1 Oct 2015"
 
 import argparse
 import bz2
+import gzip
 import os
 import re
 import sys
@@ -66,7 +67,7 @@ class IndexParser(WPParser):
         for char in string.digits + string.ascii_uppercase:
             path = "%s/%s" % (self.dest, char)
             print("+ open %s" % path)
-            self._files[char] = bz2.BZ2File(path, 'w')
+            self._files[char] = gzip.open(path, 'wb')
             self._paths[char] = path
         lpath = "%s/leftover" % self.dest
         print("+ open %s" % lpath)
