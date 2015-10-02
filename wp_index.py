@@ -76,8 +76,9 @@ class IndexParser(WPLineParser):
             print("+ open %s" % path)
             self._files[char] = gzip.open(path, 'wb')
             self._paths[char] = path
-        self.add_file("titles_found")
-        self.add_file("titles_left")
+        if self.titles:
+            self.add_file("titles_found")
+            self.add_file("titles_left")
 
     def close_files(self):
         if not self.dest:
