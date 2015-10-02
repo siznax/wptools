@@ -58,7 +58,14 @@ class IndexParser(WPParser):
         self.title = ""
         self.title_start = 0
         self.titles = None
+        self.titles_found = []
         self.titles_written = 0
+
+    def add_file(self, key):
+        path = "%s/%s" % (self.dest, key)
+        print("+ open %s" % path)
+        self._files[key] = file(path, 'w')
+        self._paths[key] = path
 
     def open_files(self):
         if not self.dest:
@@ -69,10 +76,8 @@ class IndexParser(WPParser):
             print("+ open %s" % path)
             self._files[char] = gzip.open(path, 'wb')
             self._paths[char] = path
-        lpath = "%s/leftover" % self.dest
-        print("+ open %s" % lpath)
-        self._files['leftover'] = file(lpath, 'w')
-        self._paths['leftover'] = lpath
+        self.add_file("titles_found")
+        self.add_file("titles_left")
 
     def close_files(self):
         if not self.dest:
@@ -93,6 +98,7 @@ class IndexParser(WPParser):
                     if title in self.titles:
                         _file.write(elem)
                         self.titles_written += 1
+                        self.titles_found.append(title)
                         self.titles.remove(title)
                 else:
                     _file.write(elem)
@@ -167,12 +173,15 @@ def gobble(ip, fname, chunk_size, max_mb, offset):
 
 
 def teardown(ip):
-    ip._files['leftover'].write("\n".join(sorted(ip.titles)))
+    if ip.titles:
+        ip._files['titles_found'].write("\n".join(sorted(ip.titles_found)))
+        ip._files['titles_left'].write("\n".join(sorted(ip.titles)))
     ip.close_files()
     print("pages found: %d" % ip.elems_found)
     print("titles processed: %d" % ip.elems_processed)
-    print("titles written: %d" % ip.titles_written)
-    print("titles leftover: %d" % len(ip.titles))
+    if ip.titles:
+        print("titles written: %d" % ip.titles_written)
+        print("titles leftover: %d" % len(ip.titles))
     print("first: %s %d" % (ip.first_title, ip.first_title_start))
     print("last: %s %d" % (ip.title, ip.title_start))
     print("read: %d MB" % (ip.bytes_read / ONE_MB))
