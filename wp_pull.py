@@ -23,6 +23,7 @@ __version__ = "30 Sep 2015"
 
 import argparse
 import bz2
+import os
 import re
 import sys
 import time
@@ -31,7 +32,7 @@ from wp_parser import WPParser
 from wp_index import page_title
 
 CHUNK_SIZE = 1024
-
+MAX_READ = 1024**2
 
 class PullParser(WPParser):
 
@@ -42,7 +43,6 @@ class PullParser(WPParser):
 
     def process(self, elem):
         title = page_title(elem)
-        print(title)
         if title == self.title:
             print(elem)
             self.found_article = True
@@ -57,21 +57,40 @@ def dump_pos(title, index):
                 return int(spl[-1])
 
 
-def _main(title, index, dump):
+def _offset(title, index, offset):
+    pos = None
+    if index and offset:
+        print("-index doesn't make sense with -offset")
+        sys.exit(os.EX_USAGE)
     if index:
         pos = dump_pos(title, index)
         if not pos:
             raise StandardError("could not find dump pos in index!")
+        # Shetlands 70.647 seconds
+        # pos = pos - pos % 900  # Shetlands 68.058 seconds
+        pos = pos - pos % 1000  # Shetlands 57.789 seconds
+    if offset:
+        pos = offset - offset % 1000
+    return pos
+
+
+def _main(title, dump, index, offset):
+    bytes_read = 0
+    pos = _offset(title, index, offset)
     pp = PullParser(title)
     with bz2.BZ2File(dump, 'r') as zh:
-        if index:
+        if pos:
             print("seek %d" % pos, file=sys.stderr)
             zh.seek(pos)
         while not pp.found_article:
             data = zh.read(CHUNK_SIZE)
+            bytes_read += CHUNK_SIZE
             if not data:
-                print("read %d bytes" % zh.tell())
-                return
+                print("reached EOF %d" % zh.tell())
+                sys.exit(os.EOF)
+            if bytes_read >= MAX_READ:
+                print("reached MAX_READ %d" % bytes_read)
+                sys.exit(os.EX_UNAVAILABLE)
             pp.parse(data)
 
 
@@ -81,8 +100,10 @@ if __name__ == "__main__":
     argp.add_argument("title", help="article title")
     argp.add_argument("dump", help="XML Dump bzip2 filename")
     argp.add_argument("-i", "-index", help="use index (bzip2) file")
+    argp.add_argument("-o", "-offset", type=int,
+                      help="byte offset into dump")
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.title, args.i, args.dump)
+    _main(args.title, args.dump, args.i, args.o)
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
