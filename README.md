@@ -145,21 +145,23 @@ From python:
 
 ### [wp_pull](https://github.com/siznax/wptools/blob/master/wp_pull.py)
 
-Pull article from Wikipedia XML Dump (bz2) or part (gz)
+Pull article from [Wikipedia XML
+Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download) (bz2)
+or (gzip)
 
-from XML Dump (bzip2) with index from ``wp_index``
+from (gzip) part from ``wp_index``
 
 ```shell
-$ wp_pull.py -i index/A Aristotle data/enwiki-latest-pages-articles.xml.bz2
+$ wp_pull.py Aristotle split/A
       <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
     </revision>
   </page>
 ```
 
-from (gzip) part of XML Dump split with ``wp_index``
+from XML Dump (bzip2) with index from ``wp_index``
 
 ```shell
-$ wp_pull.py Aristotle split/A
+$ wp_pull.py Aristotle -i index/A data/enwiki-latest-pages-articles.xml.bz2
       <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
     </revision>
   </page>
