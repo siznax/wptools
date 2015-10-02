@@ -147,7 +147,7 @@ From python:
 
 Pull article from [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download) (bz2)
-or (gzip)
+or (gzip) part
 
 from (gzip) part from ``wp_index``
 
