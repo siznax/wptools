@@ -39,13 +39,13 @@ ONE_KB = 1000
 ONE_MB = 1000**2
 MAX_MEGABYTES = 10
 
-from wp_parser import WPParser
+from wp_parser import WPLineParser
 
 
-class IndexParser(WPParser):
+class IndexParser(WPLineParser):
 
     def __init__(self, dest, offset, split):
-        WPParser.__init__(self)
+        WPLineParser.__init__(self)
         self._files = dict()
         self._paths = dict()
         self.bytes_read = 0
@@ -154,15 +154,19 @@ def setup(dest, offset, split, titles):
 
 def gobble(ip, fname, chunk_size, max_mb, offset):
     chunk_size = ONE_KB * chunk_size
+    est_bytes_read = 0
     max_bytes = ONE_MB * max_mb
     with bz2.BZ2File(fname, 'r') as zh:
         zh.seek(offset)
         try:
             while ip.bytes_read < max_bytes:
-                ip.parse(zh.read(chunk_size))
+                # data = zh.read(chunk_size)
+                data = zh.readlines(chunk_size)
+                ip.parse(data)
                 ip.tell = zh.tell()
                 ip.bytes_read = ip.tell - offset
-                if ip.tell % ONE_MB*10 == 0:
+                est_bytes_read += chunk_size
+                if est_bytes_read % ONE_MB * 10 == 0:
                     print("  %s %d" % (ip.title, ip.title_start))
         except KeyboardInterrupt:
             teardown(ip)

@@ -1,18 +1,16 @@
 """
-parse data (naive & reckless) from huge Wikipedia XML Dump
+parse data by line (naive and reckless)
 """
 
 __author__ = "siznax"
-__verion__ = "29 Sep 2015"
+__verion__ = "2 Oct 2015"
 
 
-class WPParser:
+class WPLineParser:
 
     MAX_ELEM_BYTES = 1024**2
-    _ebfr = ""
     _found_end = False
     _found_start = False
-    _sbfr = ""
     byte_count = 0
     elem = ""
     elems_found = 0
@@ -31,47 +29,37 @@ class WPParser:
         if len(self.elem) > self.MAX_ELEM_BYTES:
             print self.elem[:1024]
             raise RuntimeError("elem grew too big!")
-        for char in chunk:
-            self.byte_count += 1
-            self._scan(char)
-
-    def _scan(self, char):
-        if self._found_start:
-            self.elem += char
-            self._find_end(char)
+        if type(chunk) is list:
+            for line in chunk:
+                self._scan(line)
+                self.byte_count += len(line)
         else:
-            self._find_start(char)
+            self._scan(chunk)
+            self.byte_count += len(chunk)
+
+    def _scan(self, line):
+        if self._found_start:
+            self.elem += line
+            self._find_end(line)
+        else:
+            self._find_start(line)
         if self._found_end:
             self._found_end = False
             self.process(self.elem)
             self.elems_processed += 1
             self.elem = ""
 
-    def _find_start(self, char):
-        if len(self._sbfr) == len(self.start):
-            if self._sbfr == self.start:
-                if self._found_start:
-                    raise RuntimeError("already found start!")
-                self._found_start = True
-                self.elem = "  " + self.start + "\n"
-                self.elems_found += 1
-                # print self._sbfr
-            self._sbfr = ""
-        if self._sbfr:
-            self._sbfr += char
-        if char == self.start[0]:
-            self._sbfr = char
+    def _find_start(self, line):
+        if line.strip() == self.start:
+            if self._found_start:
+                raise RuntimeError("already found start!")
+            self._found_start = True
+            self.elem = line
+            self.elems_found += 1
 
-    def _find_end(self, char):
-        if len(self._ebfr) == len(self.end):
-            if self._ebfr == self.end:
-                if self._found_end:
-                    raise RuntimeError("already found end!")
-                self._found_end = True
-                self._found_start = False
-                # print self._ebfr
-            self._ebfr = ""
-        if self._ebfr:
-            self._ebfr += char
-        if char == self.end[0]:
-            self._ebfr = char
+    def _find_end(self, line):
+        if line.strip() == self.end:
+            if self._found_end:
+                raise RuntimeError("already found end!")
+            self._found_end = True
+            self._found_start = False
