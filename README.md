@@ -146,6 +146,29 @@ From python:
 ```
 
 
+### [wp_pull](https://github.com/siznax/wptools/blob/master/wp_pull.py)
+
+Pull article from Wikipedia XML Dump (bz2) or part (gz)
+
+from XML Dump (bzip2) with index from ``wp_index``
+
+```shell
+$ wp_pull.py -i index/A Aristotle data/enwiki-latest-pages-articles.xml.bz2
+      <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
+    </revision>
+  </page>
+```
+
+from (gzip) part of XML Dump split with ``wp_index``
+
+```shell
+$ wp_pull.py Aristotle split/A
+      <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
+    </revision>
+  </page>
+```
+
+
 ### [wp_parser](https://github.com/siznax/wptools/blob/master/wp_parser.py)
 
 Parse a [Wikipedia XML
