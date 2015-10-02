@@ -68,7 +68,7 @@ class IndexParser(WPParser):
             print("+ open %s" % path)
             self._files[char] = bz2.BZ2File(path, 'w')
             self._paths[char] = path
-        lpath = self.dest + "_left"
+        lpath = "%s/leftover" % self.dest
         print("+ open %s" % lpath)
         self._files['leftover'] = file(lpath, 'w')
         self._paths['leftover'] = lpath
