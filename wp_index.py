@@ -37,7 +37,7 @@ import traceback
 DEFAULT_CHUNK_KB = 1
 ONE_KB = 1000
 ONE_MB = 1000**2
-MAX_MEGABYTES = 10
+MAX_MEGABYTES = 1000 * 100  # 100 GB
 
 from wp_parser import WPLineParser
 
@@ -157,8 +157,10 @@ def gobble(ip, fname, chunk_size, max_mb, offset):
         zh.seek(offset)
         try:
             while ip.bytes_read < max_bytes:
-                # data = zh.read(chunk_size)
+                # data = zh.read(chunk_size)  SLOOOW
                 data = zh.readlines(chunk_size)
+                if not data:
+                    return
                 ip.parse(data)
                 ip.tell = zh.tell()
                 ip.bytes_read = ip.tell - offset
