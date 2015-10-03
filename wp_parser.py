@@ -8,7 +8,7 @@ __verion__ = "2 Oct 2015"
 
 class WPLineParser:
 
-    MAX_ELEM_BYTES = 1024**2
+    MAX_ELEM_BYTES = 1024**2 * 10  # 10 MiB
     _found_end = False
     _found_start = False
     byte_count = 0
@@ -27,8 +27,9 @@ class WPLineParser:
     def parse(self, chunk):
         """scan uncompressed chunk for start/end"""
         if len(self.elem) > self.MAX_ELEM_BYTES:
-            print self.elem[:1024]
-            raise RuntimeError("elem grew too big!")
+            msg = "WPLineParser elem grew too big!"
+            print(msg)
+            raise RuntimeError(msg)
         if type(chunk) is list:
             for line in chunk:
                 self._scan(line)
