@@ -22,7 +22,7 @@ GET Wikipedia article content from URL or filename
 the MediaWiki API, which is often quite slow. The problem is that you
 don't get ``wikitext``, but you can get raw HTML or Markdown
 text of just the article, sans boilerplate. It's not entirely
-deprecated, but ``wp_query`` are recommended for bulk processing.*
+deprecated, but ``wp_query`` is recommended for bulk processing.*
 
 See also ``wp_index`` and ``wp_summary``.
 
