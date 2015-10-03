@@ -21,8 +21,10 @@ GET Wikipedia article content from URL or filename
 *This is basically an alternative path to article content outside of
 the MediaWiki API, which is often quite slow. The problem is that you
 don't get ``wikitext``, but you can get raw HTML or Markdown
-text. It's not entirely deprecated, but ``wp_query`` and
-``wp_summary`` are recommended for bulk processing.*
+text of just the article, sans boilerplate. It's not entirely
+deprecated, but ``wp_query`` are recommended for bulk processing.*
+
+See also ``wp_index`` and ``wp_summary``.
 
 
 ### [wp_image](https://github.com/siznax/wptools/blob/master/wp_image.py)
