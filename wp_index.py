@@ -38,6 +38,7 @@ DEFAULT_CHUNK_KB = 1
 ONE_KB = 1000
 ONE_MB = 1000**2
 MAX_MEGABYTES = 1000 * 100  # 100 GB
+REPORT_INTERVAL = ONE_MB * 50
 
 from wp_parser import WPLineParser
 
@@ -165,7 +166,7 @@ def gobble(ip, fname, chunk_size, max_mb, offset):
                 ip.tell = zh.tell()
                 ip.bytes_read = ip.tell - offset
                 est_bytes_read += chunk_size
-                if est_bytes_read % ONE_MB * 10 == 0:
+                if est_bytes_read % REPORT_INTERVAL == 0:
                     print("  %s %d" % (ip.title, ip.title_start))
                     sys.stdout.flush()
         except KeyboardInterrupt:
