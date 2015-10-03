@@ -38,7 +38,7 @@ DEFAULT_CHUNK_KB = 1
 ONE_KB = 1000
 ONE_MB = 1000**2
 MAX_MEGABYTES = 1000 * 100  # 100 GB
-REPORT_INTERVAL = ONE_MB * 50
+REPORT_INTERVAL_MB = 10
 
 from wp_parser import WPLineParser
 
@@ -150,10 +150,11 @@ def setup(dest, offset, split, titles):
     return ip
 
 
-def gobble(ip, fname, chunk_size, max_mb, offset):
+def gobble(ip, fname, chunk_size, max_mb, offset, report_mb):
     chunk_size = ONE_KB * chunk_size
     est_bytes_read = 0
-    max_bytes = ONE_MB * max_mb
+    max_bytes = max_mb * ONE_MB
+    report_bytes = report_mb * ONE_MB
     with bz2.BZ2File(fname, 'r') as zh:
         zh.seek(offset)
         try:
@@ -166,7 +167,7 @@ def gobble(ip, fname, chunk_size, max_mb, offset):
                 ip.tell = zh.tell()
                 ip.bytes_read = ip.tell - offset
                 est_bytes_read += chunk_size
-                if est_bytes_read % REPORT_INTERVAL == 0:
+                if est_bytes_read % report_bytes == 0:
                     print("  %s %d" % (ip.title, ip.title_start))
                     sys.stdout.flush()
         except KeyboardInterrupt:
@@ -193,14 +194,14 @@ def teardown(ip):
     print("tell: %s" % ip.tell)
 
 
-def _main(fname, max_mb, chunk_size, dest, offset, split, titles):
+def _main(fname, max_mb, chunk_size, dest, offset, report_mb, split, titles):
     if titles:
         split = True
     if titles and not dest:
         print("-titles doesn't make sense without -dest")
         sys.exit(os.EX_USAGE)
     ip = setup(dest, offset, split, titles)
-    gobble(ip, fname, chunk_size, max_mb, offset)
+    gobble(ip, fname, chunk_size, max_mb, offset, report_mb)
     teardown(ip)
 
 
@@ -215,11 +216,14 @@ if __name__ == "__main__":
                       help="max bytes in MB (default=%d)" % MAX_MEGABYTES)
     argp.add_argument("-o", "-offset", type=int, default=0,
                       help="seek to byte offset")
+    argp.add_argument("-r", "-report", type=int, default=REPORT_INTERVAL_MB,
+                      help=("report interval in MB (default=%d)"
+                            % REPORT_INTERVAL_MB))
     argp.add_argument("-s", "-split", action='store_true',
                       help="split (versus index) into files")
     argp.add_argument("-t", "-titles", help="flat file of titles to pull")
     args = argp.parse_args()
 
     start = time.time()
-    _main(args.fname, args.m, args.c, args.d, args.o, args.s, args.t)
+    _main(args.fname, args.m, args.c, args.d, args.o, args.r, args.s, args.t)
     print("%5.3f seconds" % (time.time() - start))
