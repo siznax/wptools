@@ -65,7 +65,7 @@ optional arguments:
 ```
 
 
-It's interruptable...
+It's safely interruptable...
 
 ```shell
 $ wp_index.py data/enwiki-latest-pages-articles.xml.bz2
@@ -153,19 +153,36 @@ or (gzip) part
 from (gzip) part from ``wp_index``
 
 ```shell
-$ wp_pull.py Aristotle split/A
-      <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
-    </revision>
-  </page>
+$ wp_pull.py Aardvark split/A | head
+  <page>
+    <title>Aardvark</title>
+    <ns>0</ns>
+    <id>680</id>
+    <revision>
+      <id>677062948</id>
+      <parentid>677062792</parentid>
+      <timestamp>2015-08-20T21:57:54Z</timestamp>
+      <contributor>
+        <ip>174.124.250.129</ip>
+0.147 seconds
 ```
 
 from XML Dump (bzip2) with index from ``wp_index``
 
 ```shell
-$ wp_pull.py Aristotle -i index/A data/enwiki-latest-pages-articles.xml.bz2
-      <sha1>5il233urt2yitnzdv9n2coh68ny9mom</sha1>
-    </revision>
-  </page>
+$ wp_pull.py Aardvark -i index/A data/enwiki-latest-pages-articles.xml.bz2 | head
+seek 3785000
+  <page>
+    <title>Aardvark</title>
+    <ns>0</ns>
+    <id>680</id>
+    <revision>
+      <id>677062948</id>
+      <parentid>677062792</parentid>
+      <timestamp>2015-08-20T21:57:54Z</timestamp>
+      <contributor>
+        <ip>174.124.250.129</ip>
+0.350 seconds
 ```
 
 
@@ -271,30 +288,6 @@ $ curl -o WP_VAE.html https://meta.wikimedia.org/wiki/List_of_articles_every_Wik
 $ wp_vae.py WP_VAE.html '//div[@id="mw-content-text"]//div//li//a' > wp_vae.txt
   found 9966 titles
   5.132 seconds
-
-$ head wp_vae.txt
-  Harold Lloyd
-  Lillian Gish
-  Buster Keaton
-  Mary Pickford
-  Gloria Swanson
-  Asta Nielsen
-  Fred Astaire
-  Sarah Bernhardt
-  Humphrey Bogart
-  Marlon Brando
-
-$ tail wp_vae.txt
-  Standard deviation
-  Standard error
-  Statistical hypothesis testing
-  Student's t-test
-  Variance
-  Design of experiments
-  Randomized controlled trial
-  Survey methodology
-  Statistical population
-  Sampling (statistics)
 ```
 
 
