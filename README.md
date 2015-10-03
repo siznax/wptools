@@ -101,6 +101,8 @@ tell: 73508055
 
 Get <a href="https://en.wikipedia.org/wiki/Help:Infobox">Infobox</a> wikitext from titles or file
 
+as plain wikitext:
+
 ```shell
 $ wp_infobox.py Aardvark
 = Aardvark =
@@ -127,7 +129,7 @@ $ wp_infobox.py Aardvark
 }}
 ```
 
-From python:
+as python dict:
 
 ```python
 >>> import wp_infobox
