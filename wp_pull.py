@@ -44,8 +44,8 @@ class PullParser(WPLineParser):
     def process(self, elem):
         title = page_title(elem)
         if title == self.title:
-            print(elem)
             self.found_article = True
+            self.page = elem
 
 
 def dump_pos(title, index):
@@ -78,7 +78,7 @@ def _bz2_offset(title, index, offset):
     return pos
 
 
-def _read_bz2(title, dump, index, offset):
+def _read_bz2(title, dump, index=0, offset=0):
     bread = 0
     pos = _bz2_offset(title, index, offset)
     pp = PullParser(title)
@@ -96,6 +96,7 @@ def _read_bz2(title, dump, index, offset):
             if bread >= MAX_READ:
                 print("reached MAX_READ %d" % bread)
                 sys.exit(os.EX_UNAVAILABLE)
+        return pp.page
 
 
 def _read_gz(title, dump):
@@ -104,7 +105,15 @@ def _read_gz(title, dump):
         for line in gz:
             lp.parse(line)
             if lp.found_article:
-                return
+                return lp.page
+
+
+def pull(title, dump):
+    """return <page> from dump file given title"""
+    if dump.endswith('.bz2'):
+        return _read_bz2(title, dump)
+    else:
+        return _read_gz(title, dump)
 
 
 def _main(title, dump, index, offset):
@@ -112,12 +121,12 @@ def _main(title, dump, index, offset):
         print("dump file not found: %s" % dump)
         sys.exit(os.EX_USAGE)
     if dump.endswith('.bz2'):
-        _read_bz2(title, dump, index, offset)
+        print(_read_bz2(title, dump, index, offset))
     else:
         if index or offset:
             print("-index or -offset makes no sense with gzip")
             sys.exit(os.EX_USAGE)
-        _read_gz(title, dump)
+        print(_read_gz(title, dump))
 
 
 if __name__ == "__main__":
