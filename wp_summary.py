@@ -47,6 +47,7 @@ import time
 import wp_query
 
 from collections import defaultdict
+from HTMLParser import HTMLParser
 from lxml import etree
 from lxml import objectify
 from StringIO import StringIO
@@ -250,7 +251,7 @@ def _clean(wikitext):
 
 
 def _ignores(line):
-    """returns of list of matching patterns to ignore in summary lines"""
+    """return list of matching patterns to ignore in summary lines"""
     ignore = [re.search(r'^\W+$', line),  # only non-word characters
               re.search(r'^{.*}$', line),  # begins/ends with braces
               re.search(r'^\[.*\]$', line),  # begins/ends with brackets
@@ -276,6 +277,8 @@ def _summary(wikitext):
     template = False
     exited = False
     article_started = False
+    hp = HTMLParser()
+    wikitext = hp.unescape(wikitext)
     for line in wikitext.split("\n"):
         if line.startswith("="):
             break
