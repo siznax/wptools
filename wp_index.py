@@ -71,7 +71,7 @@ class IndexParser(WPLineParser):
         if not self.dest:
             return
         os.mkdir(self.dest)
-        for char in string.digits + string.ascii_uppercase:
+        for char in string.digits + string.ascii_uppercase + "_":
             path = "%s/%s" % (self.dest, char)
             print("+ open %s" % path)
             self._files[char] = gzip.open(path, 'wb')
@@ -91,22 +91,18 @@ class IndexParser(WPLineParser):
                 print("wrote %d bytes to %s" % (tell, path))
 
     def _write(self, title, title_start, elem):
-        first_char = ascii_bin(title)
-        if first_char in self._files:
-            _file = self._files[first_char]
-            if self.split:
-                if self.titles:
-                    if title in self.titles:
-                        _file.write(elem)
-                        self.titles_written += 1
-                        self.titles_found.append(title)
-                        self.titles.remove(title)
-                else:
+        _file = self._files[ascii_bin(title)]
+        if self.split:
+            if self.titles:
+                if title in self.titles:
                     _file.write(elem)
+                    self.titles_written += 1
+                    self.titles_found.append(title)
+                    self.titles.remove(title)
             else:
-                _file.write("%s %s\n" % (title, title_start))
+                _file.write(elem)
         else:
-            print("ORPHAN %s" % title)
+            _file.write("%s %s\n" % (title, title_start))
 
     def process(self, elem):
         title = page_title(elem)
@@ -137,7 +133,7 @@ def ascii_bin(title):
         return [x for x in title.upper()
                 if 47 < ord(x) < 58 or 64 < ord(x) < 91][0]
     except:
-        return title
+        return "_"
 
 
 def setup(dest, offset, split, titles):
@@ -149,7 +145,7 @@ def setup(dest, offset, split, titles):
     if titles:
         with open(titles) as fh:
             ip.titles = set(fh.read().split("\n"))
-            print("Pulling %d titles" % len(ip.titles), file=sys.stderr)
+            print("Pulling %d titles" % len(ip.titles))
     return ip
 
 
