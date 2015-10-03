@@ -44,16 +44,16 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 
 Index or split a [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-(latest revisions currently ~12GB compressed/~50GB uncompressed) into
-alphabetical files. You can optionally split on a list of titles from
-a flat file, thereby extracting only those titles into alphabetical
-parts. 
+(latest revisions currently ~12GB compressed bzip2) into
+alphabetical (gzip) files. You can optionally split on a list of
+titles from a flat file, thereby extracting only those titles into
+alphabetical parts.
 
 ```shell
 $ wp_index.py -h
-usage: wp_index.py [-h] [-c C] [-d D] [-m M] [-o O] [-s] [-t T] fname
+usage: wp_index.py [-h] [-c C] [-d D] [-m M] [-o O] [-r R] [-s] [-t T] fname
 
-Index or split Wikipedia XML Dump into alphabetical (gz) files
+Index or split Wikipedia XML Dump (bz2) into alpha (gz) files
 
 positional arguments:
   fname               XML Dump (bz2) filename
@@ -62,8 +62,9 @@ optional arguments:
   -h, --help          show this help message and exit
   -c C, -chunksize C  chunk size in KB (default=1)
   -d D, -dest D       write results to dest (dir)
-  -m M, -maxbytes M   max bytes in MB (default=10)
+  -m M, -maxbytes M   max bytes in MB (default=100000)
   -o O, -offset O     seek to byte offset
+  -r R, -report R     report interval in MB (default=10)
   -s, -split          split (versus index) into files
   -t T, -titles T     flat file of titles to pull
 ```

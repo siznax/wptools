@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Index or split Wikipedia XML Dump into alphabetical (gz) files
+Index or split Wikipedia XML Dump (bz2) into alphabetical (gz) files
 
 This expects to operate on the (currently ~12GB)
 latest/enwiki-latest-pages-articles.xml.bz2
@@ -206,7 +206,7 @@ def _main(fname, max_mb, chunk_size, dest, offset, report_mb, split, titles):
 
 
 if __name__ == "__main__":
-    desc = "Index or split Wikipedia XML Dump into alphabetical (gz) files"
+    desc = "Index or split Wikipedia XML Dump (bz2) into alpha (gz) files"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("fname", help="XML Dump (bz2) filename")
     argp.add_argument("-c", "-chunksize", type=int, default=DEFAULT_CHUNK_KB,
