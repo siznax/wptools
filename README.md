@@ -42,10 +42,11 @@ https://upload.wikimedia.org/wikipedia/commons/f/f6/Theo_van_Gogh_(1888).png
 
 ### [wp_index](https://github.com/siznax/wptools/blob/master/wp_index.py)
 
-Index or split the [Wikipedia XML
+Index or split a [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
-(currently ~12GB) into alphabetical files, optionally on a list of
-titles.
+(latest revisions currently ~12GB compressed/~50GB uncompressed) into
+alphabetical files. You can optionally split on a list of titles from
+a flat file.
 
 ```shell
 $ wp_index.py -h
