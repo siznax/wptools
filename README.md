@@ -46,7 +46,8 @@ Index or split a [Wikipedia XML
 Dump](https://en.wikipedia.org/wiki/Wikipedia:Database_download)
 (latest revisions currently ~12GB compressed/~50GB uncompressed) into
 alphabetical files. You can optionally split on a list of titles from
-a flat file.
+a flat file, thereby extracting only those titles into alphabetical
+parts. 
 
 ```shell
 $ wp_index.py -h
@@ -158,18 +159,18 @@ or (gzip) part
 from (gzip) part from ``wp_index``
 
 ```shell
-$ wp_pull.py Aardvark split/A | head
+$ ./wp_pull.py Zebra part/Z | head
   <page>
-    <title>Aardvark</title>
+    <title>Zebra</title>
     <ns>0</ns>
-    <id>680</id>
+    <id>34460</id>
     <revision>
-      <id>677062948</id>
-      <parentid>677062792</parentid>
-      <timestamp>2015-08-20T21:57:54Z</timestamp>
+      <id>673810621</id>
+      <parentid>672398170</parentid>
+      <timestamp>2015-07-30T16:57:41Z</timestamp>
       <contributor>
-        <ip>174.124.250.129</ip>
-0.147 seconds
+        <username>Equinox</username>
+0.037 seconds
 ```
 
 from XML Dump (bzip2) with index from ``wp_index``
