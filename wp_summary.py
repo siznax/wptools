@@ -47,10 +47,23 @@ import time
 import wp_query
 
 from collections import defaultdict
+from lxml import etree
+from lxml import objectify
+from StringIO import StringIO
 
 DEBUG = False
 DEFAULT = 'text'
 FORMATS = ['dict', 'json', 'text']
+
+
+def from_dump(title, page, _format=DEFAULT, noterms=False):
+    """returns Summary from XML Dump <page>"""
+    if not page:
+        raise StandardError("from_dump() got empty page!")
+    root = objectify.parse(StringIO(page))
+    tree = root.xpath('//text')
+    text = etree.tostring(tree[0]).encode('utf-8')
+    return _output(_parse_dump(title, text), _format, noterms)
 
 
 def from_api(titles, _format=DEFAULT, noterms=False):
@@ -99,7 +112,7 @@ def _summaries_to_text(summaries, noterms):
         if summary['related'] and not noterms:
             related = (" * %s" % x for x in summary['related'])
             text += "\nRelated terms:\n\n"
-            text += "\n".join(related).decode('utf-8') + "\n\n"
+            text += "\n".join(related) + "\n\n"
         text += "<%s/%s>\n" % (prefix, summary['title'].replace(" ", "_"))
     return re.sub(r'\n{3,}', "\n\n", text)
 
@@ -308,6 +321,16 @@ def _related_terms(summary):
             print("related_term >>> %s" % term)
         terms.add(term)
     return sorted(terms)
+
+
+def _parse_dump(title, wikitext):
+    sumtext = _summary(wikitext)
+    summary = _clean(sumtext)
+    related = _related_terms(sumtext)
+    return [{'title': title,
+             'wikitext': wikitext,
+             'summary': summary.encode('utf-8'),
+             'related': related}]
 
 
 def _parse(api_json):
