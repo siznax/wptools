@@ -100,6 +100,23 @@ read: 1 MB
 tell: 73508055
 ```
 
+It took about 2 hours to pull 10K articles out the "latest" 12GB XML
+Dump on a (2013) MacBook Air with no optimization, resulting in 172MB
+of alpha parts:
+
+```shell
+$ wp_index.py enwiki-latest-pages-articles.xml.bz2 -t {WP_VAE} -d titles
+pages found: 15901123
+titles processed: 15901122
+titles written: 9921
+titles leftover: 33
+first: AccessibleComputing 2901
+last: Johannes Otzen 54390070814
+read: 54390 MB
+tell: 54390072868
+6833.741 seconds
+```
+
 
 ### [wp_infobox](https://github.com/siznax/wptools/blob/master/wp_infobox.py)
 
