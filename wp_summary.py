@@ -78,14 +78,15 @@ def from_file(fname, _format=DEFAULT, noterms=False):
         return _output(_parse(json.loads(fh.read())), _format, noterms)
 
 
-def epedia(leadtxt):
+def epedia(title, leadtxt):
     """return compact paragraph from article lead text"""
+    leadtxt = leadtxt.encode('utf-8')
     par = re.sub(r"\[\d+\]", '', leadtxt)
     par = re.sub(r"\n{2,}", " \xc2\xb6 ", par)  # pilcrow '\xc2\xb6'
     last_char = par.strip()[-2:]
-    if last_char.encode('utf-8') == '\xc2\xb6':
+    if last_char == '\xc2\xb6':
         par = par.strip()[:-2]
-    return par
+    return "= %s = %s" % (title, par)
 
 
 def _output(summaries, _format, noterms):
@@ -349,7 +350,7 @@ def _parse_dump(title, wikitext):
              'wikitext': wikitext,
              'summary': summary.encode('utf-8'),
              'related': related,
-             'epedia': epedia(summary)}]
+             'epedia': epedia(title, summary)}]
 
 
 def _parse(api_json):
@@ -367,7 +368,7 @@ def _parse(api_json):
                               'wikitext': wikitext,
                               'summary': summary,
                               'related': related,
-                              'epedia': epedia(summary)})
+                              'epedia': epedia(page["title"], summary)})
     return summaries
 
 
