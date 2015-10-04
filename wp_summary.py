@@ -83,7 +83,7 @@ def epedia(leadtxt):
     par = re.sub(r"\[\d+\]", '', leadtxt)
     par = re.sub(r"\n{2,}", " \xc2\xb6 ", par)  # pilcrow '\xc2\xb6'
     last_char = par.strip()[-2:]
-    if last_char == '\xc2\xb6':
+    if last_char.encode('utf-8') == '\xc2\xb6':
         par = par.strip()[:-2]
     return par
 
@@ -91,14 +91,16 @@ def epedia(leadtxt):
 def _output(summaries, _format, noterms):
     """returns Summaries as text, dict, or json"""
     if _format == 'dict':
-        return _summaries_to_dict(summaries)
+        return _to_dict(summaries)
     if _format == 'json':
         return json.dumps(summaries)
     if _format == 'text':
-        return _summaries_to_text(summaries, noterms)
+        return _to_text(summaries, noterms)
+    if _format == 'epedia':
+        return _to_text(summaries, noterms, epedia)
 
 
-def _summaries_to_dict(summaries):
+def _to_dict(summaries):
     """return list of dicts from list of infosummaries"""
     for i, summary in enumerate(summaries):
         _dict = defaultdict(str)
@@ -113,11 +115,14 @@ def _summaries_to_dict(summaries):
     return summaries
 
 
-def _summaries_to_text(summaries, noterms):
+def _to_text(summaries, noterms, epedia=False):
     """return wikitext from list of infosummaries"""
     text = ""
     prefix = "https://en.wikipedia.org/wiki"
     for summary in summaries:
+        if epedia:
+            text += summary['epedia']
+            continue
         text += "\n= %s =\n\n" % summary['title']
         text += summary['summary'] + "\n"
         if summary['related'] and not noterms:
@@ -343,7 +348,8 @@ def _parse_dump(title, wikitext):
     return [{'title': title,
              'wikitext': wikitext,
              'summary': summary.encode('utf-8'),
-             'related': related}]
+             'related': related,
+             'epedia': epedia(summary)}]
 
 
 def _parse(api_json):
@@ -360,7 +366,8 @@ def _parse(api_json):
             summaries.append({'title': page["title"],
                               'wikitext': wikitext,
                               'summary': summary,
-                              'related': related})
+                              'related': related,
+                              'epedia': epedia(summary)})
     return summaries
 
 
@@ -384,7 +391,8 @@ if __name__ == "__main__":
         description="Get plain text of article's lead section")
     argp.add_argument("titles", nargs='+',
                       help="article titles or filename")
-    argp.add_argument("-f", "-format", choices={'text', 'json'},
+    argp.add_argument("-f", "-format",
+                      choices={'text', 'json', 'epedia'},
                       default='text',
                       help="output format (default=text)")
     argp.add_argument("-d", "-debug", action='store_true',
