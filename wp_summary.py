@@ -78,6 +78,16 @@ def from_file(fname, _format=DEFAULT, noterms=False):
         return _output(_parse(json.loads(fh.read())), _format, noterms)
 
 
+def epedia(leadtxt):
+    """return compact paragraph from article lead text"""
+    par = re.sub(r"\[\d+\]", '', leadtxt)
+    par = re.sub(r"\n{2,}", " \xc2\xb6 ", par)  # pilcrow '\xc2\xb6'
+    last_char = par.strip()[-2:]
+    if last_char == '\xc2\xb6':
+        par = par.strip()[:-2]
+    return par
+
+
 def _output(summaries, _format, noterms):
     """returns Summaries as text, dict, or json"""
     if _format == 'dict':

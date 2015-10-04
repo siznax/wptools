@@ -31,10 +31,10 @@ import html5lib
 import html2text
 import lxml
 import os
-import re
 import requests
 import sys
 import time
+import wp_summary
 
 __author__ = "siznax"
 __version__ = "24 Sep 2015"
@@ -53,15 +53,6 @@ def _tostring(elem, strip_tags=False):
     if strip_tags:
         return lxml.etree.tostring(elem, method="text", encoding="utf-8")
     return lxml.etree.tostring(elem)
-
-
-def _epedia(content):
-    content = re.sub(r"\[\d+\]", '', content)
-    content = re.sub(r"\n{2,}", " \xc2\xb6 ", content)  # pilcrow '\xc2\xb6'
-    last_char = content.strip()[-2:]
-    if last_char == '\xc2\xb6':
-        content = content.strip()[:-2]
-    return content
 
 
 def _process(html, xpath, lead=False, strip_tags=False, epedia=False):
@@ -83,7 +74,7 @@ def _process(html, xpath, lead=False, strip_tags=False, epedia=False):
             content.append(_tostring(item, strip_tags))
     content = "\n".join(content)
     if epedia:
-        content = _epedia(content)
+        content = wp_summary.epedia(content)
     return content
 
 
