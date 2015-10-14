@@ -10,11 +10,11 @@ command-line help.
 
 Command-line functions:
 
-* [html](https://github.com/siznax/wptools/blob/master/html.py) - Query MediaWiki API for article HTML
-* [infobox](https://github.com/siznax/wptools/blob/master/infobox.py) - Query MediaWiki API for article [Infobox](https://en.wikipedia.org/wiki/Help:Infobox)
-* [parsetree](https://github.com/siznax/wptools/blob/master/parsetree.py) - Query MediaWiki API for article [Parse tree](https://en.wikipedia.org/wiki/Parse_tree)
-* [text](https://github.com/siznax/wptools/blob/master/text.py) - Query MediaWiki API for plain text of article
-* [wikitext](https://github.com/siznax/wptools/blob/master/wikitext.py) - Query MediaWiki API for article [wikitext](https://meta.wikimedia.org/wiki/Wiki_syntax)
+* [html](https://github.com/siznax/wptools/blob/master/html.py) - get article HTML
+* [infobox](https://github.com/siznax/wptools/blob/master/infobox.py) -  get article [Infobox](https://en.wikipedia.org/wiki/Help:Infobox)
+* [parsetree](https://github.com/siznax/wptools/blob/master/parsetree.py) - get article [Parse tree](https://en.wikipedia.org/wiki/Parse_tree)
+* [text](https://github.com/siznax/wptools/blob/master/text.py) - get plain text of article
+* [wikitext](https://github.com/siznax/wptools/blob/master/wikitext.py) - get article [wikitext](https://meta.wikimedia.org/wiki/Wiki_syntax)
 
 
 @siznax
