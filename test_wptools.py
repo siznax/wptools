@@ -18,8 +18,13 @@ class WPToolsTestCase(unittest.TestCase):
 
 class ExtractTestCase(unittest.TestCase):
 
-    def test(self):
-        pass
+    def test_html_lead(self):
+        from wptools.extract import html_lead
+        data = ("<div><table><td><p>no</p></td></table></div>"
+                "<p>yes</p>"
+                "<div><p>no</p></div>")
+        ans = html_lead(data)
+        self.assertEqual(ans, "<p>yes</p>")
 
 
 class FetchTestCase(unittest.TestCase):
