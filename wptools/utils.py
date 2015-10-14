@@ -8,6 +8,7 @@ import hashlib
 import html5lib
 import json
 import re
+import sys
 
 
 def images(wikitext):
@@ -55,6 +56,15 @@ def parse_html(html):
     return html5lib.parse(html,
                           treebuilder='lxml',
                           namespaceHTMLElements=False)
+
+
+def safe_exit(output):
+    """exit without breaking pipes."""
+    try:
+        sys.stdout.write(output)
+        sys.stdout.flush()
+    except IOError:
+        pass
 
 
 def single_space(blob):
