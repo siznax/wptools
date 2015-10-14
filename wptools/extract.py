@@ -33,7 +33,7 @@ def disambig(source, data):
                 return "DISAMBIGUATION"
 
 
-def html(data, lead=False, plain=False, compact=False):
+def html(data, lead=False):
     """returns HTML part of action=parse query"""
     try:
         doc = json.loads(data)["parse"]["text"]["*"]
@@ -47,13 +47,6 @@ def html(data, lead=False, plain=False, compact=False):
         return red
     if lead:
         doc = lead_html(doc)
-    if plain or compact:
-        doc = lead_html_keep_tags(doc)
-        doc = utils.strip_refs(doc)
-        doc = utils.single_space(doc)
-        doc = plain_text_cleanup(doc)
-    if compact:
-        doc = utils.collapse(doc)
     try:
         return doc.encode('utf-8')
     except:
@@ -145,6 +138,25 @@ def template_to_dict(tree):
                 value = etree.tostring(tmp)
             obj[name.text.strip()] = value
     return dict(obj)
+
+
+def text(data, lead=False, compact=False):
+    """
+    returns plain text of article
+    :param lead: lead section only
+    :param compact: collapse newlines into pilcrows
+    """
+    doc = html(data, lead)
+    doc = lead_html_keep_tags(doc)
+    doc = utils.strip_refs(doc)
+    doc = utils.single_space(doc)
+    doc = plain_text_cleanup(doc)
+    if compact:
+        doc = utils.collapse(doc)
+    try:
+        return doc.encode('utf-8')
+    except:
+        return doc
 
 
 def wikitext(data):

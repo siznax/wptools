@@ -17,13 +17,13 @@ import time
 import wptools
 
 
-def main(title, compact, lead, test, wiki, verbose):
+def main(title, compact, lead, test, verbose, wiki):
     start = time.time()
     data = wptools.get_html(title, lead, test, wiki, verbose)
     if test:
         print(data)
         sys.exit(os.EX_OK)
-    print(wptools.html(data, lead, plain=True, compact=compact))
+    print(wptools.text(data, compact=compact))
     if verbose:
         print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
@@ -45,4 +45,4 @@ if __name__ == "__main__":
                       help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
     args = argp.parse_args()
 
-    main(args.title, args.c, args.l, args.t, args.w, args.v)
+    main(args.title, args.c, args.l, args.t, args.v, args.w)

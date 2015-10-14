@@ -15,6 +15,6 @@ __title__ = "wptools"
 __version__ = "0.0.2"
 
 from . import utils
-from .extract import html, infobox, parsetree, wikitext
+from .extract import html, infobox, parsetree, text, wikitext
 from .fetch import get_html, get_infobox, get_parsetree, get_wikitext
 from .fetch import WPToolsFetch
