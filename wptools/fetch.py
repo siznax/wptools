@@ -52,7 +52,7 @@ class WPToolsFetch:
                                    "&disabletoc="))}
     TIMEOUT = 30
 
-    def __init__(self, wiki, lead, verbose):
+    def __init__(self, wiki, lead=False, verbose=False):
         self.wiki = wiki or self.ENDPOINT
         self.lead = lead
         self.verbose = verbose
@@ -89,6 +89,7 @@ class WPToolsFetch:
 
     def query(self, content, page):
         page = page.replace(" ", "+")
+        page = page[0].upper() + page[1:]
         qry = self.QUERY[content].substitute(WIKI=self.wiki, page=page)
         if self.lead:
             return qry + "&section=0"
@@ -102,7 +103,8 @@ class WPToolsFetch:
         return r.content
 
 
-def get_html(title, lead, test, wiki, verbose=False):
+def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+             verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('html', title)
     if test:
