@@ -1,0 +1,76 @@
+# -*- coding:utf-8 -*-
+
+"""
+WPTools Utilities module.
+"""
+
+import hashlib
+import html5lib
+import json
+import re
+
+
+def images(wikitext):
+    """
+    return list of images from wikitext
+    """
+
+    def search(item):
+        match = re.search(r"\[\[(.*)\]\]", item)
+        if match:
+            item = match.group(1)
+        match = re.search(r"([^\|]*)|", item)
+        if match:
+            item = match.group(1)
+        return media_url(item)
+
+    images = []
+    wikitext = wikitext.encode('utf-8')
+    for line in wikitext.split("\n"):
+        if re.search(r'image\d{0,} {0,}=', line):
+            image = line.split("=")[1].strip()
+            images.append(search(image))
+    return images
+
+
+def collapse(text):
+    """replace newlines with pilcrows"""
+    # pilcrow '\xc2\xb6'
+    text = text.strip()
+    text = re.sub(r"\n{1,}", " \xc2\xb6 ", text)
+    if text.strip()[-2:] == '\xc2\xb6':
+        text = text.strip()[:-2]
+    return text
+
+
+def media_url(fname, namespace='common', wiki='http://en.wikipedia.org'):
+    """return Wikimedia File/Image URL from name"""
+    name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
+    digest = hashlib.md5(name).hexdigest()
+    return "/".join([wiki, namespace, digest[:1], digest[:2], name])
+
+
+def parse_html(html):
+    """returns etree from HTML"""
+    return html5lib.parse(html,
+                          treebuilder='lxml',
+                          namespaceHTMLElements=False)
+
+
+def single_space(blob):
+    """replace 3 or more newlines with 2"""
+    return re.sub(r"\n{3,}", "\n\n", blob)
+
+
+def strip_refs(blob):
+    """remove [1][2][3]:456 references from text blob"""
+    return re.sub(r"\[\d+\](:\d+)?", "", blob)
+
+
+def wikitext_from_json(_json):
+    """return wikitext from API JSON"""
+    text = ""
+    for page in json.loads(_json)["query"]["pages"]:
+        text += "\n= %s =\n" % page["title"]
+        text += page["revisions"][0]["content"]
+    return text
