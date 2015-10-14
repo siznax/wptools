@@ -7,7 +7,9 @@ WPTools Utilities module.
 import hashlib
 import html5lib
 import json
+import random
 import re
+import string
 import sys
 
 
@@ -65,6 +67,42 @@ def safe_exit(output):
         sys.stdout.flush()
     except IOError:
         pass
+
+
+def sample_titles(fname, pop=100, num=10):
+    """
+    return list of random titles from file
+    :param fname: flat file of titles
+    :type fname: str
+    :param pop: population size
+    :type pop: int
+    :param num: sample size
+    :type num: int
+    """
+    titles = []
+    count = 0
+    sample = random.sample(xrange(pop), num)
+    with open(fname) as fh:
+        for item in fh:
+            if count in sample:
+                titles.append(item.strip())
+                sample.remove(count)
+            count += 1
+    return titles
+
+
+def sample_titles_alpha(fname):
+    """return list of first alphabetical item found in sorted titles file"""
+    sample = string.ascii_uppercase
+    titles = []
+    with open(fname) as fh:
+        for item in fh:
+            if item.startswith(sample[0]):
+                titles.append(item.strip())
+                sample = sample[1:]
+                if not sample:
+                    break
+    return titles
 
 
 def single_space(blob):
