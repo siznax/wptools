@@ -22,13 +22,11 @@ class WPToolsExtract:
 def disambig(source, data):
     """return DISAMBIGUATION if found"""
     if source == 'html':
-        xpath = "//p[1]"
-        for item in lxml.html.fromstring(data).xpath(xpath):
-            if "may refer to" in etree.tostring(item):
+        for item in lxml.html.fromstring(data).xpath("//p[1]"):
+            if "may refer to:" in etree.tostring(item):
                 return "DISAMBIGUATION"
     if source == 'parsetree':
-        txtnodes = etree.fromstring(data).xpath("//text()")
-        for item in txtnodes:
+        for item in etree.fromstring(data).xpath("//text()"):
             if 'may refer to:' in item:
                 return "DISAMBIGUATION"
 
@@ -106,14 +104,17 @@ def infobox(data):
 
 def parsetree(data):
     """return parsetree XML from API JSON"""
-    ptree = json.loads(data)["parse"]["parsetree"]["*"].encode('utf-8')
-    dis = disambig('parsetree', ptree)
-    if dis:
-        return dis
-    red = redirect('parsetree', ptree)
-    if red:
-        return red
-    return ptree
+    try:
+        ptree = json.loads(data)["parse"]["parsetree"]["*"].encode('utf-8')
+        dis = disambig('parsetree', ptree)
+        if dis:
+            return dis
+        red = redirect('parsetree', ptree)
+        if red:
+            return red
+        return ptree
+    except:
+        return json.loads(data)["error"]["info"].encode('utf-8')
 
 
 def redirect(source, data):
