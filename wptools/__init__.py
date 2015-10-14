@@ -3,10 +3,9 @@
 """
 Wikipedia Tools library
 
-Get the plain text, wikitext, HTML, or parse tree of a MediaWiki
-article via the MediaWiki API. You may get the whole article in those
-formats, just the "lead" section (summary), or just the Infobox (if
-extant). 
+Get the plain text, wikitext, HTML, or parse tree of an article via 
+the MediaWiki API. You may get the whole article in those formats,
+just the "lead" section (summary), or just the Infobox (if extant).
 """
 
 __author__ = "siznax"
