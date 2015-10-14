@@ -23,7 +23,7 @@ def main(title, compact, lead, test, verbose, wiki):
     if test:
         print(data)
         sys.exit(os.EX_OK)
-    print(wptools.text(data, compact=compact))
+    print(wptools.text(data, lead, compact))
     if verbose:
         print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
