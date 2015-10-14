@@ -46,7 +46,47 @@ def html(data, lead=False):
     if red:  # Einstein
         return red
     if lead:
-        doc = lead_html(doc)
+        doc = html_lead(doc)
+    try:
+        return doc.encode('utf-8')
+    except:
+        return doc
+
+
+def html_lead(frag):
+    """returns lead section from page HTML fragment"""
+    lead = []
+    for item in lxml.html.fromstring(frag).xpath("p"):
+        # print(etree.tostring(item))
+        lead.append(etree.tostring(item))
+    return "\n".join(lead)
+
+
+def html_keep_tags(frag):
+    """strip tags, except replace <b> and <i> with markdown"""
+    from lxml.html.clean import Cleaner
+    cleaner = Cleaner(allow_tags=['b', 'i'], remove_unknown_tags=False)
+    text = cleaner.clean_html(frag)
+    text = text.replace("<div>", "").replace("</div>", "")
+    text = re.sub(r"</?b>", "**", text)
+    text = re.sub(r"</?i>", "_", text)
+    return text
+
+
+def html_strip_tags(frag):
+    """returns lead HTML fragment with tags removed"""
+    html = lxml.html.fromstring(frag)
+    return etree.tostring(html, method="text", encoding="utf-8")
+
+
+def html_text(data, lead=False, compact=False):
+    doc = html(data, lead)
+    doc = html_keep_tags(doc)
+    doc = utils.strip_refs(doc)
+    doc = utils.single_space(doc)
+    doc = plain_text_cleanup(doc)
+    if compact:
+        doc = utils.collapse(doc)
     try:
         return doc.encode('utf-8')
     except:
@@ -62,34 +102,6 @@ def infobox(data):
                 return json.dumps(template_to_dict(item))
     except:
         return ptree
-
-
-def lead_html(frag):
-    """returns lead section from page HTML fragment"""
-    lead = []
-    for item in lxml.html.fromstring(frag).xpath("//p"):
-        lead.append(etree.tostring(item))
-    return "\n".join(lead)
-
-
-def lead_html_keep_tags(frag):
-    """strip tags, except replace <b> and <i> with markdown"""
-    from lxml.html.clean import Cleaner
-    cleaner = Cleaner(allow_tags=['b', 'i'], remove_unknown_tags=False)
-    text = cleaner.clean_html(frag)
-    text = text.replace("<div>", "").replace("</div>", "")
-    text = re.sub(r"</?b>", "**", text)
-    text = re.sub(r"</?i>", "_", text)
-    return text
-
-
-def lead_html_strip_tags(frag):
-    """returns lead HTML fragment with tags removed"""
-    lead = []
-    for item in lxml.html.fromstring(frag).xpath("//p"):
-        txt = etree.tostring(item, method="text", encoding="utf-8")
-        lead.append(txt)
-    return "\n".join(lead)
 
 
 def parsetree(data):
@@ -142,21 +154,11 @@ def template_to_dict(tree):
 
 def text(data, lead=False, compact=False):
     """
-    returns plain text of article
+    returns plain text of article from HTML
     :param lead: lead section only
     :param compact: collapse newlines into pilcrows
     """
-    doc = html(data, lead)
-    doc = lead_html_keep_tags(doc)
-    doc = utils.strip_refs(doc)
-    doc = utils.single_space(doc)
-    doc = plain_text_cleanup(doc)
-    if compact:
-        doc = utils.collapse(doc)
-    try:
-        return doc.encode('utf-8')
-    except:
-        return doc
+    return html_text(data, lead, compact)
 
 
 def wikitext(data):
