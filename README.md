@@ -10,30 +10,11 @@ command-line help.
 
 Command-line functions:
 
-
-### [html](https://github.com/siznax/wptools/blob/master/html.py)
-
-Query [MediaWiki](https://www.mediawiki.org/wiki/API:Main_page) API for article HTML
-
-
-### [infobox](https://github.com/siznax/wptools/blob/master/infobox.py)
-
-Query [MediaWiki](https://www.mediawiki.org/wiki/API:Main_page) API for article [Infobox](https://en.wikipedia.org/wiki/Help:Infobox)
-
-
-### [parsetree](https://github.com/siznax/wptools/blob/master/parsetree.py)
-
-Query [MediaWiki](https://www.mediawiki.org/wiki/API:Main_page) API for article [Parse tree](https://en.wikipedia.org/wiki/Parse_tree)
-
-
-### [text](https://github.com/siznax/wptools/blob/master/text.py)
-
-Query [MediaWiki](https://www.mediawiki.org/wiki/API:Main_page) API for plain text of article
-
-
-### [wikitext](https://github.com/siznax/wptools/blob/master/wikitext.py)
-
-Query [MediaWiki](https://www.mediawiki.org/wiki/API:Main_page) API for article [wikitext](https://meta.wikimedia.org/wiki/Wiki_syntax)
+* [html](https://github.com/siznax/wptools/blob/master/html.py) - Query MediaWiki API for article HTML
+* [infobox](https://github.com/siznax/wptools/blob/master/infobox.py) - Query MediaWiki API for article [Infobox](https://en.wikipedia.org/wiki/Help:Infobox)
+* [parsetree](https://github.com/siznax/wptools/blob/master/parsetree.py) - Query MediaWiki API for article [Parse tree](https://en.wikipedia.org/wiki/Parse_tree)
+* [text](https://github.com/siznax/wptools/blob/master/text.py) - Query MediaWiki API for plain text of article
+* [wikitext](https://github.com/siznax/wptools/blob/master/wikitext.py) - Query MediaWiki API for article [wikitext](https://meta.wikimedia.org/wiki/Wiki_syntax)
 
 
 @siznax
