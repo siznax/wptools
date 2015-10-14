@@ -54,9 +54,15 @@ def html(data, lead=False):
 def html_lead(frag):
     """returns lead section from page HTML fragment"""
     lead = []
-    for item in lxml.html.fromstring(frag).xpath("p"):
-        # print(etree.tostring(item))
-        lead.append(etree.tostring(item))
+    start = False
+    for item in lxml.html.fromstring(frag):
+        if item.tag == "ol":  # references not valid for lead
+            break
+        if not start and item.tag == "p":  # skip templates
+            start = True
+        if start:
+            # print(etree.tostring(item))
+            lead.append(etree.tostring(item))
     return "\n".join(lead)
 
 
