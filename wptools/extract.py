@@ -20,16 +20,16 @@ class WPToolsExtract:
         pass
 
 
-def disambig(source, data):
+def disambig(source, data, title):
     """return DISAMBIGUATION if found"""
     if source == 'html':
         for item in lxml.html.fromstring(data).xpath("//p[1]"):
             if "may refer to:" in etree.tostring(item):
-                return "DISAMBIGUATION"
+                return "DISAMBIGUATION " + title
     if source == 'parsetree':
         for item in etree.fromstring(data).xpath("//text()"):
             if 'may refer to:' in item:
-                return "DISAMBIGUATION"
+                return "DISAMBIGUATION " + title
 
 
 def handle_redirect(red, lead):
@@ -44,10 +44,12 @@ def handle_redirect(red, lead):
 def html(data, lead=False):
     """returns HTML part of action=parse query"""
     try:
-        doc = json.loads(data)["parse"]["text"]["*"]
+        data = json.loads(data)
+        doc = data["parse"]["text"]["*"]
+        title = data["parse"]["title"]
     except:
         return "NOTFOUND"
-    dis = disambig('html', doc)
+    dis = disambig('html', doc, title)
     if dis:  # Misfits
         return dis
     red = redirect('html', doc)
@@ -129,8 +131,10 @@ def infobox(data):
 def parsetree(data):
     """return parsetree XML from API JSON"""
     try:
-        ptree = json.loads(data)["parse"]["parsetree"]["*"].encode('utf-8')
-        dis = disambig('parsetree', ptree)
+        data = json.loads(data)
+        ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
+        title = data["parse"]["title"].encode('utf-8')
+        dis = disambig('parsetree', ptree, title)
         if dis:
             return dis
         red = redirect('parsetree', ptree)
