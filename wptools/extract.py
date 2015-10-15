@@ -8,6 +8,7 @@ import lxml.html
 import json
 import re
 
+from . import fetch
 from . import utils
 from collections import defaultdict
 from lxml import etree
@@ -31,6 +32,15 @@ def disambig(source, data):
                 return "DISAMBIGUATION"
 
 
+def handle_redirect(red, lead):
+    title = red.split("REDIRECT")[-1].strip()
+    doc  = html(fetch.get_html(title, lead))
+    try:
+        return doc.decode('utf-8')
+    except:
+        return doc
+
+
 def html(data, lead=False):
     """returns HTML part of action=parse query"""
     try:
@@ -42,7 +52,7 @@ def html(data, lead=False):
         return dis
     red = redirect('html', doc)
     if red:  # Einstein
-        return red
+        doc = handle_redirect(red, lead)
     if lead:
         doc = html_lead(doc)
     try:
