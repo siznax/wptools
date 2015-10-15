@@ -1,8 +1,8 @@
 ## Wikipedia Tools library
 
 Get the plain text, wikitext, HTML, or parse tree of an article via
-the MediaWiki API. You may get the whole article in those formats,
-just the "lead" section (summary), or just the Infobox (if extant).
+MediaWiki API. You may get the whole article in those formats, just
+the "lead" section (summary), or just the Infobox (if extant).
 
 See ``pydoc wptools`` for module docs. See ``<func> -h`` for
 command-line help.
