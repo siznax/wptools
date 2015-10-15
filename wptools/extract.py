@@ -71,16 +71,15 @@ def html_lead(frag):
         if not start and item.tag == "p":  # skip templates
             start = True
         if start:
-            if html_lead_break(item):
-                break
-            # print(etree.tostring(item))
+            if html_lead_ignore(item):
+                continue
             lead.append(etree.tostring(item))
     if not lead:
         return frag
     return "\n".join(lead)
 
 
-def html_lead_break(elem):
+def html_lead_ignore(elem):
     """returns True if element ends lead section"""
     if elem.tag == "ol":
         return True
