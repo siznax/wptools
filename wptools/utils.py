@@ -115,6 +115,12 @@ def strip_refs(blob):
     return re.sub(r"\[\d+\](:\d+)?", "", blob)
 
 
+def wiki_path(title):
+    title = title.replace(" ", "_")
+    title = title[0].upper() + title[1:]
+    return "/wiki/%s" % title
+
+
 def wikitext_from_json(_json):
     """return wikitext from API JSON"""
     text = ""
