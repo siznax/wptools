@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python -u
 """
 Query MediaWiki API for article HTML
 """
