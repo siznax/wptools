@@ -112,7 +112,9 @@ def single_space(blob):
 
 def strip_refs(blob):
     """remove [1][2][3]:456 references from text blob"""
-    return re.sub(r"\[\d+\](:\d+)?", "", blob)
+    out = re.sub(r"\[\d+\](:\d+)?", "", blob)
+    out = out.replace("[_citation needed_]", "")
+    return out
 
 
 def wiki_path(title):
