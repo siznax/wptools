@@ -34,7 +34,7 @@ def disambig(source, data, title):
 
 def handle_redirect(red, lead):
     title = red.split("REDIRECT")[-1].strip()
-    doc  = html(fetch.get_html(title, lead))
+    doc = html(fetch.get_html(title, lead))
     try:
         return doc.decode('utf-8')
     except:

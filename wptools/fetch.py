@@ -9,6 +9,7 @@ from __future__ import print_function
 import pycurl
 import requests
 import sys
+import time
 
 from . import __title__, __contact__, __version__
 from io import BytesIO
@@ -50,6 +51,8 @@ class WPToolsFetch:
                                    "&disablelimitreport="
                                    "&disableeditsection="
                                    "&disabletoc="))}
+    RETRY_SLEEP = 2
+    RETRY_MAX = 3
     TIMEOUT = 30
 
     def __init__(self, wiki=ENDPOINT, lead=False, verbose=False):
@@ -57,6 +60,8 @@ class WPToolsFetch:
         self.lead = lead
         self.verbose = verbose
         self.curl_setup()
+        self.title = None
+        self.retries = 0
 
     def __del__(self):
         self.cobj.close()
@@ -66,18 +71,31 @@ class WPToolsFetch:
     def curl(self, url):
         """speed"""
         crl = self.cobj
-        bfr = BytesIO()
         try:
             crl.setopt(crl.URL, url)
         except UnicodeEncodeError:
             crl.setopt(crl.URL, url.encode('utf-8'))
-        crl.setopt(crl.WRITEFUNCTION, bfr.write)
-        crl.perform()
-        if self.verbose:
-            self.curl_report(crl)
-        body = bfr.getvalue()
-        bfr.close()
-        return body
+        return self.curl_perform(crl)
+
+    def curl_perform(self, crl):
+        """try curl, retry after sleep up to max retries"""
+        if self.retries >= self.RETRY_MAX:
+            return "RETRY_MAX (%d) exceeded!" % self.RETRY_MAX
+        try:
+            bfr = BytesIO()
+            crl.setopt(crl.WRITEFUNCTION, bfr.write)
+            crl.perform()
+            if self.verbose:
+                self.curl_report(crl)
+            body = bfr.getvalue()
+            bfr.close()
+            self.retries = 0
+            return body
+        except Exception as detail:
+            print("RETRY Caught exception: %s" % detail)
+            self.retries += 1
+            time.sleep(self.RETRY_SLEEP)
+            self.curl_perform(crl)
 
     def curl_report(self, crl):
         kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
@@ -106,6 +124,7 @@ class WPToolsFetch:
         return self.curl(self.query('html', title))
 
     def query(self, content, page):
+        self.title = page
         page = page.replace(" ", "+")
         page = page[0].upper() + page[1:]
         qry = self.QUERY[content].substitute(WIKI=self.wiki, page=page)
