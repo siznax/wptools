@@ -20,9 +20,9 @@ class ExtractTestCase(unittest.TestCase):
 
     def test_html_lead(self):
         from wptools.extract import html_lead
-        data = ("<div>templates</div>"
+        data = ("<div/>"
                 "<p>lead</p><div>lead</div>"
-                "<ol>references</ol>")
+                "<ol/><table/>")
         ans = html_lead(data)
         self.assertEqual(ans, "<p>lead</p>\n<div>lead</div>")
 
