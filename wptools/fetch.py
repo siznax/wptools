@@ -52,40 +52,55 @@ class WPToolsFetch:
                                    "&disabletoc="))}
     TIMEOUT = 30
 
-    def __init__(self, wiki, lead=False, verbose=False):
+    def __init__(self, wiki=ENDPOINT, lead=False, verbose=False):
         self.wiki = wiki or self.ENDPOINT
         self.lead = lead
         self.verbose = verbose
+        self.curl_setup()
 
-    def curl(self, url, agent):
-        """speed"""
+    def __del__(self):
+        self.cobj.close()
+        if self.verbose:
+            print("connection closed.", file=sys.stderr)
 
-        def report(crl):
-            kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
-            out = {"url": url,
-                   "user-agent": agent,
-                   "content": crl.getinfo(crl.CONTENT_TYPE),
-                   "status": crl.getinfo(crl.RESPONSE_CODE),
-                   "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
-                   "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
-                   "kB/s": "%3.1f" % kbps}
-            for key in out:
-                print("%s: %s" % (key, out[key]), file=sys.stderr)
+    def curl_report(self, crl):
+        kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
+        out = {"url": crl.getinfo(crl.EFFECTIVE_URL),
+               "user-agent": self.user_agent(),
+               "content": crl.getinfo(crl.CONTENT_TYPE),
+               "status": crl.getinfo(crl.RESPONSE_CODE),
+               "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
+               "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
+               "kB/s": "%3.1f" % kbps}
+        print("WPToolsFetch HTTP", file=sys.stderr)
+        for key in out:
+            print("    %s: %s" % (key, out[key]), file=sys.stderr)
+        print(file=sys.stderr)
 
-        bfr = BytesIO()
+    def curl_setup(self):
         crl = pycurl.Curl()
-        crl.setopt(crl.URL, url)
-        crl.setopt(crl.USERAGENT, agent)
+        # crl.setopt(crl.URL, wiki)
+        crl.setopt(crl.USERAGENT, self.user_agent())
         crl.setopt(crl.FOLLOWLOCATION, True)
         crl.setopt(crl.CONNECTTIMEOUT, self.TIMEOUT)
+        self.cobj = crl
+
+    def curl(self, url):
+        """speed"""
+        crl = self.cobj
+        bfr = BytesIO()
+        crl.setopt(crl.URL, url)
         crl.setopt(crl.WRITEFUNCTION, bfr.write)
         crl.perform()
         if self.verbose:
-            report(crl)
-        crl.close()
+            self.curl_report(crl)
         body = bfr.getvalue()
         bfr.close()
         return body
+
+    def html(self, title):
+        """get HTML keeping connection open"""
+        return self.curl(self.query('html', title))
 
     def query(self, content, page):
         page = page.replace(" ", "+")
@@ -102,6 +117,9 @@ class WPToolsFetch:
             raise ValueError("HTTP status code = %d" % r.status_code)
         return r.content
 
+    def user_agent(self):
+        return "%s/%s (+%s)" % (__title__, __version__, __contact__)
+
 
 def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
              verbose=False):
@@ -109,7 +127,7 @@ def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
     qry = obj.query('html', title)
     if test:
         return qry
-    return obj.curl(qry, user_agent())
+    return obj.curl(qry)
 
 
 def get_infobox():
@@ -121,7 +139,7 @@ def get_parsetree(title, lead, test, wiki, verbose=False):
     qry = obj.query('parsetree', title)
     if test:
         return qry
-    return obj.curl(qry, user_agent())
+    return obj.curl(qry)
 
 
 def get_wikitext(title, lead, test, wiki, verbose=False):
@@ -129,8 +147,4 @@ def get_wikitext(title, lead, test, wiki, verbose=False):
     url = obj.query('wikitext', title)
     if test:
         return url
-    return obj.curl(url, user_agent())
-
-
-def user_agent(api=False):
-    return "%s/%s (+%s)" % (__title__, __version__, __contact__)
+    return obj.curl(url)
