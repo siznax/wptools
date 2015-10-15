@@ -56,14 +56,22 @@ def html_lead(frag):
     lead = []
     start = False
     for item in lxml.html.fromstring(frag):
-        if item.tag == "ol":  # references not valid for lead
+        if html_lead_break(item):
             break
         if not start and item.tag == "p":  # skip templates
             start = True
         if start:
             # print(etree.tostring(item))
             lead.append(etree.tostring(item))
+    if not lead:
+        return frag
     return "\n".join(lead)
+
+
+def html_lead_break(elem):
+    """returns True if element ends lead section"""
+    if elem.tag == "ol":
+        return True
 
 
 def html_keep_tags(frag):
