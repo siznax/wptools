@@ -63,6 +63,22 @@ class WPToolsFetch:
         if self.verbose:
             print("connection closed.", file=sys.stderr)
 
+    def curl(self, url):
+        """speed"""
+        crl = self.cobj
+        bfr = BytesIO()
+        try:
+            crl.setopt(crl.URL, url)
+        except UnicodeEncodeError:
+            crl.setopt(crl.URL, url.encode('utf-8'))
+        crl.setopt(crl.WRITEFUNCTION, bfr.write)
+        crl.perform()
+        if self.verbose:
+            self.curl_report(crl)
+        body = bfr.getvalue()
+        bfr.close()
+        return body
+
     def curl_report(self, crl):
         kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
         out = {"url": crl.getinfo(crl.EFFECTIVE_URL),
@@ -84,19 +100,6 @@ class WPToolsFetch:
         crl.setopt(crl.FOLLOWLOCATION, True)
         crl.setopt(crl.CONNECTTIMEOUT, self.TIMEOUT)
         self.cobj = crl
-
-    def curl(self, url):
-        """speed"""
-        crl = self.cobj
-        bfr = BytesIO()
-        crl.setopt(crl.URL, url)
-        crl.setopt(crl.WRITEFUNCTION, bfr.write)
-        crl.perform()
-        if self.verbose:
-            self.curl_report(crl)
-        body = bfr.getvalue()
-        bfr.close()
-        return body
 
     def html(self, title):
         """get HTML keeping connection open"""
