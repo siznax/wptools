@@ -26,6 +26,15 @@ class ExtractTestCase(unittest.TestCase):
         ans = html_lead(data)
         self.assertEqual(ans, "<p>lead</p>\n<div>lead</div>")
 
+    def test_html_lead_no_templates(self):
+        # Active galactic nucleus returns None
+        from wptools.extract import html_lead
+        ans = html_lead("<p>lead</p>")
+        self.assertEqual(ans, "<p>lead</p>")
+
+    # transient? Active galactic nucleus
+    #     lxml.etree.XMLSyntaxError: line 267: Tag bdi invalid
+
 
 class FetchTestCase(unittest.TestCase):
 
