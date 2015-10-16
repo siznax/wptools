@@ -81,10 +81,12 @@ def html_lead(frag):
 
 def html_lead_ignore(elem):
     """returns True if element ends lead section"""
-    if elem.tag == "ol":
-        return True
     if elem.tag == "table":
         return True
+    if elem.tag == "ul" or elem.tag == "ol":
+        for item in elem.getchildren():
+            if item.get('id') and "cite_note" in item.get('id'):
+                return True
 
 
 def html_keep_tags(frag):
