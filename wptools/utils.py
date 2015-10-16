@@ -114,6 +114,7 @@ def strip_refs(blob):
     """remove [1][2][3]:456 references from text blob"""
     out = re.sub(r"\[\d+\](:\d+)?", "", blob)
     out = out.replace("[_citation needed_]", "")
+    out = out.replace("[_clarification needed_]", "")
     return out
 
 
