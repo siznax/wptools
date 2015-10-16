@@ -165,6 +165,11 @@ def plain_text_cleanup(blob):
     except:
         pass
     blob = re.sub(r'\s\( listen\)', "", blob, flags=re.UNICODE)
+    tmp = []
+    for line in blob.split("\n"):
+        if not line.startswith("Cite error"):
+            tmp.append(line)
+    blob = "\n".join(tmp)
     return blob.encode('utf-8')
 
 
