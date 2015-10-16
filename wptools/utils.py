@@ -121,7 +121,7 @@ def strip_refs(blob):
 def wiki_path(title):
     title = title.replace(" ", "_")
     title = title[0].upper() + title[1:]
-    return "/wiki/%s" % title
+    return "/wiki/%s" % title.strip()
 
 
 def wikitext_from_json(_json):
