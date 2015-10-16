@@ -8,6 +8,7 @@ ipaddress==1.0.14
 lxml==3.4.4
 pyasn1==0.1.9
 pycparser==2.14
+pycurl==7.19.5.1
 pyOpenSSL==0.15.1
 requests==2.8.0
 six==1.10.0
