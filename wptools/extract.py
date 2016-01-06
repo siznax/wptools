@@ -123,12 +123,9 @@ def html_text(data, lead=False, compact=False):
 def infobox(data):
     """returns infobox dict from parsetree"""
     ptree = parsetree(data)
-    try:
-        for item in etree.fromstring(ptree).xpath("//template"):
-            if "box" in item.find('title').text:
-                return json.dumps(template_to_dict(item))
-    except:
-        return ptree
+    for item in etree.fromstring(ptree).xpath("//template"):
+        if "box" in item.find('title').text:
+            return json.dumps(template_to_dict(item))
 
 
 def parsetree(data):
@@ -179,13 +176,16 @@ def template_to_dict(tree):
     """returns wikitext template as dict (one deep)"""
     obj = defaultdict(str)
     for item in tree:
-        name = item.find('name')
-        if name is not None:
-            value = item.find('value').text.strip()
-            tmp = item.find('value').find('template')
-            if tmp is not None:
-                value = etree.tostring(tmp)
-            obj[name.text.strip()] = value
+        try:
+            name = item.find('name')
+            if name is not None:
+                value = item.find('value').text.strip()
+                tmp = item.find('value').find('template')
+                if tmp is not None:
+                    value = etree.tostring(tmp)
+                obj[name.text.strip()] = value
+        except:
+            obj["%s ERROR" % __name__] = etree.tostring(item)
     return dict(obj)
 
 
