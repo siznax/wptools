@@ -177,13 +177,14 @@ def template_to_dict(tree):
     obj = defaultdict(str)
     for item in tree:
         try:
-            name = item.find('name')
-            if name is not None:
-                value = item.find('value').text.strip()
-                tmp = item.find('value').find('template')
-                if tmp is not None:
-                    value = etree.tostring(tmp)
-                obj[name.text.strip()] = value
+            name = item.findtext('name')
+            tmpl = item.find('value').find('template')
+            if tmpl is not None:
+                value = etree.tostring(tmpl)
+            else:
+                value = item.findtext('value')
+            if name and value:
+                obj[name.strip()] = value.strip()
         except:
             obj["%s ERROR" % __name__] = etree.tostring(item)
     return dict(obj)
