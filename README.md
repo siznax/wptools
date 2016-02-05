@@ -2,7 +2,9 @@
 
 Get the plain text, wikitext, HTML, or parse tree of an article via
 MediaWiki API. You may get the whole article in those formats, just
-the "lead" section (summary), or just the Infobox (if extant).
+the "lead" section (summary), or just the Infobox (if extant). You
+can get this information as an object in python, or in various text
+formats (e.g. json) at the command line.
 
 See ``pydoc wptools`` for module docs. See ``<func> -h`` for
 command-line help.
