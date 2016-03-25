@@ -35,6 +35,12 @@ class WPToolsFetch:
                                "&disablelimitreport="
                                "&disableeditsection="
                                "&disabletoc=")),
+             "images": Template(("${WIKI}/w/api.php?action=query"
+                                 "&titles=${page}"
+                                 "&format=json"
+                                 "&format=json"
+                                 "&formatversion=2"
+                                 "&prop=images")),
              "parsetree": Template(("${WIKI}/w/api.php?action=parse"
                                     "&format=json"
                                     "&page=${page}"
@@ -154,6 +160,15 @@ def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
 
 def get_infobox():
     pass
+
+
+def get_images(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+               verbose=False):
+    obj = WPToolsFetch(wiki, lead, verbose)
+    qry = obj.query('images', title)
+    if test:
+        return qry
+    return obj.curl(qry)
 
 
 def get_parsetree(title, lead, test, wiki, verbose=False):

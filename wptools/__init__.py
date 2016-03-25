@@ -16,5 +16,6 @@ __version__ = "0.0.2"
 
 from . import utils
 from .extract import html, infobox, parsetree, text, wikitext
-from .fetch import get_html, get_infobox, get_parsetree, get_wikitext
+from .fetch import get_html, get_images, get_infobox
+from .fetch import get_parsetree, get_wikitext
 from .fetch import WPToolsFetch

@@ -120,11 +120,13 @@ def html_text(data, lead=False, compact=False):
         return doc
 
 
-def infobox(data):
+def infobox(data, _format="json"):
     """returns infobox dict from parsetree"""
     ptree = parsetree(data)
     for item in etree.fromstring(ptree).xpath("//template"):
         if "box" in item.find('title').text:
+            if _format == "dict":
+                return template_to_dict(item)
             return json.dumps(template_to_dict(item))
 
 

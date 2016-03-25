@@ -46,7 +46,8 @@ def collapse(text):
     return text
 
 
-def media_url(fname, namespace='common', wiki='http://en.wikipedia.org'):
+def media_url(fname, namespace='commons',
+              wiki='https://upload.wikimedia.org/wikipedia'):
     """return Wikimedia File/Image URL from name"""
     name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
     digest = hashlib.md5(name).hexdigest()
