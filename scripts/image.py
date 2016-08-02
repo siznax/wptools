@@ -17,7 +17,8 @@ import json
 import os
 import sys
 import time
-import wptools
+
+from lxml import etree
 
 
 def main(title, api, test, verbose, wiki):
@@ -25,11 +26,21 @@ def main(title, api, test, verbose, wiki):
     ptree = wptools.get_parsetree(title, lead=False,
                                   test=test, wiki=wiki,
                                   verbose=verbose)
+    # wikitext = wptools.get_wikitext(title, lead=False,
+    #                                 test=test, wiki=wiki,
+    #                                 verbose=verbose)
+    # print(wikitext)
+    # return
+
     if test:
         print(ptree)
         sys.exit(os.EX_OK)
 
     ibox = wptools.infobox(ptree, "dict")
+
+    # print(json.dumps(ibox))
+    # return
+    
     types = ["image", "image_map", "logo"]
     image = {"fname": None, "url": None, "key": None}
 
@@ -55,6 +66,10 @@ def main(title, api, test, verbose, wiki):
 
 
 if __name__ == "__main__":
+
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    import wptools
+
     desc = "Query MediaWiki API for article image(s)"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title",

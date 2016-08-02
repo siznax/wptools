@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 """
-Query MediaWiki API for article Parse tree
+Query MediaWiki API for article wikitext
 
 References
-    https://en.wikipedia.org/wiki/Parse_tree
+    https://meta.wikimedia.org/wiki/Wiki_syntax
+    https://www.mediawiki.org/wiki/API:Data_formats
     https://www.mediawiki.org/wiki/API:Main_page
 """
 
@@ -13,21 +14,24 @@ import argparse
 import os
 import sys
 import time
-import wptools
 
 
 def main(title, lead, test, wiki):
     start = time.time()
-    data = wptools.get_parsetree(title, lead, test, wiki)
+    data = wptools.get_wikitext(title, lead, test, wiki)
     if test:
         print(data)
         sys.exit(os.EX_OK)
-    print(wptools.parsetree(data))
+    print(wptools.wikitext(data))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
 if __name__ == "__main__":
-    desc = "Query MediaWiki API for article Parse tree"
+
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    import wptools
+
+    desc = "Query MediaWiki API for article wikitext"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title",
                       help="article title")

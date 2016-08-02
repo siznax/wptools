@@ -14,7 +14,6 @@ import argparse
 import os
 import sys
 import time
-import wptools
 
 
 def main(title, test, verbose, wiki):
@@ -29,6 +28,10 @@ def main(title, test, verbose, wiki):
 
 
 if __name__ == "__main__":
+
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+    import wptools
+
     desc = "Query MediaWiki API for article Infobox"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title",
