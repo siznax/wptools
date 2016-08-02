@@ -77,7 +77,7 @@ Get article Infobox
 
 .. code-block:: shell
 
-  $ scripts/infobox.py Aardvark | jsonlint
+  $ scripts/infobox.py Aardvark | jsonlint | fold
   {
     "status": "LC",
     "range_map": "Aardvark area.png",
@@ -87,6 +87,7 @@ Get article Infobox
     "image": "Porc formiguer.JPG",
     "status_system": "iucn3.1",
     "subdivision_ranks": "[[Subspecies]]",
+    "wptools.extract ERROR": "<title>speciesbox\n</title>",
     "image_caption": "",
     "greatgrandparent_authority": "[[Thomas Henry Huxley|Huxley]], 1872",
     "status_ref": "",
@@ -94,7 +95,9 @@ Get article Infobox
     "name": "Aardvark",
     "range_map_caption": "Aardvark range",
     "display_parents": "4",
-    "fossil_range": "<template><title>Fossil range</title><part><name index=\"1\"/><value>5</value></part><part><name index=\"2\"/><value>0</value></part></template>&lt;small&gt;Early [[Pliocene]] &#8211; Recent&lt;/small&gt;\n",
+    "fossil_range": "<template><title>Fossil range</title><part><name index=\"1\"/
+  ><value>5</value></part><part><name index=\"2\"/><value>0</value></part></templa
+  te>&lt;small&gt;Early [[Pliocene]] &#8211; Recent&lt;/small&gt;",
     "species": "afer",
     "parent_authority": "[[Georges Cuvier|G. Cuvier]], 1798",
     "genus": "Orycteropus"
