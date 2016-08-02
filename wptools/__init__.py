@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
-Wikipedia Tools library
+Wikipedia tools (for Humans)
 
 Get the plain text, wikitext, HTML, or parse tree of an article via
 MediaWiki API. You may get the whole article in those formats, just
-the "lead" section (summary), or just the Infobox (if extant).
+the "lead" section (summary), the Infobox (if extant), or a
+representative image for the article.
 """
 
 __author__ = "siznax"
