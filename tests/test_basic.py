@@ -5,9 +5,12 @@
 Basic tests for WPTools.
 """
 
+import os
+import sys
 import unittest
-import wptools
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import wptools
 
 class WPToolsTestCase(unittest.TestCase):
 
