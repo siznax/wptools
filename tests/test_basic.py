@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-"""Tests for WPTools."""
+"""
+Basic tests for WPTools.
+"""
 
 import unittest
 import wptools
@@ -17,17 +19,6 @@ class WPToolsTestCase(unittest.TestCase):
 
 
 class ExtractTestCase(unittest.TestCase):
-
-    def test_html_lead(self):
-        # Ag Qoyunlu
-        # Dhyan Chand
-        # Einstein
-        from wptools.extract import html_lead
-        data = ("<p>1</p><table/>"
-                "<p>2</p>"
-                "<p>3</p><ol/>")
-        ans = html_lead(data)
-        self.assertEqual(ans, "<p>1</p>\n<p>2</p>\n<p>3</p>")
 
     def test_no_templates(self):
         # Active galactic nucleus
