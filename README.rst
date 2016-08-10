@@ -22,7 +22,7 @@ Install
 
 .. code-block:: shell
 
-    $ pip install wptools
+    (venv)$ pip install wptools
 
 
 Usage
@@ -35,10 +35,10 @@ Get the lead section of an article as Markdown text
 
 .. code-block:: python
 
-    >>> import wptools
-    >>> t = wptools.text(wptools.get_html("Aardvark", True), True)
-    >>> print t[:72]
-    The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)
+  >>> import wptools
+  >>> t = wptools.text(wptools.get_html("Aardvark", True), True)
+  >>> print t[:72]
+  The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)
 
 Get an article's Infobox_ as a python object
 
@@ -46,12 +46,12 @@ Get an article's Infobox_ as a python object
 
 .. code-block:: python
 
-    >>> import json, wptools
-    >>> p = wptools.get_parsetree("Aardvark", False, False, 'en.wikipedia.org')
-    >>> i = wptools.infobox(p)
-    >>> d = json.loads(i)
-    >>> print d['genus']
-    Orycteropus
+  >>> import json, wptools
+  >>> p = wptools.get_parsetree("Aardvark", False, False, 'en.wikipedia.org')
+  >>> i = wptools.infobox(p)
+  >>> d = json.loads(i)
+  >>> print d['genus']
+  Orycteropus
 
 
 CLI examples
@@ -61,7 +61,7 @@ Get article HTML
 
 .. code-block:: shell
 
-  $ scripts/html.py Aardvark -l | fold | head
+  $ wp_html Aardvark -l | fold | head
   <p>The <b>aardvark</b> (<span class="nowrap"><span class="IPA nopopups"><a href=
   "/wiki/Help:IPA_for_English" title="Help:IPA for English">/<span style="border-b
   ottom:1px dotted"><span title="/&#712;/ primary stress follows">&#712;</span><sp
@@ -77,7 +77,7 @@ Get article Infobox
 
 .. code-block:: shell
 
-  $ scripts/infobox.py Aardvark | jsonlint | fold
+  $ wp_infobox Aardvark | jsonlint | fold
   {
     "status": "LC",
     "range_map": "Aardvark area.png",
@@ -109,7 +109,7 @@ Get article `Parse tree`_
 
 .. code-block:: shell
 
-  $ scripts/parsetree.py Aardvark | fold | head
+  $ wp_parsetree Aardvark | fold | head
   <root><template><title>Other uses</title></template>
   <template lineStart="1"><title>pp-move-indef</title></template>
   <template lineStart="1"><title>Use dmy dates</title><part><name>date</name>=<val
@@ -125,7 +125,7 @@ Get plain text of article
 
 .. code-block:: shell
 
-  $ scripts/text.py Aardvark -l | fold -s
+  $ wp_text Aardvark -l | fold -s
   The **aardvark** (/ˈɑrd.vɑrk/ _**ARD**-vark_; _Orycteropus afer_) is a
   medium-sized, burrowing, nocturnal mammal native to Africa. It is the only
   living species of the order Tubulidentata, although other prehistoric species
@@ -143,7 +143,7 @@ Get article wikitext_
 
 .. code-block:: shell
 
-  $ scripts/wikitext.py Aardvark -l | head
+  $ wp_wikitext Aardvark -l | head
   {{Other uses}}
   {{pp-move-indef}}
   {{Use dmy dates|date=July 2012}}
