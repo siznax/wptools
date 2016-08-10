@@ -10,8 +10,10 @@ import os
 import sys
 import time
 
+import wptools
 
-def main(title, lead, test, wiki, verbose):
+
+def html(title, lead, test, wiki, verbose):
     start = time.time()
     data = wptools.get_html(title, lead, test, wiki, verbose)
     if test:
@@ -22,11 +24,7 @@ def main(title, lead, test, wiki, verbose):
         print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
-if __name__ == "__main__":
-
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    import wptools
-
+def main():
     desc = "Query MediaWiki API for article HTML"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title", help="article title")
@@ -41,4 +39,8 @@ if __name__ == "__main__":
                       help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
     args = argp.parse_args()
 
-    main(args.title, args.l, args.t, args.w, args.v)
+    html(args.title, args.l, args.t, args.w, args.v)
+
+
+if __name__ == "__main__":
+    main()

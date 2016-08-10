@@ -18,10 +18,10 @@ import os
 import sys
 import time
 
-from lxml import etree
+import wptools
 
 
-def main(title, api, test, verbose, wiki):
+def wpimage(title, api, test, verbose, wiki):
     start = time.time()
     ptree = wptools.get_parsetree(title, lead=False,
                                   test=test, wiki=wiki,
@@ -40,7 +40,7 @@ def main(title, api, test, verbose, wiki):
 
     # print(json.dumps(ibox))
     # return
-    
+
     types = ["image", "image_map", "logo"]
     image = {"fname": None, "url": None, "key": None}
 
@@ -65,11 +65,7 @@ def main(title, api, test, verbose, wiki):
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
-if __name__ == "__main__":
-
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    import wptools
-
+def main():
     desc = "Query MediaWiki API for article image(s)"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title",
@@ -85,4 +81,8 @@ if __name__ == "__main__":
                       help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
     args = argp.parse_args()
 
-    main(args.title, args.a, args.t, args.v, args.w)
+    wpimage(args.title, args.a, args.t, args.v, args.w)
+
+
+if __name__ == "__main__":
+    main()

@@ -14,8 +14,10 @@ import os
 import sys
 import time
 
+import wptools
 
-def main(title, lead, test, wiki):
+
+def parsetree(title, lead, test, wiki):
     start = time.time()
     data = wptools.get_parsetree(title, lead, test, wiki)
     if test:
@@ -25,11 +27,7 @@ def main(title, lead, test, wiki):
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
-if __name__ == "__main__":
-
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-    import wptools
-
+def main():
     desc = "Query MediaWiki API for article Parse tree"
     argp = argparse.ArgumentParser(description=desc)
     argp.add_argument("title",
@@ -43,4 +41,8 @@ if __name__ == "__main__":
                       help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
     args = argp.parse_args()
 
-    main(args.title, args.l, args.t, args.w)
+    parsetree(args.title, args.l, args.t, args.w)
+
+
+if __name__ == "__main__":
+    main()
