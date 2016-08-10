@@ -31,7 +31,7 @@ Usage
 python examples
 ---------------
 
-Get the lead section of an article
+Get the lead section of an article as Markdown text
 
 .. code-block:: python
 
