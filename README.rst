@@ -28,11 +28,18 @@ Usage
 python examples
 ---------------
 
-Get the lead section of an article as Markdown text
+Get the lead section of an article as HTML
 
 .. code-block:: python
 
   >>> import wptools
+  >>> wptools.html("Aardvark", lead=True)
+  '<p>The <b>aardvark</b>...
+
+Get the lead section of an article as Markdown text
+
+.. code-block:: python
+
   >>> wptools.text("Aardvark", lead=True)
   The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)...
 
@@ -47,8 +54,8 @@ Get the Wikitext_ behind an article
 
 .. code-block:: python
 
-  >>> wptools.wikitext('Aardvark')[:72]
-  '{{Other uses}}\n{{pp-move-indef}}\n{{Use dmy dates|date=July 2012}}\n{{spec'
+  >>> wptools.wikitext('Aardvark')
+  '{{Other uses}}\n{{pp-move-indef}}\n...
 
 Handle misses
 
