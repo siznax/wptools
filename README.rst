@@ -55,11 +55,11 @@ Handle misses
 
 .. code-block:: python
 
-  >>> wptools.text('Blerg', lead=True)
-  'NOTFOUND'
-
-  >>> wptools.text('Misfits', lead=True)
+  >>> wptools.text('Misfits')
   'DISAMBIGUATION Misfits'
+
+  >>> wptools.html('blerg')
+  'NOTFOUND'
 
 
 CLI examples
