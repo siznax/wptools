@@ -9,10 +9,7 @@ MediaWiki API. You may get the whole article in those formats, just
 the "lead" section (summary), the Infobox (if extant), or a
 representative image for the article.
 
-
 See also: `MediaWiki API:Client code`_
-
-.. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
 
 P.S. "(for Humans)" à la @kennethreitz, in parentheses because that is a goal.
 
@@ -36,22 +33,33 @@ Get the lead section of an article as Markdown text
 .. code-block:: python
 
   >>> import wptools
-  >>> t = wptools.text(wptools.get_html("Aardvark", True), True)
-  >>> print t[:72]
+  >>> print wptools.text("Aardvark", lead=True)[:72]
   The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)
 
 Get an article's Infobox_ as a python object
 
-.. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
+.. code-block:: python
+
+  >>> import wptools
+  >>> wptools.infobox("Aardvark")['genus']
+  Orycteropus
+
+Get the Wikitext_ behind an article
 
 .. code-block:: python
 
-  >>> import json, wptools
-  >>> p = wptools.get_parsetree("Aardvark", False, False, 'en.wikipedia.org')
-  >>> i = wptools.infobox(p)
-  >>> d = json.loads(i)
-  >>> print d['genus']
-  Orycteropus
+  >>> wptools.wikitext('Aardvark', lead=True)[:72]
+  '{{Other uses}}\n{{pp-move-indef}}\n{{Use dmy dates|date=July 2012}}\n{{spec'
+
+Handle misses
+
+.. code-block:: python
+
+  >>> wptools.text('Blerg', lead=True)
+  'NOTFOUND'
+
+  >>> wptools.text('Misfits', lead=True)
+  'DISAMBIGUATION Misfits'
 
 
 CLI examples
@@ -105,8 +113,6 @@ Get article Infobox
 
 Get article `Parse tree`_
 
-.. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
-
 .. code-block:: shell
 
   $ wp_parsetree Aardvark | fold | head
@@ -137,9 +143,7 @@ Get plain text of article
   burrows in which to live and rear its young. It receives a "least concern"
   rating from the IUCN; although its numbers seem to be decreasing.
 
-Get article wikitext_
-
-.. _wikitext: https://meta.wikimedia.org/wiki/Wiki_syntax
+Get article Wikitext_
 
 .. code-block:: shell
 
@@ -157,3 +161,9 @@ Get article wikitext_
 
 
 @siznax
+
+
+.. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
+.. _Wikitext: https://www.mediawiki.org/wiki/Wikitext
+.. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
+.. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
