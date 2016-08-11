@@ -34,31 +34,9 @@ def disambig(source, data, title):
 
 def handle_redirect(red, lead):
     title = red.split("REDIRECT")[-1].strip()
-    doc = html(fetch.get_html(title, lead))
+    doc = qry_html(fetch.get_html(title, lead))
     try:
         return doc.decode('utf-8')
-    except:
-        return doc
-
-
-def html(data, lead=False):
-    """returns HTML part of action=parse query"""
-    try:
-        data = json.loads(data)
-        doc = data["parse"]["text"]["*"]
-        title = data["parse"]["title"]
-    except:
-        return "NOTFOUND"
-    dis = disambig('html', doc, title)
-    if dis:  # Misfits
-        return dis
-    red = redirect('html', doc)
-    if red:  # Einstein
-        doc = handle_redirect(red, lead)
-    if lead:
-        doc = html_lead(doc)
-    try:
-        return doc.encode('utf-8')
     except:
         return doc
 
@@ -107,7 +85,8 @@ def html_strip_tags(frag):
 
 
 def html_text(data, lead=False, compact=False):
-    doc = html(data, lead)
+    """returns plain text version of HTML MediaWiki query"""
+    doc = qry_html(data, lead)
     doc = html_keep_tags(doc)
     doc = utils.strip_refs(doc)
     doc = utils.single_space(doc)
@@ -118,33 +97,6 @@ def html_text(data, lead=False, compact=False):
         return doc.encode('utf-8')
     except:
         return doc
-
-
-def infobox(data, _format="json"):
-    """returns infobox dict from parsetree"""
-    ptree = parsetree(data)
-    for item in etree.fromstring(ptree).xpath("//template"):
-        if "box" in item.find('title').text:
-            if _format == "dict":
-                return template_to_dict(item)
-            return json.dumps(template_to_dict(item))
-
-
-def parsetree(data):
-    """return parsetree XML from API JSON"""
-    try:
-        data = json.loads(data)
-        ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
-        title = data["parse"]["title"].encode('utf-8')
-        dis = disambig('parsetree', ptree, title)
-        if dis:
-            return dis
-        red = redirect('parsetree', ptree)
-        if red:
-            return red
-        return ptree
-    except:
-        return json.loads(data)["error"]["info"].encode('utf-8')
 
 
 def redirect(source, data):
@@ -192,30 +144,63 @@ def template_to_dict(tree):
     return dict(obj)
 
 
-def text(data, lead=False, compact=False):
-    """
-    returns plain text of article from HTML
-    :param lead: lead section only
-    :param compact: collapse newlines into pilcrows
-    """
+def qry_html(data, lead=False):
+    """returns HTML part of action=parse MediaWiki query"""
+    try:
+        data = json.loads(data)
+        doc = data["parse"]["text"]["*"]
+        title = data["parse"]["title"]
+    except:
+        return "NOTFOUND"
+    dis = disambig('html', doc, title)
+    if dis:  # Misfits
+        return dis
+    red = redirect('html', doc)
+    if red:  # Einstein
+        doc = handle_redirect(red, lead)
+    if lead:
+        doc = html_lead(doc)
+    try:
+        return doc.encode('utf-8')
+    except:
+        return doc
+
+
+def qry_infobox(data, _format="json"):
+    """returns infobox from parsetree"""
+    ptree = qry_parsetree(data)
+    for item in etree.fromstring(ptree).xpath("//template"):
+        if "box" in item.find('title').text:
+            if _format == "dict":
+                return template_to_dict(item)
+            return json.dumps(template_to_dict(item))
+
+
+def qry_parsetree(data):
+    """return parsetree XML from API JSON"""
+    try:
+        data = json.loads(data)
+        ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
+        title = data["parse"]["title"].encode('utf-8')
+        dis = disambig('parsetree', ptree, title)
+        if dis:
+            return dis
+        red = redirect('parsetree', ptree)
+        if red:
+            return red
+        return ptree
+    except:
+        return json.loads(data)["error"]["info"].encode('utf-8')
+
+
+def qry_text(data, lead=False, compact=False):
+    """returns plain text of article from HTML"""
     return html_text(data, lead, compact)
 
 
-def wikitext(data):
+def qry_wikitext(data):
     """return wikitext from API JSON"""
     text = json.loads(data)["parse"]["wikitext"]["*"].encode('utf-8')
     if text.startswith("#REDIRECT"):
         return text.split("\n")[0]
     return text
-
-
-def wikitext_from_action_query(data):
-    """DEPRECATED"""
-    out = []
-    try:
-        for page in json.loads(data)["query"]["pages"]:
-            content = page["revisions"][0]["content"].encode('utf-8')
-            out.append({"title": page["title"], "content": content})
-            return json.dumps(out)
-    except:
-        return data
