@@ -38,9 +38,9 @@ def main():
                       help="lead section only")
     argp.add_argument("-t", "-test", action='store_true',
                       help="show query and exit")
-    argp.add_argument("-w", "-wiki",
-                      default=wptools.WPToolsFetch.ENDPOINT,
-                      help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
+    wiki = wptools.fetch.WPToolsFetch.ENDPOINT
+    argp.add_argument("-w", "-wiki", default=wiki, help="wiki (%s)" % wiki)
+
     args = argp.parse_args()
 
     wikitext(args.title, args.l, args.t, args.w)

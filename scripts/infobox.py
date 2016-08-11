@@ -38,9 +38,9 @@ def main():
                       help="show query and exit")
     argp.add_argument("-v", "-verbose", action='store_true',
                       help="HTTP status to stdout")
-    argp.add_argument("-w", "-wiki",
-                      default=wptools.WPToolsFetch.ENDPOINT,
-                      help="wiki (%s)" % wptools.WPToolsFetch.ENDPOINT)
+    wiki = wptools.fetch.WPToolsFetch.ENDPOINT
+    argp.add_argument("-w", "-wiki", default=wiki, help="wiki (%s)" % wiki)
+
     args = argp.parse_args()
 
     infobox(args.title, args.t, args.v, args.w)
