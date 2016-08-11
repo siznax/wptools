@@ -171,7 +171,8 @@ def get_images(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
     return obj.curl(qry)
 
 
-def get_parsetree(title, lead, test, wiki, verbose=False):
+def get_parsetree(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+                  verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('parsetree', title)
     if test:
@@ -179,7 +180,8 @@ def get_parsetree(title, lead, test, wiki, verbose=False):
     return obj.curl(qry)
 
 
-def get_wikitext(title, lead, test, wiki, verbose=False):
+def get_wikitext(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+                 verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     url = obj.query('wikitext', title)
     if test:
