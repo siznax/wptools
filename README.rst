@@ -33,14 +33,13 @@ Get the lead section of an article as Markdown text
 .. code-block:: python
 
   >>> import wptools
-  >>> print wptools.text("Aardvark", lead=True)[:72]
-  The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)
+  >>> wptools.text("Aardvark", lead=True)
+  The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)...
 
 Get an article's Infobox_ as a python object
 
 .. code-block:: python
 
-  >>> import wptools
   >>> wptools.infobox("Aardvark")['genus']
   Orycteropus
 
