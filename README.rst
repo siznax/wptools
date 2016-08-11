@@ -19,7 +19,7 @@ Install
 
 .. code-block:: shell
 
-    (venv)$ pip install wptools
+    $ pip install wptools
 
 
 Usage
@@ -48,7 +48,7 @@ Get the Wikitext_ behind an article
 
 .. code-block:: python
 
-  >>> wptools.wikitext('Aardvark', lead=True)[:72]
+  >>> wptools.wikitext('Aardvark')[:72]
   '{{Other uses}}\n{{pp-move-indef}}\n{{Use dmy dates|date=July 2012}}\n{{spec'
 
 Handle misses
