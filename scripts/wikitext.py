@@ -11,7 +11,6 @@ References
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 import time
 
@@ -20,11 +19,7 @@ import wptools
 
 def wikitext(title, lead, test, wiki):
     start = time.time()
-    data = wptools.get_wikitext(title, lead, test, wiki)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-    print(wptools.wikitext(data))
+    print(wptools.wikitext(title, lead, test, wiki))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 

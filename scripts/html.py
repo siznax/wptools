@@ -6,22 +6,15 @@ Query MediaWiki API for article HTML
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 import time
-
 import wptools
 
 
-def html(title, lead, test, wiki, verbose):
+def html(title, lead, test, verbose, wiki):
     start = time.time()
-    data = wptools.get_html(title, lead, test, wiki, verbose)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-    print(wptools.html(data, lead))
-    if verbose:
-        print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    print(wptools.html(title, lead, test, verbose, wiki))
+    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
 def main():
@@ -39,7 +32,7 @@ def main():
 
     args = argp.parse_args()
 
-    html(args.title, args.l, args.t, args.w, args.v)
+    html(args.title, args.l, args.t, args.v, args.w)
 
 
 if __name__ == "__main__":

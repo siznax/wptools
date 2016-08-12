@@ -11,7 +11,6 @@ References
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 import time
 
@@ -20,13 +19,8 @@ import wptools
 
 def text(title, compact, lead, test, verbose, wiki):
     start = time.time()
-    data = wptools.get_html(title, lead, test, wiki, verbose)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-    print(wptools.text(data, lead, compact))
-    if verbose:
-        print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    print(wptools.text(title, compact, lead, test, verbose, wiki))
+    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
 def main():

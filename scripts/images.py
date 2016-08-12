@@ -13,7 +13,7 @@ References
 from __future__ import print_function
 
 import argparse
-import os
+import json
 import sys
 import time
 
@@ -22,16 +22,8 @@ import wptools
 
 def wpimages(title, source, test, verbose, wiki):
     start = time.time()
-    data = wptools.get_images(title, source,
-                              lead=False, test=test,
-                              wiki=wiki, verbose=verbose)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-
-    data = wptools.extract.qry_images(data, source)
-    print(data)
-
+    data = wptools.images(title, source, test, verbose, wiki)
+    print(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 

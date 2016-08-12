@@ -11,7 +11,7 @@ References
 from __future__ import print_function
 
 import argparse
-import os
+import json
 import sys
 import time
 
@@ -20,12 +20,8 @@ import wptools
 
 def infobox(title, test, verbose, wiki):
     start = time.time()
-    data = wptools.get_parsetree(title, lead=False,
-                                 test=test, wiki=wiki, verbose=verbose)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-    print(wptools.infobox(data))
+    data = wptools.infobox(title, test, verbose, wiki)
+    print(json.dumps(data, sort_keys=True, indent=4, separators=(',', ': ')))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 

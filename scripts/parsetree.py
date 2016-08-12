@@ -10,20 +10,14 @@ References
 from __future__ import print_function
 
 import argparse
-import os
 import sys
 import time
-
 import wptools
 
 
 def parsetree(title, lead, test, wiki):
     start = time.time()
-    data = wptools.get_parsetree(title, lead, test, wiki)
-    if test:
-        print(data)
-        sys.exit(os.EX_OK)
-    print(wptools.parsetree(data))
+    print(wptools.parsetree(title, lead, test, wiki))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
