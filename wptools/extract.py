@@ -188,24 +188,24 @@ def qry_html(data, lead=False):
         return doc
 
 
-def qry_images(data, source):
+def qry_images(data, source, fmt=None):
     """returns images from selected source"""
     if "missing" in data:
         return "NOTFOUND"
     if source == "images":
-        return img_images(data)
+        return img_images(data, fmt)
     if source == "pageimages":
-        return img_pageimages(data)
+        return img_pageimages(data, fmt)
     if source == "infobox":
-        return img_infobox(data)
+        return img_infobox(data, fmt)
 
 
-def qry_infobox(data, _format="json"):
+def qry_infobox(data, fmt=None):
     """returns infobox from parsetree"""
     ptree = qry_parsetree(data)
     for item in etree.fromstring(ptree).xpath("//template"):
         if "box" in item.find('title').text:
-            if _format == "dict":
+            if fmt == "dict":
                 return template_to_dict(item)
             return json.dumps(template_to_dict(item))
 

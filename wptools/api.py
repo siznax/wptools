@@ -20,6 +20,17 @@ def html(title, lead=False, test=False, verbose=False,
     return extract.qry_html(data, lead)
 
 
+def images(title, source="pageimages", test=False, verbose=False,
+           wiki=fetch.WPToolsFetch.ENDPOINT):
+    """returns article images"""
+    data = fetch.get_images(title, source,
+                            lead=False, test=test,
+                            wiki=wiki, verbose=verbose)
+    if test:
+        return data
+    return extract.qry_images(data, source, 'dict')
+
+
 def infobox(title, test=False, verbose=False,
             wiki=fetch.WPToolsFetch.ENDPOINT):
     """returns article Infobox as dict"""
