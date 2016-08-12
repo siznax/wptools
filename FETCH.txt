@@ -1,0 +1,51 @@
+MediaWiki API
+=============
+
+https://www.mediawiki.org/wiki/Special:ApiSandbox
+
+    HTML
+        action=parse
+        contentmodel=text
+        page={title}
+        prop=text
+            |
+            '-> html
+            |
+            '-> text
+    
+    IMAGES
+        action=query
+        prop=images
+        titles={title}
+            |
+            '-> list of images
+    
+    PAGEIMAGES
+        action=query
+        prop=pageimages
+        pithumbsize=320
+        pilimit=1
+        titles={title}
+            |
+            '-> thumbnail image
+    
+    PARSETREE
+        action=parse
+        contentmodel=text
+        page={title}
+        prop=parsetree
+            |
+            '-> parse tree
+    
+    WIKITEXT
+        action=parse
+        contentmodel=wikitext
+        page={title}
+        prop=wikitext
+            |
+            '-> wikitext
+
+RESTBase
+========
+
+    TBD
