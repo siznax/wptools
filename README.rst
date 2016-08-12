@@ -50,6 +50,16 @@ Get an article's Infobox_ as a python object
   >>> wptools.infobox("Aardvark")['genus']
   Orycteropus
 
+Get an article's `thumbnail image`_ (or full original image)
+
+.. code-block:: python
+
+  >>> wptools.images("Aardvark")["thumbnail"]["source"]
+  u'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Porc_formiguer.JPG/320px-Porc_formiguer.JPG'
+
+  >>> wptools.images("Aardvark")["source"]
+  u'https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG'
+
 Get the Wikitext_ behind an article
 
 .. code-block:: python
@@ -170,6 +180,7 @@ Get article Wikitext_
 
 
 .. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
+.. _`thumbnail image`: https://www.mediawiki.org/wiki/Extension:PageImages
 .. _Wikitext: https://www.mediawiki.org/wiki/Wikitext
 .. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
 .. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
