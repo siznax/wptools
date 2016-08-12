@@ -28,7 +28,7 @@ Usage
 python examples
 ---------------
 
-Get the lead section of an article as HTML
+Get the `lead section`_ of an article as HTML
 
 .. code-block:: python
 
@@ -36,7 +36,7 @@ Get the lead section of an article as HTML
   >>> wptools.html("Aardvark", lead=True)
   '<p>The <b>aardvark</b>...
 
-Get the lead section of an article as Markdown text
+Get the `lead section`_ of an article as Markdown text
 
 .. code-block:: python
 
@@ -180,7 +180,8 @@ Get article Wikitext_
 
 
 .. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
-.. _`thumbnail image`: https://www.mediawiki.org/wiki/Extension:PageImages
 .. _Wikitext: https://www.mediawiki.org/wiki/Wikitext
 .. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
 .. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
+.. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+.. _`thumbnail image`: https://www.mediawiki.org/wiki/Extension:PageImages
