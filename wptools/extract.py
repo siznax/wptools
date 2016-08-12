@@ -32,6 +32,13 @@ def disambig(source, data, title):
                 return "DISAMBIGUATION " + title
 
 
+def disambig_ptree(data):
+    data = json.loads(data)
+    ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
+    title = data["parse"]["title"].encode('utf-8')
+    return disambig('parsetree', ptree, title)
+
+
 def handle_redirect(red, lead):
     title = red.split("REDIRECT")[-1].strip()
     doc = qry_html(fetch.get_html(title, lead))
@@ -110,6 +117,11 @@ def img_images(data, fmt=None):
 
 def img_infobox(data, fmt=None):  # EXPERIMENTAL
     """returns images from infobox (data=parsetree)"""
+
+    dis = disambig_ptree(data)
+    if dis:
+        return dis
+
     ibox = qry_infobox(data, "dict")
     types = ["image", "image_map", "logo"]
     data = {"fname": None, "url": None, "key": None}
@@ -132,7 +144,8 @@ def img_pageimages(data, fmt=None):
     """returns images from pageimages query"""
     data = json.loads(data)
     data = data["query"]["pages"][0]
-    data["source"] = utils.media_url(data["pageimage"])
+    if "pageimage" in data:
+        data["source"] = utils.media_url(data["pageimage"])
     if fmt == 'dict':
         return data
     return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
@@ -177,6 +190,8 @@ def qry_html(data, lead=False):
 
 def qry_images(data, source):
     """returns images from selected source"""
+    if "missing" in data:
+        return "NOTFOUND"
     if source == "images":
         return img_images(data)
     if source == "pageimages":
