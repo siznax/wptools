@@ -20,7 +20,7 @@ import time
 import wptools
 
 
-def wpimage(title, source, test, verbose, wiki):
+def wpimages(title, source, test, verbose, wiki):
     start = time.time()
 
     if source == "images":
@@ -48,7 +48,7 @@ def wpimage(title, source, test, verbose, wiki):
 
 
 def main():
-    desc = "Query MediaWiki API for article image(s)"
+    desc = "Query MediaWiki API for article images"
     epig = ("source=infobox is experimental\n"
             "you probably want source=pageimages")
     argp = argparse.ArgumentParser(
@@ -69,7 +69,7 @@ def main():
 
     args = argp.parse_args()
 
-    wpimage(args.title, args.source, args.t, args.v, args.w)
+    wpimages(args.title, args.source, args.t, args.v, args.w)
 
 
 if __name__ == "__main__":
