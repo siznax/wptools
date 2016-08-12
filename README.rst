@@ -5,13 +5,21 @@ Wikipedia tools (for Humans)
         :target: https://pypi.python.org/pypi/wptools/
 
 Get the plain text, wikitext, HTML, or parse tree of an article via
-MediaWiki API. You may get the whole article in those formats, just
-the "lead" section (summary), the Infobox (if extant), or a
-representative image for the article.
+`MediaWiki API`_. You may get the whole article in those formats,
+just the "lead_" section (summary), the Infobox_ (if extant), or a
+representative image_ for the article.
 
-See also: `MediaWiki API:Client code`_
+These are purpose-built python methods intended to ease use for
+common requests (by me anyway ;) in the style of @kennethreitz
+`requests`_. We say "(for Humans)" because that is a goal.
 
-P.S. "(for Humans)" à la @kennethreitz, in parentheses because that is a goal.
+You can learn more about the API paths we use here: `FETCH.txt`_,
+and the many other wrappers for the MediaWiki API that do more or
+less here: `MediaWiki API:Client code`_. An newer (and ostensibly
+more robust) path to content is provided by RESTBase_ which we
+hope to make use of.
+
+Contributions are happily welcome!
 
 
 Install
@@ -180,8 +188,14 @@ Get article Wikitext_
 
 
 .. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
+.. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
 .. _Wikitext: https://www.mediawiki.org/wiki/Wikitext
+.. _`FETCH.txt`: https://github.com/siznax/wptools/blob/master/FETCH.txt
 .. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
+.. _`MediaWiki API`: https://www.mediawiki.org/wiki/API:Main_page
 .. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 .. _`thumbnail image`: https://www.mediawiki.org/wiki/Extension:PageImages
+.. _image: https://www.mediawiki.org/wiki/Extension:PageImages
+.. _lead: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+.. _requests: http://docs.python-requests.org/en/master/user/intro/
