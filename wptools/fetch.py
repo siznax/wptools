@@ -171,6 +171,8 @@ def get_infobox():
 
 def get_images(title, source, lead=False, test=False,
                wiki=WPToolsFetch.ENDPOINT, verbose=False):
+    if source == "infobox":
+        return get_parsetree(title, lead, test, wiki, verbose)
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query(source, title)
     if test:

@@ -22,26 +22,14 @@ import wptools
 
 def wpimages(title, source, test, verbose, wiki):
     start = time.time()
-
-    if source == "images":
-        data = wptools.get_images(title, 'images',
-                                  lead=False, test=test,
-                                  wiki=wiki, verbose=verbose)
-    if source == "pageimages":
-        data = wptools.get_images(title, 'pageimages',
-                                  lead=False, test=test,
-                                  wiki=wiki, verbose=verbose)
-    if source == "infobox":
-        data = wptools.get_parsetree(title, lead=False,
-                                     test=test, wiki=wiki,
-                                     verbose=verbose)
-
+    data = wptools.get_images(title, source,
+                              lead=False, test=test,
+                              wiki=wiki, verbose=verbose)
     if test:
         print(data)
         sys.exit(os.EX_OK)
 
     data = wptools.extract.qry_images(data, source)
-
     print(data)
 
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
