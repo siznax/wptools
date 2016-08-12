@@ -99,16 +99,43 @@ def html_text(data, lead=False, compact=False):
         return doc
 
 
-def redirect(source, data):
-    """return #REDIRECT text from query if extant"""
-    if source == 'html':
-        xpath = "//div[@class=\"redirectMsg\"]//a"
-        for item in lxml.html.fromstring(data).xpath(xpath):
-            return "#REDIRECT %s" % item.text
-    if source == 'parsetree':
-        for item in etree.fromstring(data).xpath("//text()"):
-            if item.startswith("#REDIRECT"):
-                return item.strip()
+def img_images(data, fmt=None):
+    """returns list of images from prop=images query"""
+    data = json.loads(data)
+    data = data["query"]["pages"][0]
+    if fmt == 'dict':
+        return data
+    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+
+
+def img_infobox(data, fmt=None):  # EXPERIMENTAL
+    """returns images from infobox (data=parsetree)"""
+    ibox = qry_infobox(data, "dict")
+    types = ["image", "image_map", "logo"]
+    data = {"fname": None, "url": None, "key": None}
+
+    # BREAKS on Benjamin Franklin
+    # consider wikitextinstead of parsetree... ?
+
+    for item in types:
+        if item in ibox and ibox[item]:
+            data["key"] = item
+            data["fname"] = ibox[item]
+            data["source"] = utils.media_url(ibox[item])
+            break
+    if fmt == 'dict':
+        return data
+    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+
+
+def img_pageimages(data, fmt=None):
+    """returns images from pageimages query"""
+    data = json.loads(data)
+    data = data["query"]["pages"][0]
+    data["source"] = utils.media_url(data["pageimage"])
+    if fmt == 'dict':
+        return data
+    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def plain_text_cleanup(blob):
@@ -124,24 +151,6 @@ def plain_text_cleanup(blob):
             tmp.append(line)
     blob = "\n".join(tmp)
     return blob.encode('utf-8')
-
-
-def template_to_dict(tree):
-    """returns wikitext template as dict (one deep)"""
-    obj = defaultdict(str)
-    for item in tree:
-        try:
-            name = item.findtext('name')
-            tmpl = item.find('value').find('template')
-            if tmpl is not None:
-                value = etree.tostring(tmpl)
-            else:
-                value = item.findtext('value')
-            if name and value:
-                obj[name.strip()] = value.strip()
-        except:
-            obj["%s ERROR" % __name__] = etree.tostring(item)
-    return dict(obj)
 
 
 def qry_html(data, lead=False):
@@ -164,6 +173,16 @@ def qry_html(data, lead=False):
         return doc.encode('utf-8')
     except:
         return doc
+
+
+def qry_images(data, source):
+    """returns images from selected source"""
+    if source == "images":
+        return img_images(data)
+    if source == "pageimages":
+        return img_pageimages(data)
+    if source == "infobox":
+        return img_infobox(data)
 
 
 def qry_infobox(data, _format="json"):
@@ -204,3 +223,33 @@ def qry_wikitext(data):
     if text.startswith("#REDIRECT"):
         return text.split("\n")[0]
     return text
+
+
+def redirect(source, data):
+    """return #REDIRECT text from query if extant"""
+    if source == 'html':
+        xpath = "//div[@class=\"redirectMsg\"]//a"
+        for item in lxml.html.fromstring(data).xpath(xpath):
+            return "#REDIRECT %s" % item.text
+    if source == 'parsetree':
+        for item in etree.fromstring(data).xpath("//text()"):
+            if item.startswith("#REDIRECT"):
+                return item.strip()
+
+
+def template_to_dict(tree):
+    """returns wikitext template as dict (one deep)"""
+    obj = defaultdict(str)
+    for item in tree:
+        try:
+            name = item.findtext('name')
+            tmpl = item.find('value').find('template')
+            if tmpl is not None:
+                value = etree.tostring(tmpl)
+            else:
+                value = item.findtext('value')
+            if name and value:
+                obj[name.strip()] = value.strip()
+        except:
+            obj["%s ERROR" % __name__] = etree.tostring(item)
+    return dict(obj)
