@@ -1,19 +1,18 @@
 #!/usr/bin/env python
 """
-Query MediaWiki API for main article image
+Query MediaWiki API for article images
 
-Here, we look in the infobox instead of the API query "prop=images"
-because we want to find the image that is most relevant.
+pageimages is typically what you want
 
 References
     https://www.mediawiki.org/wiki/API:Images
-    https://www.mediawiki.org/wiki/API:Main_page
+    https://www.mediawiki.org/wiki/Extension:PageImages
+    https://www.mediawiki.org/wiki/Extension:Popups
 """
 
 from __future__ import print_function
 
 import argparse
-import json
 import os
 import sys
 import time
@@ -21,57 +20,46 @@ import time
 import wptools
 
 
-def wpimage(title, api, test, verbose, wiki):
+def wpimage(title, source, test, verbose, wiki):
     start = time.time()
-    ptree = wptools.get_parsetree(title, lead=False,
-                                  test=test, wiki=wiki,
-                                  verbose=verbose)
-    # wikitext = wptools.get_wikitext(title, lead=False,
-    #                                 test=test, wiki=wiki,
-    #                                 verbose=verbose)
-    # print(wikitext)
-    # return
+
+    if source == "images":
+        data = wptools.get_images(title, 'images',
+                                  lead=False, test=test,
+                                  wiki=wiki, verbose=verbose)
+    if source == "pageimages":
+        data = wptools.get_images(title, 'pageimages',
+                                  lead=False, test=test,
+                                  wiki=wiki, verbose=verbose)
+    if source == "infobox":
+        data = wptools.get_parsetree(title, lead=False,
+                                     test=test, wiki=wiki,
+                                     verbose=verbose)
 
     if test:
-        print(ptree)
+        print(data)
         sys.exit(os.EX_OK)
 
-    ibox = wptools.infobox(ptree, "dict")
+    data = wptools.extract.qry_images(data, source)
 
-    # print(json.dumps(ibox))
-    # return
-
-    types = ["image", "image_map", "logo"]
-    image = {"fname": None, "url": None, "key": None}
-
-    # AWWW... this breaks on Benjamin Franklin, consider wikitext
-    # instead of parsetree?
-
-    for item in types:
-        if item in ibox and ibox[item]:
-            image["key"] = item
-            image["fname"] = ibox[item]
-            image["url"] = wptools.utils.media_url(ibox[item])
-            break
-
-    if api:
-        data = wptools.get_images(title, lead=False,
-                                  test=test, wiki=wiki,
-                                  verbose=verbose)
-        print(data)
-    else:
-        print(json.dumps(image))
+    print(data)
 
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
 def main():
     desc = "Query MediaWiki API for article image(s)"
-    argp = argparse.ArgumentParser(description=desc)
+    epig = ("source=infobox is experimental\n"
+            "you probably want source=pageimages")
+    argp = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=desc,
+        epilog=epig
+    )
     argp.add_argument("title",
                       help="article title")
-    argp.add_argument("-a", "-api", action='store_true',
-                      help="show images from API")
+    argp.add_argument("source", choices=['images', 'pageimages', 'infobox'],
+                      help="API entrypoint")
     argp.add_argument("-t", "-test", action='store_true',
                       help="show query and exit")
     argp.add_argument("-v", "-verbose", action='store_true',
@@ -81,7 +69,7 @@ def main():
 
     args = argp.parse_args()
 
-    wpimage(args.title, args.a, args.t, args.v, args.w)
+    wpimage(args.title, args.source, args.t, args.v, args.w)
 
 
 if __name__ == "__main__":
