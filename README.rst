@@ -15,7 +15,7 @@ common requests (by me anyway ;) in the style of @kennethreitz
 
 You can learn more about the API paths we use here: `FETCH.txt`_,
 and the many other wrappers for the MediaWiki API that do more or
-less here: `MediaWiki API:Client code`_. An newer (and ostensibly
+less here: `MediaWiki API:Client code`_. A newer (and ostensibly
 more robust) path to content is provided by RESTBase_ which we
 hope to make use of.
 
