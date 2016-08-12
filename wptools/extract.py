@@ -106,16 +106,13 @@ def html_text(data, lead=False, compact=False):
         return doc
 
 
-def img_images(data, fmt=None):
+def img_images(data):
     """returns list of images from prop=images query"""
     data = json.loads(data)
-    data = data["query"]["pages"][0]
-    if fmt == 'dict':
-        return data
-    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+    return data["query"]["pages"][0]
 
 
-def img_infobox(data, fmt=None):  # EXPERIMENTAL
+def img_infobox(data):  # EXPERIMENTAL
     """returns images from infobox (data=parsetree)"""
 
     dis = disambig_ptree(data)
@@ -135,20 +132,16 @@ def img_infobox(data, fmt=None):  # EXPERIMENTAL
             data["fname"] = ibox[item]
             data["source"] = utils.media_url(ibox[item])
             break
-    if fmt == 'dict':
-        return data
-    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+    return data
 
 
-def img_pageimages(data, fmt=None):
+def img_pageimages(data):
     """returns images from pageimages query"""
     data = json.loads(data)
     data = data["query"]["pages"][0]
     if "pageimage" in data:
         data["source"] = utils.media_url(data["pageimage"])
-    if fmt == 'dict':
-        return data
-    return json.dumps(data, sort_keys=True, indent=4, separators=(',', ': '))
+    return data
 
 
 def plain_text_cleanup(blob):
@@ -188,26 +181,24 @@ def qry_html(data, lead=False):
         return doc
 
 
-def qry_images(data, source, fmt=None):
+def qry_images(data, source):
     """returns images from selected source"""
     if "missing" in data:
         return "NOTFOUND"
     if source == "images":
-        return img_images(data, fmt)
+        return img_images(data)
     if source == "pageimages":
-        return img_pageimages(data, fmt)
+        return img_pageimages(data)
     if source == "infobox":
-        return img_infobox(data, fmt)
+        return img_infobox(data)
 
 
-def qry_infobox(data, fmt=None):
+def qry_infobox(data):
     """returns infobox from parsetree"""
     ptree = qry_parsetree(data)
     for item in etree.fromstring(ptree).xpath("//template"):
         if "box" in item.find('title').text:
-            if fmt == "dict":
-                return template_to_dict(item)
-            return json.dumps(template_to_dict(item))
+            return template_to_dict(item)
 
 
 def qry_parsetree(data):

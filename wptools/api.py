@@ -28,7 +28,7 @@ def images(title, source="pageimages", test=False, verbose=False,
                             wiki=wiki, verbose=verbose)
     if test:
         return data
-    return extract.qry_images(data, source, 'dict')
+    return extract.qry_images(data, source)
 
 
 def infobox(title, test=False, verbose=False,
@@ -37,7 +37,7 @@ def infobox(title, test=False, verbose=False,
     data = fetch.get_parsetree(title, False, test, wiki, verbose)
     if test:
         return data
-    return extract.qry_infobox(data, 'dict')
+    return extract.qry_infobox(data)
 
 
 def parsetree(title, lead=False, test=False,

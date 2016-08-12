@@ -37,7 +37,7 @@ class ExtractTestCase(unittest.TestCase):
         # wptools.fetch.get_parsetree('Aardvark')
         p = "<template><title>speciesbox</title><part><name> genus </name><equals>=</equals><value> Orycteropus</value></part></template>"
         d = r'{"parse":{"title":"Aardvark","pageid":680,"parsetree":{"*":"' + p + '"}}}'
-        ans = qry_infobox(d, 'dict')['genus']
+        ans = qry_infobox(d)['genus']
         self.assertEqual(ans, 'Orycteropus')
 
     def test_qry_parsetree(self):
