@@ -38,9 +38,15 @@ class WPToolsFetch:
              "images": Template(("${WIKI}/w/api.php?action=query"
                                  "&titles=${page}"
                                  "&format=json"
-                                 "&format=json"
                                  "&formatversion=2"
                                  "&prop=images")),
+             "pageimages": Template(("${WIKI}/w/api.php?action=query"
+                                     "&titles=${page}"
+                                     "&format=json"
+                                     "&formatversion=2"
+                                     "&prop=pageimages"
+                                     "&pithumbsize=320"
+                                     "&pilimit=1")),
              "parsetree": Template(("${WIKI}/w/api.php?action=parse"
                                     "&format=json"
                                     "&page=${page}"
@@ -159,13 +165,14 @@ def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
 
 
 def get_infobox():
+    """currently, no way to query Infobox directly"""
     pass
 
 
-def get_images(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
-               verbose=False):
+def get_images(title, source, lead=False, test=False,
+               wiki=WPToolsFetch.ENDPOINT, verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
-    qry = obj.query('images', title)
+    qry = obj.query(source, title)
     if test:
         return qry
     return obj.curl(qry)
