@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+0.0.3 (2016-08-12)
+++++++++++++++++++
+
+* Implemented wptools.image choices.
+* Added wptools.api to simplify python i/f and CLI scripts.
+* Merged @0x9900's CLI dist fixes.
+* A little more test coverage.
+
+
 0.0.2 (2016-08-02)
 ++++++++++++++++++
 
