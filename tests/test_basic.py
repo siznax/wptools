@@ -27,7 +27,8 @@ class ExtractTestCase(unittest.TestCase):
     def test_qry_wikitext(self):
         from wptools.extract import qry_wikitext
         # wptools.fetch.get_wikitext('Aardvark')
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"wikitext":{"*":"{{speciesbox\n| genus = Orycteropus\n}}"}}}'
+        w = r'{{speciesbox\n| genus = Orycteropus\n}}'
+        d = r'{"parse":{"title":"Aardvark","pageid":680,"wikitext":{"*":"' + w + '"}}}'
         ans = qry_wikitext(d)
         self.assertEqual(ans, "{{speciesbox\n| genus = Orycteropus\n}}")
 
@@ -42,21 +43,23 @@ class ExtractTestCase(unittest.TestCase):
     def test_qry_parsetree(self):
         from wptools.extract import qry_parsetree
         # wptools.fetch.get_parsetree('Aardvark')
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"parsetree":{"*":"<root/>"}}}'
+        p = '<root/>'
+        d = r'{"parse":{"title":"Aardvark","pageid":680,"parsetree":{"*":"' + p + '"}}}'
         self.assertEqual(qry_parsetree(d), '<root/>')
 
     def test_qry_text(self):
         from wptools.extract import qry_text
         # wptools.fetch.get_html('Aardvark', lead=True)
-        h = '<p>The <b>aardvark</b>'
+        h = '<b>aardvark</b>'
         d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"' + h + '"}}}'
         ans = qry_text(d, lead=True)
-        self.assertEqual(ans, 'The **aardvark**')
+        self.assertEqual(ans, '**aardvark**')
 
     def test_qry_html(self):
         from wptools.extract import qry_html
         # wptools.fetch.get_html('Aardvark', lead=True)
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"<html>"}}}'
+        h = '<html>'
+        d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"' + h + '"}}}'
         self.assertEqual(qry_html(d), '<html>')
 
     def test_html_disambig(self):
