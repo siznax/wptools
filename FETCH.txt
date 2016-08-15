@@ -48,4 +48,20 @@ https://www.mediawiki.org/wiki/Special:ApiSandbox
 RESTBase
 ========
 
-    TBD
+https://en.wikipedia.org/api/rest_v1/
+
+    /page/mobile-text/ => OK for lead HTML
+        json["sections"[0]["items"]
+        - ignore hatnote
+        - prune references
+        - prune IPA ogg audio
+    
+    /page/mobile-sections-lead/ => NOPE
+        json["sections"][0]["text"]
+        - first paragraph, followed by Infobox, lead section remainder
+        - too much work to re-organize
+    
+    /page/summary/ => NOPE
+        json["extract"]
+        - first few sentences of plain text (truncated lead)
+        - close to Google text
