@@ -13,7 +13,7 @@ These are purpose-built python methods intended to ease use for
 common requests (by me anyway ;) in the style of @kennethreitz
 `requests`_. We say "(for Humans)" because that is a goal.
 
-You can learn more about the API paths we use here: `FETCH.txt`_,
+You can learn more about the API paths we use here: `NOTES.txt`_,
 and the many other wrappers for the MediaWiki API that do more or
 less here: `MediaWiki API:Client code`_. A newer (and perhaps
 more performant) path to content is provided by RESTBase_ which we
@@ -190,7 +190,7 @@ Get article Wikitext_
 .. _Infobox: https://en.wikipedia.org/wiki/Help:Infobox
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
 .. _Wikitext: https://www.mediawiki.org/wiki/Wikitext
-.. _`FETCH.txt`: https://github.com/siznax/wptools/blob/master/FETCH.txt
+.. _`NOTES.txt`: https://github.com/siznax/wptools/blob/master/NOTES.txt
 .. _`MediaWiki API:Client code`: https://www.mediawiki.org/wiki/API:Client_code
 .. _`MediaWiki API`: https://www.mediawiki.org/wiki/API:Main_page
 .. _`Parse tree`: https://en.wikipedia.org/wiki/Parse_tree
