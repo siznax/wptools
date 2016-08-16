@@ -52,7 +52,7 @@ def media_url(fname, namespace='commons',
     try:
         digest = hashlib.md5(name).hexdigest()
         path = "/".join([digest[:1], digest[:2], name])
-    except:
+    except UnicodeEncodeError:
         name = name.encode('utf-8')
         digest = hashlib.md5(name).hexdigest()
         path = urllib.quote("/".join([digest[:1], digest[:2], name]))
