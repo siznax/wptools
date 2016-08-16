@@ -13,7 +13,7 @@ __author__ = "siznax"
 __contact__ = "https://github.com/siznax/wptools"
 __license__ = "MIT"
 __title__ = "wptools"
-__version__ = "0.0.3"
+__version__ = "0.0.4"
 
 from . import utils
 from .api import html, images, infobox, lead, parsetree, text, wikitext

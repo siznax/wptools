@@ -10,7 +10,7 @@ with open('HISTORY.rst') as f:
 
 setup(
     name='wptools',
-    version='0.0.3',
+    version='0.0.4',
     description='Get Wikipedia article lead (summary), infobox, and more via MediaWiki API',
     long_description=readme + '\n\n' + history,
     url='https://github.com/siznax/wptools/',
@@ -26,6 +26,7 @@ setup(
             'wp_html = scripts.html:main',
             'wp_image = scripts.image:main',
             'wp_infobox = scripts.infobox:main',
+            'wp_lead = scripts.lead:main',
             'wp_parsetree = scripts.parsetree:main',
             'wp_text = scripts.text:main',
             'wp_wikitext = scripts.wikitext:main',

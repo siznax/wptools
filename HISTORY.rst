@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+0.0.4 (2016-08-16)
+++++++++++++++++++
+
+* Added wptools.lead.
+* Added safe_exit() to CLI scripts.
+* Removed a fair amount of unused code.
+
+
 0.0.3 (2016-08-12)
 ++++++++++++++++++
 
