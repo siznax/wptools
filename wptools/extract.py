@@ -8,7 +8,6 @@ import lxml.html
 import json
 import re
 
-from . import fetch
 from . import utils
 from collections import defaultdict
 from lxml import etree
@@ -18,34 +17,6 @@ class WPToolsExtract:
 
     def __init__(self):
         pass
-
-
-def disambig(source, data, title):
-    """return DISAMBIGUATION if found"""
-    if source == 'html':
-        for item in lxml.html.fromstring(data).xpath("//p[1]"):
-            if "may refer to:" in etree.tostring(item):
-                return "DISAMBIGUATION " + title
-    if source == 'parsetree':
-        for item in etree.fromstring(data).xpath("//text()"):
-            if 'may refer to:' in item:
-                return "DISAMBIGUATION " + title
-
-
-def disambig_ptree(data):
-    data = json.loads(data)
-    ptree = data["parse"]["parsetree"]["*"]
-    title = data["parse"]["title"]
-    return disambig('parsetree', ptree, title)
-
-
-def handle_redirect(red, lead):
-    title = red.split("REDIRECT")[-1].strip()
-    doc = qry_html(fetch.get_html(title, lead))
-    try:
-        return doc.decode('utf-8')
-    except:
-        return doc
 
 
 def html_lead(frag):
@@ -115,11 +86,7 @@ def img_images(data):
 def img_infobox(data):  # EXPERIMENTAL
     """returns images from infobox (data=parsetree)"""
 
-    dis = disambig_ptree(data)
-    if dis:
-        return dis
-
-    ibox = qry_infobox(data, "dict")
+    ibox = qry_infobox(data)
     types = ["image", "image_map", "logo"]
     data = {"fname": None, "url": None, "key": None}
 
@@ -146,10 +113,6 @@ def img_pageimages(data):
 
 def plain_text_cleanup(blob):
     """remove known extraneous items"""
-    # try:
-    #     blob = blob.decode('utf-8')
-    # except:
-    #     pass
     blob = re.sub(r'\s\( listen\)', "", blob, flags=re.UNICODE)
     tmp = []
     for line in blob.split("\n"):
@@ -164,18 +127,11 @@ def qry_html(data, lead=False):
     try:
         data = json.loads(data)
         doc = data["parse"]["text"]["*"]
-        title = data["parse"]["title"]
+        if lead:
+            return html_lead(doc)
+        return doc
     except:
-        return "NOTFOUND"
-    dis = disambig('html', doc, title)
-    if dis:  # Misfits
-        return dis
-    red = redirect('html', doc)
-    if red:  # Einstein
-        doc = handle_redirect(red, lead)
-    if lead:
-        doc = html_lead(doc)
-    return doc
+        return data
 
 
 def qry_images(data, source):
@@ -193,9 +149,12 @@ def qry_images(data, source):
 def qry_infobox(data):
     """returns infobox from parsetree"""
     ptree = qry_parsetree(data)
-    for item in etree.fromstring(ptree).xpath("//template"):
-        if "box" in item.find('title').text:
-            return template_to_dict(item)
+    try:
+        for item in etree.fromstring(ptree).xpath("//template"):
+            if "box" in item.find('title').text:
+                return template_to_dict(item)
+    except:
+        return ptree
 
 
 def qry_parsetree(data):
@@ -203,16 +162,9 @@ def qry_parsetree(data):
     try:
         data = json.loads(data)
         ptree = data["parse"]["parsetree"]["*"]
-        title = data["parse"]["title"]
-        dis = disambig('parsetree', ptree, title)
-        if dis:
-            return dis
-        red = redirect('parsetree', ptree)
-        if red:
-            return red
         return ptree
     except:
-        return json.loads(data)["error"]["info"]
+        return data
 
 
 def qry_text(data, lead=False, compact=False):
@@ -222,22 +174,7 @@ def qry_text(data, lead=False, compact=False):
 
 def qry_wikitext(data):
     """return wikitext from API JSON"""
-    text = json.loads(data)["parse"]["wikitext"]["*"]
-    if text.startswith("#REDIRECT"):
-        return text.split("\n")[0]
-    return text
-
-
-def redirect(source, data):
-    """return #REDIRECT text from query if extant"""
-    if source == 'html':
-        xpath = "//div[@class=\"redirectMsg\"]//a"
-        for item in lxml.html.fromstring(data).xpath(xpath):
-            return "#REDIRECT %s" % item.text
-    if source == 'parsetree':
-        for item in etree.fromstring(data).xpath("//text()"):
-            if item.startswith("#REDIRECT"):
-                return item.strip()
+    return json.loads(data)["parse"]["wikitext"]["*"]
 
 
 def template_to_dict(tree):
