@@ -4,36 +4,13 @@
 WPTools Utilities module.
 """
 
+from __future__ import print_function
+
 import hashlib
-import html5lib
-import json
-import random
+import lxml.etree
+import lxml.html
 import re
-import string
 import sys
-
-
-def images(wikitext):
-    """
-    return list of images from wikitext
-    """
-
-    def search(item):
-        match = re.search(r"\[\[(.*)\]\]", item)
-        if match:
-            item = match.group(1)
-        match = re.search(r"([^\|]*)|", item)
-        if match:
-            item = match.group(1)
-        return media_url(item)
-
-    images = []
-    wikitext = wikitext.encode('utf-8')
-    for line in wikitext.split("\n"):
-        if re.search(r'image\d{0,} {0,}=', line):
-            image = line.split("=")[1].strip()
-            images.append(search(image))
-    return images
 
 
 def collapse(text):
@@ -46,6 +23,10 @@ def collapse(text):
     return text
 
 
+def console(msg):
+    print(msg[:72].replace("\n", ""), file=sys.stderr)
+
+
 def media_url(fname, namespace='commons',
               wiki='https://upload.wikimedia.org/wikipedia'):
     """return Wikimedia File/Image URL from name"""
@@ -54,56 +35,56 @@ def media_url(fname, namespace='commons',
     return "/".join([wiki, namespace, digest[:1], digest[:2], name])
 
 
-def parse_html(html):
-    """returns etree from HTML"""
-    return html5lib.parse(html,
-                          treebuilder='lxml',
-                          namespaceHTMLElements=False)
+def prune_html(frag):
+    """prune select fragments by ELEMENT"""
+
+    def exclude(item, elem):
+        """returns true if element should be excluded"""
+        _class = item.get("class")
+        if item.tag == "sup":
+            if _class and ("reference" in _class or "noprint" in _class):
+                return True
+            if "note" in elem.lower():
+                return True
+        if 'span id="coordinates"' in elem:
+            return True
+        if _class and "cite-error" in _class:
+            return True
+        if _class and "noexcerpt" in _class:
+            return True
+        if _class and "hatnote" in _class:
+            return True
+        return False
+
+    norefs = []
+    console("-" * 72)
+    console("FRAG: %s" % frag)
+    for item in lxml.html.fragments_fromstring(frag):
+        if type(item) is str or type(item) is unicode:
+            elem = item
+            console("BARE: %s" % elem)
+        else:
+            elem = lxml.etree.tostring(item)
+            console("ELEM: %s" % elem)
+            if exclude(item, elem):
+                a = elem
+                b = elem.split('>')[-1]
+                console("___A: %s" % a)
+                console("___B: %s" % b)
+                elem = b
+        norefs.append(elem)
+    return "".join(norefs)
 
 
-def safe_exit(output):
-    """exit without breaking pipes."""
-    try:
-        sys.stdout.write(output)
-        sys.stdout.flush()
-    except IOError:
-        pass
-
-
-def sample_titles(fname, pop=100, num=10):
-    """
-    return list of random titles from file
-    :param fname: flat file of titles
-    :type fname: str
-    :param pop: population size
-    :type pop: int
-    :param num: sample size
-    :type num: int
-    """
-    titles = []
-    count = 0
-    sample = random.sample(xrange(pop), num)
-    with open(fname) as fh:
-        for item in fh:
-            if count in sample:
-                titles.append(item.strip())
-                sample.remove(count)
-            count += 1
-    return titles
-
-
-def sample_titles_alpha(fname):
-    """return list of first alphabetical item found in sorted titles file"""
-    sample = string.ascii_uppercase
-    titles = []
-    with open(fname) as fh:
-        for item in fh:
-            if item.startswith(sample[0]):
-                titles.append(item.strip())
-                sample = sample[1:]
-                if not sample:
-                    break
-    return titles
+def prune_html_spans(frag):
+    """prune select spans by XPATH"""
+    root = lxml.html.fromstring(frag)
+    for item in root.xpath("//span"):
+        if item.get("class") and "noexcerpt" in item.get("class"):
+            console("-" * 72)
+            console("PRUNE_SPAN: %s" % lxml.etree.tostring(item))
+            item.getparent().remove(item)
+    return lxml.etree.tostring(root)
 
 
 def single_space(blob):
@@ -117,18 +98,3 @@ def strip_refs(blob):
     out = out.replace("[_citation needed_]", "")
     out = out.replace("[_clarification needed_]", "")
     return out
-
-
-def wiki_path(title):
-    title = title.replace(" ", "_")
-    title = title[0].upper() + title[1:]
-    return "/wiki/%s" % title.strip()
-
-
-def wikitext_from_json(_json):
-    """return wikitext from API JSON"""
-    text = ""
-    for page in json.loads(_json)["query"]["pages"]:
-        text += "\n= %s =\n" % page["title"]
-        text += page["revisions"][0]["content"]
-    return text
