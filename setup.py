@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 
-import os
-
 from setuptools import setup, find_packages
 
 with open('README.rst') as f:
@@ -23,7 +21,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=['html5lib', 'lxml', 'pycurl', 'requests'],
     include_package_data=True,
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'wp_html = scripts.html:main',
             'wp_image = scripts.image:main',
