@@ -13,7 +13,7 @@ import wptools
 
 def html(title, lead, test, verbose, wiki):
     start = time.time()
-    print(wptools.html(title, lead, test, verbose, wiki))
+    print(wptools.html(title, lead, test, verbose, wiki).encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 

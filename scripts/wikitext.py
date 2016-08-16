@@ -19,7 +19,11 @@ import wptools
 
 def wikitext(title, lead, test, wiki):
     start = time.time()
-    print(wptools.wikitext(title, lead, test, wiki))
+    text = wptools.wikitext(title, lead, test, wiki)
+    try:
+        print(text)
+    except:
+        print(text.encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 

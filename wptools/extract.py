@@ -34,8 +34,8 @@ def disambig(source, data, title):
 
 def disambig_ptree(data):
     data = json.loads(data)
-    ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
-    title = data["parse"]["title"].encode('utf-8')
+    ptree = data["parse"]["parsetree"]["*"]
+    title = data["parse"]["title"]
     return disambig('parsetree', ptree, title)
 
 
@@ -77,11 +77,14 @@ def html_lead_ignore(elem):
 def html_keep_tags(frag):
     """strip tags, except replace <b> and <i> with markdown"""
     from lxml.html.clean import Cleaner
-    cleaner = Cleaner(allow_tags=['b', 'i'], remove_unknown_tags=False)
+    allow = ['b', 'i', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    cleaner = Cleaner(allow_tags=allow, remove_unknown_tags=False)
     text = cleaner.clean_html(frag)
     text = text.replace("<div>", "").replace("</div>", "")
     text = re.sub(r"</?b>", "**", text)
     text = re.sub(r"</?i>", "_", text)
+    text = re.sub(r"<h\d>", "\n# ", text)
+    text = re.sub(r"</h\d>", "\n", text)
     return text
 
 
@@ -100,10 +103,7 @@ def html_text(data, lead=False, compact=False):
     doc = plain_text_cleanup(doc)
     if compact:
         doc = utils.collapse(doc)
-    try:
-        return doc.encode('utf-8')
-    except:
-        return doc
+    return doc
 
 
 def img_images(data):
@@ -146,17 +146,17 @@ def img_pageimages(data):
 
 def plain_text_cleanup(blob):
     """remove known extraneous items"""
-    try:
-        blob = blob.decode('utf-8')
-    except:
-        pass
+    # try:
+    #     blob = blob.decode('utf-8')
+    # except:
+    #     pass
     blob = re.sub(r'\s\( listen\)', "", blob, flags=re.UNICODE)
     tmp = []
     for line in blob.split("\n"):
         if not line.startswith("Cite error"):
             tmp.append(line)
     blob = "\n".join(tmp)
-    return blob.encode('utf-8')
+    return blob
 
 
 def qry_html(data, lead=False):
@@ -175,10 +175,7 @@ def qry_html(data, lead=False):
         doc = handle_redirect(red, lead)
     if lead:
         doc = html_lead(doc)
-    try:
-        return doc.encode('utf-8')
-    except:
-        return doc
+    return doc
 
 
 def qry_images(data, source):
@@ -205,8 +202,8 @@ def qry_parsetree(data):
     """return parsetree XML from API JSON"""
     try:
         data = json.loads(data)
-        ptree = data["parse"]["parsetree"]["*"].encode('utf-8')
-        title = data["parse"]["title"].encode('utf-8')
+        ptree = data["parse"]["parsetree"]["*"]
+        title = data["parse"]["title"]
         dis = disambig('parsetree', ptree, title)
         if dis:
             return dis
@@ -215,7 +212,7 @@ def qry_parsetree(data):
             return red
         return ptree
     except:
-        return json.loads(data)["error"]["info"].encode('utf-8')
+        return json.loads(data)["error"]["info"]
 
 
 def qry_text(data, lead=False, compact=False):
@@ -225,7 +222,7 @@ def qry_text(data, lead=False, compact=False):
 
 def qry_wikitext(data):
     """return wikitext from API JSON"""
-    text = json.loads(data)["parse"]["wikitext"]["*"].encode('utf-8')
+    text = json.loads(data)["parse"]["wikitext"]["*"]
     if text.startswith("#REDIRECT"):
         return text.split("\n")[0]
     return text

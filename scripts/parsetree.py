@@ -17,7 +17,11 @@ import wptools
 
 def parsetree(title, lead, test, wiki):
     start = time.time()
-    print(wptools.parsetree(title, lead, test, wiki))
+    ptree = wptools.parsetree(title, lead, test, wiki)
+    try:
+        print(ptree)
+    except:
+        print(ptree.encode('utf-8'))
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
 
