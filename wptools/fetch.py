@@ -18,14 +18,6 @@ from string import Template
 class WPToolsFetch:
 
     ENDPOINT = "http://en.wikipedia.org"
-    ACTION_QUERY = Template(("${API}/w/api.php?action=query"
-                             "&titles=${titles}"
-                             "&format=json"
-                             "&formatversion=2"
-                             "&prop=revisions"  # latest revision
-                             "&rvprop=content"  # content of latest revision
-                             "&redirects"
-                             "&continue="))
     QUERY = {"html": Template(("${WIKI}/w/api.php?action=parse"
                                "&format=json"
                                "&page=${page}"
