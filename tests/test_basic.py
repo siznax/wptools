@@ -62,11 +62,6 @@ class ExtractTestCase(unittest.TestCase):
         d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"' + h + '"}}}'
         self.assertEqual(qry_html(d), '<html>')
 
-    def test_html_disambig(self):
-        from wptools.extract import qry_html
-        d = r'{"parse":{"title":"Misfits","pageid":151422,"text":{"*":"<p><b>Misfits</b> may refer to:</p>"}}}'
-        self.assertEqual(qry_html(d), 'DISAMBIGUATION Misfits')
-
     def test_no_templates(self):  # Active galactic nucleus
         from wptools.extract import html_lead
         self.assertEqual(html_lead("<p>lead</p>"), "<p>lead</p>")
