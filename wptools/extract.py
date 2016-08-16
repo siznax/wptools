@@ -45,38 +45,6 @@ def html_lead_ignore(elem):
                 return True
 
 
-def html_keep_tags(frag):
-    """strip tags, except replace <b> and <i> with markdown"""
-    from lxml.html.clean import Cleaner
-    allow = ['b', 'i', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-    cleaner = Cleaner(allow_tags=allow, remove_unknown_tags=False)
-    text = cleaner.clean_html(frag)
-    text = text.replace("<div>", "").replace("</div>", "")
-    text = re.sub(r"</?b>", "**", text)
-    text = re.sub(r"</?i>", "_", text)
-    text = re.sub(r"<h\d>", "\n# ", text)
-    text = re.sub(r"</h\d>", "\n", text)
-    return text
-
-
-def html_strip_tags(frag):
-    """returns lead HTML fragment with tags removed"""
-    html = lxml.html.fromstring(frag)
-    return etree.tostring(html, method="text", encoding="utf-8")
-
-
-def html_text(data, lead=False, compact=False):
-    """returns plain text version of HTML MediaWiki query"""
-    doc = qry_html(data, lead)
-    doc = html_keep_tags(doc)
-    doc = utils.strip_refs(doc)
-    doc = utils.single_space(doc)
-    doc = plain_text_cleanup(doc)
-    if compact:
-        doc = utils.collapse(doc)
-    return doc
-
-
 def img_images(data):
     """returns list of images from prop=images query"""
     data = json.loads(data)
@@ -123,7 +91,7 @@ def plain_text_cleanup(blob):
 
 
 def qry_html(data, lead=False):
-    """returns HTML part of action=parse MediaWiki query"""
+    """returns HTML from MediaWiki query"""
     try:
         data = json.loads(data)
         doc = data["parse"]["text"]["*"]
@@ -131,13 +99,11 @@ def qry_html(data, lead=False):
             return html_lead(doc)
         return doc
     except:
-        return data
+        return json.dumps(data)
 
 
 def qry_images(data, source):
     """returns images from selected source"""
-    if "missing" in data:
-        return "NOTFOUND"
     if source == "images":
         return img_images(data)
     if source == "pageimages":
@@ -157,6 +123,18 @@ def qry_infobox(data):
         return ptree
 
 
+def qry_lead(data, text=False, compact=False):
+    """returns (pruned) lead section from MediaWiki HTML query"""
+    try:
+         if text:
+             return qry_text(data, True, compact)
+         doc = json.loads(data)["parse"]["text"]["*"]
+         html = html_lead(doc)
+         return utils.prune(html)
+    except:
+        return data
+
+
 def qry_parsetree(data):
     """return parsetree XML from API JSON"""
     try:
@@ -169,12 +147,22 @@ def qry_parsetree(data):
 
 def qry_text(data, lead=False, compact=False):
     """returns plain text of article from HTML"""
-    return html_text(data, lead, compact)
+    doc = qry_html(data, lead)
+    doc = utils.keep_tags(doc)
+    doc = utils.strip_refs(doc)
+    doc = utils.single_space(doc)
+    doc = plain_text_cleanup(doc)
+    if compact:
+        doc = utils.collapse(doc)
+    return doc
 
 
 def qry_wikitext(data):
-    """return wikitext from API JSON"""
-    return json.loads(data)["parse"]["wikitext"]["*"]
+    """return wikitext from wikitext query"""
+    try:
+        return json.loads(data)["parse"]["wikitext"]["*"]
+    except:
+        return data
 
 
 def template_to_dict(tree):

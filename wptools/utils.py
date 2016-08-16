@@ -27,21 +27,67 @@ def console(msg):
     print(msg[:72].replace("\n", ""), file=sys.stderr)
 
 
+def keep_tags(frag):
+    """keep only select tags in HTML fragment"""
+
+    # TODO: replace with Markdown or rST or something...
+
+    from lxml.html.clean import Cleaner
+    allow = ['b', 'i', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    cleaner = Cleaner(allow_tags=allow, remove_unknown_tags=False)
+    text = cleaner.clean_html(frag)
+    text = text.replace("<div>", "").replace("</div>", "")
+    text = re.sub(r"</?b>", "**", text)
+    text = re.sub(r"</?i>", "_", text)
+    text = re.sub(r"<h\d>", "\n## ", text)
+    text = re.sub(r"</h\d>", "\n", text)
+    return text
+
+
 def media_url(fname, namespace='commons',
               wiki='https://upload.wikimedia.org/wikipedia'):
     """return Wikimedia File/Image URL from name"""
     name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
-    digest = hashlib.md5(name).hexdigest()
-    return "/".join([wiki, namespace, digest[:1], digest[:2], name])
+    try:
+        digest = hashlib.md5(name).hexdigest()
+        return "/".join([wiki, namespace, digest[:1], digest[:2], name])
+    except Exception as detail:
+        return "wptools.utils.media_url Exception: %s" % detail,
+
+
+def inner_html(elem, xpath):
+    """returns full inner HTML of xpath selected element"""
+    root = lxml.html.fromstring(elem)
+    i = root.xpath(xpath)[0]
+    try:
+        return (i.text + ''.join(map(lxml.html.tostring, i))).strip()
+    except:
+        return (''.join(map(lxml.html.tostring, i))).strip()
 
 
 def prune(frag):
-    out = prune_html(frag)
-    return prune_html_spans(out)
+    """return HTML fragment with MediaWiki cruft removed"""
+    pruned = prune_html_inner(frag)
+    pruned = prune_html_spans(pruned)
+    return pruned
+
+
+def prune_html_inner(frag):
+    """returns pruned HTML fragments inside paragraphs"""
+    out = []
+    for par in lxml.html.fromstring(frag).xpath("//p"):
+        console("-" * 72)
+        console(lxml.html.tostring(par))
+        inner = inner_html(lxml.html.tostring(par), "//p")
+        console(inner)
+        out.append(prune_html(inner))
+    if out:
+        return "\n".join(out)
+    return frag
 
 
 def prune_html(frag):
-    """prune select fragments by ELEMENT"""
+    """prune select elements from HTML fragment"""
 
     def exclude(item, elem):
         """returns true if element should be excluded"""
@@ -62,7 +108,7 @@ def prune_html(frag):
         return False
 
     norefs = []
-    console("-" * 72)
+    console("~" * 72)
     console("FRAG: %s" % frag)
     for item in lxml.html.fragments_fromstring(frag):
         if type(item) is str or type(item) is unicode:
@@ -82,12 +128,12 @@ def prune_html(frag):
 
 
 def prune_html_spans(frag):
-    """prune select spans by XPATH"""
+    """prune select spans from HTML fragment"""
     root = lxml.html.fromstring(frag)
     for item in root.xpath("//span"):
         if item.get("class") and "noexcerpt" in item.get("class"):
-            console("-" * 72)
-            console("PRUNE_SPAN: %s" % lxml.etree.tostring(item))
+            console("." * 72)
+            console("SPAN: %s" % lxml.etree.tostring(item))
             item.getparent().remove(item)
     return lxml.etree.tostring(root)
 
@@ -103,3 +149,9 @@ def strip_refs(blob):
     out = out.replace("[_citation needed_]", "")
     out = out.replace("[_clarification needed_]", "")
     return out
+
+
+def strip_tags(frag):
+    """returns HTML fragment with tags removed"""
+    html = lxml.html.fromstring(frag)
+    return lxml.html.tostring(html, method="text", encoding="utf-8")
