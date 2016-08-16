@@ -18,11 +18,9 @@ import wptools
 def parsetree(title, lead, test, wiki):
     start = time.time()
     ptree = wptools.parsetree(title, lead, test, wiki)
-    try:
-        print(ptree)
-    except:
-        print(ptree.encode('utf-8'))
+    output = ptree.encode('utf-8')
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    return output
 
 
 def main():
@@ -39,7 +37,16 @@ def main():
 
     args = argp.parse_args()
 
-    parsetree(args.title, args.l, args.t, args.w)
+    safe_exit(parsetree(args.title, args.l, args.t, args.w))
+
+
+def safe_exit(output):
+    """exit without breaking pipes."""
+    try:
+        sys.stdout.write(output)
+        sys.stdout.flush()
+    except IOError:
+        pass
 
 
 if __name__ == "__main__":

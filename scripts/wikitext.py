@@ -20,11 +20,9 @@ import wptools
 def wikitext(title, lead, test, wiki):
     start = time.time()
     text = wptools.wikitext(title, lead, test, wiki)
-    try:
-        print(text)
-    except:
-        print(text.encode('utf-8'))
+    output = text.encode('utf-8')
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    return output
 
 
 def main():
@@ -42,7 +40,16 @@ def main():
 
     args = argp.parse_args()
 
-    wikitext(args.title, args.l, args.t, args.w)
+    safe_exit(wikitext(args.title, args.l, args.t, args.w))
+
+
+def safe_exit(output):
+    """exit without breaking pipes."""
+    try:
+        sys.stdout.write(output)
+        sys.stdout.flush()
+    except IOError:
+        pass
 
 
 if __name__ == "__main__":

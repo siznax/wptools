@@ -13,8 +13,9 @@ import wptools
 
 def html(title, lead, test, verbose, wiki):
     start = time.time()
-    print(wptools.html(title, lead, test, verbose, wiki).encode('utf-8'))
+    output = wptools.html(title, lead, test, verbose, wiki).encode('utf-8')
     print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    return output
 
 
 def main():
@@ -32,7 +33,16 @@ def main():
 
     args = argp.parse_args()
 
-    html(args.title, args.l, args.t, args.v, args.w)
+    safe_exit(html(args.title, args.l, args.t, args.v, args.w))
+
+
+def safe_exit(output):
+    """exit without breaking pipes."""
+    try:
+        sys.stdout.write(output)
+        sys.stdout.flush()
+    except IOError:
+        pass
 
 
 if __name__ == "__main__":
