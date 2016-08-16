@@ -11,6 +11,7 @@ import lxml.etree
 import lxml.html
 import re
 import sys
+import urllib
 
 
 def collapse(text):
@@ -50,9 +51,12 @@ def media_url(fname, namespace='commons',
     name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
     try:
         digest = hashlib.md5(name).hexdigest()
-        return "/".join([wiki, namespace, digest[:1], digest[:2], name])
-    except Exception as detail:
-        return "wptools.utils.media_url Exception: %s" % detail,
+        path = "/".join([digest[:1], digest[:2], name])
+    except:
+        name = name.encode('utf-8')
+        digest = hashlib.md5(name).hexdigest()
+        path = urllib.quote("/".join([digest[:1], digest[:2], name]))
+    return "/".join([wiki, namespace, path])
 
 
 def inner_html(elem, xpath):
