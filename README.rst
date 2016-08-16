@@ -36,29 +36,36 @@ Usage
 python examples
 ---------------
 
-Get the `lead section`_ of an article as HTML
+Get an article as HTML:
 
 .. code-block:: python
 
   >>> import wptools
-  >>> wptools.html("Aardvark", lead=True)
-  '<p>The <b>aardvark</b>...
+  >>> wptools.html('Aardvark')
+  <div role="note" class="hatnote">For other uses, see <a href="/wiki/Aa...
 
-Get the `lead section`_ of an article as Markdown text
+Get the `lead section`_ of an article:
 
 .. code-block:: python
 
-  >>> wptools.text("Aardvark", lead=True)
+  >>> wptools.lead('Aardvark', plain=True)
+  <p>The <b>aardvark</b> (<span class="nowrap"><span class="IPA nopopups">...
+
+Get the `lead section`_ of an article as plain text:
+
+.. code-block:: python
+
+  >>> wptools.lead('Aardvark', plain=True)
   The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_)...
 
-Get an article's Infobox_ as a python object
+Get an article's Infobox_ as a python object:
 
 .. code-block:: python
 
   >>> wptools.infobox("Aardvark")['genus']
   Orycteropus
 
-Get an article's `thumbnail image`_ (or full original image)
+Get an article's `thumbnail image`_ (or full original image):
 
 .. code-block:: python
 
@@ -73,59 +80,93 @@ Get the Wikitext_ behind an article
 .. code-block:: python
 
   >>> wptools.wikitext('Aardvark')
-  '{{Other uses}}\n{{pp-move-indef}}\n...
+  {{Other uses}}{{pp-move-indef}}{{Use dmy dates|date=July 2012}}{{species
 
 
 CLI examples
 ------------
 
-Get article HTML
+All interfaces in ``wptools.api`` are available as CLI scripts. For example...
+
+
+Get the `lead section`_ as plain text:
 
 .. code-block:: shell
 
-  $ wp_html Aardvark -l | fold | head
+  $ wp_lead Aardvark -p | fold -s
+  The **aardvark** (/ˈɑːrd.vɑːrk/ _**ARD**-vark_; _Orycteropus afer_) is a
+  medium-sized, burrowing, nocturnal mammal native to Africa. It is the only
+  living species of the order Tubulidentata, although other prehistoric species
+  and genera of Tubulidentata are known. Unlike other insectivores, it has a long
+  pig-like snout, which is used to sniff out food. It roams over most of the
+  southern two-thirds of the African continent, avoiding areas that are mainly
+  rocky. A nocturnal feeder, it subsists on ants and termites, which it will dig
+  out of their hills using its sharp claws and powerful legs. It also digs to
+  create burrows in which to live and rear its young. It receives a "least
+  concern" rating from the IUCN, although its numbers seem to be decreasing.
+
+
+Get the `lead section`_ as HTML:
+
+.. code-block:: shell
+
+  $ wp_lead Aardvark | fold | head
   <p>The <b>aardvark</b> (<span class="nowrap"><span class="IPA nopopups"><a href=
   "/wiki/Help:IPA_for_English" title="Help:IPA for English">/<span style="border-b
   ottom:1px dotted"><span title="/&#712;/ primary stress follows">&#712;</span><sp
-  an title="/&#593;r/ 'ar' in 'bard'">&#593;r</span><span title="'d' in 'dye'">d</
-  span><span title="/./ syllable break">.</span><span title="'v' in 'vie'">v</span
-  ><span title="/&#593;r/ 'ar' in 'bard'">&#593;r</span><span title="'k' in 'kind'
-  ">k</span></span>/</a></span></span> <span title="English pronunciation respelli
-  ng"><a href="/wiki/Wikipedia:Pronunciation_respelling_key" title="Wikipedia:Pron
-  unciation respelling key"><i><b><span class="smallcaps"><span style="FONT-VARIAN
-  T: SMALL-CAPS; TEXT-TRANSFORM: LOWERCASE;">ARD</span></span></b>-vark</i></a></s
+  an title="/&#593;&#720;r/ 'ar' in 'bard'">&#593;&#720;r</span><span title="'d' i
+  n 'dye'">d</span><span title="/./ syllable break">.</span><span title="'v' in 'v
+  ie'">v</span><span title="/&#593;&#720;r/ 'ar' in 'bard'">&#593;&#720;r</span><s
+  pan title="'k' in 'kind'">k</span></span>/</a></span></span> <span title="Englis
+  h pronunciation respelling"><a href="/wiki/Help:Pronunciation_respelling_key" ti
+  tle="Help:Pronunciation respelling key"><i><b><span class="smallcaps"><span styl
+  e="font-variant: small-caps; text-transform: lowercase;">ARD</span></span></b>-v
 
-Get article Infobox
+Get the Infobox_:
 
 .. code-block:: shell
 
   $ wp_infobox Aardvark | jsonlint | fold
   {
-    "status": "LC",
-    "range_map": "Aardvark area.png",
-    "binomial_authority": "([[Peter Simon Pallas|Pallas]], 1766)",
-    "grandparent_authority": "[[John Edward Gray|Gray]], 1821",
-    "trend": "unknown",
-    "image": "Porc formiguer.JPG",
-    "status_system": "iucn3.1",
-    "subdivision_ranks": "[[Subspecies]]",
-    "wptools.extract ERROR": "<title>speciesbox\n</title>",
-    "image_caption": "",
-    "greatgrandparent_authority": "[[Thomas Henry Huxley|Huxley]], 1872",
-    "status_ref": "",
-    "subdivision": "See Text",
-    "name": "Aardvark",
-    "range_map_caption": "Aardvark range",
-    "display_parents": "4",
-    "fossil_range": "<template><title>Fossil range</title><part><name index=\"1\"/
-  ><value>5</value></part><part><name index=\"2\"/><value>0</value></part></templa
-  te>&lt;small&gt;Early [[Pliocene]] &#8211; Recent&lt;/small&gt;",
-    "species": "afer",
-    "parent_authority": "[[Georges Cuvier|G. Cuvier]], 1798",
-    "genus": "Orycteropus"
+      "binomial_authority": "([[Peter Simon Pallas|Pallas]], 1766)",
+      "display_parents": "4",
+      "fossil_range": "<template><title>Fossil range</title><part><name in...",
+      "genus": "Orycteropus",
+      "grandparent_authority": "[[John Edward Gray|Gray]], 1821",
+      "greatgrandparent_authority": "[[Thomas Henry Huxley|Huxley]], 1872",
+      "image": "Porc formiguer.JPG",
+      "image_caption": "",
+      "name": "Aardvark",
+      "parent_authority": "[[Georges Cuvier|G. Cuvier]], 1798",
+      "range_map": "Aardvark area.png",
+      "range_map_caption": "Aardvark range",
+      "species": "afer",
+      "status": "LC",
+      "status_ref": "",
+      "status_system": "iucn3.1",
+      "subdivision": "See Text",
+      "subdivision_ranks": "[[Subspecies]]",
+      "trend": "unknown",
+      "wptools.extract ERROR": "<title>speciesbox\n</title>"
   }
 
-Get article `Parse tree`_
+Get the Wikitext_:
+
+.. code-block:: shell
+
+  $ wp_wikitext Aardvark | head
+  {{Other uses}}
+  {{pp-move-indef}}
+  {{Use dmy dates|date=July 2012}}
+  {{speciesbox
+  | genus = Orycteropus
+  | species = afer
+  | name = Aardvark
+  | fossil_range = {{Fossil range|5|0}}<small>Early [[Pliocene]] – Recent</small>
+  | status = LC
+  | status_system = iucn3.1
+
+Get an article's `Parse tree`_:
 
 .. code-block:: shell
 
@@ -141,37 +182,6 @@ Get article `Parse tree`_
   </value></part><part><name> fossil_range </name>=<value> <template><title>Fossil
    range</title><part><name index="1"/><value>5</value></part><part><name index="2
 
-Get plain text of article
-
-.. code-block:: shell
-
-  $ wp_text Aardvark -l | fold -s
-  The **aardvark** (/ˈɑrd.vɑrk/ _**ARD**-vark_; _Orycteropus afer_) is a
-  medium-sized, burrowing, nocturnal mammal native to Africa. It is the only
-  living species of the order Tubulidentata, although other prehistoric species
-  and genera of Tubulidentata are known. Unlike other insectivores, it has a long
-  pig-like snout, which is used to sniff out food. It roams over most of the
-  southern two-thirds of the African continent, avoiding mainly rocky areas. A
-  nocturnal feeder, it subsists on ants and termites, which it will dig out of
-  their hills using its sharp claws and powerful legs. It also digs to create
-  burrows in which to live and rear its young. It receives a "least concern"
-  rating from the IUCN; although its numbers seem to be decreasing.
-
-Get article Wikitext_
-
-.. code-block:: shell
-
-  $ wp_wikitext Aardvark -l | head
-  {{Other uses}}
-  {{pp-move-indef}}
-  {{Use dmy dates|date=July 2012}}
-  {{speciesbox
-  | genus = Orycteropus
-  | species = afer
-  | name = Aardvark
-  | fossil_range = {{Fossil range|5|0}}<small>Early [[Pliocene]] – Recent</small>
-  | status = LC
-  | status_system = iucn3.1
 
 
 @siznax
