@@ -48,10 +48,10 @@ Get the `lead section`_ of an article:
 
 .. code-block:: python
 
-  >>> wptools.lead('Aardvark', plain=True)
+  >>> wptools.lead('Aardvark')
   <p>The <b>aardvark</b> (<span class="nowrap"><span class="IPA nopopups">...
 
-Get the `lead section`_ of an article as plain text:
+Get the `lead section`_ of an article *as plain text*:
 
 .. code-block:: python
 
@@ -75,7 +75,7 @@ Get an article's `thumbnail image`_ (or full original image):
   >>> wptools.images("Aardvark")["source"]
   u'https://upload.wikimedia.org/wikipedia/commons/8/8a/Porc_formiguer.JPG'
 
-Get the Wikitext_ behind an article
+Get the Wikitext_ behind an article:
 
 .. code-block:: python
 
