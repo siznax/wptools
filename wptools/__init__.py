@@ -25,3 +25,5 @@ from .fetch import (
     get_html, get_images, get_infobox,
     get_parsetree, get_wikitext,
 )
+
+from . import rest
