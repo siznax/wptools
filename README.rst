@@ -75,16 +75,6 @@ Get the Wikitext_ behind an article
   >>> wptools.wikitext('Aardvark')
   '{{Other uses}}\n{{pp-move-indef}}\n...
 
-Handle misses
-
-.. code-block:: python
-
-  >>> wptools.text('Misfits')
-  'DISAMBIGUATION Misfits'
-
-  >>> wptools.html('blerg')
-  'NOTFOUND'
-
 
 CLI examples
 ------------
