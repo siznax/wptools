@@ -56,7 +56,7 @@ class WPToolsFetch:
                                    "&disabletoc="))}
     RETRY_SLEEP = 2
     RETRY_MAX = 3
-    TIMEOUT = 30
+    TIMEOUT = 5
 
     def __init__(self, wiki=ENDPOINT, lead=False, verbose=False):
         self.wiki = wiki or self.ENDPOINT
@@ -73,6 +73,14 @@ class WPToolsFetch:
 
     def curl(self, url):
         """speed"""
+
+        # consistently faster than requests by 3x
+        #
+        # r = requests.get(url,
+        #                  timeout=self.TIMEOUT,
+        #                  headers={'User-Agent': self.user_agent})
+        # return r.text
+
         crl = self.cobj
         try:
             crl.setopt(crl.URL, url)
@@ -139,7 +147,10 @@ class WPToolsFetch:
         return "%s/%s (+%s)" % (__title__, __version__, __contact__)
 
 
-def get_html(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+def get_html(title,
+             lead=False,
+             test=False,
+             wiki=WPToolsFetch.ENDPOINT,
              verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('html', title)
@@ -153,8 +164,11 @@ def get_infobox():
     pass
 
 
-def get_images(title, source, lead=False, test=False,
-               wiki=WPToolsFetch.ENDPOINT, verbose=False):
+def get_images(title, source,
+               lead=False,
+               test=False,
+               wiki=WPToolsFetch.ENDPOINT,
+               verbose=False):
     if source == "infobox":
         return get_parsetree(title, lead, test, wiki, verbose)
     obj = WPToolsFetch(wiki, lead, verbose)
@@ -164,7 +178,10 @@ def get_images(title, source, lead=False, test=False,
     return obj.curl(qry)
 
 
-def get_parsetree(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+def get_parsetree(title,
+                  lead=False,
+                  test=False,
+                  wiki=WPToolsFetch.ENDPOINT,
                   verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('parsetree', title)
@@ -173,7 +190,10 @@ def get_parsetree(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
     return obj.curl(qry)
 
 
-def get_wikitext(title, lead=False, test=False, wiki=WPToolsFetch.ENDPOINT,
+def get_wikitext(title,
+                 lead=False,
+                 test=False,
+                 wiki=WPToolsFetch.ENDPOINT,
                  verbose=False):
     obj = WPToolsFetch(wiki, lead, verbose)
     url = obj.query('wikitext', title)
