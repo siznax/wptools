@@ -7,7 +7,6 @@ WPTools Fetch module.
 from __future__ import print_function
 
 import pycurl
-import requests
 import sys
 import time
 
@@ -143,13 +142,6 @@ class WPToolsFetch:
         if self.lead:
             return qry + "&section=0"
         return qry
-
-    def request(self, url, hdr, output):
-        print("GET %s\nHDR %s\nOUT %s" % (url, hdr, output), file=sys.stderr)
-        r = requests.get(url, headers=hdr, timeout=self.TIMEOUT)
-        if r.status_code != 200:
-            raise ValueError("HTTP status code = %d" % r.status_code)
-        return r.content
 
     def user_agent(self):
         return "%s/%s (+%s)" % (__title__, __version__, __contact__)
