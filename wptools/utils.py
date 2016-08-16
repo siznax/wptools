@@ -24,7 +24,8 @@ def collapse(text):
     return text
 
 
-def console(msg):
+def console(msg):  # development
+    return
     print(msg[:72].replace("\n", ""), file=sys.stderr)
 
 
