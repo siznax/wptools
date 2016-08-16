@@ -35,6 +35,11 @@ def media_url(fname, namespace='commons',
     return "/".join([wiki, namespace, digest[:1], digest[:2], name])
 
 
+def prune(frag):
+    out = prune_html(frag)
+    return prune_html_spans(out)
+
+
 def prune_html(frag):
     """prune select fragments by ELEMENT"""
 
