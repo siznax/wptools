@@ -80,14 +80,24 @@ Get the Wikitext_ behind an article:
 .. code-block:: python
 
   >>> wptools.wikitext('Aardvark')
-  {{Other uses}}{{pp-move-indef}}{{Use dmy dates|date=July 2012}}{{species
+  {{Other uses}}{{pp-move-indef}}{{Use dmy dates|date=July 2012}}{{species...
+
+
+All ``wptools.api`` interfaces are available as CLI scripts:
+
+::
+
+  wp_html
+  wp_image
+  wp_infobox
+  wp_lead
+  wp_parsetree
+  wp_text
+  wp_wikitext
 
 
 CLI examples
 ------------
-
-All interfaces in ``wptools.api`` are available as CLI scripts. For example...
-
 
 Get the `lead section`_ as plain text:
 
