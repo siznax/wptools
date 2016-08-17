@@ -46,13 +46,13 @@ def html_lead_ignore(elem):
 
 
 def img_images(data):
-    """returns list of images from prop=images query"""
+    """returns list of images from [images] API query"""
     data = json.loads(data)
     return data["query"]["pages"][0]
 
 
 def img_infobox(data):  # EXPERIMENTAL
-    """returns images from infobox (data=parsetree)"""
+    """returns images from [parsetree] API query"""
 
     ibox = qry_infobox(data)
     types = ["image", "image_map", "logo"]
@@ -71,7 +71,7 @@ def img_infobox(data):  # EXPERIMENTAL
 
 
 def img_pageimages(data):
-    """returns images from pageimages query"""
+    """returns images from [pageimages] API query"""
     data = json.loads(data)
     data = data["query"]["pages"][0]
     if "pageimage" in data:
@@ -91,7 +91,7 @@ def plain_text_cleanup(blob):
 
 
 def qry_html(data, lead=False):
-    """returns HTML from MediaWiki query"""
+    """returns HTML from [html] API query"""
     try:
         data = json.loads(data)
         doc = data["parse"]["text"]["*"]
@@ -113,7 +113,7 @@ def qry_images(data, source):
 
 
 def qry_infobox(data):
-    """returns infobox from parsetree"""
+    """returns infobox from [parsetree] API query"""
     ptree = qry_parsetree(data)
     try:
         for item in etree.fromstring(ptree).xpath("//template"):
@@ -124,7 +124,7 @@ def qry_infobox(data):
 
 
 def qry_lead(data, text=False, compact=False):
-    """returns (pruned) lead section from MediaWiki HTML query"""
+    """returns (pruned) lead section from {html} query"""
     try:
          if text:
              return qry_text(data, True, compact)
@@ -136,7 +136,7 @@ def qry_lead(data, text=False, compact=False):
 
 
 def qry_parsetree(data):
-    """return parsetree XML from API JSON"""
+    """returns parsetree XML from {parsetree} query"""
     try:
         data = json.loads(data)
         ptree = data["parse"]["parsetree"]["*"]
@@ -146,7 +146,7 @@ def qry_parsetree(data):
 
 
 def qry_text(data, lead=False, compact=False):
-    """returns plain text of article from HTML"""
+    """returns plain text from [html] API query"""
     doc = qry_html(data, lead)
     doc = utils.keep_tags(doc)
     doc = utils.strip_refs(doc)
@@ -158,7 +158,7 @@ def qry_text(data, lead=False, compact=False):
 
 
 def qry_wikitext(data):
-    """return wikitext from wikitext query"""
+    """return wikitext from [wikitext] API query"""
     try:
         return json.loads(data)["parse"]["wikitext"]["*"]
     except:

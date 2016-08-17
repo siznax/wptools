@@ -89,7 +89,7 @@ class WPToolsFetch:
         return self.curl_perform(crl)
 
     def curl_perform(self, crl):
-        """try curl, retry after sleep up to max retries"""
+        """perform curl, retry after sleep up to max retries"""
         if self.retries >= self.RETRY_MAX:
             return "RETRY_MAX (%d) exceeded!" % self.RETRY_MAX
         try:
@@ -109,6 +109,7 @@ class WPToolsFetch:
             self.curl_perform(crl)
 
     def curl_report(self, crl):
+        """writes curl response details to stderr"""
         kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
         out = {"url": crl.getinfo(crl.EFFECTIVE_URL),
                "user-agent": self.user_agent(),
@@ -123,6 +124,7 @@ class WPToolsFetch:
         print(file=sys.stderr)
 
     def curl_setup(self):
+        """set curl options"""
         crl = pycurl.Curl()
         # crl.setopt(crl.URL, wiki)
         crl.setopt(crl.USERAGENT, self.user_agent())
@@ -135,6 +137,7 @@ class WPToolsFetch:
         return self.curl(self.query('html', title))
 
     def query(self, content, page):
+        """returns planned MediaWiki API query"""
         self.title = page
         page = page.replace(" ", "+")
         page = page[0].upper() + page[1:]
@@ -144,6 +147,7 @@ class WPToolsFetch:
         return qry
 
     def user_agent(self):
+        """returns the wptools user-agent string"""
         return "%s/%s (+%s)" % (__title__, __version__, __contact__)
 
 
@@ -152,6 +156,7 @@ def get_html(title,
              test=False,
              wiki=WPToolsFetch.ENDPOINT,
              verbose=False):
+    """make MediaWiki API HTTP request for article HTML"""
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('html', title)
     if test:
@@ -160,7 +165,7 @@ def get_html(title,
 
 
 def get_infobox():
-    """currently, no way to query Infobox directly"""
+    """NOOP: currently, no way to query Infobox directly"""
     pass
 
 
@@ -169,6 +174,7 @@ def get_images(title, source,
                test=False,
                wiki=WPToolsFetch.ENDPOINT,
                verbose=False):
+    """make MediaWiki API HTTP request for article images"""
     if source == "infobox":
         return get_parsetree(title, lead, test, wiki, verbose)
     obj = WPToolsFetch(wiki, lead, verbose)
@@ -183,6 +189,7 @@ def get_parsetree(title,
                   test=False,
                   wiki=WPToolsFetch.ENDPOINT,
                   verbose=False):
+    """make MediaWiki API HTTP request for article parse tree"""
     obj = WPToolsFetch(wiki, lead, verbose)
     qry = obj.query('parsetree', title)
     if test:
@@ -195,6 +202,7 @@ def get_wikitext(title,
                  test=False,
                  wiki=WPToolsFetch.ENDPOINT,
                  verbose=False):
+    """make MediaWiki API HTTP request for article wikitext"""
     obj = WPToolsFetch(wiki, lead, verbose)
     url = obj.query('wikitext', title)
     if test:
