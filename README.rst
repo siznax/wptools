@@ -10,8 +10,8 @@ just the "lead_" section (summary), the Infobox_ (if extant), or a
 representative image_ for the article.
 
 These are purpose-built python methods intended to ease use for
-common requests (by me anyway ;) in the style of @kennethreitz
-`requests`_. We say "(for Humans)" because that is a goal.
+common requests in the style of @kennethreitz `requests`_. We say
+"(for Humans)" because that is a goal.
 
 You can learn more about the API paths we use here: `NOTES.txt`_,
 and the many other wrappers for the MediaWiki API that do more or
