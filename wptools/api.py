@@ -72,7 +72,7 @@ def text(title,
          lead=False,
          test=False, verbose=False,
          wiki=fetch.WPToolsFetch.ENDPOINT):
-    """returns article as Markdown text"""
+    """returns article as plain text"""
     data = fetch.get_html(title, lead, test, wiki, verbose)
     if test:
         return data
