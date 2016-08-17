@@ -136,7 +136,7 @@ Get the Infobox_:
 
 .. code-block:: shell
 
-  $ wp_infobox Aardvark | jsonlint | fold
+  $ wp_infobox Aardvark | jsonlint
   {
       "binomial_authority": "([[Peter Simon Pallas|Pallas]], 1766)",
       "display_parents": "4",
