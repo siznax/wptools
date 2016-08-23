@@ -182,11 +182,11 @@ class WPTools:
         """
         make all available API requests and fully hydrate instance
         """
-        self.get_query()
-        self.get_parse()
+        self.get_query(show=False)
+        self.get_parse(show=False)
         self.get_wikidata()
 
-    def get_parse(self):
+    def get_parse(self, show=True):
         """
         request MediaWiki:API action=parse
         see https://en.wikipedia.org/w/api.php?action=help&modules=parse
@@ -200,9 +200,11 @@ class WPTools:
         parse['info'] = self.__fetch.info
         self.g_parse = parse
         self._set_parse_data()
-        self.show()
+        if show:
+            self.show()
+        return self
 
-    def get_query(self):
+    def get_query(self, show=True):
         """
         request MediaWiki:API action=query
         see https://en.wikipedia.org/w/api.php?action=help&modules=query
@@ -218,9 +220,11 @@ class WPTools:
         query['info'] = self.__fetch.info
         self.g_query = query
         self._set_query_data()
-        self.show()
+        if show:
+            self.show()
+        return self
 
-    def get_random(self):
+    def get_random(self, show=True):
         """
         request MediaWiki API:Random
         see https://www.mediawiki.org/wiki/API:Random
@@ -231,9 +235,11 @@ class WPTools:
         rand = json.loads(response).get('query').get('random')[0]
         self.pageid = rand.get('id')
         self.title = rand.get('title').replace(' ', '_')
-        self.show()
+        if show:
+            self.show()
+        return self
 
-    def get_wikidata(self):
+    def get_wikidata(self, show=True):
         """
         request Wikidata:API action=wbgetentities
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
@@ -250,7 +256,9 @@ class WPTools:
         wdata['info'] = self.__fetch.info
         self.g_wikidata = wdata
         self._set_wikibase_data()
-        self.show()
+        if show:
+            self.show()
+        return self
 
     def show(self):
         """
