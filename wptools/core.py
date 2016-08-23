@@ -25,9 +25,14 @@ class WPTools:
         'get_wikidata': {'image', 'description', 'label'}
     }
 
+    Description = None
+    Image = None
+    Label = None
+    g_parse = {}
+    g_query = {}
+    g_wikidata = {}
     images = {}
     pageid = None
-    parse = {}
     title = None
 
     def __init__(self, title='', lang='en', verbose=False,
@@ -81,7 +86,7 @@ class WPTools:
         """
         set attributes derived from action=parse
         """
-        data = json.loads(self.parse['response'])
+        data = json.loads(self.g_parse['response'])
         pdata = data.get('parse')
         if not pdata:
             return
@@ -98,7 +103,7 @@ class WPTools:
         """
         set attributes derived from action=query
         """
-        data = json.loads(self.query['response'])
+        data = json.loads(self.g_query['response'])
         qdata = data.get('query')
         page = qdata.get('pages')[0]
         self.extract = page.get('extract')
@@ -120,7 +125,7 @@ class WPTools:
         """
         set attributes derived from action=wbentities
         """
-        data = json.loads(self.wikidata['response'])
+        data = json.loads(self.g_wikidata['response'])
         entities = data.get('entities')
         item = None
         if entities:
@@ -133,21 +138,21 @@ class WPTools:
             P18 = claims.get('P18')
             if P18:
                 image = P18[0].get('mainsnak').get('datavalue').get('value')
-                self.image = utils.media_url(image)
+                self.Image = utils.media_url(image)
                 if self.images:
-                    self.images['image'] = image
+                    self.images['Image'] = image
         descriptions = item.get('descriptions')
         if descriptions:
             try:
-                self.description = descriptions.get(self.lang).get('value')
+                self.Description = descriptions.get(self.lang).get('value')
             except:
-                self.description = descriptions.get('value')
+                self.Description = descriptions.get('value')
         labels = item.get('labels')
         if labels:
             try:
-                self.label = labels.get(self.lang).get('value')
+                self.Label = labels.get(self.lang).get('value')
             except:
-                self.label = labels.get('value')
+                self.Label = labels.get('value')
 
     def _skip_get(self, action):
         """
@@ -181,9 +186,11 @@ class WPTools:
         if self._skip_get('get_parse'):
             return
         query = self.__fetch.query('parse', self.title)
-        self.parse['query'] = query
-        self.parse['response'] = self.__fetch.curl(query)
-        self.parse['info'] = self.__fetch.info
+        parse = {}
+        parse['query'] = query
+        parse['response'] = self.__fetch.curl(query)
+        parse['info'] = self.__fetch.info
+        self.g_parse = parse
         self._set_parse_data()
         self.show()
 
@@ -201,7 +208,7 @@ class WPTools:
         query['query'] = qry
         query['response'] = self.__fetch.curl(qry)
         query['info'] = self.__fetch.info
-        self.query = query
+        self.g_query = query
         self._set_query_data()
         self.show()
 
@@ -233,7 +240,7 @@ class WPTools:
         wdata['query'] = query
         wdata['response'] = self.__fetch.curl(query)
         wdata['info'] = self.__fetch.info
-        self.wikidata = wdata
+        self.g_wikidata = wdata
         self._set_wikibase_data()
         self.show()
 
@@ -255,8 +262,10 @@ class WPTools:
 
         data = {}
         attrs = [x for x in self.__dict__ if getattr(self, x)
-                 and not x.startswith("_")]
+                 and not x.startswith("__")]
         for item in attrs:
+            if item.startswith("_WPTools"):
+                continue
             prop = self.__dict__[item]
             data[item] = prop
             if item is None:
