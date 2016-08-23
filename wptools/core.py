@@ -22,7 +22,7 @@ class WPTools:
     _skipmap = {
         'get_parse': {'infobox', 'parsetree', 'wikibase', 'wikitext'},
         'get_query': {'extract', 'images', 'pageid', 'random'},
-        'get_wikidata': {'image', 'description', 'label'}
+        'get_wikidata': {'Image', 'Description', 'Label'}
     }
 
     Description = None
@@ -38,7 +38,7 @@ class WPTools:
     def __init__(self, title='', lang='en', verbose=False,
                  wikibase=None, wiki=None):
         self.lang = lang
-        self.__fetch = fetch.WPToolsFetch(self.lang, verbose)
+        self.__fetch = fetch.WPToolsFetch(self.lang, verbose, wiki)
         if wikibase:
             self.wikibase = wikibase
         if title:
@@ -167,7 +167,10 @@ class WPTools:
         returns true if nothing (interesting) can be added by making request
         """
         for attr in self._skipmap[action]:
-            if not hasattr(self, attr):
+            has_attr = hasattr(self, attr)
+            if not has_attr:
+                return False
+            if has_attr and not getattr(self, attr):
                 return False
         print("skipping %s" % action, file=sys.stderr)
         return True
@@ -229,11 +232,11 @@ class WPTools:
         request MediaWiki API:Random
         see https://www.mediawiki.org/wiki/API:Random
         """
-        qry = self.__fetch.query('random', None)
-        response = self.__fetch.curl(qry)
-        rand = json.loads(response).get('query').get('random')[0]
-        self.pageid = rand.get('id')
-        self.title = rand.get('title').replace(' ', '_')
+        query = self.__fetch.query('random', None)
+        response = self.__fetch.curl(query)
+        rdata = json.loads(response).get('query').get('random')[0]
+        self.pageid = rdata.get('id')
+        self.title = rdata.get('title').replace(' ', '_')
         if show:
             self.show()
         return self
@@ -244,9 +247,6 @@ class WPTools:
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if self._skip_get('get_wikidata'):
-            return
-        if not hasattr(self, 'wikibase') or not self.wikibase:
-            print("requires self.wikibase")
             return
         query = self.__fetch.query('wikidata', self.wikibase)
         wdata = {}
@@ -303,6 +303,7 @@ class WPTools:
                     prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
                 data[item] = prop
 
+        header = None
         if hasattr(self, 'title') and self.title:
             header = "%s (%s)" % (self.title, self.lang)
         elif hasattr(self, 'wikibase') and self.wikibase:
