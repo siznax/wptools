@@ -102,11 +102,11 @@ If you give only *lang*, you get a random_ article in that language:
 
     >>> wptools.wptools(lang='jp')
     jp.wikipedia.org (action=random) None
-    土御門殿 (jp)
+    摺物 (jp)
     {
       lang: jp
-      pageid: 526200
-      title: 土御門殿
+      pageid: 2482304
+      title: 摺物
     }
 
 .. _random: https://www.mediawiki.org/wiki/API:Random
@@ -324,6 +324,20 @@ Sometimes, you can mix languages!
       url: https://zh.wikipedia.org/wiki/J%C2%B7R%C2%B7R%C2%B7%E6%89%98%E7%88%BE%E9%87%91
       urlraw: https://zh.wikipedia.org/wiki/J·R·R·托爾金?action=raw
       wikibase: https://www.wikidata.org/wiki/Q892
+    }
+
+
+And, of course, you can get info from other wikisites:
+
+.. code-block:: python
+
+    >>> wptools.wptools(wiki='en.wikinews.org')
+    en.wikinews.org (action=random) None
+    Main_belt_asteroid_No._274301_named_'Wikipedia' (en)
+    {
+      lang: en
+      pageid: 659423
+      title: Main_belt_asteroid_No._274301_named_'Wikipedia'
     }
 
 
