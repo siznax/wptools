@@ -17,11 +17,11 @@ Easily get Wikipedia article info and Wikidata via MediaWiki APIs.
 This package is intended to make it as easy as possible to get data
 from MediaWiki instances, expose more Wikidata, and extend MediaWiki
 API functions just for kicks. We say "(for Humans)" because that is a
-goal, in the style of @kennethreitz's `requests`_.
+goal_.
 
 Questions, feedback, and especially contributions are happily welcome!
 
-.. _requests: http://docs.python-requests.org/en/master/user/intro/
+.. _goal: http://docs.python-requests.org/en/master/user/intro/
 
 
 Install
@@ -228,7 +228,7 @@ You can get a (Markdown_) text *extract*:
     decreasing.
 
 
-Or, get an *infobox* and some *wikidata*:
+Or, get an Infobox_ and some Wikidata_:
 
 .. code-block:: python
 
@@ -246,8 +246,10 @@ Or, get an *infobox* and some *wikidata*:
     >>> len(n.infobox.keys())
     64
 
+.. _Wikidata: https://www.wikidata.org/
 
-Get *wikidata* directly from a Wikidata `entity ID`_ (*wikibase*):
+
+Get Wikidata_ directly from a Wikidata `entity ID`_ (*wikibase*):
 
 .. code-block:: python
 
