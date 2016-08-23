@@ -121,6 +121,18 @@ class WPTools:
         self.url = page.get('fullurl')
         self.urlraw = self._wiki_url(raw=True)
 
+    def _set_wikibase_claims(self, claims):
+        if not claims:
+            return
+        # P17 = claims.get('P17')  # country
+        # P585 = claims.get('P569')  # point in time
+        P18 = claims.get('P18')  # image
+        if P18:
+            image = P18[0].get('mainsnak').get('datavalue').get('value')
+            self.Image = utils.media_url(image)
+            if self.images:
+                self.images['Image'] = image
+
     def _set_wikibase_data(self):
         """
         set attributes derived from action=wbentities
@@ -133,20 +145,16 @@ class WPTools:
         if not item:
             return
         self.wikibase = "https://www.wikidata.org/wiki/%s" % item.get('id')
-        claims = item.get('claims')
-        if claims:
-            P18 = claims.get('P18')
-            if P18:
-                image = P18[0].get('mainsnak').get('datavalue').get('value')
-                self.Image = utils.media_url(image)
-                if self.images:
-                    self.images['Image'] = image
+
+        self._set_wikibase_claims(item.get('claims'))
+
         descriptions = item.get('descriptions')
         if descriptions:
             try:
                 self.Description = descriptions.get(self.lang).get('value')
             except:
                 self.Description = descriptions.get('value')
+
         labels = item.get('labels')
         if labels:
             try:
