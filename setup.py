@@ -19,7 +19,7 @@ setup(
     author_email='steve@siznax.net',
     py_modules=['wptools'],
     packages=find_packages(exclude=['tests']),
-    install_requires=['html5lib', 'lxml', 'pycurl', 'requests'],
+    install_requires=['html2text', 'html5lib', 'lxml', 'pycurl', 'requests'],
     include_package_data=True,
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
