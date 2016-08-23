@@ -296,7 +296,10 @@ class WPTools:
             if type(prop) is str or type(prop) is unicode:
                 prop = prop.strip().replace("\n", '')
                 prop = re.sub(' +', ' ', prop)
-                prop = str(prop.encode('utf-8'))
+                try:
+                    prop = str(prop.encode('utf-8'))
+                except:
+                    prop = str(prop)
                 if len(prop) > maxlen and not prop.startswith('http'):
                     prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
                 data[item] = prop
