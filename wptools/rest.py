@@ -2,6 +2,8 @@
 
 """
 WPTools RESTBase module.
+
+EXPERIMENTAL
 """
 
 from __future__ import print_function
