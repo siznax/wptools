@@ -229,9 +229,8 @@ class WPTools:
         request MediaWiki API:Random
         see https://www.mediawiki.org/wiki/API:Random
         """
-        qry = self.__fetch.query('random', self.title)
+        qry = self.__fetch.query('random', None)
         response = self.__fetch.curl(qry)
-        # info = self.__fetch.info
         rand = json.loads(response).get('query').get('random')[0]
         self.pageid = rand.get('id')
         self.title = rand.get('title').replace(' ', '_')
