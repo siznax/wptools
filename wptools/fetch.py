@@ -8,7 +8,6 @@ from __future__ import print_function
 
 import pycurl
 import sys
-import time
 
 from . import __title__, __contact__, __version__
 from io import BytesIO
@@ -17,62 +16,62 @@ from string import Template
 
 class WPToolsFetch:
 
-    ENDPOINT = "http://en.wikipedia.org"
-    QUERY = {"html": Template(("${WIKI}/w/api.php?action=parse"
-                               "&format=json"
-                               "&page=${page}"
-                               "&prop=text"
-                               "&contentmodel=text"
-                               "&disablelimitreport="
-                               "&disableeditsection="
-                               "&disabletoc=")),
-             "images": Template(("${WIKI}/w/api.php?action=query"
-                                 "&titles=${page}"
-                                 "&format=json"
-                                 "&formatversion=2"
-                                 "&prop=images")),
-             "pageimages": Template(("${WIKI}/w/api.php?action=query"
-                                     "&titles=${page}"
-                                     "&format=json"
-                                     "&formatversion=2"
-                                     "&prop=pageimages"
-                                     "&pithumbsize=320"
-                                     "&pilimit=1")),
-             "parsetree": Template(("${WIKI}/w/api.php?action=parse"
-                                    "&format=json"
-                                    "&page=${page}"
-                                    "&prop=parsetree"
-                                    "&disablelimitreport="
-                                    "&disableeditsection="
-                                    "&disabletoc="
-                                    "&contentmodel=text")),
-             "wikitext": Template(("${WIKI}/w/api.php?action=parse"
-                                   "&format=json"
-                                   "&page=${page}"
-                                   "&prop=wikitext"
-                                   "&contentmodel=wikitext"
-                                   "&disablelimitreport="
-                                   "&disableeditsection="
-                                   "&disabletoc="))}
-    RETRY_SLEEP = 2
-    RETRY_MAX = 3
-    TIMEOUT = 5
+    ACTION = {
+        "parse": Template((
+            "https://${WIKI}/w/api.php?action=parse"
+            "&contentmodel=text"
+            "&disableeditsection="
+            "&disablelimitreport="
+            "&disabletoc="
+            "&format=json"
+            "&formatversion=2"
+            "&page=${thing}"
+            "&prop="
+            "text|iwlinks|parsetree|wikitext|displaytitle|properties"
+            "&redirects")),
+        "query": Template((
+            "https://${WIKI}/w/api.php?action=query"
+            "&exintro"
+            "&format=json"
+            "&formatversion=2"
+            "&inprop=displaytitle|url|watchers"
+            "&list=random"
+            "&prop=extracts|images|info|pageimages"
+            "&rnlimit=1"
+            "&rnnamespace=0"
+            "&titles=${thing}"
+            "&redirects")),
+        "random": Template((
+            "https://${WIKI}/w/api.php?action=query"
+            "&format=json"
+            "&formatversion=2"
+            "&list=random"
+            "&rnlimit=1"
+            "&rnnamespace=0")),
+        "wikidata": Template((
+            "https://${WIKI}/w/api.php?action=wbgetentities"
+            "&format=json"
+            "&ids=${thing}"
+            "&languages=${lang}"
+            "&props=info|claims|descriptions|labels|sitelinks"))
+    }
 
-    def __init__(self, wiki=ENDPOINT, lead=False, verbose=False):
-        self.wiki = wiki or self.ENDPOINT
-        self.lead = lead
+    timeout = 5
+    title = None
+
+    def __init__(self, lang='en', verbose=False, wiki=None):
+        self.lang = lang
         self.verbose = verbose
+        self.wiki = wiki or self.target()
         self.curl_setup()
-        self.title = None
-        self.retries = 0
 
     def __del__(self):
         self.cobj.close()
-        if self.verbose:
-            print("connection closed.", file=sys.stderr)
 
     def curl(self, url):
-        """speed"""
+        """
+        in favor of python-requests for speed
+        """
 
         # consistently faster than requests by 3x
         #
@@ -86,125 +85,92 @@ class WPToolsFetch:
             crl.setopt(crl.URL, url)
         except UnicodeEncodeError:
             crl.setopt(crl.URL, url.encode('utf-8'))
+        print("%s (action=%s) %s" % (self.wiki, self.action, self.thing),
+              file=sys.stderr)
         return self.curl_perform(crl)
 
     def curl_perform(self, crl):
-        """perform curl, retry after sleep up to max retries"""
-        if self.retries >= self.RETRY_MAX:
-            return "RETRY_MAX (%d) exceeded!" % self.RETRY_MAX
+        """
+        performs HTTP GET and returns body of response
+        """
         try:
             bfr = BytesIO()
             crl.setopt(crl.WRITEFUNCTION, bfr.write)
             crl.perform()
-            if self.verbose:
-                self.curl_report(crl)
+            info = self.curl_info(crl)
+            if info:
+                if self.verbose:
+                    for item in sorted(info):
+                        print("  %s: %s" % (item, info[item]))
+                self.info = info
             body = bfr.getvalue()
             bfr.close()
-            self.retries = 0
             return body
         except Exception as detail:
-            print("RETRY Caught exception: %s" % detail)
-            self.retries += 1
-            time.sleep(self.RETRY_SLEEP)
-            self.curl_perform(crl)
+            raise detail
+            return "Caught exception: %s" % detail
 
-    def curl_report(self, crl):
-        """writes curl response details to stderr"""
+    def curl_info(self, crl):
+        """
+        returns curl (response) info
+        """
         kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
-        out = {"url": crl.getinfo(crl.EFFECTIVE_URL),
-               "user-agent": self.user_agent(),
-               "content": crl.getinfo(crl.CONTENT_TYPE),
-               "status": crl.getinfo(crl.RESPONSE_CODE),
-               "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
-               "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
-               "kB/s": "%3.1f" % kbps}
-        print("WPToolsFetch HTTP", file=sys.stderr)
-        for key in out:
-            print("    %s: %s" % (key, out[key]), file=sys.stderr)
-        print(file=sys.stderr)
+        url = crl.getinfo(crl.EFFECTIVE_URL)
+        url = url.replace("&format=json", '')
+        url = url.replace("&formatversion=2", '')
+        return {"url": url,
+                "user-agent": self.user_agent(),
+                "content": crl.getinfo(crl.CONTENT_TYPE),
+                "status": crl.getinfo(crl.RESPONSE_CODE),
+                "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
+                "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
+                "kB/s": "%3.1f" % kbps}
 
     def curl_setup(self):
-        """set curl options"""
+        """
+        set curl options
+        """
         crl = pycurl.Curl()
-        # crl.setopt(crl.URL, wiki)
         crl.setopt(crl.USERAGENT, self.user_agent())
         crl.setopt(crl.FOLLOWLOCATION, True)
-        crl.setopt(crl.CONNECTTIMEOUT, self.TIMEOUT)
+        crl.setopt(crl.CONNECTTIMEOUT, self.timeout)
         self.cobj = crl
 
-    def html(self, title):
-        """get HTML keeping connection open"""
-        return self.curl(self.query('html', title))
+    def get(self, action, title):
+        """
+        returns GET result from API
+        """
+        obj = WPToolsFetch()
+        return obj.curl(obj.query(action, title))
 
-    def query(self, content, page):
-        """returns planned MediaWiki API query"""
-        self.title = page
-        page = page.replace(" ", "+")
-        page = page[0].upper() + page[1:]
-        qry = self.QUERY[content].substitute(WIKI=self.wiki, page=page)
-        if self.lead:
-            return qry + "&section=0"
+    def query(self, action, thing, pageid=False):
+        """
+        returns API query string
+        """
+        self.thing = thing
+        self.action = action
+        self.wiki = self.target(action)
+        if action == 'wikidata':
+            qry = self.ACTION[action].substitute(WIKI=self.wiki,
+                                                 lang=self.lang,
+                                                 thing=self.thing)
+        else:
+            qry = self.ACTION[action].substitute(WIKI=self.wiki,
+                                                 thing=self.thing)
+        if action == 'query' and pageid:
+            qry = qry.replace('&titles=', '&pageids=')
         return qry
+
+    def target(self, action=None):
+        """
+        returns target domain
+        """
+        if action == "wikidata":
+            return "www.wikidata.org"
+        return "%s.wikipedia.org" % self.lang
 
     def user_agent(self):
-        """returns the wptools user-agent string"""
+        """
+        returns the wptools user-agent string
+        """
         return "%s/%s (+%s)" % (__title__, __version__, __contact__)
-
-
-def get_html(title,
-             lead=False,
-             test=False,
-             wiki=WPToolsFetch.ENDPOINT,
-             verbose=False):
-    """make MediaWiki API HTTP request for article HTML"""
-    obj = WPToolsFetch(wiki, lead, verbose)
-    qry = obj.query('html', title)
-    if test:
-        return qry
-    return obj.curl(qry)
-
-
-def get_infobox():
-    """NOOP: currently, no way to query Infobox directly"""
-    pass
-
-
-def get_images(title, source,
-               lead=False,
-               test=False,
-               wiki=WPToolsFetch.ENDPOINT,
-               verbose=False):
-    """make MediaWiki API HTTP request for article images"""
-    if source == "infobox":
-        return get_parsetree(title, lead, test, wiki, verbose)
-    obj = WPToolsFetch(wiki, lead, verbose)
-    qry = obj.query(source, title)
-    if test:
-        return qry
-    return obj.curl(qry)
-
-
-def get_parsetree(title,
-                  lead=False,
-                  test=False,
-                  wiki=WPToolsFetch.ENDPOINT,
-                  verbose=False):
-    """make MediaWiki API HTTP request for article parse tree"""
-    obj = WPToolsFetch(wiki, lead, verbose)
-    qry = obj.query('parsetree', title)
-    if test:
-        return qry
-    return obj.curl(qry)
-
-
-def get_wikitext(title,
-                 lead=False,
-                 test=False,
-                 wiki=WPToolsFetch.ENDPOINT,
-                 verbose=False):
-    """make MediaWiki API HTTP request for article wikitext"""
-    obj = WPToolsFetch(wiki, lead, verbose)
-    url = obj.query('wikitext', title)
-    if test:
-        return url
-    return obj.curl(url)
