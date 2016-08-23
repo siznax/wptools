@@ -17,58 +17,14 @@ class WPToolsTestCase(unittest.TestCase):
 
     def test_entry_points(self):
 
-        wptools.extract
         wptools.fetch
         wptools.utils
 
 
-class ExtractTestCase(unittest.TestCase):
+class CoreTestCase(unittest.TestCase):
 
-    def test_qry_wikitext(self):
-        from wptools.extract import qry_wikitext
-        # wptools.fetch.get_wikitext('Aardvark')
-        w = r'{{speciesbox\n| genus = Orycteropus\n}}'
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"wikitext":{"*":"' + w + '"}}}'
-        ans = qry_wikitext(d)
-        self.assertEqual(ans, "{{speciesbox\n| genus = Orycteropus\n}}")
-
-    def test_qry_infobox(self):
-        from wptools.extract import qry_infobox
-        # wptools.fetch.get_parsetree('Aardvark')
-        p = "<template><title>speciesbox</title><part><name> genus </name><equals>=</equals><value> Orycteropus</value></part></template>"
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"parsetree":{"*":"' + p + '"}}}'
-        ans = qry_infobox(d)['genus']
-        self.assertEqual(ans, 'Orycteropus')
-
-    def test_qry_parsetree(self):
-        from wptools.extract import qry_parsetree
-        # wptools.fetch.get_parsetree('Aardvark')
-        p = '<root/>'
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"parsetree":{"*":"' + p + '"}}}'
-        self.assertEqual(qry_parsetree(d), '<root/>')
-
-    def test_qry_text(self):
-        from wptools.extract import qry_text
-        # wptools.fetch.get_html('Aardvark', lead=True)
-        h = '<b>aardvark</b>'
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"' + h + '"}}}'
-        ans = qry_text(d, lead=True)
-        self.assertEqual(ans, '**aardvark**')
-
-    def test_qry_html(self):
-        from wptools.extract import qry_html
-        # wptools.fetch.get_html('Aardvark', lead=True)
-        h = '<html>'
-        d = r'{"parse":{"title":"Aardvark","pageid":680,"text":{"*":"' + h + '"}}}'
-        self.assertEqual(qry_html(d), '<html>')
-
-    def test_no_templates(self):  # Active galactic nucleus
-        from wptools.extract import html_lead
-        self.assertEqual(html_lead("<p>lead</p>"), "<p>lead</p>")
-
-    def test_cite_error(self):  # 14th Dalai Lama (15 Oct 2015)
-        from wptools.extract import plain_text_cleanup
-        self.assertEqual(plain_text_cleanup("lead\nCite error"), "lead")
+    def test(self):
+        pass
 
 
 class FetchTestCase(unittest.TestCase):
