@@ -4,6 +4,7 @@ WPTools NOTES
 * https://meta.wikimedia.org/wiki/List_of_Wikipedias
 * https://www.mediawiki.org/wiki/API:Main_page
 * https://www.wikidata.org/wiki/Wikidata:Data_access
+* https://www.mediawiki.org/wiki/API:Client_code#Python
 
 
 DBPedia
