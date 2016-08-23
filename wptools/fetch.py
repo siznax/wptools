@@ -61,8 +61,10 @@ class WPToolsFetch:
 
     def __init__(self, lang='en', verbose=False, wiki=None):
         self.lang = lang
+        self.wiki = "%s.wikipedia.org" % lang
+        if wiki:
+            self.wiki = wiki
         self.verbose = verbose
-        self.wiki = wiki or self.target()
         self.curl_setup()
 
     def __del__(self):
@@ -149,9 +151,8 @@ class WPToolsFetch:
         """
         self.thing = thing
         self.action = action
-        self.wiki = self.target(action)
         if action == 'wikidata':
-            qry = self.ACTION[action].substitute(WIKI=self.wiki,
+            qry = self.ACTION[action].substitute(WIKI="www.wikidata.org",
                                                  lang=self.lang,
                                                  thing=self.thing)
         else:
@@ -160,14 +161,6 @@ class WPToolsFetch:
         if action == 'query' and pageid:
             qry = qry.replace('&titles=', '&pageids=')
         return qry
-
-    def target(self, action=None):
-        """
-        returns target domain
-        """
-        if action == "wikidata":
-            return "www.wikidata.org"
-        return "%s.wikipedia.org" % self.lang
 
     def user_agent(self):
         """
