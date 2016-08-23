@@ -20,9 +20,9 @@ from . import utils
 class WPTools:
 
     _skipmap = {
-        'get_parse': {'infobox', 'parsetree', 'wikibase', 'wikitext'},
-        'get_query': {'extract', 'images', 'pageid', 'random'},
-        'get_wikidata': {'Image', 'Description', 'Label'}
+        'get_parse': {'parsetree', 'wikibase', 'wikitext'},
+        'get_query': {'extract', 'pageid', 'random'},
+        'get_wikidata': {'Label'}
     }
 
     Description = None
@@ -34,6 +34,7 @@ class WPTools:
     images = {}
     pageid = None
     title = None
+    wikibase = None
 
     def __init__(self, title='', lang='en', verbose=False,
                  wikibase=None, wiki=None):
@@ -164,7 +165,7 @@ class WPTools:
 
     def _skip_get(self, action):
         """
-        returns true if nothing (interesting) can be added by making request
+        returns true if additional request is likely not needed
         """
         for attr in self._skipmap[action]:
             has_attr = hasattr(self, attr)
@@ -246,6 +247,9 @@ class WPTools:
         request Wikidata:API action=wbgetentities
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
+        if not self.wikibase:
+            print("instance needs a wikibase")
+            return
         if self._skip_get('get_wikidata'):
             return
         query = self.__fetch.query('wikidata', self.wikibase)
