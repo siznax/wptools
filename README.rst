@@ -192,6 +192,18 @@ API requests populate the following attributes:
 |    }
 
 
+Api-User-Agent
+""""""""""""""
+
+The ``wptools`` user-agent_ will look something like this:
+
+::
+
+    wptools/0.0.5 (https://github.com/siznax/wptools) PycURL/7.43.0 libcurl/7.43.0 SecureTransport zlib/1.2.5
+
+.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
+
+
 Examples
 ^^^^^^^^
 
@@ -311,18 +323,6 @@ Sometimes, you can mix languages!
       urlraw: https://zh.wikipedia.org/wiki/J·R·R·托爾金?action=raw
       wikibase: https://www.wikidata.org/wiki/Q892
     }
-
-
-Api-User-Agent
-^^^^^^^^^^^^^^
-
-The ``wptools`` user-agent_ will look something like this:
-
-::
-
-    wptools/0.0.5 (https://github.com/siznax/wptools) PycURL/7.43.0 libcurl/7.43.0 SecureTransport zlib/1.2.5
-
-.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
 
 
 Enjoy!
