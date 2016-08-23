@@ -1,6 +1,11 @@
 WPTools NOTES
 =============
 
+* https://meta.wikimedia.org/wiki/List_of_Wikipedias
+* https://www.mediawiki.org/wiki/API:Main_page
+* https://www.wikidata.org/wiki/Wikidata:Data_access
+
+
 DBPedia
 -------
 
@@ -11,8 +16,22 @@ http://dbpedia.org/page/Napoleon
   Extention:TextExtracts)
 
 
-Image
------
+Lead Section
+------------
+
+The lead section is essentially a summary of the article.
+
+* https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+* https://www.mediawiki.org/wiki/Extension:TextExtracts
+    * https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
+
+
+Images
+------
+
+* https://www.mediawiki.org/wiki/API:Images
+* https://www.mediawiki.org/wiki/Extension:PageImages
+* https://www.mediawiki.org/wiki/Extension:Popups
 
 For a representative image, we probably want Wikidata:P18. You can
 probably get away with using 'thumbnail' (Mediawiki:Query) or
@@ -35,21 +54,30 @@ Wikidata:P18:
     }
 
 
-Extension:TextExtracts
-----------------------
+Infobox
+-------
 
-* https://www.mediawiki.org/wiki/Extension:TextExtracts
-* https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
+* https://en.wikipedia.org/wiki/Help:Infobox
+* https://meta.wikimedia.org/wiki/Wiki_syntax
 
 
 MediaWiki API
-=============
+-------------
 
 https://www.mediawiki.org/wiki/Special:ApiSandbox
 
 
+Parse tree
+----------
+
+* https://www.mediawiki.org/wiki/User:Kephir/XML_parse_tree
+* https://www.mediawiki.org/wiki/API:Parsing_wikitext
+* https://www.mediawiki.org/wiki/Alternative_parsers
+* https://en.wikipedia.org/wiki/Parse_tree
+
+
 RESTBase
-========
+--------
 
 https://en.wikipedia.org/api/rest_v1/
 
@@ -88,10 +116,13 @@ https://www.wikidata.org/wiki/Property:P1343
 Wikitext
 --------
 
+* https://www.mediawiki.org/wiki/API:Data_formats
+* https://www.mediawiki.org/wiki/API:Parsing_wikitext
+
 Probably the most direct way to get to wikitext:
 https://en.wikipedia.org/wiki/Abraham_Lincoln?action=raw&section=0
 
-but fails if there is '.' in the title:
+But fails if there is '.' in the title:
 https://en.wikipedia.org/wiki/J._R._R._Tolkien?action=raw
 
 
