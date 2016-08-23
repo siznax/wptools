@@ -3,6 +3,21 @@
 Release History
 ---------------
 
+0.0.5 (2016-08-23)
+++++++++++++++++++
+
+* Major re-write.
+* Exposed core.WPTools as entrypoint.
+* Added get_parse(), get_query(), and get_wikidata().
+* Added get(self) to query all APIs.
+* Added show(self) method to display fetched attrs.
+* Show instance attributes after each request.
+* Ignore requests if attrs will not be updated.
+* Enabled language support across APIs.
+* Gets random article if no arguments.
+* CLI scripts and tests disabled pending update.
+
+
 0.0.4 (2016-08-16)
 ++++++++++++++++++
 

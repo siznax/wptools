@@ -5,12 +5,12 @@ Wikipedia tools (for Humans)
 
 Easily get Wikipedia article info and Wikidata via MediaWiki APIs.
 
-- get an HTML or plain text "extract" (lead, summary, etc.)
+- get an HTML or plain text "extract" (lead or summary)
 - get a representative image (or thumbnail)
 - get an Infobox as a python dictionary
-- get the Wikidata item ID by title
-- get Wikidata by property name
-- get random data!
+- get selected Wikidata properties
+- get a Wikidata item by title
+- get random info
 """
 
 __author__ = "siznax"
