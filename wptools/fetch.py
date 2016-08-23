@@ -173,4 +173,7 @@ class WPToolsFetch:
         """
         returns the wptools user-agent string
         """
-        return "%s/%s (+%s)" % (__title__, __version__, __contact__)
+        return "%s/%s (%s) %s" % (__title__,
+                                  __version__,
+                                  __contact__,
+                                  pycurl.version)
