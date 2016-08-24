@@ -1,5 +1,8 @@
 #!/usr/bin/env python -u
 # -*- coding:utf-8 -*-
+"""
+Command line interface to wptools. See `wptool -h`
+"""
 
 from __future__ import print_function
 
@@ -106,6 +109,7 @@ def _text_image(item):
 
 
 def get(html, lang, nowrap, query, silent, title, verbose, wiki):
+    """wptools.get() and emit selected output"""
     start = time.time()
 
     if query:
@@ -115,13 +119,13 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
             return f.query('query', title)
         return f.query('random', None)
 
-    item = wptools.wptools(lang=lang, silent=silent, title=title,
-        verbose=verbose, wiki=wiki)
+    item = wptools.wptools(title=title, lang=lang, silent=silent,
+                           verbose=verbose, wiki=wiki)
     item.get()
 
     if not hasattr(item, 'extract') or not item.extract:
         return "NOT_FOUND"
-    
+
     out = _item_text(item, nowrap)
     if html:
         out = _item_html(item)
@@ -136,15 +140,17 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
 
 
 def main():
-    desc = (
+    description = (
         "Get Wikipedia article info and Wikidata via MediaWiki APIs.\n\n"
         "Gets a random English Wikipedia article by default, or in the\n"
-        "language -lang, or from the wikisite -wiki, or the specific title\n"
-        "-title. The output is a plaintext extract unless -HTML.")
+        "language -lang, or from the wikisite -wiki, or by specific\n"
+        "title -title. The output is a plain text extract unless -HTML.")
+    epilog = ("Powered by https://github.com/siznax/wptools/ %s"
+              % wptools.__version__)
     argp = argparse.ArgumentParser(
-        description=desc,
+        description=description,
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog = "Powered by https://github.com/siznax/wptools/")
+        epilog=epilog)
     argp.add_argument("-H", "-HTML", action='store_true',
                       help="output HTML extract")
     argp.add_argument("-l", "-lang", default='en',
