@@ -58,7 +58,7 @@ class WPToolsFetch:
     }
 
     silent = False
-    timeout = 5
+    timeout = 15
     title = None
 
     def __init__(self, lang='en', silent=False, verbose=False, wiki=None):
