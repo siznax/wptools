@@ -248,7 +248,7 @@ class WPTools:
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if not self.wikibase:
-            print("instance needs a wikibase")
+            print("instance needs a wikibase", file=sys.stderr)
             return
         if self._skip_get('get_wikidata'):
             return
@@ -315,7 +315,7 @@ class WPTools:
 
         # NOTE: json.dumps and pprint show unicode literals
         print(header, file=sys.stderr)
-        print("{")
+        print("{", file=sys.stderr)
         for item in sorted(data):
-            print("  %s: %s" % (item, data[item]))
-        print("}")
+            print("  %s: %s" % (item, data[item]), file=sys.stderr)
+        print("}", file=sys.stderr)
