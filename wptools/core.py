@@ -37,8 +37,8 @@ class WPTools:
     title = None
     wikibase = None
 
-    def __init__(self, lang='en', silent=False, title='',
-                 verbose=False, wiki=None, wikibase=None):
+    def __init__(self, title='',  lang='en', wikibase=None,
+                 silent=False, verbose=False, wiki=None):
         self.silent = silent
         self.lang = lang
         self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki)
@@ -190,6 +190,7 @@ class WPTools:
         """
         self.get_query(show=False)
         self.get_parse(show=False)
+
         self.get_wikidata()
 
     def get_parse(self, show=True):
