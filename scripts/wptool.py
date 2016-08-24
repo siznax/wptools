@@ -105,19 +105,18 @@ def _text_image(item):
     return img
 
 
-def get(title, lang, html, nowrap, query, verbose, wiki):
+def get(html, lang, nowrap, query, silent, title, verbose, wiki):
     start = time.time()
 
     if query:
-        f = wptools.fetch.WPToolsFetch(lang=lang, wiki=wiki)
+        f = wptools.fetch.WPToolsFetch(lang=lang, verbose=verbose,
+                                       wiki=wiki)
         if title:
             return f.query('query', title)
         return f.query('random', None)
 
-    item = wptools.wptools(title=title,
-                           lang=lang,
-                           verbose=verbose,
-                           wiki=wiki)
+    item = wptools.wptools(lang=lang, silent=silent, title=title,
+        verbose=verbose, wiki=wiki)
     item.get()
 
     if not hasattr(item, 'extract') or not item.extract:
@@ -127,7 +126,8 @@ def get(title, lang, html, nowrap, query, verbose, wiki):
     if html:
         out = _item_html(item)
 
-    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    if not silent:
+        print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
     try:
         return out.encode('utf-8')
@@ -136,25 +136,35 @@ def get(title, lang, html, nowrap, query, verbose, wiki):
 
 
 def main():
-    desc = "Get Wikipedia article info and Wikidata via MediaWiki APIs."
-    argp = argparse.ArgumentParser(description=desc)
-    argp.add_argument("-t", "-title", help="article title")
+    desc = (
+        "Get Wikipedia article info and Wikidata via MediaWiki APIs.\n\n"
+        "Gets a random English Wikipedia article by default, or in the\n"
+        "language -lang, or from the wikisite -wiki, or the specific title\n"
+        "-title. The output is a plaintext extract unless -HTML.")
+    argp = argparse.ArgumentParser(
+        description=desc,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog = "Powered by https://github.com/siznax/wptools/")
+    argp.add_argument("-H", "-HTML", action='store_true',
+                      help="output HTML extract")
     argp.add_argument("-l", "-lang", default='en',
                       help="language code")
-    argp.add_argument("-H", "-HTML", action='store_true',
-                      help="output HTML")
     argp.add_argument("-n", "-nowrap", action='store_true',
                       help="do not wrap text")
     argp.add_argument("-q", "-query", action='store_true',
                       help="show query and exit")
+    argp.add_argument("-s", "-shh", action='store_true',
+                      help="quiet output to stderr")
+    argp.add_argument("-t", "-title", help="get a specific title")
     argp.add_argument("-v", "-verbose", action='store_true',
-                      help="HTTP status to stdout")
+                      help="HTTP status to stderr")
     argp.add_argument("-w", "-wiki",
-                      help="alternative wikisite")
+                      help="use alternative wikisite")
 
     args = argp.parse_args()
 
-    _safe_exit(get(args.t, args.l, args.H, args.n, args.q, args.v, args.w))
+    _safe_exit(get(args.H, args.l, args.n, args.q, args.s, args.t,
+                   args.v, args.w))
 
 
 if __name__ == "__main__":

@@ -57,14 +57,16 @@ class WPToolsFetch:
             "&props=info|claims|descriptions|labels|sitelinks"))
     }
 
+    silent = False
     timeout = 5
     title = None
 
-    def __init__(self, lang='en', verbose=False, wiki=None):
+    def __init__(self, lang='en', silent=False, verbose=False, wiki=None):
         self.lang = lang
         self.wiki = "%s.wikipedia.org" % lang
         if wiki:
             self.wiki = wiki
+        self.silent = silent
         self.verbose = verbose
         self.curl_setup()
 
@@ -88,8 +90,9 @@ class WPToolsFetch:
             crl.setopt(crl.URL, url)
         except UnicodeEncodeError:
             crl.setopt(crl.URL, url.encode('utf-8'))
-        print("%s (action=%s) %s" % (self.wiki, self.action, self.thing),
-              file=sys.stderr)
+        if not self.silent:
+            print("%s (action=%s) %s" % (self.wiki, self.action,
+                                         self.thing), file=sys.stderr)
         return self.curl_perform(crl)
 
     def curl_perform(self, crl):
@@ -102,9 +105,9 @@ class WPToolsFetch:
             crl.perform()
             info = self.curl_info(crl)
             if info:
-                if self.verbose:
+                if self.verbose and not self.silent:
                     for item in sorted(info):
-                        print("  %s: %s" % (item, info[item]))
+                        print("  %s: %s" % (item, info[item]), file=sys.stderr)
                 self.info = info
             body = bfr.getvalue()
             bfr.close()

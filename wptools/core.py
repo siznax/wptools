@@ -33,13 +33,15 @@ class WPTools:
     g_wikidata = {}
     images = {}
     pageid = None
+    silent = False
     title = None
     wikibase = None
 
-    def __init__(self, title='', lang='en', verbose=False,
-                 wikibase=None, wiki=None):
+    def __init__(self, lang='en', silent=False, title='',
+                 verbose=False, wiki=None, wikibase=None):
+        self.silent = silent
         self.lang = lang
-        self.__fetch = fetch.WPToolsFetch(self.lang, verbose, wiki)
+        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki)
         if wikibase:
             self.wikibase = wikibase
         if title:
@@ -173,7 +175,7 @@ class WPTools:
                 return False
             if has_attr and not getattr(self, attr):
                 return False
-        print("skipping %s" % action, file=sys.stderr)
+        stderr("skipping %s" % action, self.silent)
         return True
 
     def _wiki_url(self, raw=False):
@@ -248,7 +250,7 @@ class WPTools:
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if not self.wikibase:
-            print("instance needs a wikibase", file=sys.stderr)
+            stderr("instance needs a wikibase", self.silent)
             return
         if self._skip_get('get_wikidata'):
             return
@@ -314,8 +316,13 @@ class WPTools:
             header = "%s (%s)" % (self.wikibase, self.lang)
 
         # NOTE: json.dumps and pprint show unicode literals
-        print(header, file=sys.stderr)
-        print("{", file=sys.stderr)
+        stderr(header, self.silent)
+        stderr("{", self.silent)
         for item in sorted(data):
-            print("  %s: %s" % (item, data[item]), file=sys.stderr)
-        print("}", file=sys.stderr)
+            stderr("  %s: %s" % (item, data[item]), self.silent)
+        stderr("}", self.silent)
+
+
+def stderr(msg, silent):
+    if not silent:
+        print(msg, file=sys.stderr)
