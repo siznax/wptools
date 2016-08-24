@@ -36,6 +36,7 @@ class WPToolsFetch:
             "&formatversion=2"
             "&inprop=displaytitle|url|watchers"
             "&list=random"
+            "&pithumbsize=240"
             "&prop=extracts|images|info|pageimages"
             "&rnlimit=1"
             "&rnnamespace=0"
