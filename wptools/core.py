@@ -164,6 +164,8 @@ class WPTools:
                 self.Label = labels.get(self.lang).get('value')
             except:
                 self.Label = labels.get('value')
+        if self.Label and not self.title:
+            self.title = self.Label.replace(' ', '_')
 
     def _skip_get(self, action):
         """
@@ -188,10 +190,14 @@ class WPTools:
         """
         make all available API requests and fully hydrate instance
         """
-        self.get_query(show=False)
-        self.get_parse(show=False)
-
-        self.get_wikidata()
+        if self.wikibase and not self.title:
+            self.get_wikidata(show=False)
+            self.get_query(show=False)
+            self.get_parse()
+        else:
+            self.get_query(show=False)
+            self.get_parse(show=False)
+            self.get_wikidata()
 
     def get_parse(self, show=True):
         """
