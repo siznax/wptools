@@ -1,30 +1,41 @@
 WPTools NOTES
 =============
 
-* https://meta.wikimedia.org/wiki/List_of_Wikipedias
+“For reading, there will never be enough time” —Harold Bloom
+
 * https://www.mediawiki.org/wiki/API:Main_page
+* https://www.mediawiki.org/wiki/Web_APIs_hub
 * https://www.wikidata.org/wiki/Wikidata:Data_access
-* https://www.mediawiki.org/wiki/API:Client_code#Python
+
+This project is listed here as "wptools":
+https://www.mediawiki.org/wiki/API:Client_code#Python
+
+
+Table of Contents
+-----------------
+
+* DBPedia
+* Images
+* Infobox
+* Language Codes and Wikisites
+* Lead Section
+* MediaWiki API
+* Parse tree
+* RESTBase
+* URL Shortener
+* WikiData
+* Wikitext
 
 
 DBPedia
 -------
 
+It's not clear to me how to make use of DBPedia yet.
 http://dbpedia.org/page/Napoleon
 
 * depiction => a better page_image (but see wikidata Property:P18)
 * abstract => yet another version of lead section text (this may be
   Extention:TextExtracts)
-
-
-Lead Section
-------------
-
-The lead section is essentially a summary of the article.
-
-* https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
-* https://www.mediawiki.org/wiki/Extension:TextExtracts
-    * https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
 
 
 Images
@@ -58,8 +69,34 @@ Wikidata:P18:
 Infobox
 -------
 
+We're getting the Infoboxen from parse tree XML, and converting it to
+a dict with ``wptools.utils.template_to_dict(ptree)``.
+
 * https://en.wikipedia.org/wiki/Help:Infobox
 * https://meta.wikimedia.org/wiki/Wiki_syntax
+
+
+Language Codes and Wikisites
+----------------------------
+
+Here's a list of language codes (even non-standard ones) currently in use:
+https://meta.wikimedia.org/wiki/Table_of_Wikimedia_projects
+
+Another list sorted by number of articles
+https://meta.wikimedia.org/wiki/List_of_Wikipedias
+
+
+Lead Section
+------------
+
+The lead section is essentially a summary of the article.
+
+* https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+* https://www.mediawiki.org/wiki/Extension:TextExtracts
+
+Example
+
+https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
 
 
 MediaWiki API
@@ -99,19 +136,47 @@ https://en.wikipedia.org/api/rest_v1/
         + close to Google text
 
 
+URL Shortener
+-------------
+
+It would be especially useful for commons media URLs.
+
+* https://www.mediawiki.org/wiki/Extension:UrlShortener
+* https://www.mediawiki.org/wiki/Requests_for_comment/URL_shortener
+
+
 WikiData
 --------
+
+We get wikidata through (action=wbgetentities)
+https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+
+Currently, we get these items when available:
+
+* Wikidata Description
+* Wikidata Label
+* Property:P18 image
+
+There is so much more that may be done here.
+
+Wikidata resources:
 
 * https://www.mediawiki.org/wiki/Wikibase/DataModel#Overview_of_the_data_model
 * https://www.wikidata.org/wiki/Help:Wikidata_datamodel
 * https://www.mediawiki.org/wiki/Wikibase/API#wbgetentities
-* https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+* https://www.mediawiki.org/wiki/API:Presenting_Wikidata_knowledge
+
+Wikidata properties:
 
 Property:P18 (image)
 https://www.wikidata.org/w/api.php?action=wbgetentities&ids=P18&languages=en
 
 Property:P1343 (described by source) - where the info came from
 https://www.wikidata.org/wiki/Property:P1343
+
+P17 country
+
+P585 point in time
 
 
 Wikitext
