@@ -1,7 +1,9 @@
 WPTools NOTES
 =============
 
-“For reading, there will never be enough time” —Harold Bloom
+This is the current wptools knowledge base.
+
+_“For reading, there will never be enough time” —Harold Bloom_
 
 * https://www.mediawiki.org/wiki/API:Main_page
 * https://www.mediawiki.org/wiki/Web_APIs_hub
