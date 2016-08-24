@@ -28,6 +28,7 @@ class WPTools:
     Description = None
     Image = None
     Label = None
+    fatal = False
     g_parse = {}
     g_query = {}
     g_wikidata = {}
@@ -89,7 +90,13 @@ class WPTools:
         """
         set attributes derived from action=parse
         """
-        data = json.loads(self.g_parse['response'])
+        try:
+            data = json.loads(self.g_parse['response'])
+        except:
+            self.fatal = True
+            print("Could not load JSON response for query: %s"
+                  % self.g_parse['query'], file=sys.stderr)
+            return
         pdata = data.get('parse')
         if not pdata:
             return
@@ -106,7 +113,13 @@ class WPTools:
         """
         set attributes derived from action=query
         """
-        data = json.loads(self.g_query['response'])
+        try:
+            data = json.loads(self.g_query['response'])
+        except:
+            self.fatal = True
+            print("Could not load JSON response for query: %s"
+                  % self.g_query['query'], file=sys.stderr)
+            return
         qdata = data.get('query')
         page = qdata.get('pages')[0]
         self.extract = page.get('extract')
@@ -140,7 +153,13 @@ class WPTools:
         """
         set attributes derived from action=wbentities
         """
-        data = json.loads(self.g_wikidata['response'])
+        try:
+            data = json.loads(self.g_wikidata['response'])
+        except:
+            self.fatal = True
+            print("Could not load JSON response for query: %s"
+                  % self.g_wikidata['query'], file=sys.stderr)
+            return
         entities = data.get('entities')
         item = None
         if entities:
@@ -171,6 +190,8 @@ class WPTools:
         """
         returns true if additional request is likely not needed
         """
+        if self.fatal:
+            return True
         for attr in self._skipmap[action]:
             has_attr = hasattr(self, attr)
             if not has_attr:
@@ -198,6 +219,7 @@ class WPTools:
             self.get_query(show=False)
             self.get_parse(show=False)
             self.get_wikidata()
+        return self
 
     def get_parse(self, show=True):
         """
@@ -244,7 +266,13 @@ class WPTools:
         """
         query = self.__fetch.query('random', None)
         response = self.__fetch.curl(query)
-        rdata = json.loads(response).get('query').get('random')[0]
+        try:
+            rdata = json.loads(response).get('query').get('random')[0]
+        except:
+            self.fatal = True
+            print("Could not load JSON response for query: %s"
+                  % query, file=sys.stderr)
+            return
         self.pageid = rdata.get('id')
         self.title = rdata.get('title').replace(' ', '_')
         if show:
