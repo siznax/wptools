@@ -3,6 +3,22 @@
 Release History
 ---------------
 
+0.1 (proposed)
+++++++++++++++
+
+* Many fixes, enhancements.
+* ONE CLI SCRIPT TO RULE THEM ALL: wptool.
+* Much testing of random (title, lang, and wiki).
+* Allow chaining get_s or just get().
+* Enabled full-hydration from wikibase only.
+* Block further requests on fatal error.
+* Get 240x thumbnails instead of default 50x.
+* Harmonized silent and verbose arguments.
+* Mock-up tests/test_advanced.py.
+* Made NOTES.md a knowledge base.
+* Use _humans_ in README examples. ;-)
+
+
 0.0.5 (2016-08-23)
 ++++++++++++++++++
 

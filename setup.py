@@ -10,7 +10,7 @@ with open('HISTORY.rst') as f:
 
 setup(
     name='wptools',
-    version='0.0.5',
+    version='0.1',
     description='Easily get Wikipedia article info and Wikidata via MediaWiki APIs.',
     long_description=readme + '\n\n' + history,
     url='https://github.com/siznax/wptools/',
@@ -21,9 +21,16 @@ setup(
     packages=find_packages(exclude=['tests']),
     install_requires=['html2text', 'html5lib', 'lxml', 'pycurl', 'requests'],
     include_package_data=True,
+    entry_points={
+        'console_scripts': [
+            'wptool = scripts.wptool:main',
+        ],
+    },
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
