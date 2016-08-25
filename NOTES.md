@@ -19,6 +19,7 @@ Table of Contents
 * DBPedia
 * Extracts
 * Hovercards
+* Humans
 * Images
 * Infobox
 * Language Codes and Wikisites
@@ -67,6 +68,30 @@ functions.
 
 * https://www.mediawiki.org/wiki/Beta_Features/Hovercards
 * https://www.mediawiki.org/wiki/Extension:Popups
+
+
+Humans
+------
+
+A goal of this project is to make it easier for humans—all humans.
+Let's have a preference for using Women, People of Color, and LGBTQ
+(lesbian, gay, bisexual, transgender, and queer) people in our
+examples.
+
+**README.md**
+
+1. Flannery O'Connor - American novelist, short story writer
+2. 穐吉敏子 (ja) Toshiko Akiyoshi - Japanese American jazz musician
+3. Sylvia Rivera - American bisexual transgender activist and trans woman
+4. 哈莉特·塔布曼 (zh) Harriet Tubman - African-American abolitionist and humanitarian
+5. Q43303 Malcolm X - American human rights activist
+6. Frida Kahlo - Mexican painter
+7. Ella Fitzgerald - American jazz singer
+8. Fela Kuti - Nigerian musician and activist
+9. Stephen Fry - English comedian, actor, writer, presenter, and activist
+10. Jill Lepore - American historian
+11. Malala Yousafzai - Pakistani children's education activist
+12. Jeann d'Arc - folk heroine and Roman Catholic saint
 
 
 Images
