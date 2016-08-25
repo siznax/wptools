@@ -17,10 +17,11 @@ Table of Contents
 -----------------
 
 * DBPedia
+* Extracts
+* Hovercards
 * Images
 * Infobox
 * Language Codes and Wikisites
-* Lead Section
 * MediaWiki API
 * Parse tree
 * RESTBase
@@ -38,6 +39,24 @@ http://dbpedia.org/page/Napoleon
 * depiction => a better page_image (but see wikidata Property:P18)
 * abstract => yet another version of lead section text (this may be
   Extention:TextExtracts)
+
+
+Extracts
+--------
+
+Currently we get an extract of only the "lead section" (content before
+the first setion) using ``action=query`` with ``&prop=extracts`` and
+``&exintro``. The lead section is essentially a summary of the article.
+
+* https://www.mediawiki.org/wiki/Extension:TextExtracts
+* https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+
+Example
+
+https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
+
+We get the extract in HTML and put it in the attribute _extract_, which
+we convert to Markdown text and put that into _extext_.
 
 
 Hovercards
@@ -97,19 +116,6 @@ Another list sorted by number of articles
 https://meta.wikimedia.org/wiki/List_of_Wikipedias
 
 
-Lead Section
-------------
-
-The lead section is essentially a summary of the article.
-
-* https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
-* https://www.mediawiki.org/wiki/Extension:TextExtracts
-
-Example
-
-https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
-
-
 MediaWiki API
 -------------
 
@@ -118,6 +124,9 @@ https://www.mediawiki.org/wiki/Special:ApiSandbox
 
 Parse tree
 ----------
+
+We get the XML parse tree by ``action=query`` and put it into the
+_parsetree_ attribute.
 
 * https://www.mediawiki.org/wiki/User:Kephir/XML_parse_tree
 * https://www.mediawiki.org/wiki/API:Parsing_wikitext
@@ -192,6 +201,9 @@ P585 point in time
 
 Wikitext
 --------
+
+We get wikitext by ``action=parse`` and put it in the _wikitext_
+attribute.
 
 * https://www.mediawiki.org/wiki/API:Data_formats
 * https://www.mediawiki.org/wiki/API:Parsing_wikitext
