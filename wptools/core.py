@@ -209,7 +209,10 @@ class WPTools:
 
     def get(self):
         """
-        make all available API requests and fully hydrate instance
+        make all requests necessary to populate all the things:
+        - get_query()
+        - get_parse()
+        - get_wikidata()
         """
         if self.wikibase and not self.title:
             self.get_wikidata(show=False)
@@ -223,8 +226,14 @@ class WPTools:
 
     def get_parse(self, show=True):
         """
-        request MediaWiki:API action=parse
-        see https://en.wikipedia.org/w/api.php?action=help&modules=parse
+        MediaWiki:API action=parse request for:
+        - infobox: <dict> Infobox data as python dictionary
+        - links: <list> interwiki links (iwlinks)
+        - pageid: <int> Wikipedia database ID
+        - parsetree: <unicode> XML parse tree
+        - wikibase: <unicode> Wikidata entity ID or wikidata URL
+        - wikitext: <unicode> raw wikitext URL
+        https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
         if self._skip_get('get_parse'):
             return
@@ -241,8 +250,17 @@ class WPTools:
 
     def get_query(self, show=True):
         """
-        request MediaWiki:API action=query
-        see https://en.wikipedia.org/w/api.php?action=help&modules=query
+        MediaWiki:API action=query request for:
+        - extext: <unicode> plain text (Markdown) extract
+        - extract: <unicode> HTML extract via Extension:TextExtract
+        - images: <dict> {image, pageimages, thumbnail}
+        - pageid: <int> Wikipedia database ID
+        - pageimage: <unicode> pageimage URL via Extension:PageImages
+        - random: <unicode> a random article title with every request!
+        - thumbnail: <unicode> thumbnail URL via Extension:PageImages
+        - url: <unicode> the canonical wiki URL
+        - urlraw: <unicode> ostensible raw wikitext URL
+        https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
         if self._skip_get('get_query'):
             return
@@ -261,8 +279,10 @@ class WPTools:
 
     def get_random(self, show=True):
         """
-        request MediaWiki API:Random
-        see https://www.mediawiki.org/wiki/API:Random
+        MediaWiki:API (action=query) request for:
+        - pageid: <int> Wikipedia database ID
+        - title: <unicode> article title
+        https://www.mediawiki.org/wiki/API:Random
         """
         query = self.__fetch.query('random', None)
         response = self.__fetch.curl(query)
@@ -281,7 +301,10 @@ class WPTools:
 
     def get_wikidata(self, show=True):
         """
-        request Wikidata:API action=wbgetentities
+        Wikidata:API (action=wbgetentities) for:
+        - Description: <unicode> Wikidata description
+        - Image: <unicode> Wikidata Property:P18 image URL
+        - Label: <unicode> Wikidata label
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if not self.wikibase:
@@ -302,7 +325,7 @@ class WPTools:
 
     def show(self):
         """
-        prettyprint instance attributes
+        pretty-print instance attributes
         """
         maxlen = 72
 
