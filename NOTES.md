@@ -40,12 +40,21 @@ http://dbpedia.org/page/Napoleon
   Extention:TextExtracts)
 
 
+Hovercards
+----------
+
+This is going to be a great feature that may yield more useful API
+functions.
+
+* https://www.mediawiki.org/wiki/Beta_Features/Hovercards
+* https://www.mediawiki.org/wiki/Extension:Popups
+
+
 Images
 ------
 
 * https://www.mediawiki.org/wiki/API:Images
 * https://www.mediawiki.org/wiki/Extension:PageImages
-* https://www.mediawiki.org/wiki/Extension:Popups
 
 For a representative image, we probably want Wikidata:P18. You can
 probably get away with using 'thumbnail' (Mediawiki:Query) or
