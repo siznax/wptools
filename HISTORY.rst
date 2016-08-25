@@ -3,8 +3,8 @@
 Release History
 ---------------
 
-0.1 (proposed)
-++++++++++++++
+0.1 (2016-08-25)
+++++++++++++++++
 
 * Many fixes, enhancements.
 * ONE CLI SCRIPT TO RULE THEM ALL: wptool.
