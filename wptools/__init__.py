@@ -2,8 +2,9 @@
 
 """
 Wikipedia tools (for Humans)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Easily get Wikipedia article info and Wikidata via MediaWiki APIs.
+Get Wikipedia article info and Wikidata via MediaWiki APIs:
 
 - get an HTML or plain text "extract" (lead or summary)
 - get a representative image, pageimage, thumbnail

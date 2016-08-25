@@ -11,7 +11,7 @@ with open('HISTORY.rst') as f:
 setup(
     name='wptools',
     version='0.1',
-    description='Easily get Wikipedia article info and Wikidata via MediaWiki APIs.',
+    description='Wikipedia tools (for Humans)',
     long_description=readme + '\n\n' + history,
     url='https://github.com/siznax/wptools/',
     license='MIT',
