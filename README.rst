@@ -62,8 +62,8 @@ The simplest way to begin is with a title:
 
 .. code-block:: python
 
-    >>> import wptools
-    >>> f = wptools.wptools("Flannery O'Connor")
+    >>> from wptools import wptools as wptools
+    >>> f = wptools.page("Flannery O'Connor")
     Flannery_O'Connor (en)
     {
       lang: en
@@ -75,7 +75,7 @@ The default language is 'en' (English):
 
 .. code-block:: python
 
-    >>> t = wptools.wptools('穐吉敏子')
+    >>> t = wptools.page('穐吉敏子')
     穐吉敏子 (en)
     {
       lang: en
@@ -87,7 +87,7 @@ Leaving off arguments invokes a random_ lookup in English:
 
 .. code-block:: python
 
-    >>> r = wptools.wptools()
+    >>> r = wptools.page()
     en.wikipedia.org (action=random) None
     Sylvia_Rivera (en)
     {
@@ -103,7 +103,7 @@ If you give only *lang*, you get a random_ article in that language:
 
 .. code-block:: python
 
-    >>> zh = wptools.wptools(lang='zh')
+    >>> zh = wptools.page(lang='zh')
     zh.wikipedia.org (action=random) None
     哈莉特·塔布曼 (zh)
     {
@@ -117,7 +117,7 @@ You can also start with a *wikibase* item:
 
 .. code-block:: python
 
-    >>> q = wptools.wptools(wikibase='Q43303')
+    >>> q = wptools.page(wikibase='Q43303')
     Q43303 (en)
     {
       lang: en
@@ -130,7 +130,7 @@ with ``silent=True``.
 
 .. code-block:: python
 
-    >>> r = wptools.wptools(silent=True).get()
+    >>> r = wptools.page(silent=True).get()
     >>>
 
 
@@ -143,7 +143,7 @@ Get a representative image:
 
 .. code-block:: python
 
-    >>> frida = wptools.wptools("Frida Kahlo").get()
+    >>> frida = wptools.page("Frida Kahlo").get()
     >>> frida.Image
 
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
@@ -159,7 +159,7 @@ Get a text (or HTML) extract:
 
 .. code-block:: python
 
-    >>> ella = wptools.wptools('Ella Fitzgerald').get_query()
+    >>> ella = wptools.page('Ella Fitzgerald').get_query()
     >>> print ella.extext
 
     **Ella Jane Fitzgerald** (April 25, 1917 – June 15, 1996) was an
@@ -183,7 +183,7 @@ Get an Infobox_ as a python object:
 
 .. code-block:: python
 
-    >>> fela = wptools.wptools('Fela Kuti').get_parse()
+    >>> fela = wptools.page('Fela Kuti').get_parse()
     >>> fela.infobox['instrument']
 
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
@@ -193,7 +193,7 @@ Get a *wikibase* by title:
 
 .. code-block:: python
 
-    >>> fry = wptools.wptools('Stephen Fry').get_parse()
+    >>> fry = wptools.page('Stephen Fry').get_parse()
     >>> fry.wikibase
 
     u'Q192912'
@@ -203,7 +203,7 @@ Get all the things by *wikibase*:
 
 .. code-block:: python
 
-    >>> jill = wptools.wptools(wikibase='Q6192915').get()
+    >>> jill = wptools.page(wikibase='Q6192915').get()
     >>> jill.show()
 
     Jill_Lepore (en)
@@ -232,7 +232,7 @@ Get info from another *wiki*:
 
 .. code-block:: python
 
-    >>> m = wptools.wptools(wiki='en.wikiquote.org')
+    >>> m = wptools.page(wiki='en.wikiquote.org')
     en.wikiquote.org (action=random) None
 
     Malala_Yousafzai (en)

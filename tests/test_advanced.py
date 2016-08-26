@@ -16,17 +16,17 @@ import wptools
 # Get random item everything
 # EXPECT: no breakage
 #
-wptools.wptools().get()
+wptools.page().get()
 
 # Get everything from random item in another language
 # EXPECT: no breakage
 #
-# wptools.wptools(lang='ja').get()
+# wptools.page(lang='ja').get()
 
 # Get random item from another wiki
 # EXPECT: no breakage
 #
-# wptools.wptools(wiki='en.wikinews.org').get()
+# wptools.page(wiki='en.wikinews.org').get()
 
 
 # FULLY HYDRATE
@@ -36,34 +36,34 @@ wptools.wptools().get()
 # Get specific title
 # EXPECT: should populate everything
 #
-# wptools.wptools('Shakespeare').get()
+# wptools.page('Shakespeare').get()
 
 # Get specific title w/redirect
 # EXPECT: should populate everything
 #
-# wptools.wptools(title='Abe Lincoln').get()
+# wptools.page(title='Abe Lincoln').get()
 
 # Get everything in another language
 # EXPECT: should populate everything
 #
-# wptools.wptools('Napoleon', lang='fr').get()
+# wptools.page('Napoleon', lang='fr').get()
 
 # Get everything wikibase only
 # Q43303 Malcolm_X
 # EXPECT: should populate everything
 #
-# wptools.wptools(wikibase='Q43303').get()
+# wptools.page(wikibase='Q43303').get()
 
 # Get everything multibyte request
 # e.g. 托爾金 (zh) Tolkien
 # EXPECT: should populate everything
 #
-# wptools.wptools('托爾金', lang='zh')
+# wptools.page('托爾金', lang='zh')
 
 # Get everything mixed languages
 # EXPECT: should populate everything
 #
-# wptools.wptools(title='Abe Lincoln', lang='zh').get()
+# wptools.page(title='Abe Lincoln', lang='zh').get()
 
 
 # COMPLEX INFOBOXEN
@@ -73,7 +73,7 @@ wptools.wptools().get()
 # Successfully populate complex infobox dict
 # EXPECT: <dict(42)>
 #
-# wptools.wptools('Abe Lincoln').get()
+# wptools.page('Abe Lincoln').get()
    
 
 # BAD REQUESTS
@@ -84,7 +84,7 @@ wptools.wptools().get()
 # e.g. "jp" Wikinews (unknown language code)
 # EXPECT: error message, self.fatal = True
 #
-# wptools.wptools(wiki='jp.wikinews.org').get()
+# wptools.page(wiki='jp.wikinews.org').get()
 
 
 # Random Points of Interest
@@ -92,8 +92,8 @@ wptools.wptools().get()
 # Need more analysis.
 
 # no image, no infobox
-# wptools.wptools('audio mining').get()
+# wptools.page('audio mining').get()
 
 # has country (P17) and point in time (P585)
-# wptools.wptools(wikibase='Q34664').get_wikidata()
+# wptools.page(wikibase='Q34664').get_wikidata()
 # print h.g_wikidata['query']

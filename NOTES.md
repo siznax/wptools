@@ -54,7 +54,7 @@ the first setion) using ``action=query`` with ``&prop=extracts`` and
 
 Example
 
-https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Aardvark
+https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles=Abraham_Lincoln
 
 We get the extract in HTML and put it in the attribute _extract_, which
 we convert to Markdown text and put that into _extext_.

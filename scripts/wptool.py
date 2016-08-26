@@ -1,7 +1,7 @@
 #!/usr/bin/env python -u
 # -*- coding:utf-8 -*-
 """
-Command line interface to wptools. See `wptool -h`
+Command line interface to wptools.
 """
 
 from __future__ import print_function
@@ -119,8 +119,8 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
             return f.query('query', title)
         return f.query('random', None)
 
-    item = wptools.wptools(title=title, lang=lang, silent=silent,
-                           verbose=verbose, wiki=wiki)
+    item = wptools.page(title=title, lang=lang, silent=silent,
+                        verbose=verbose, wiki=wiki)
     item.get()
 
     if not hasattr(item, 'extract') or not item.extract:

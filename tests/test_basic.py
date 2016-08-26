@@ -17,8 +17,11 @@ class WPToolsTestCase(unittest.TestCase):
 
     def test_entry_points(self):
 
+        wptools.core
         wptools.fetch
         wptools.utils
+
+        from scripts.wptool import main
 
 
 class CoreTestCase(unittest.TestCase):

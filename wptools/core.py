@@ -18,6 +18,9 @@ from . import utils
 
 
 class WPTools:
+    """
+    A user-created :class:WPTools object.
+    """
 
     _skipmap = {
         'get_parse': {'parsetree', 'wikibase', 'wikitext'},
