@@ -5,6 +5,3 @@
 /dist/
 *.egg-info
 
-build.sh
-build.py
-scratch.py
