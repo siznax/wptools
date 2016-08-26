@@ -113,7 +113,7 @@ If you give only *lang*, you get a random_ article in that language:
     }
 
 
-You can also start with a *wikibase*:
+You can also start with a *wikibase* item:
 
 .. code-block:: python
 
@@ -270,7 +270,7 @@ MediaWiki:API `action=parse`_ request for:
 
 - infobox: <dict> Infobox_ data as python dictionary
 - links: <list> interwiki links (iwlinks_)
-- pageid: <int> Wikipedia database ID
+- pageid: <int> MediaWiki database ID
 - parsetree: <unicode> `XML parse tree`_
 - wikibase: <unicode> Wikidata `entity ID`_ or wikidata URL
 - wikitext: <unicode> raw wikitext URL
@@ -283,12 +283,12 @@ MediaWiki:API `action=parse`_ request for:
 
 **get_query** (self)
 
-MediaWiki:API `action=query`_
+MediaWiki:API `action=query`_ request for:
 
 - extext: <unicode> plain text (Markdown_) extract
 - extract: <unicode> HTML extract via `Extension:TextExtract`_
 - images: <dict> {image, pageimages, thumbnail}
-- pageid: <int> Wikipedia database ID
+- pageid: <int> MediaWiki database ID
 - pageimage: <unicode> pageimage URL via `Extension:PageImages`_
 - random: <unicode> a random article title with every request!
 - thumbnail: <unicode> thumbnail URL via `Extension:PageImages`_
@@ -303,15 +303,15 @@ MediaWiki:API `action=query`_
 
 **get_random** (self)
 
-MediaWiki:API `action=query`_
+MediaWiki:API `action=query`_ request for:
 
-- pageid: <int> Wikipedia database ID
+- pageid: <int> MediaWiki database ID
 - title: <unicode> article title
 
 
 **get_wikidata** (self)
 
-Wikidata:API `action=wbgetentities`_
+Wikidata:API `action=wbgetentities`_ request for:
 
 - Description: <unicode> Wikidata description
 - Image: <unicode> Wikidata Property:P18_ image URL
