@@ -24,6 +24,7 @@ especially contributions_ are welcome!
 .. _contributions: https://github.com/siznax/wptools/issues
 .. _goal: http://docs.python-requests.org/en/master/user/intro/
 
+
 - Install_
 - Usage_
 - Examples_
@@ -50,8 +51,12 @@ Usage
 
 An instance can be initialized by:
 
-- ``title``: <unicode> a MediaWiki article title
+**wptools.page** (self)
+
+- ``None``: <NoneType>
 - ``lang``: <str> MediaWiki `language code`_ (default='en')
+- ``title``: <unicode> a MediaWiki article title
+- ``wiki``: <str> any MediaWiki site
 - ``wikibase``: <str> Wikidata `entity ID`_
 
 .. _`language code`: https://meta.wikimedia.org/wiki/Table_of_Wikimedia_projects
@@ -62,7 +67,7 @@ The simplest way to begin is with a title:
 
 .. code-block:: python
 
-    >>> from wptools import wptools as wptools
+    >>> import wptools
     >>> f = wptools.page("Flannery O'Connor")
     Flannery_O'Connor (en)
     {
@@ -125,13 +130,34 @@ You can also start with a *wikibase* item:
     }
 
 
-Instance attributes are echoed automatically. You can turn that off
-with ``silent=True``.
+Or, another *wiki* site:
 
 .. code-block:: python
 
-    >>> r = wptools.page(silent=True).get()
-    >>>
+    >>> m = wptools.page(wiki='en.wikiquote.org')
+    en.wikiquote.org (action=random) None
+
+    Malala_Yousafzai (en)
+    {
+      lang: en
+      title: Malala_Yousafzai
+    }
+
+
+Instance attributes echo automatically. You can turn that off with
+``silent=True``:
+
+.. code-block:: python
+
+    >>> r = wptools.page(silent=True)
+
+
+Request details echo to *stderr* with ``verbose=True``:
+
+.. code-block:: python
+
+    >>> r = wptools.page(verbose=True)
+
 
 
 .. _Examples:
@@ -225,20 +251,6 @@ Get all the things by *wikibase*:
       urlraw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
       wikibase: Q6192915
       wikitext: <str(13011)> {{Infobox scientist| name = Jill Lepore| na...
-    }
-
-
-Get info from another *wiki*:
-
-.. code-block:: python
-
-    >>> m = wptools.page(wiki='en.wikiquote.org')
-    en.wikiquote.org (action=random) None
-
-    Malala_Yousafzai (en)
-    {
-      lang: en
-      title: Malala_Yousafzai
     }
 
 
@@ -340,7 +352,7 @@ Detailed request info can be found in these instance attributes:
 
 The ``wptools`` user-agent_ will look like this:
 
-*wptools/0.0.5 (https://github.com/siznax/wptools) PycURL/7.43.0 libcurl/7.43.0 SecureTransport zlib/1.2.5*
+wptools/*version* (https://github.com/siznax/wptools) *pycurl libs*
 
 .. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
 
@@ -382,10 +394,9 @@ For example:
 .. code-block:: bash
 
     $ wptool -t "Jeanne d'Arc" -l fr -s
-
     JEANNE_D'ARC—_sainte et héroïne de l'histoire de France_
 
-    ![Jeanne d'Arc](https://upload.wikimedia.org/wikipedia/commons/3/39/Joan_of_arc_miniature_graded.jpg)
+    ![Jeanne d'Arc](https://upload.wikimedia.org/wikipedia/commons/3/39/...)
 
     **Jeanne d'Arc**, née vers 1412 à Domrémy village du duché de Bar dont
     une partie relevait du royaume de France pour le temporel et de
@@ -402,4 +413,7 @@ For example:
     https://www.wikidata.org/wiki/Q7226
 
 
-@siznax
+Please enjoy!
+
+
+@siznax 👹

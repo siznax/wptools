@@ -85,12 +85,12 @@ examples.
 3. Sylvia Rivera - American bisexual transgender activist and trans woman
 4. 哈莉特·塔布曼 (zh) Harriet Tubman - African-American abolitionist and humanitarian
 5. Q43303 Malcolm X - American human rights activist
-6. Frida Kahlo - Mexican painter
-7. Ella Fitzgerald - American jazz singer
-8. Fela Kuti - Nigerian musician and activist
-9. Stephen Fry - English comedian, actor, writer, presenter, and activist
-10. Jill Lepore - American historian
-11. Malala Yousafzai - Pakistani children's education activist
+6. Malala Yousafzai - Pakistani children's education activist
+7. Frida Kahlo - Mexican painter
+8. Ella Fitzgerald - American jazz singer
+9. Fela Kuti - Nigerian musician and activist
+10. Stephen Fry - English comedian, actor, writer, presenter, and activist
+11. Jill Lepore - American historian
 12. Jeann d'Arc - folk heroine and Roman Catholic saint
 
 
