@@ -49,6 +49,11 @@ Install
 Usage
 -----
 
+.. code-block:: python
+
+    >>> import wptools
+
+
 An instance can be initialized by:
 
 **wptools.page** (self)
@@ -67,7 +72,6 @@ The simplest way to begin is with a title:
 
 .. code-block:: python
 
-    >>> import wptools
     >>> f = wptools.page("Flannery O'Connor")
     Flannery_O'Connor (en)
     {
