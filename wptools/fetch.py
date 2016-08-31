@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import pycurl
 import sys
+import urllib
 
 from . import __title__, __contact__, __version__
 from io import BytesIO
@@ -37,7 +38,8 @@ class WPToolsFetch:
             "&inprop=displaytitle|url|watchers"
             "&list=random"
             "&pithumbsize=240"
-            "&prop=extracts|images|info|pageimages"
+            "&prop=extracts|images|info|pageimages|pageprops"
+            "&ppprop=wikibase_item"
             "&rnlimit=1"
             "&rnnamespace=0"
             "&titles=${thing}"
@@ -49,6 +51,8 @@ class WPToolsFetch:
             "&list=random"
             "&rnlimit=1"
             "&rnnamespace=0")),
+        "rest": Template((
+            "https://${WIKI}/api/rest_v1${entrypoint}${title}")),
         "wikidata": Template((
             "https://${WIKI}/w/api.php?action=wbgetentities"
             "&format=json"
@@ -149,21 +153,30 @@ class WPToolsFetch:
         obj = WPToolsFetch()
         return obj.curl(obj.query(action, title))
 
-    def query(self, action, thing, pageid=False):
+    def query(self, action, thing, pageid=False, entrypoint=None):
         """
         returns API query string
         """
         self.thing = thing
         self.action = action
-        if action == 'wikidata':
-            qry = self.ACTION[action].substitute(WIKI="www.wikidata.org",
-                                                 lang=self.lang,
-                                                 thing=self.thing)
+        if action.startswith('/'):
+            qry = self.ACTION['rest'].substitute(
+                WIKI=self.wiki,
+                entrypoint=action,
+                title=urllib.quote(self.thing.encode('utf-8')))
+        elif action == 'wikidata':
+            qry = self.ACTION[action].substitute(
+                WIKI="www.wikidata.org",
+                lang=self.lang,
+                thing=self.thing)
         else:
-            qry = self.ACTION[action].substitute(WIKI=self.wiki,
-                                                 thing=self.thing)
+            qry = self.ACTION[action].substitute(
+                WIKI=self.wiki,
+                thing=self.thing)
+
         if action == 'query' and pageid:
             qry = qry.replace('&titles=', '&pageids=')
+
         return qry
 
     def user_agent(self):

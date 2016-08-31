@@ -9,9 +9,10 @@ from __future__ import print_function
 
 import html2text
 import json
-import lxml.etree
+import lxml
 import re
 import sys
+import urlparse
 
 from . import fetch
 from . import utils
@@ -54,6 +55,7 @@ class WPTools:
             self.get_random()
         else:
             self.show()
+        self.verbose = verbose
 
     def __get_links(self, iwlinks):
         """
@@ -89,9 +91,107 @@ class WPTools:
             if "box" in item.find('title').text:
                 return utils.template_to_dict(item)
 
+    def __get_lead(self, data):
+        """
+        returns lead HTML with heading and image and refs removed
+        """
+        lead = []
+        lead.append(self.__get_lead_heading())
+        lead.append(self.__get_lead_img())
+        lead.append(self.__get_lead_rest(data))
+        lead.append(self.__get_lead_metadata())
+        return "\n".join([x for x in lead if x])
+
+    def __get_lead_geo(self, data):
+        """
+        returns span.geo text from RESTBase sections
+        """
+        for section in data['sections']:
+            for item in section.get('items'):
+                if item.get('text') is None:
+                    continue
+                text = item['text']
+                if 'geo' in utils.span_classes(text):
+                    doc = lxml.html.fromstring(text)
+                    for geo in doc.xpath('//span[@class="geo"]'):
+                        return geo.text
+
+    def __get_lead_heading(self):
+        """
+        returns lead section HTML heading
+        """
+        if not hasattr(self, 'url') or not hasattr(self, 'title'):
+            return
+        heading = "<a href=\"%s\">%s</a>" % (self.url, self.title)
+        if hasattr(self, 'Description') and self.Description:
+            heading += "&mdash;<i>%s</i>" % self.Description
+        return "<p heading>%s</p>" % heading
+
+    def __get_lead_img(self):
+        """
+        returns <img> HTML from image attributes
+        """
+        alt = self.title
+        if hasattr(self, 'Label') and self.Label:
+            alt = self.Label
+
+        src = None
+        cls = None
+        if hasattr(self, 'Image') and self.Image:
+            src = self.Image
+            cls = 'Image'
+        elif hasattr(self, 'pageimage') and self.thumbnail:
+            src = self.pageimage
+            cls = 'pageimage'
+        elif hasattr(self, 'thumbnail') and self.thumbnail:
+            src = self.thumbnail
+            cls = 'thumbnail'
+        if src:
+            img = ("<img %s src=\"%s\" alt=\"%s\" title=\"%s\" "
+                   % (cls, src, alt, alt))
+            img += "align=right width=240>"
+            return img
+
+    def __get_lead_metadata(self):
+        """
+        returns lead HTML metadata from attributes
+        """
+        meta = []
+        if hasattr(self, 'lastmodified'):
+            meta.append("Last modified: %s" % self.lastmodified)
+        if hasattr(self, 'geo'):
+            meta.append("Coordinates: %s" % self.geo)
+        return "<p metadata>%s</p>" % "\n".join([x for x in meta if x])
+
+    def __get_lead_rest(self, data):
+        """
+        returns lead section HTML from RESTBase:/page/mobile-text/
+        """
+        pars = []
+        for section in data['sections']:
+            for item in section['items']:
+                _type = item.get('type')
+                if _type == 'hatnote' or _type == 'image':
+                    continue
+                if 'text' in item:
+                    ids = utils.span_ids(item['text'])
+                    if ids and ids == ['coordinates']:
+                        continue
+                    pars.append(item['text'])
+                else:
+                    pars.append(", ".join(item.keys()))
+            break
+
+        if pars:
+            pars = "\n".join(pars)
+            self.g_rest['html'] = pars
+
+            snip = utils.snip_html(pars, verbose=1 if self.verbose else 0)
+            return "<p snipped>%s</p>" % snip
+
     def _set_parse_data(self):
         """
-        set attributes derived from action=parse
+        set attributes derived from MediaWiki (action=parse)
         """
         try:
             data = json.loads(self.g_parse['response'])
@@ -114,7 +214,7 @@ class WPTools:
 
     def _set_query_data(self):
         """
-        set attributes derived from action=query
+        set attributes derived from MediaWiki (action=query)
         """
         try:
             data = json.loads(self.g_query['response'])
@@ -125,36 +225,94 @@ class WPTools:
             return
         qdata = data.get('query')
         page = qdata.get('pages')[0]
+
         self.extract = page.get('extract')
         try:
             self.extext = html2text.html2text(self.extract)
         except:
             pass
+
         self.images = self.__get_images(page)
         self.pageid = page.get('pageid')
         if self.images and 'pageimage' in self.images:
             pageimage = self.images.get('pageimage').get('source')
             self.pageimage = utils.media_url(pageimage)
+
+        props = page.get('pageprops')
+        if props:
+            wikibase = props.get('wikibase_item')
+            if wikibase:
+                self.wikibase = wikibase
+
         self.random = qdata.get('random')[0]["title"]
         self.title = page.get('title').replace(' ', '_')
         self.url = page.get('fullurl')
         self.urlraw = self._wiki_url(raw=True)
 
+    def _set_rest_data(self):
+        """
+        set attributes derived from RESTBase
+        """
+        try:
+            data = json.loads(self.g_rest['response'])
+            url = urlparse.urlparse(self.g_rest['query'])
+        except:
+            self.fatal = True
+            print("Could not load JSON response for query: %s"
+                  % self.g_rest['query'], file=sys.stderr)
+            return
+
+        self.Description = data.get('description')
+
+        image = data.get('image')
+        if image:
+            self.images['pageimage'] = data.get('image')
+            self.pageimage = utils.media_url(image.get('file'))
+
+        thumb = data.get('thumb')
+        if thumb:
+            self.images['thumbnail'] = data.get('thumb')
+            self.thumbnail = "%s:%s" % (url.scheme, thumb.get('url'))
+
+        self.title = data.get('displaytitle')
+        if 'normalizedtitle' in data:
+            self.title = data['normalizedtitle']
+
+        self.lastmodified = data.get('lastmodified')
+        self.pageid = data.get('id')
+
+        self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
+
+        if 'sections' in data:
+            geo = self.__get_lead_geo(data)
+            if geo:
+                self.geo = geo
+
+        if 'sections' in data:
+            lead = self.__get_lead(data)
+            if lead:
+                self.lead = lead
+
     def _set_wikibase_claims(self, claims):
+        """
+        set selected Wikidata claims attributes
+        """
         if not claims:
             return
-        # P17 = claims.get('P17')  # country
-        # P585 = claims.get('P569')  # point in time
+
+        # P17  country
         P18 = claims.get('P18')  # image
         if P18:
             image = P18[0].get('mainsnak').get('datavalue').get('value')
             self.Image = utils.media_url(image)
             if self.images:
                 self.images['Image'] = image
+        # P585 point in time
+        # P625 coordinate location
 
     def _set_wikibase_data(self):
         """
-        set attributes derived from action=wbentities
+        set attributes derived from Wikidata (action=wbentities)
         """
         try:
             data = json.loads(self.g_wikidata['response'])
@@ -298,6 +456,21 @@ class WPTools:
             return
         self.pageid = rdata.get('id')
         self.title = rdata.get('title').replace(' ', '_')
+        if show:
+            self.show()
+        return self
+
+    def get_rest(self, show=True):
+        """
+        MediaWiki:RESTBase (/page/mobile-text/)
+        """
+        query = self.__fetch.query('/page/mobile-text/', self.title)
+        rest = {}
+        rest['query'] = query
+        rest['response'] = self.__fetch.curl(query)
+        rest['info'] = self.__fetch.info
+        self.g_rest = rest
+        self._set_rest_data()
         if show:
             self.show()
         return self

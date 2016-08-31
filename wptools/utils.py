@@ -17,42 +17,6 @@ import urllib
 from collections import defaultdict
 
 
-def collapse(text):
-    """
-    replace newlines with pilcrows
-    """
-    # pilcrow '\xc2\xb6'
-    text = text.strip()
-    text = re.sub(r"\n{1,}", " \xc2\xb6 ", text)
-    if text.strip()[-2:] == '\xc2\xb6':
-        text = text.strip()[:-2]
-    return text
-
-
-def console(msg):  # development
-    return
-    print(msg[:72].replace("\n", ""), file=sys.stderr)
-
-
-def keep_tags(frag):
-    """
-    keep only select tags in HTML fragment
-    """
-
-    # TODO: replace with CommonMark
-
-    from lxml.html.clean import Cleaner
-    allow = ['b', 'i', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
-    cleaner = Cleaner(allow_tags=allow, remove_unknown_tags=False)
-    text = cleaner.clean_html(frag)
-    text = text.replace("<div>", "").replace("</div>", "")
-    text = re.sub(r"</?b>", "**", text)
-    text = re.sub(r"</?i>", "_", text)
-    text = re.sub(r"<h\d>", "\n## ", text)
-    text = re.sub(r"</h\d>", "\n", text)
-    return text
-
-
 def media_url(fname, namespace='commons',
               wiki='https://upload.wikimedia.org/wikipedia'):
     """
@@ -69,48 +33,6 @@ def media_url(fname, namespace='commons',
     return "/".join([wiki, namespace, path])
 
 
-def infobox_images(data):  # EXPERIMENTAL
-    """returns images from [parsetree] API query"""
-
-    ibox = data
-    types = ["image", "image_map", "logo"]
-    data = {"fname": None, "url": None, "key": None}
-
-    # BREAKS on Benjamin Franklin
-    # consider wikitextinstead of parsetree... ?
-
-    for item in types:
-        if item in ibox and ibox[item]:
-            data["key"] = item
-            data["fname"] = ibox[item]
-            data["source"] = media_url(ibox[item])
-            break
-    return data
-
-
-def inner_html(elem, xpath):
-    """
-    returns full inner HTML of xpath selected element
-    """
-    root = lxml.html.fromstring(elem)
-    i = root.xpath(xpath)[0]
-    try:
-        return (i.text + ''.join(map(lxml.html.tostring, i))).strip()
-    except:
-        return (''.join(map(lxml.html.tostring, i))).strip()
-
-
-def plain_text_cleanup(blob):
-    """remove known extraneous items"""
-    blob = re.sub(r'\s\( listen\)', "", blob, flags=re.UNICODE)
-    tmp = []
-    for line in blob.split("\n"):
-        if not line.startswith("Cite error"):
-            tmp.append(line)
-    blob = "\n".join(tmp)
-    return blob
-
-
 def pretty(data):
     """
     return pretty JSON
@@ -121,122 +43,102 @@ def pretty(data):
                       separators=(',', ': '))
 
 
-def prune(frag):
+def snip_html(text, verbose=0):
     """
-    return HTML fragment with MediaWiki cruft removed
-    """
-    pruned = prune_html_inner(frag)
-    pruned = prune_html_spans(pruned)
-    return pruned
+    removed unwanted elements from HTML
 
+    e.g. class=metadata, class=noexcerpt, class=reference
 
-def prune_html_inner(frag):
-    """
-    returns pruned HTML fragments inside paragraphs
-    """
-    out = []
-    for par in lxml.html.fromstring(frag).xpath("//p"):
-        console("-" * 72)
-        console(lxml.html.tostring(par))
-        inner = inner_html(lxml.html.tostring(par), "//p")
-        console(inner)
-        out.append(prune_html(inner))
-    if out:
-        return "\n".join(out)
-    return frag
-
-
-def prune_html(frag):
-    """
-    prune select elements from HTML fragment
+    verbose
+        0 = silent
+        1 = show replacements (stderr)
+        2 = inspect descendants (stderr)
     """
 
-    def exclude(item, elem):
-        """returns true if element should be excluded"""
-        _class = item.get("class")
-        if item.tag == "sup":
-            if _class and ("reference" in _class or "noprint" in _class):
-                return True
-            if "note" in elem.lower():
-                return True
-        if 'span id="coordinates"' in elem:
-            return True
-        if _class and "cite-error" in _class:
-            return True
-        if _class and "noexcerpt" in _class:
-            return True
-        if _class and "hatnote" in _class:
-            return True
-        return False
+    if type(text) is str:
+        text = text.decode('utf-8')
 
-    norefs = []
-    console("~" * 72)
-    console("FRAG: %s" % frag)
-    for item in lxml.html.fragments_fromstring(frag):
-        if type(item) is str or type(item) is unicode:
-            elem = item
-            console("BARE: %s" % elem)
-        else:
-            elem = lxml.etree.tostring(item)
-            console("ELEM: %s" % elem)
-            if exclude(item, elem):
-                a = elem
-                b = elem.split('>')[-1]
-                console("___A: %s" % a)
-                console("___B: %s" % b)
-                elem = b
-        norefs.append(elem)
-    return "".join(norefs)
+    def _inspect(elem, sub=False):
+        if verbose > 1:
+            print("\n", file=sys.stderr)
+            if sub:
+                print("+ %s" % lxml.html.tostring(elem), file=sys.stderr)
+            else:
+                print("%s" % lxml.html.tostring(elem), file=sys.stderr)
+            print("  class: %s" % elem.get('class'), file=sys.stderr)
+            print("  href: %s" % elem.get('href'), file=sys.stderr)
+            print("  id: %s" % elem.get('id'), file=sys.stderr)
+            print("  tag: %s" % elem.tag, file=sys.stderr)
+            print("  tail: %s" % elem.tail, file=sys.stderr)
+            print("  text: %s" % elem.text, file=sys.stderr)
+
+    def _note(old, new):
+        old = lxml.html.tostring(old).strip()
+        new = lxml.html.tostring(new).strip()
+        if verbose > 0:
+            print("\n%s REPLACING: %s WITH: %s"
+                  % (snip_html.__name__, old, new),
+                  file=sys.stderr)
+
+    def _span(note, text):
+        span = lxml.html.fromstring("<span %s>" % note)
+        span.tail = text
+        return span
+
+    def _exclude(_class):
+        return ('metadata' in _class
+                or 'noexcerpt' in _class
+                or 'noprint' in _class
+                or 'reference' in _class)
+
+    keep = lxml.html.Element("span")
+    for elem in lxml.html.fromstring(text):
+        _inspect(elem)
+
+        # ignore selected elements entirely, keeping tail
+        elem_class = elem.get('class')
+        if elem_class:
+            if _exclude(elem_class):
+                span = _span('ignored', elem.tail or '')
+                keep.append(span)
+                _note(elem, span)
+                continue
+
+        # remove selected descendants, keeping tail
+        for desc in elem.iterdescendants():
+            _inspect(desc, True)
+            desc_class = desc.get('class')
+            if desc_class:
+                if _exclude(desc_class):
+                    elem.remove(desc)
+                    span = _span('removed', desc.tail or '')
+                    _note(desc, span)
+                    elem.append(span)
+                    break
+
+        keep.append(elem)
+
+    return text.split('<')[0] + lxml.html.tostring(keep)
 
 
-def prune_html_spans(frag):
+def span_classes(frag):
     """
-    prune select spans from HTML fragment
+    returns list of <span> classes found in <frag>
     """
-    root = lxml.html.fromstring(frag)
-    for item in root.xpath("//span"):
-        if item.get("class") and "noexcerpt" in item.get("class"):
-            console("." * 72)
-            console("SPAN: %s" % lxml.etree.tostring(item))
-            item.getparent().remove(item)
-    return lxml.etree.tostring(root)
+    cls = []
+    for item in lxml.html.fromstring(frag).xpath('//span'):
+        cls.append(item.get("class"))
+    return [x for x in cls if x]
 
 
-def qry_text(data, lead=False, compact=False):
-    """returns plain text from [html] API query"""
-    doc = data
-    doc = keep_tags(doc)
-    doc = strip_refs(doc)
-    doc = single_space(doc)
-    doc = plain_text_cleanup(doc)
-    if compact:
-        doc = collapse(doc)
-    return doc
-
-
-def single_space(blob):
+def span_ids(frag):
     """
-    replace 3 or more newlines with 2
+    returns list of <span> id attributes found in <frag>
     """
-    return re.sub(r"\n{3,}", "\n\n", blob)
-
-
-def strip_refs(blob):
-    """
-    remove [1][2][3]:456 references from text blob
-    """
-    out = re.sub(r"\[\d+\](:\d+)?", "", blob)
-    out = out.replace("[_citation needed_]", "")
-    out = out.replace("[_clarification needed_]", "")
-    return out
-
-
-def strip_tags(frag):
-    """
-    returns HTML fragment with tags removed
-    """
-    html = lxml.html.fromstring(frag)
-    return lxml.html.tostring(html, method="text", encoding="utf-8")
+    ids = []
+    for item in lxml.html.fromstring(frag).xpath('//span'):
+        ids.append(item.get("id"))
+    return [x for x in ids if x]
 
 
 def template_to_dict(tree):
