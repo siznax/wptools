@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import argparse
 import random
 import unittest
 import wptools
@@ -44,17 +45,7 @@ titles = [
 ]
 
 
-class WPToolTest(unittest.TestCase):
-    """
-    WPTOOL TESTS
-    """
-
-    def test_wptool(self):
-        from scripts.wptool import main as wptool
-        wptool()
-
-
-class WPToolsBadRequestTest(unittest.TestCase):
+class WPToolsBadTest(unittest.TestCase):
     """
     BAD API REQUEST TESTS
     """
@@ -80,33 +71,9 @@ class WPToolsBadRequestTest(unittest.TestCase):
         assert g.fatal is not None
 
 
-class WPToolsRandomTest(unittest.TestCase):
+class WPToolsPickTest(unittest.TestCase):
     """
-    RANDOM TESTS
-    """
-
-    def test_random(self):
-        """
-        Get random everything
-        """
-        wptools.page().get()
-
-    def test_random_lang(self):
-        """
-        Get everything from random item in another language
-        """
-        wptools.page(lang=random.choice(langs)).get()
-
-    def test_random_wiki(self):
-        """
-        Get random item from another wiki
-        """
-        wptools.page(wiki='en.wikinews.org').get()
-
-
-class WPToolsSelectedTest(unittest.TestCase):
-    """
-    SELECTED TESTS
+    SELECTED (cherry-picked) TESTS
     """
 
     def test_multibyte(self):
@@ -134,6 +101,37 @@ class WPToolsSelectedTest(unittest.TestCase):
         g = wptools.page(title='Abraham Lincoln', lang='zh').get()
         assert g.Description is not None
 
+    def test_complex_infobox(self):
+        """
+        Successfully populate complex infobox dict
+        """
+        g = wptools.page('Abe Lincoln').get()
+        self.assertGreaterEqual(len(g.infobox), 42)
+
+
+class WPToolsRandomTest(unittest.TestCase):
+    """
+    RANDOM TESTS
+    """
+
+    def test_random(self):
+        """
+        Get random everything
+        """
+        wptools.page().get()
+
+    def test_random_lang(self):
+        """
+        Get everything from random item in another language
+        """
+        wptools.page(lang=random.choice(langs)).get()
+
+    def test_random_wiki(self):
+        """
+        Get random item from another wiki
+        """
+        wptools.page(wiki='en.wikinews.org').get()
+
 
 class WPToolsRestBaseTest(unittest.TestCase):
     """
@@ -152,15 +150,31 @@ class WPToolsRestBaseTest(unittest.TestCase):
             print r.lead.encode('utf-8')
 
 
-class WPToolsInfoboxTest(unittest.TestCase):
+class WPToolsToolTest(unittest.TestCase):
+    """
+    WPTOOL TESTS
+    """
 
-    def test_complex_infobox(self):
-        """
-        Successfully populate complex infobox dict
-        """
-        g = wptools.page('Abe Lincoln').get()
-        self.assertGreaterEqual(len(g.infobox), 42)
+    def test_wptool(self):
+        from scripts.wptool import main
+        main()
 
 
 if __name__ == '__main__':
-    unittest.main()
+    # unittest.main()
+
+    from unittest import TestLoader
+    suites = {
+        'bad':  TestLoader().loadTestsFromTestCase(WPToolsBadTest),
+        'pick': TestLoader().loadTestsFromTestCase(WPToolsPickTest),
+        'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
+        'rest': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
+        'tool': TestLoader().loadTestsFromTestCase(WPToolsToolTest),
+    }
+    suites['all'] = unittest.TestSuite(suites.values())
+
+    argp = argparse.ArgumentParser()
+    argp.add_argument('suite', choices=suites.keys())
+    args = argp.parse_args()
+
+    unittest.TextTestRunner().run(suites[args.suite])
