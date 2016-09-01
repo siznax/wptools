@@ -1,99 +1,166 @@
+#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+import random
+import unittest
 import wptools
 
+# langs that exposed an issue
+langs = ['es', 'fr', 'hi', 'ja', 'zh', 'ru']
 
-# WPTOOLS ADVANCED TESTS
-# ======================
-#
-# See also ./scripts/wptool.py (no arguments does random everything)
-
-
-# STRESS TESTS
-# ------------
-# These are good in development, making actual HTTP requests.
-
-# Get random item everything
-# EXPECT: no breakage
-#
-wptools.page().get()
-
-# Get everything from random item in another language
-# EXPECT: no breakage
-#
-# wptools.page(lang='ja').get()
-
-# Get random item from another wiki
-# EXPECT: no breakage
-#
-# wptools.page(wiki='en.wikinews.org').get()
-
-
-# FULLY HYDRATE
-# -------------
-# These can be done with simulated HTTP responses. 
-
-# Get specific title
-# EXPECT: should populate everything
-#
-# wptools.page('Shakespeare').get()
-
-# Get specific title w/redirect
-# EXPECT: should populate everything
-#
-# wptools.page(title='Abe Lincoln').get()
-
-# Get everything in another language
-# EXPECT: should populate everything
-#
-# wptools.page('Napoleon', lang='fr').get()
-
-# Get everything wikibase only
-# Q43303 Malcolm_X
-# EXPECT: should populate everything
-#
-# wptools.page(wikibase='Q43303').get()
-
-# Get everything multibyte request
-# e.g. 托爾金 (zh) Tolkien
-# EXPECT: should populate everything
-#
-# wptools.page('托爾金', lang='zh')
-
-# Get everything mixed languages
-# EXPECT: should populate everything
-#
-# wptools.page(title='Abe Lincoln', lang='zh').get()
+# titles that exposed an issue
+titles = [
+    "Flannery O'Connor",
+    "Jeanne d'Arc",
+    'Abe Lincoln',
+    'Benjamin Franklin',
+    'Borges',
+    'Bruce Lee',
+    'Buddha',
+    'Cervantes',
+    'Denis Diderot',
+    'Ella Fitzgerald',
+    'Encyclopédie',
+    'Fela Kuti',
+    'François-Marie Arouet'
+    'Frida Kahlo',
+    'Harriet Tubman',
+    'Malala Yousafzai',
+    'Malcolm X',
+    'Monkey King',
+    'Napoleon',
+    'Paris',
+    'Quaternion',
+    'Shakespeare',
+    'Stephen Fry',
+    'Анна Ахматова',
+    'Анто́н Па́влович Че́хов',
+    'Фёдор Миха́йлович Достое́вский',
+    '武俠',
+    '浮世絵',
+    '漢語',
+    '相撲',
+    '穐吉敏子',
+]
 
 
-# COMPLEX INFOBOXEN
-# -----------------
-# Just need to supply a tmp/parsetree.xml
+class WPToolTest(unittest.TestCase):
+    """
+    WPTOOL TESTS
+    """
 
-# Successfully populate complex infobox dict
-# EXPECT: <dict(42)>
-#
-# wptools.page('Abe Lincoln').get()
-   
-
-# BAD REQUESTS
-# ------------
-# More failed requests needed here.
-
-# Mediawiki site function not supported
-# e.g. "jp" Wikinews (unknown language code)
-# EXPECT: error message, self.fatal = True
-#
-# wptools.page(wiki='jp.wikinews.org').get()
+    def test_wptool(self):
+        from scripts.wptool import main as wptool
+        wptool()
 
 
-# Random Points of Interest
-# -------------------------
-# Need more analysis.
+class WPToolsBadRequestTest(unittest.TestCase):
+    """
+    BAD API REQUEST TESTS
+    """
 
-# no image, no infobox
-# wptools.page('audio mining').get()
+    def test_redirect(self):
+        """
+        Get redirected
+        """
+        wptools.page(title='Abe Lincoln').get()
 
-# has country (P17) and point in time (P585)
-# wptools.page(wikibase='Q34664').get_wikidata()
-# print h.g_wikidata['query']
+    def test_missing(self):
+        """
+        Get missing title
+        """
+        wptools.page(title='ƀļēřğ').get()
+
+    def test_uknown_lang(self):
+        """
+        Mediawiki site function not supported
+        """
+        # "jp" Wikinews (unknown language code)
+        g = wptools.page(wiki='jp.wikinews.org').get()
+        assert g.fatal is not None
+
+
+class WPToolsRandomTest(unittest.TestCase):
+    """
+    RANDOM TESTS
+    """
+
+    def test_random(self):
+        """
+        Get random everything
+        """
+        wptools.page().get()
+
+    def test_random_lang(self):
+        """
+        Get everything from random item in another language
+        """
+        wptools.page(lang=random.choice(langs)).get()
+
+    def test_random_wiki(self):
+        """
+        Get random item from another wiki
+        """
+        wptools.page(wiki='en.wikinews.org').get()
+
+
+class WPToolsSelectedTest(unittest.TestCase):
+    """
+    SELECTED TESTS
+    """
+
+    def test_multibyte(self):
+        """
+        Get everything multibyte request
+        """
+        wptools.page('托爾金', lang='zh')  # 托爾金 (zh) Tolkien
+
+    def test_wikibase(self):
+        """
+        Get everything wikibase only
+        """
+        wptools.page(wikibase='Q43303').get()  # Q43303=Malcolm_X
+
+    def test_selected(self):
+        """
+        Get selected title
+        """
+        wptools.page(title=random.choice(titles)).get()
+
+    def test_mixed_lang(self):
+        """
+        Get everything mixed languages
+        """
+        g = wptools.page(title='Abraham Lincoln', lang='zh').get()
+        assert g.Description is not None
+
+
+class WPToolsRestBaseTest(unittest.TestCase):
+    """
+    RESTBase TESTS
+    """
+
+    def test_get_rest(self):
+        r = wptools.page()
+        r.get_parse()
+        r.get_query()
+        r.get_wikidata()
+        r.get_rest()
+        if hasattr(r, 'g_rest') and 'html' in r.g_rest:
+            print r.g_rest['html'].encode('utf-8')
+            print "\n<hr>\n"
+            print r.lead.encode('utf-8')
+
+
+class WPToolsInfoboxTest(unittest.TestCase):
+
+    def test_complex_infobox(self):
+        """
+        Successfully populate complex infobox dict
+        """
+        g = wptools.page('Abe Lincoln').get()
+        self.assertGreaterEqual(len(g.infobox), 42)
+
+
+if __name__ == '__main__':
+    unittest.main()

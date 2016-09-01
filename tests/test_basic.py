@@ -5,11 +5,7 @@
 Basic tests for WPTools.
 """
 
-import os
-import sys
 import unittest
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import wptools
 
 
@@ -24,22 +20,34 @@ class WPToolsTestCase(unittest.TestCase):
         from scripts.wptool import main
 
 
-class CoreTestCase(unittest.TestCase):
+class WPToolsCoreTestCase(unittest.TestCase):
 
     def test(self):
         pass
 
 
-class FetchTestCase(unittest.TestCase):
+class WPtoolsFetchTestCase(unittest.TestCase):
 
     def test(self):
         pass
 
 
-class UtilsTestCase(unittest.TestCase):
+class WPToolsUtilsTestCase(unittest.TestCase):
 
-    def test(self):
-        pass
+    def test_snip_html_metadata(self):
+        """
+        Ignore elem.metadata
+        """
+        from wptools.utils import snip_html
+        txt = "<small class=\"metadata\">a</small>b"
+        ans = '<span><span ignored></span>b</span>'
+        self.assertEqual(snip_html(txt), ans)
+
+    def test_snip_html_reference(self):
+        from wptools.utils import snip_html
+        txt = "a<sup class=\"reference\"><a href>[b]</a></sup>c"
+        ans = "a<span><span ignored></span>c</span>"
+        self.assertEqual(snip_html(txt), ans)
 
 
 if __name__ == '__main__':
