@@ -185,9 +185,20 @@ class WPTools:
         if pars:
             pars = "\n".join(pars)
             self.g_rest['html'] = pars
+            return self.__postprocess_lead(pars)
 
-            snip = utils.snip_html(pars, verbose=1 if self.verbose else 0)
-            return "<p snipped>%s</p>" % snip
+    def __postprocess_lead(self, html):
+        """
+        snip and base href lead HTML
+        """
+        snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
+        snip = "<p snipped>%s</p>" % snip
+
+        url = urlparse.urlparse(self.g_rest['query'])
+        base = "%s://%s" % (url.scheme, url.netloc)
+        snip = snip.replace('href="/', "href=\"%s/" % base)
+
+        return snip
 
     def _set_parse_data(self):
         """
