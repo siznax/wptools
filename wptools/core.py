@@ -223,6 +223,7 @@ class WPTools:
             print("Could not load JSON response for query: %s"
                   % self.g_query['query'], file=sys.stderr)
             return
+
         qdata = data.get('query')
         page = qdata.get('pages')[0]
 
@@ -246,8 +247,10 @@ class WPTools:
 
         self.random = qdata.get('random')[0]["title"]
         self.title = page.get('title').replace(' ', '_')
-        self.url = page.get('fullurl')
-        self.urlraw = self._wiki_url(raw=True)
+
+        url = page.get('fullurl')
+        self.url = url
+        self.urlraw = url + '?action=raw'
 
     def _set_rest_data(self):
         """
@@ -361,12 +364,6 @@ class WPTools:
                 return False
         stderr("skipping %s" % action, self.silent)
         return True
-
-    def _wiki_url(self, raw=False):
-        url = "https://%s.wikipedia.org/wiki/%s" % (self.lang, self.title)
-        if raw:
-            return url + '?action=raw'
-        return url
 
     def get(self):
         """
