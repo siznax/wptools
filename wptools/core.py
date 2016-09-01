@@ -492,7 +492,8 @@ class WPTools:
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if not self.wikibase:
-            stderr("instance needs a wikibase", self.silent)
+            stderr("%s: wikibase needed" % self.get_wikidata.__name__,
+                   self.silent)
             return
         if self._skip_get('get_wikidata'):
             return
