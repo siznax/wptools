@@ -193,7 +193,6 @@ class WPTools:
         """
         snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
         snip = "<p snipped>%s</p>" % snip
-
         url = urlparse.urlparse(self.g_rest['query'])
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
@@ -208,12 +207,17 @@ class WPTools:
             data = json.loads(self.g_parse['response'])
         except:
             self.fatal = True
-            print("Could not load JSON response for query: %s"
-                  % self.g_parse['query'], file=sys.stderr)
+            stderr("Could not load JSON response for query: %s"
+                   % self.g_parse['query'])
             return
+
         pdata = data.get('parse')
         if not pdata:
+            error = data.get('error')
+            if error:
+                stderr("MediaWiki:API error: %s" % error)
             return
+
         parsetree = pdata.get('parsetree')
         self.infobox = self.__get_infobox(parsetree)
         self.links = self.__get_links(pdata.get('iwlinks'))
@@ -231,12 +235,16 @@ class WPTools:
             data = json.loads(self.g_query['response'])
         except:
             self.fatal = True
-            print("Could not load JSON response for query: %s"
-                  % self.g_query['query'], file=sys.stderr)
+            stderr("Could not load JSON response for query: %s"
+                   % self.g_query['query'])
             return
 
         qdata = data.get('query')
         page = qdata.get('pages')[0]
+
+        if page.get('missing'):
+            stderr("MediaWiki:API missing title: %s" % page.get('title'))
+            return
 
         self.extract = page.get('extract')
         try:
@@ -272,9 +280,15 @@ class WPTools:
             url = urlparse.urlparse(self.g_rest['query'])
         except:
             self.fatal = True
-            print("Could not load JSON response for query: %s"
-                  % self.g_rest['query'], file=sys.stderr)
+            stderr("Could not load JSON response for query: %s"
+                   % self.g_rest['query'])
             return
+
+        if data.get('detail'):
+            error = data.get('detail').get('error')
+            if error:
+                stderr("RESTBase error: %s" % error)
+                return
 
         self.Description = data.get('description')
 
@@ -332,8 +346,8 @@ class WPTools:
             data = json.loads(self.g_wikidata['response'])
         except:
             self.fatal = True
-            print("Could not load JSON response for query: %s"
-                  % self.g_wikidata['query'], file=sys.stderr)
+            stderr("Could not load JSON response for query: %s"
+                   % self.g_wikidata['query'])
             return
         entities = data.get('entities')
         item = None
@@ -459,8 +473,7 @@ class WPTools:
             rdata = json.loads(response).get('query').get('random')[0]
         except:
             self.fatal = True
-            print("Could not load JSON response for query: %s"
-                  % query, file=sys.stderr)
+            stderr("Could not load JSON response for query: %s" % query)
             return
         self.pageid = rdata.get('id')
         self.title = rdata.get('title').replace(' ', '_')
@@ -492,7 +505,7 @@ class WPTools:
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if not self.wikibase:
-            stderr("%s: wikibase needed" % self.get_wikidata.__name__,
+            stderr("%s: need wikibase" % self.get_wikidata.__name__,
                    self.silent)
             return
         if self._skip_get('get_wikidata'):
@@ -566,6 +579,6 @@ class WPTools:
         stderr("}", self.silent)
 
 
-def stderr(msg, silent):
+def stderr(msg, silent=False):
     if not silent:
         print(msg, file=sys.stderr)
