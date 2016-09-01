@@ -160,10 +160,14 @@ class WPToolsFetch:
         self.thing = thing
         self.action = action
         if action.startswith('/'):
+            try:
+                self.thing = urllib.quote(thing.encode('utf-8'))
+            except:
+                self.thing = thing
             qry = self.ACTION['rest'].substitute(
                 WIKI=self.wiki,
                 entrypoint=action,
-                title=urllib.quote(self.thing.encode('utf-8')))
+                title=self.thing)
         elif action == 'wikidata':
             qry = self.ACTION[action].substitute(
                 WIKI="www.wikidata.org",
