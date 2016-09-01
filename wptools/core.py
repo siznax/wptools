@@ -55,7 +55,7 @@ class WPTools:
             self.get_random()
         else:
             self.show()
-        self.verbose = verbose
+        self._verbose = verbose
 
     def __get_links(self, iwlinks):
         """
@@ -191,7 +191,7 @@ class WPTools:
         """
         snip and base href lead HTML
         """
-        snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
+        snip = utils.snip_html(html, verbose=1 if self._verbose else 0)
         snip = "<p snipped>%s</p>" % snip
 
         url = urlparse.urlparse(self.g_rest['query'])
