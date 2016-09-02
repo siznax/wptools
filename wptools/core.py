@@ -29,16 +29,9 @@ class WPTools:
         'get_wikidata': {'Label'}
     }
 
-    Description = None
-    Image = None
-    Label = None
     fatal = False
-    g_parse = {}
-    g_query = {}
-    g_wikidata = {}
-    images = {}
+    images = None
     pageid = None
-    silent = False
     title = None
     wikibase = None
 
@@ -68,21 +61,6 @@ class WPTools:
             return links[0]
         return sorted(links) if links else None
 
-    def __get_images(self, page):
-        """
-        returns image dict from query/page
-        """
-        image = {}
-        if page.get('pageimage'):
-            image['pageimage'] = {
-                "file": page.get('pageimage'),
-                "source": page.get('pageimage')}
-        if page.get('thumbnail'):
-            thumb = page.get('thumbnail')
-            image["thumbnail"] = thumb
-            self.thumbnail = thumb.get('source')
-        return image if image else None
-
     def __get_infobox(self, ptree):
         """
         returns infobox <type 'dict'> from parse/parsetreee
@@ -97,7 +75,7 @@ class WPTools:
         """
         lead = []
         lead.append(self.__get_lead_heading())
-        lead.append(self.__get_lead_img())
+        lead.append(self.__get_lead_image())
         lead.append(self.__get_lead_rest(data))
         lead.append(self.__get_lead_metadata())
         return "\n".join([x for x in lead if x])
@@ -127,7 +105,7 @@ class WPTools:
             heading += "&mdash;<i>%s</i>" % self.Description
         return "<p heading>%s</p>" % heading
 
-    def __get_lead_img(self):
+    def __get_lead_image(self):
         """
         returns <img> HTML from image attributes
         """
@@ -140,7 +118,7 @@ class WPTools:
         if hasattr(self, 'Image') and self.Image:
             src = self.Image
             cls = 'Image'
-        elif hasattr(self, 'pageimage') and self.thumbnail:
+        elif hasattr(self, 'pageimage') and self.pageimage:
             src = self.pageimage
             cls = 'pageimage'
         elif hasattr(self, 'thumbnail') and self.thumbnail:
@@ -261,11 +239,20 @@ class WPTools:
         except:
             pass
 
-        self.images = self.__get_images(page)
-        self.pageid = page.get('pageid')
-        if self.images and 'pageimage' in self.images:
-            pageimage = self.images.get('pageimage').get('source')
+        images = dict()
+        pageimage = page.get('pageimage')
+        if pageimage:
+            images['qimage'] = pageimage
             self.pageimage = utils.media_url(pageimage)
+
+        thumbnail = page.get('thumbnail')
+        if thumbnail:
+            images['qthumb'] = thumbnail
+            self.thumbnail = thumbnail
+
+        self.images = images
+
+        self.pageid = page.get('pageid')
 
         props = page.get('pageprops')
         if props:
@@ -303,7 +290,7 @@ class WPTools:
 
         image = data.get('image')
         if image:
-            self.images['image'] = image
+            self.images['rimage'] = image
             image_file = utils.media_url(image.get('file'))
             # apparently get_query pageimage or get_wikidata Image
             # self.__setattr('pageimage', image_file, 'rest')
@@ -311,7 +298,7 @@ class WPTools:
 
         thumb = data.get('thumb')
         if thumb:
-            self.images['thumb'] = thumb
+            self.images['rthumb'] = thumb
             thumbnail = "%s:%s" % (url.scheme, thumb.get('url'))
             # apparently scaled (larger) get_query thumbnail
             # self.__setattr('thumbnail', thumbnail, 'rest')
@@ -350,7 +337,7 @@ class WPTools:
             image = P18[0].get('mainsnak').get('datavalue').get('value')
             self.Image = utils.media_url(image)
             if self.images:
-                self.images['Image'] = image
+                self.images['wimage'] = image
         # P585 point in time
         # P625 coordinate location
 
