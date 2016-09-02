@@ -106,7 +106,8 @@ class WPToolsRestBaseTest(unittest.TestCase):
     """
 
     def test_get_rest(self):
-        r = wptools.page(title=random.choice(titles))
+        t = wptools.test.title()
+        r = wptools.page(lang=t['lang'], title=t['title'])
         r.get_query()
         r.get_wikidata()
         r.get_rest()
