@@ -233,11 +233,16 @@ class WPTools:
             stderr("MediaWiki:API missing title: %s" % page.get('title'))
             return
 
-        self.extract = page.get('extract')
-        try:
-            self.extext = html2text.html2text(self.extract)
-        except:
-            pass
+        extext = None
+        extract = page.get('extract')
+        if extract:
+            self.extract = extract
+            try:
+                extext = html2text.html2text(self.extract)
+                if extext.strip():
+                    self.extext = extext
+            except:
+                pass
 
         images = dict()
         pageimage = page.get('pageimage')
