@@ -86,20 +86,20 @@ class WPToolsTestTitles:
             "Stephen Fry",
         },
         "ja": {
-            "三島 由紀夫",  # Yukio Mishima
+            "三島由紀夫",  # Yukio Mishima
             "北斎",  # Hokusai
-            "穐吉 敏子",  # Toshiko Akiyoshi
-            "草薙 素子",  # Major Motoko Kusanagi
-            "紫 式部",  # Murasaki Shikibu
-            "村上 春樹",  # Haruki Murakami
+            "穐吉敏子",  # Toshiko Akiyoshi
+            "草薙素子",  # Major Motoko Kusanagi
+            "紫式部",  # Murasaki Shikibu
+            "村上春樹",  # Haruki Murakami
         },
         "ru": {
             "Анна Ахматова",  # Anna Akhmatova
             "Анна Павлова",  # Anna Pavlova
             "Анто́н Па́влович Че́хов",  # Anton Chekhov
-            "Екатерина Алексеевна",  # Catherine the Great
-            "Фёдор Миха́йлович Достое́вский",  # Fyodor Dostoyevsky
-            "Валенти́на Влади́мировна Терешко́ва",  # Valentina Tereshkova
+            "Екатерина II",  # Catherine the Great
+            "Фёдор Михайлович Достоевский",  # Fyodor Dostoyevsky
+            "Валентина Владимировна Терешкова",  # Valentina Tereshkova
         },
         "zh": {
             "老子",  # Laozi
@@ -107,7 +107,7 @@ class WPToolsTestTitles:
             "艾未未",  # Ai Weiwei
             "刘晓波",  # Liu Xiaobo
             "楊紫瓊",  # Michelle Yeoh
-            "刘洋",  # Liu Yang (astronaut)
+            "刘洋 (航天员)",  # Liu Yang (astronaut)
             "李振藩",  # Bruce Lee
         }
     }
@@ -133,10 +133,10 @@ class WPToolsTestTitles:
         },
         "ru": {
             "Москва",  # Moscow
-            "Кра́сная пло́щадь",  # Red Square
+            "Красная площадь",  # Red Square
             "Собор Василия Блаженного",  # Saint Basil's Cathedral
             "Санкт-Петербург",  # Saint Petersburg
-            "Зи́мний дворе́ц",  # Winter Palace
+            "Зимний дворец",  # Winter Palace
         },
         "zh": {
             "北京市",  # Beijing
@@ -161,11 +161,11 @@ class WPToolsTestTitles:
             "歌舞伎",  # kabuki
             "浮世絵",  # ukiyo-e
             "相撲",  # sumo
-            "舞踏",  # butoh
+            "暗黒舞踏",  # butoh
         },
         "ru": {
-            "балала́йка",  # balalaika
-            "оммунистическая партия Советского Союза",  # communist party
+            "Балалайка",  # balalaika
+            "Коммунистическая партия Советского Союза",  # communist party
             "Калашникова",  # kalash
             "пирожки",  # pirozhki
             "водка",  # vodka
