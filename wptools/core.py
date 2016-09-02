@@ -196,8 +196,17 @@ class WPTools:
         url = urlparse.urlparse(self.g_rest['query'])
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
-
         return snip
+
+    def __setattr(self, attr, value, suffix):
+        """
+        set attribute, append suffix if clobber
+        """
+        if hasattr(self, attr):
+            extant = getattr(self, attr)
+            if extant != value:
+                attr = "%s_%s" % (attr, suffix)
+                setattr(self, attr, value)
 
     def _set_parse_data(self):
         """
@@ -290,21 +299,28 @@ class WPTools:
                 stderr("RESTBase error: %s" % error)
                 return
 
-        self.Description = data.get('description')
+        self.__setattr('Description', data.get('description'), 'rest')
 
         image = data.get('image')
         if image:
-            self.images['pageimage'] = data.get('image')
-            self.pageimage = utils.media_url(image.get('file'))
+            self.images['image'] = image
+            image_file = utils.media_url(image.get('file'))
+            # apparently get_query pageimage or get_wikidata Image
+            # self.__setattr('pageimage', image_file, 'rest')
+            self.pageimage = image_file
 
         thumb = data.get('thumb')
         if thumb:
-            self.images['thumbnail'] = data.get('thumb')
-            self.thumbnail = "%s:%s" % (url.scheme, thumb.get('url'))
+            self.images['thumb'] = thumb
+            thumbnail = "%s:%s" % (url.scheme, thumb.get('url'))
+            # apparently scaled (larger) get_query thumbnail
+            # self.__setattr('thumbnail', thumbnail, 'rest')
+            self.thumbnail = thumbnail
 
-        self.title = data.get('displaytitle')
+        title = data.get('displaytitle')
         if 'normalizedtitle' in data:
-            self.title = data['normalizedtitle']
+            title = data['normalizedtitle']
+        self.__setattr('title', title.replace(' ', '_'), 'rest')
 
         self.lastmodified = data.get('lastmodified')
         self.pageid = data.get('id')
