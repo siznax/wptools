@@ -30,7 +30,7 @@ class WPTools:
     }
 
     fatal = False
-    images = None
+    images = dict()
     pageid = None
     title = None
     wikibase = None
@@ -312,12 +312,13 @@ class WPTools:
         title = data.get('displaytitle')
         if 'normalizedtitle' in data:
             title = data['normalizedtitle']
-        self.__setattr('title', title.replace(' ', '_'), 'rest')
+        self.title = title.replace(' ', '_')
 
         self.lastmodified = data.get('lastmodified')
         self.pageid = data.get('id')
 
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
+        self.urlraw = self.url + '?action=raw'
 
         if 'sections' in data:
             geo = self.__get_lead_geo(data)
