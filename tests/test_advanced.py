@@ -6,43 +6,8 @@ import random
 import unittest
 import wptools
 
-# langs that exposed an issue
-langs = ['es', 'fr', 'hi', 'ja', 'zh', 'ru']
 
-# titles that exposed an issue
-titles = [
-    "Flannery O'Connor",
-    "Jeanne d'Arc",
-    'Abe Lincoln',
-    'Benjamin Franklin',
-    'Borges',
-    'Bruce Lee',
-    'Buddha',
-    'Cervantes',
-    'Denis Diderot',
-    'Ella Fitzgerald',
-    'Encyclopédie',
-    'Fela Kuti',
-    'François-Marie Arouet'
-    'Frida Kahlo',
-    'Harriet Tubman',
-    'Malala Yousafzai',
-    'Malcolm X',
-    'Monkey King',
-    'Napoleon',
-    'Paris',
-    'Quaternion',
-    'Shakespeare',
-    'Stephen Fry',
-    'Анна Ахматова',
-    'Анто́н Па́влович Че́хов',
-    'Фёдор Миха́йлович Достое́вский',
-    '武俠',
-    '浮世絵',
-    '漢語',
-    '相撲',
-    '穐吉敏子',
-]
+lang = ['es', 'fr', 'hi', 'ja', 'zh', 'ru']
 
 
 class WPToolsBadTest(unittest.TestCase):
@@ -92,7 +57,9 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Get selected title
         """
-        wptools.page(title=random.choice(titles)).get()
+        rtitle = wptools.test.title()
+        wptools.page(lang=rtitle['lang'],
+                     title=rtitle['title']).get()
 
     def test_mixed_lang(self):
         """
@@ -124,7 +91,7 @@ class WPToolsRandomTest(unittest.TestCase):
         """
         Get everything from random item in another language
         """
-        wptools.page(lang=random.choice(langs)).get()
+        wptools.page(lang=random.choice(lang)).get()
 
     def test_random_wiki(self):
         """
@@ -139,8 +106,7 @@ class WPToolsRestBaseTest(unittest.TestCase):
     """
 
     def test_get_rest(self):
-        r = wptools.page()
-        r.get_parse()
+        r = wptools.page(title=random.choice(titles))
         r.get_query()
         r.get_wikidata()
         r.get_rest()

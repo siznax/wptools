@@ -21,7 +21,8 @@ __license__ = "MIT"
 __title__ = "wptools"
 __version__ = "0.1.1"
 
-from . import utils
 from . import fetch
+from . import utils
+from . import test
 
 from .core import WPTools as page
