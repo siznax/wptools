@@ -8,6 +8,7 @@ _“For reading, there will never be enough time” —Harold Bloom_
 * https://www.mediawiki.org/wiki/API:Main_page
 * https://www.mediawiki.org/wiki/Web_APIs_hub
 * https://www.wikidata.org/wiki/Wikidata:Data_access
+* https://en.wikipedia.org/wiki/Wikipedia:Wikipedia_records
 
 This project is listed here as "wptools":
 https://www.mediawiki.org/wiki/API:Client_code#Python
