@@ -258,6 +258,21 @@ Get all the things by *wikibase*:
     }
 
 
+Get *special* `lead section`_ HTML:
+
+.. code-block:: python
+
+    >>> b = wptools.page("Buddha")
+    >>> b.get_rest()
+    >>> b.lead
+    u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
+    <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
+    <p snipped><span><b>Gautama Buddha</b>, also known as <b>Siddh&#2...
+    Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Wa...
+    Gautama is the primary figure in Buddhism. He is recognized by Bu...
+    <p metadata>Last modified: 2016-09-01T08:15:49Z</p>'
+
+
 .. _Methods:
 
 Methods
@@ -303,7 +318,7 @@ MediaWiki:API `action=query`_ request for:
 
 - extext: <unicode> plain text (Markdown_) extract
 - extract: <unicode> HTML extract via `Extension:TextExtract`_
-- images: <dict> {image, pageimages, thumbnail}
+- images: <dict> {qimage, qthumb}
 - pageid: <int> MediaWiki database ID
 - pageimage: <unicode> pageimage URL via `Extension:PageImages`_
 - random: <unicode> a random article title with every request!
@@ -325,6 +340,29 @@ MediaWiki:API `action=query`_ request for:
 - title: <unicode> article title
 
 
+**get_rest** (self)
+
+RESTBase_ ``/page/mobile-text/`` request for:
+
+- Description: <unicode> apparently, Wikidata description
+- geo: <str> Geographic coordinates if found
+- images: <dict> {rimage, rthumb}
+- lastmodified: <str> ISO8601 date and time
+- lead: <str> assembled encyclopedia-like `lead section`_
+- pageimage: <unicode> probably ``action=query`` pageimage
+- thumbnail: <unicode> larger ``action=query`` thumbnail
+
+The *lead* attribute contains an encyclopedia-like HTML fragment having:
+
+- Title and full wiki URL heading with description if available.
+- Image if available (from Image, pageimage, or thumbnail).
+- Lead paragraphs (before first section) with references removed.
+- Metadata if available (e.g. Last modified, Coordinates).
+
+.. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+.. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
+
+
 **get_wikidata** (self)
 
 Wikidata:API `action=wbgetentities`_ request for:
@@ -332,6 +370,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 - Description: <unicode> Wikidata description
 - Image: <unicode> Wikidata Property:P18_ image URL
 - Label: <unicode> Wikidata label
+- images: <dict> {wimage}
 
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
@@ -351,6 +390,7 @@ Detailed request info can be found in these instance attributes:
 
 - g_parse: <dict> {info, query, response}
 - g_query: <dict> {info, query, response}
+- g_rest: <dict> {html, info, query, response}
 - g_wikidata: <dict> {info, query, response}
 
 

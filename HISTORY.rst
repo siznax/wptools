@@ -3,6 +3,12 @@
 Release History
 ---------------
 
+0.1.2 (2016-09-02)
+++++++++++++++++++
+
+* added RESTBase support, lead attribute
+
+
 0.1.1 (2016-08-25)
 ++++++++++++++++++
 
