@@ -56,6 +56,8 @@ class WPToolsFetch:
             "https://${WIKI}/w/api.php?action=wbgetentities"
             "&format=json"
             "&ids=${thing}"
+            "&sites=${site}"
+            "&titles=${title}"
             "&languages=${lang}"
             "&props=info|claims|descriptions|labels|sitelinks"))
     }
@@ -156,26 +158,32 @@ class WPToolsFetch:
         """
         returns API query string
         """
-        self.thing = thing
-        self.action = action
         if action.startswith('/'):
             qry = self.ACTION['rest'].substitute(
                 WIKI=self.wiki,
                 entrypoint=action,
-                title=self.thing)
+                title=thing)
         elif action == 'wikidata':
             qry = self.ACTION[action].substitute(
                 WIKI="www.wikidata.org",
                 lang=self.lang,
-                thing=self.thing)
+                site=thing['site'],
+                title=thing['title'],
+                thing=thing['id'])
+            if thing['id']:
+                thing = thing['id']
+            else:
+                thing = thing['title']
         else:
             qry = self.ACTION[action].substitute(
                 WIKI=self.wiki,
-                thing=self.thing)
+                thing=thing)
 
         if action == 'query' and pageid:
             qry = qry.replace('&titles=', '&pageids=')
 
+        self.action = action
+        self.thing = thing
         return qry
 
     def user_agent(self):

@@ -347,7 +347,6 @@ class WPTools:
             if self.images:
                 self.images['wimage'] = image
         # P585 point in time
-        # P625 coordinate location
 
     def _set_wikibase_data(self):
         """
@@ -355,17 +354,19 @@ class WPTools:
         """
         try:
             data = json.loads(self.g_wikidata['response'])
+            entities = data.get('entities')
         except:
             self.fatal = True
             stderr("Could not load JSON response for query: %s"
                    % self.g_wikidata['query'])
             return
-        entities = data.get('entities')
-        item = None
-        if entities:
-            item = entities.get(self.wikibase.upper())
-        if not item:
+
+        item = entities.get(entities.keys()[0])
+        if 'id' not in item:
+            if 'title' in item:
+                stderr("Wikidata missing title: %s" % item['title'])
             return
+
         self.wikibase = "https://www.wikidata.org/wiki/%s" % item.get('id')
 
         self._set_wikibase_claims(item.get('claims'))
@@ -383,7 +384,7 @@ class WPTools:
                 self.Label = labels.get(self.lang).get('value')
             except:
                 self.Label = labels.get('value')
-        if self.Label and not self.title:
+        if hasattr(self, 'Label') and not self.title:
             self.title = self.Label.replace(' ', '_')
 
     def _skip_get(self, action):
@@ -519,13 +520,22 @@ class WPTools:
         - Label: <unicode> Wikidata label
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        if not self.wikibase:
-            stderr("%s: need wikibase" % self.get_wikidata.__name__,
-                   self.silent)
-            return
         if self._skip_get('get_wikidata'):
             return
-        query = self.__fetch.query('wikidata', self.wikibase)
+
+        thing = {'id': '', 'site': '', 'title': ''}
+        if self.wikibase:
+            thing['id'] = self.wikibase
+        elif self.lang and self.title:
+            thing['site'] = "%swiki" % self.lang
+            thing['title'] = self.title
+        else:
+            stderr("%s: need wikibase or lang and title"
+                   % self.get_wikidata.__name__,
+                   self.silent)
+            return
+
+        query = self.__fetch.query('wikidata', thing)
         wdata = {}
         wdata['query'] = query
         wdata['response'] = self.__fetch.curl(query)
