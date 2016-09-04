@@ -81,20 +81,6 @@ class WPTools:
         lead.append(self.__get_lead_metadata())
         return "\n".join([x for x in lead if x])
 
-    def __get_lead_geo(self, data):
-        """
-        returns span.geo text from RESTBase sections
-        """
-        for section in data['sections']:
-            for item in section.get('items'):
-                if item.get('text') is None:
-                    continue
-                text = item['text']
-                if 'geo' in utils.span_classes(text):
-                    doc = lxml.html.fromstring(text)
-                    for geo in doc.xpath('//span[@class="geo"]'):
-                        return geo.text
-
     def __get_lead_heading(self):
         """
         returns lead section HTML heading
@@ -323,11 +309,6 @@ class WPTools:
         self.urlraw = self.url + '?action=raw'
 
         if 'sections' in data:
-            geo = self.__get_lead_geo(data)
-            if geo:
-                self.geo = geo
-
-        if 'sections' in data:
             lead = self.__get_lead(data)
             if lead:
                 self.lead = lead
@@ -340,13 +321,19 @@ class WPTools:
             return
 
         # P17  country
-        P18 = claims.get('P18')  # image
+        P18 = claims.get('P18')  # P18 image
         if P18:
             image = P18[0].get('mainsnak').get('datavalue').get('value')
             self.Image = utils.media_url(image)
             if self.images:
                 self.images['wimage'] = image
         # P585 point in time
+        P625 = claims.get('P625')  # P625 coordinate location
+        if P625:
+            geo = P625[0].get('mainsnak').get('datavalue').get('value')
+            if geo:
+                self.geo = "%s,%s" % (geo.get('latitude'),
+                                      geo.get('longitude'))
 
     def _set_wikibase_data(self):
         """

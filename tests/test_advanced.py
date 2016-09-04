@@ -65,6 +65,13 @@ class WPToolsPickTest(unittest.TestCase):
         w = wptools.page('Les Misérables').get_wikidata(False)
         self.assertTrue(w.wikibase is not None)
 
+    def test_wikidata_geo(self):
+        """
+        Get wikidata geographic coordinates
+        """
+        p = wptools.page('Paris').get_wikidata(False)
+        self.assertTrue(p.geo is not None)
+
     def test_mixed_lang(self):
         """
         Get mixed language
