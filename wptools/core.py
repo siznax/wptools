@@ -270,8 +270,9 @@ class WPTools:
         self.title = page.get('title').replace(' ', '_')
 
         url = page.get('fullurl')
-        self.url = url
-        self.urlraw = url + '?action=raw'
+        if url:
+            self.url = url
+            self.urlraw = url + '?action=raw'
 
     def _set_rest_data(self):
         """
@@ -495,7 +496,10 @@ class WPTools:
         """
         MediaWiki:RESTBase (/page/mobile-text/)
         """
-        title = urllib.quote(self.title)
+        try:
+            title = urllib.quote(self.title)
+        except KeyError:
+            title = urllib.quote(self.title.encode('utf-8'))
         query = self.__fetch.query('/page/mobile-text/', title)
         rest = {}
         rest['query'] = query
