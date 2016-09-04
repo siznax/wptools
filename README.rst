@@ -348,16 +348,16 @@ RESTBase_ ``/page/mobile-text/`` request for:
 - geo: <str> Geographic coordinates if found
 - images: <dict> {rimage, rthumb}
 - lastmodified: <str> ISO8601 date and time
-- lead: <str> assembled encyclopedia-like `lead section`_
+- lead: <str> encyclopedia-like `lead section`_
 - pageimage: <unicode> probably ``action=query`` pageimage
 - thumbnail: <unicode> larger ``action=query`` thumbnail
 
-The *lead* attribute contains an encyclopedia-like HTML fragment having:
+The encyclopedia-like *lead* attribute HTML fragment assembles:
 
-- Title and full wiki URL heading with description if available.
-- Image if available (from Image, pageimage, or thumbnail).
-- Lead paragraphs (before first section) with references removed.
-- Metadata if available (e.g. Last modified, Coordinates).
+- ``<p heading>`` wiki-linked title and description
+- ``<img {type}>`` {Image, pageimage, or thumbnail}
+- ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
+- ``<p metadata>`` available metadata (e.g. Last modified, Coordinates)
 
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
