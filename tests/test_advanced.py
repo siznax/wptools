@@ -7,7 +7,7 @@ import unittest
 import wptools
 
 
-lang = ['es', 'fr', 'hi', 'ja', 'zh', 'ru']
+lang = ['de', 'es', 'fr', 'hi', 'it', 'ja', 'nl', 'ru', 'sv', 'vi', 'zh']
 
 
 class WPToolsBadTest(unittest.TestCase):
@@ -19,21 +19,23 @@ class WPToolsBadTest(unittest.TestCase):
         """
         Get redirected
         """
-        wptools.page(title='Abe Lincoln').get()
+        b = wptools.page('Abe Lincoln').get_query(False)
+        self.assertEqual(b.title, "Abraham_Lincoln")
 
     def test_missing(self):
         """
         Get missing title
         """
-        wptools.page(title='ƀļēřğ').get()
+        b = wptools.page('_____').get_query(False)
+        self.assertTrue(b.pageid is None)
 
-    def test_uknown_lang(self):
+    def test_unknown_lang(self):
         """
         Mediawiki site function not supported
         """
         # "jp" Wikinews (unknown language code)
-        g = wptools.page(wiki='jp.wikinews.org').get()
-        assert g.fatal is not None
+        b = wptools.page(wiki='jp.wikinews.org')
+        self.assertTrue(hasattr(b, 'fatal'))
 
 
 class WPToolsPickTest(unittest.TestCase):
@@ -41,39 +43,34 @@ class WPToolsPickTest(unittest.TestCase):
     SELECTED (cherry-picked) TESTS
     """
 
-    def test_multibyte(self):
+    def test_selected(self):
         """
-        Get everything multibyte request
+        Get selected title
         """
-        wptools.page('托爾金', lang='zh')  # 托爾金 (zh) Tolkien
+        t = wptools.test.title()
+        p = wptools.page(t['title'], lang=t['lang']).get_query(False)
+        self.assertTrue(hasattr(p, 'pageid'))
 
     def test_wikibase(self):
         """
         Get everything wikibase only
         """
-        wptools.page(wikibase='Q43303').get()  # Q43303=Malcolm_X
-
-    def test_selected(self):
-        """
-        Get selected title
-        """
-        rtitle = wptools.test.title()
-        wptools.page(lang=rtitle['lang'],
-                     title=rtitle['title']).get()
+        p = wptools.page(wikibase='Q43303').get_wikidata(False)
+        self.assertEqual(p.title, "Malcolm_X")
 
     def test_mixed_lang(self):
         """
-        Get everything mixed languages
+        Get mixed language
         """
-        g = wptools.page(title='Abraham Lincoln', lang='zh').get()
-        assert g.Description is not None
+        p = wptools.page('Abraham Lincoln', lang='zh').get_query(False)
+        self.assertEqual(p.wikibase, "Q91")
 
     def test_complex_infobox(self):
         """
         Successfully populate complex infobox dict
         """
-        g = wptools.page('Abe Lincoln').get()
-        self.assertGreaterEqual(len(g.infobox), 42)
+        p = wptools.page('Abe Lincoln').get_parse(False)
+        self.assertGreaterEqual(len(p.infobox), 42)
 
 
 class WPToolsRandomTest(unittest.TestCase):
@@ -83,21 +80,24 @@ class WPToolsRandomTest(unittest.TestCase):
 
     def test_random(self):
         """
-        Get random everything
+        Get a random title
         """
-        wptools.page().get()
+        r = wptools.page()
+        self.assertTrue(hasattr(r, 'pageid'))
 
     def test_random_lang(self):
         """
-        Get everything from random item in another language
+        Get random title by language
         """
-        wptools.page(lang=random.choice(lang)).get()
+        r = wptools.page(lang=random.choice(lang))
+        self.assertTrue(hasattr(r, 'pageid'))
 
     def test_random_wiki(self):
         """
-        Get random item from another wiki
+        Get random title by wiki
         """
-        wptools.page(wiki='en.wikinews.org').get()
+        r = wptools.page(wiki='commons.wikimedia.org')
+        self.assertTrue(hasattr(r, 'pageid'))
 
 
 class WPToolsRestBaseTest(unittest.TestCase):
@@ -107,14 +107,9 @@ class WPToolsRestBaseTest(unittest.TestCase):
 
     def test_get_rest(self):
         t = wptools.test.title()
-        r = wptools.page(lang=t['lang'], title=t['title'])
-        r.get_query()
-        r.get_wikidata()
-        r.get_rest()
-        if hasattr(r, 'g_rest') and 'html' in r.g_rest:
-            print r.g_rest['html'].encode('utf-8')
-            print "\n<hr>\n"
-            print r.lead.encode('utf-8')
+        r = wptools.page(t['title'], lang=t['lang'])
+        r.get_rest(show=False)
+        self.assertTrue(hasattr(r, 'lead'))
 
 
 class WPToolsToolTest(unittest.TestCase):
@@ -124,7 +119,6 @@ class WPToolsToolTest(unittest.TestCase):
 
     def test_wptool(self):
         from scripts.wptool import main
-        main()
 
 
 if __name__ == '__main__':
