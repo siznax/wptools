@@ -58,6 +58,13 @@ class WPToolsPickTest(unittest.TestCase):
         p = wptools.page(wikibase='Q43303').get_wikidata(False)
         self.assertEqual(p.title, "Malcolm_X")
 
+    def test_wikidata_title(self):
+        """
+        Get wikidata from title only
+        """
+        w = wptools.page('Les Misérables').get_wikidata(False)
+        self.assertTrue(w.wikibase is not None)
+
     def test_mixed_lang(self):
         """
         Get mixed language
