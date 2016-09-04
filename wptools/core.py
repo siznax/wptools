@@ -311,8 +311,8 @@ class WPTools:
             self.thumbnail = thumbnail
 
         title = data.get('displaytitle')
-        if 'normalizedtitle' in data:
-            title = data['normalizedtitle']
+        if 'redirected' in data:
+            title = data['redirected']
         self.title = title.replace(' ', '_')
 
         self.lastmodified = data.get('lastmodified')
@@ -495,7 +495,7 @@ class WPTools:
         """
         MediaWiki:RESTBase (/page/mobile-text/)
         """
-        title = urllib.quote(self.title.replace(' ', '_'))
+        title = urllib.quote(self.title)
         query = self.__fetch.query('/page/mobile-text/', title)
         rest = {}
         rest['query'] = query
