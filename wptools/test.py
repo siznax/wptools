@@ -96,7 +96,7 @@ class WPToolsTestTitles:
         "ru": {
             "Анна Ахматова",  # Anna Akhmatova
             "Анна Павлова",  # Anna Pavlova
-            "Анто́н Па́влович Че́хов",  # Anton Chekhov
+            "Антон Павлович Чехов",  # Anton Chekhov
             "Екатерина II",  # Catherine the Great
             "Фёдор Михайлович Достоевский",  # Fyodor Dostoyevsky
             "Валентина Владимировна Терешкова",  # Valentina Tereshkova
@@ -166,7 +166,7 @@ class WPToolsTestTitles:
         "ru": {
             "Балалайка",  # balalaika
             "Коммунистическая партия Советского Союза",  # communist party
-            "Калашникова",  # kalash
+            "Автомат Калашникова",  # AK-47
             "пирожки",  # pirozhki
             "водка",  # vodka
         },
