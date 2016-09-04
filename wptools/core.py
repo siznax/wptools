@@ -12,6 +12,7 @@ import json
 import lxml
 import re
 import sys
+import urllib
 import urlparse
 
 from . import fetch
@@ -494,7 +495,8 @@ class WPTools:
         """
         MediaWiki:RESTBase (/page/mobile-text/)
         """
-        query = self.__fetch.query('/page/mobile-text/', self.title)
+        title = urllib.quote(self.title.replace(' ', '_'))
+        query = self.__fetch.query('/page/mobile-text/', title)
         rest = {}
         rest['query'] = query
         rest['response'] = self.__fetch.curl(query)

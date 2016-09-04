@@ -8,7 +8,6 @@ from __future__ import print_function
 
 import pycurl
 import sys
-import urllib
 
 from . import __title__, __contact__, __version__
 from io import BytesIO
@@ -153,17 +152,13 @@ class WPToolsFetch:
         obj = WPToolsFetch()
         return obj.curl(obj.query(action, title))
 
-    def query(self, action, thing, pageid=False, entrypoint=None):
+    def query(self, action, thing, pageid=False):
         """
         returns API query string
         """
         self.thing = thing
         self.action = action
         if action.startswith('/'):
-            try:
-                self.thing = urllib.quote(thing.encode('utf-8'))
-            except:
-                self.thing = thing
             qry = self.ACTION['rest'].substitute(
                 WIKI=self.wiki,
                 entrypoint=action,
