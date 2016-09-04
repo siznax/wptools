@@ -21,7 +21,7 @@ goal_. Please see NOTES_ for details. Questions, feedback, and
 especially contributions_ are welcome!
 
 .. _NOTES: https://github.com/siznax/wptools/blob/master/NOTES.md
-.. _contributions: https://github.com/siznax/wptools/issues
+.. _contributions: https://github.com/siznax/wptools/blob/master/CONTRIBUTING.md
 .. _goal: http://docs.python-requests.org/en/master/user/intro/
 
 
@@ -352,7 +352,7 @@ RESTBase_ ``/page/mobile-text/`` request for:
 - pageimage: <unicode> probably ``action=query`` pageimage
 - thumbnail: <unicode> larger ``action=query`` thumbnail
 
-The encyclopedia-like *lead* attribute HTML fragment assembles:
+The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
 
 - ``<p heading>`` wiki-linked title and description
 - ``<img {type}>`` {Image, pageimage, or thumbnail}
