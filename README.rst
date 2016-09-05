@@ -219,14 +219,38 @@ Get an Infobox_ as a python object:
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
 
-Get a *wikibase* by title:
+Get wikidata by title:
 
 .. code-block:: python
 
-    >>> fry = wptools.page('Stephen Fry').get_parse()
+    >>> fry = wptools.page('Stephen Fry').get_wikidata()
     >>> fry.wikibase
 
-    u'Q192912'
+    u'https://www.wikidata.org/wiki/Q192912'
+
+
+Get geographic coordinates:
+
+.. code-block:: python
+
+    >>> paris = wptools.page('Paris').get_wikidata()
+    >>> paris.geo
+    '48.8565777778,2.35182777778'
+
+
+Get *special* `lead section`_ HTML:
+
+.. code-block:: python
+
+    >>> b = wptools.page("Buddha")
+    >>> b.get_rest()
+    >>> b.lead
+    u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
+    <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
+    <p snipped><span><b>Gautama Buddha</b>, also known as <b>Siddh&#2...
+    Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Wa...
+    Gautama is the primary figure in Buddhism. He is recognized by Bu...
+    <p metadata>Last modified: 2016-09-01T08:15:49Z</p>'
 
 
 Get all the things by *wikibase*:
@@ -256,21 +280,6 @@ Get all the things by *wikibase*:
       wikibase: Q6192915
       wikitext: <str(13011)> {{Infobox scientist| name = Jill Lepore| na...
     }
-
-
-Get *special* `lead section`_ HTML:
-
-.. code-block:: python
-
-    >>> b = wptools.page("Buddha")
-    >>> b.get_rest()
-    >>> b.lead
-    u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
-    <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
-    <p snipped><span><b>Gautama Buddha</b>, also known as <b>Siddh&#2...
-    Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Wa...
-    Gautama is the primary figure in Buddhism. He is recognized by Bu...
-    <p metadata>Last modified: 2016-09-01T08:15:49Z</p>'
 
 
 .. _Methods:
@@ -345,12 +354,13 @@ MediaWiki:API `action=query`_ request for:
 RESTBase_ ``/page/mobile-text/`` request for:
 
 - Description: <unicode> apparently, Wikidata description
-- geo: <str> Geographic coordinates if found
 - images: <dict> {rimage, rthumb}
 - lastmodified: <str> ISO8601 date and time
 - lead: <str> encyclopedia-like `lead section`_
-- pageimage: <unicode> probably ``action=query`` pageimage
+- pageimage: <unicode> apparently, ``action=query`` pageimage
 - thumbnail: <unicode> larger ``action=query`` thumbnail
+- url: <unicode> the canonical wiki URL
+- urlraw: <unicode> ostensible raw wikitext URL
 
 The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
 
@@ -370,8 +380,10 @@ Wikidata:API `action=wbgetentities`_ request for:
 - Description: <unicode> Wikidata description
 - Image: <unicode> Wikidata Property:P18_ image URL
 - Label: <unicode> Wikidata label
+- geo: <str> P625_ Geographic coordinates (lat,lon)
 - images: <dict> {wimage}
 
+.. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 

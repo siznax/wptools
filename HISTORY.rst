@@ -3,6 +3,14 @@
 Release History
 ---------------
 
+0.1.3 (2016-09-04)
+++++++++++++++++++
+
+* Patch get_rest() path, tests/test_advanced
+* Implemented get_wikidata() by title, lang
+* Geo coordinates Property:P625 from Wikidata
+
+
 0.1.2 (2016-09-02)
 ++++++++++++++++++
 
