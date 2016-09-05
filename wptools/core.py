@@ -435,7 +435,7 @@ class WPTools:
         MediaWiki:API action=query request for:
         - extext: <unicode> plain text (Markdown) extract
         - extract: <unicode> HTML extract via Extension:TextExtract
-        - images: <dict> {image, pageimages, thumbnail}
+        - images: <dict> {qimage, qthumb}
         - pageid: <int> Wikipedia database ID
         - pageimage: <unicode> pageimage URL via Extension:PageImages
         - random: <unicode> a random article title with every request!
@@ -482,7 +482,16 @@ class WPTools:
 
     def get_rest(self, show=True):
         """
-        MediaWiki:RESTBase (/page/mobile-text/)
+        RESTBase (/page/mobile-text/)
+        - Description: <unicode> apparently, Wikidata description
+        - images: <dict> {rimage, rthumb}
+        - lastmodified: <str> ISO8601 date and time
+        - lead: <str> encyclopedia-like lead section
+        - pageimage: <unicode> apparently, action=query pageimage
+        - thumbnail: <unicode> larger action=query thumbnail
+        - url: <unicode> the canonical wiki URL
+        - urlraw: <unicode> ostensible raw wikitext URL
+        https://en.wikipedia.org/api/rest_v1/
         """
         try:
             title = urllib.quote(self.title)
@@ -505,6 +514,8 @@ class WPTools:
         - Description: <unicode> Wikidata description
         - Image: <unicode> Wikidata Property:P18 image URL
         - Label: <unicode> Wikidata label
+        - geo: <str> P625 Geographic coordinates (lat,lon)
+        - images: <dict> {wimage}
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if self._skip_get('get_wikidata'):
