@@ -100,26 +100,7 @@ Images
 
 * https://www.mediawiki.org/wiki/API:Images
 * https://www.mediawiki.org/wiki/Extension:PageImages
-
-For a representative image, we probably want Wikidata:P18. You can
-probably get away with using 'thumbnail' (Mediawiki:Query) or
-'pageimage' (Mediawiki:Query), but they can be oddly inappropriate,
-e.g.
-
-    Napoleon (en)
-    {
-      "pageimage": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Grandes_Armes_Imp%C3%A9riales_%281804-1815%292.svg",
-      "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Grandes_Armes_Imp%C3%A9riales_%281804-1815%292.svg/43px-Grandes_Armes_Imp%C3%A9riales_%281804-1815%292.svg.png",
-    }
-
-The images above are both rendering of "Imperial Coat of Arms", but
-what we really want is a _portrait_ of Napoleon! We can get it from
-Wikidata:P18:
-
-    Napoleon (en)
-    {
-      "image": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Jacques-Louis_David_-_The_Emperor_Napoleon_in_His_Study_at_the_Tuileries_-_Google_Art_Project_2.jpg",
-    }
+* https://github.com/siznax/wptools/issues/14 Figure out "best" image
 
 
 Infobox
@@ -197,32 +178,19 @@ WikiData
 We get wikidata through (action=wbgetentities)
 https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
-Currently, we get these items when available:
-
-* Wikidata Description
-* Wikidata Label
-* Property:P18 image
-
-There is so much more that may be done here.
-
-Wikidata resources:
-
 * https://www.mediawiki.org/wiki/Wikibase/DataModel#Overview_of_the_data_model
 * https://www.wikidata.org/wiki/Help:Wikidata_datamodel
 * https://www.mediawiki.org/wiki/Wikibase/API#wbgetentities
 * https://www.mediawiki.org/wiki/API:Presenting_Wikidata_knowledge
 
-Wikidata properties:
+Properties
 
-Property:P18 (image)
-https://www.wikidata.org/w/api.php?action=wbgetentities&ids=P18&languages=en
-
-Property:P1343 (described by source) - where the info came from
-https://www.wikidata.org/wiki/Property:P1343
-
-P17 country
-
-P585 point in time
+* [P17](https://www.wikidata.org/wiki/Property:P17): country
+* [P18](https://www.wikidata.org/wiki/Property:P18): image
+* [P30](https://www.wikidata.org/wiki/Property:P30): continent
+* [P585](https://www.wikidata.org/wiki/Property:P585): point in time
+* [P625](https://www.wikidata.org/wiki/Property:P625): coordinate location
+* [P1343](https://www.wikidata.org/wiki/Property:P1343): described by source
 
 
 Wikitext
