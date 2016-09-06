@@ -6,15 +6,17 @@ WPTools Utilities module.
 
 from __future__ import print_function
 
-import hashlib
-import json
-import lxml.etree
-import lxml.html
 import re
 import sys
+
+import hashlib
+import json
 import urllib
 
 from collections import defaultdict
+
+import lxml.etree
+import lxml.html
 
 
 def media_url(fname, namespace='commons',
@@ -55,7 +57,7 @@ def snip_html(text, verbose=0):
         2 = inspect descendants (stderr)
     """
 
-    if type(text) is str:
+    if isinstance(text, str):
         text = text.decode('utf-8')
 
     def _inspect(elem, sub=False):
@@ -161,7 +163,7 @@ def template_to_dict(tree):
             if name and value:
                 obj[name] = value.strip()
         except AttributeError:
-            if type(item) is lxml.etree._Element:
+            if isinstance(item, lxml.etree.ElementBase):
                 name = item.tag.strip()
                 text = item.text.strip()
                 if item.tag == 'title':

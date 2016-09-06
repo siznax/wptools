@@ -1,16 +1,33 @@
 # -*- coding:utf-8 -*-
 
+"""
+WPToolsTestTitles module.
+"""
+
+# animals
+# https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status
+# featured
+# https://en.wikipedia.org/wiki/Wikipedia:Today%27s_featured_article/Most_viewed
+# https://ja.wikipedia.org/wiki/Wikipedia:%E7%A7%80%E9%80%B8%E3%81%AA%E8%A8%98%E4%BA%8B
+# https://ru.wikipedia.org/wiki/%D0%92%D0%B8%D0%BA%D0%B8%D0%BF%D0%B5%D0%B4%D0%B8%D1%8F:%D0%98%D0%B7%D0%B1%D1%80%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5_%D1%81%D1%82%D0%B0%D1%82%D1%8C%D0%B8
+# https://zh.wikipedia.org/wiki/Wikipedia:%E7%89%B9%E8%89%B2%E6%9D%A1%E7%9B%AE
+# places
+# https://en.wikipedia.org/wiki/List_of_cities_proper_by_population
+
 import random
 
 
-class WPToolsTestTitles:
+class WPToolsTestTitles(object):
     """
     selected test titles
     - lang: en, ja, ru, zh
     - categories: animals, featured, people, places, things
     """
 
-    animals = {  # https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status
+    def __init__(self):
+        pass
+
+    animals = {
         "en": {
             "Amur Leopard",
             "Black Rhino",
@@ -35,28 +52,28 @@ class WPToolsTestTitles:
 
     # these are somewhat random, but should be high-quality articles
     featured = {
-        "en": {  # https://en.wikipedia.org/wiki/Wikipedia:Today%27s_featured_article/Most_viewed
+        "en": {
             "Franz Kafka",
             "Elizabeth II",
             "Barack Obama",
             "Pluto",
             "Shah Rukh Khan",
         },
-        "ja": {  # https://ja.wikipedia.org/wiki/Wikipedia:%E7%A7%80%E9%80%B8%E3%81%AA%E8%A8%98%E4%BA%8B
+        "ja": {
             "ノストラダムス",  # Nostrodamus
             "アンネ・フランク",  # Anne Frank
             "フィンセント・ファン・ゴッホ",  # Vincent van Gogh
             "アイザック・アシモフ",  # Isaac Asimov
             "チンドン屋",  # musical sandwichmen
         },
-        "ru": {  # https://ru.wikipedia.org/wiki/%D0%92%D0%B8%D0%BA%D0%B8%D0%BF%D0%B5%D0%B4%D0%B8%D1%8F:%D0%98%D0%B7%D0%B1%D1%80%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5_%D1%81%D1%82%D0%B0%D1%82%D1%8C%D0%B8
+        "ru": {
             "Малер, Густав",  # Gustav Mahler
             "Сенеш, Хана",  # Hannah Szenes
             "Уильямс, Серена",  # Crime and Punishment
             "Бронте, Энн",  # Anne Bronte
             "Уолстонкрафт, Мэри",  # Mary Wollstonecraft
         },
-        "zh": {  # https://zh.wikipedia.org/wiki/Wikipedia:%E7%89%B9%E8%89%B2%E6%9D%A1%E7%9B%AE
+        "zh": {
             "異特龍屬",  # allosaurus
             "兴圣教寺塔",  # Hing temple
             "玛丽·沃斯通克拉夫特",  # Mary Wollstonecraft
@@ -112,7 +129,7 @@ class WPToolsTestTitles:
         }
     }
 
-    places = {  # https://en.wikipedia.org/wiki/List_of_cities_proper_by_population
+    places = {
         "en": {
             # "Shanghai",
             "Karachi",

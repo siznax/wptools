@@ -6,17 +6,21 @@ WPTools Fetch module.
 
 from __future__ import print_function
 
-import pycurl
-import sys
-
-from . import __title__, __contact__, __version__
 from io import BytesIO
 from string import Template
 
+import sys
+import pycurl
 
-class WPToolsFetch:
+from . import __title__, __contact__, __version__
 
-    ACTION = {
+
+class WPToolsFetch(object):
+    """
+    Supports MediaWiki:API, RESTBase, Wikidata API HTTP requests
+    """
+
+    QUERY = {
         "parse": Template((
             "https://${WIKI}/w/api.php?action=parse"
             "&contentmodel=text"
@@ -63,7 +67,10 @@ class WPToolsFetch:
             "&titles=${title}"))
     }
 
+    action = None
+    info = None
     silent = False
+    thing = None
     timeout = 15
     title = None
 
@@ -93,9 +100,9 @@ class WPToolsFetch:
 
         crl = self.cobj
         try:
-            crl.setopt(crl.URL, url)
+            crl.setopt(pycurl.URL, url)
         except UnicodeEncodeError:
-            crl.setopt(crl.URL, url.encode('utf-8'))
+            crl.setopt(pycurl.URL, url.encode('utf-8'))
         if not self.silent:
             print("%s (action=%s) %s" % (self.wiki, self.action,
                                          self.thing), file=sys.stderr)
@@ -109,7 +116,7 @@ class WPToolsFetch:
             bfr = BytesIO()
             crl.setopt(crl.WRITEFUNCTION, bfr.write)
             crl.perform()
-            info = self.curl_info(crl)
+            info = curl_info(crl)
             if info:
                 if self.verbose and not self.silent:
                     for item in sorted(info):
@@ -119,47 +126,24 @@ class WPToolsFetch:
             bfr.close()
             return body
         except Exception as detail:
-            raise detail
             return "Caught exception: %s" % detail
-
-    def curl_info(self, crl):
-        """
-        returns curl (response) info
-        """
-        kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
-        url = crl.getinfo(crl.EFFECTIVE_URL)
-        url = url.replace("&format=json", '').replace("&formatversion=2", '')
-        return {"url": url,
-                "user-agent": self.user_agent(),
-                "content": crl.getinfo(crl.CONTENT_TYPE),
-                "status": crl.getinfo(crl.RESPONSE_CODE),
-                "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
-                "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
-                "kB/s": "%3.1f" % kbps}
 
     def curl_setup(self):
         """
         set curl options
         """
         crl = pycurl.Curl()
-        crl.setopt(crl.USERAGENT, self.user_agent())
-        crl.setopt(crl.FOLLOWLOCATION, True)
-        crl.setopt(crl.CONNECTTIMEOUT, self.timeout)
+        crl.setopt(pycurl.USERAGENT, user_agent())
+        crl.setopt(pycurl.FOLLOWLOCATION, True)
+        crl.setopt(pycurl.CONNECTTIMEOUT, self.timeout)
         self.cobj = crl
-
-    def get(self, action, title):
-        """
-        returns GET result from API
-        """
-        obj = WPToolsFetch()
-        return obj.curl(obj.query(action, title))
 
     def query(self, action, thing, pageid=False):
         """
         returns API query string
         """
         if action.startswith('/'):
-            qry = self.ACTION['rest'].substitute(
+            qry = self.QUERY['rest'].substitute(
                 WIKI=self.wiki,
                 entrypoint=action,
                 title=thing)
@@ -177,7 +161,7 @@ class WPToolsFetch:
                 site = thing.get('site')
                 title = thing.get('title')
                 thing = title
-            qry = self.ACTION[action].substitute(
+            qry = self.QUERY[action].substitute(
                 WIKI="www.wikidata.org",
                 ids=ids,
                 lang=self.lang,
@@ -185,7 +169,7 @@ class WPToolsFetch:
                 site=site,
                 title=title)
         else:
-            qry = self.ACTION[action].substitute(
+            qry = self.QUERY[action].substitute(
                 WIKI=self.wiki,
                 thing=thing)
 
@@ -196,11 +180,36 @@ class WPToolsFetch:
         self.thing = thing
         return qry
 
-    def user_agent(self):
-        """
-        returns the wptools user-agent string
-        """
-        return "%s/%s (%s) %s" % (__title__,
-                                  __version__,
-                                  __contact__,
-                                  pycurl.version)
+
+def curl_info(crl):
+    """
+    returns curl (response) info from Pycurl object
+    """
+    kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
+    url = crl.getinfo(crl.EFFECTIVE_URL)
+    url = url.replace("&format=json", '').replace("&formatversion=2", '')
+    return {"url": url,
+            "user-agent": user_agent(),
+            "content": crl.getinfo(crl.CONTENT_TYPE),
+            "status": crl.getinfo(crl.RESPONSE_CODE),
+            "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
+            "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),
+            "kB/s": "%3.1f" % kbps}
+
+
+def get(action, title):
+    """
+    returns GET result from API
+    """
+    obj = WPToolsFetch()
+    return obj.curl(obj.query(action, title))
+
+
+def user_agent():
+    """
+    returns the wptools user-agent string
+    """
+    return "%s/%s (%s) %s" % (__title__,
+                              __version__,
+                              __contact__,
+                              pycurl.version)

@@ -7,19 +7,20 @@ WPTools core module.
 
 from __future__ import print_function
 
-import html2text
 import json
-import lxml
 import re
 import sys
 import urllib
 import urlparse
 
+import lxml
+import html2text
+
 from . import fetch
 from . import utils
 
 
-class WPTools:
+class WPTools(object):
     """
     A user-created :class:WPTools object.
     """
@@ -30,14 +31,37 @@ class WPTools:
         'get_wikidata': {'Label'}
     }
 
-    claims = {}
-    fatal = False
-    images = {}
-    pageid = None
-    title = None
-    wikibase = None
+    Coordinates = None
+    Description = None
+    Image = None
+    Label = None
 
-    def __init__(self, title='',  lang='en', wikibase=None,
+    claims = {}
+    extext = None
+    extract = None
+    fatal = False
+    g_claims = None
+    g_parse = None
+    g_query = None
+    g_rest = None
+    g_wikidata = None
+    images = {}
+    infobox = None
+    lastmodified = None
+    lead = None
+    links = None
+    pageid = None
+    pageimage = None
+    parsetree = None
+    random = None
+    thumbnail = None
+    title = None
+    url = None
+    urlraw = None
+    wikibase = None
+    wikitext = None
+
+    def __init__(self, title='', lang='en', wikibase=None,
                  silent=False, verbose=False, wiki=None):
         self.silent = silent
         self.lang = lang
@@ -70,25 +94,6 @@ class WPTools:
                 return labels.get(self.lang).get('value')
             except AttributeError:
                 return labels.get('value')
-
-    def __get_links(self, iwlinks):
-        """
-        returns list of interwiki links from parse/iwlinks
-        """
-        links = []
-        for item in iwlinks:
-            links.append(item['url'])
-        if len(links) == 1:
-            return links[0]
-        return sorted(links) if links else None
-
-    def __get_infobox(self, ptree):
-        """
-        returns infobox <type 'dict'> from parse/parsetreee
-        """
-        for item in lxml.etree.fromstring(ptree).xpath("//template"):
-            if "box" in item.find('title').text:
-                return utils.template_to_dict(item)
 
     def __get_lead(self, data):
         """
@@ -145,7 +150,7 @@ class WPTools:
         if hasattr(self, 'lastmodified'):
             meta.append("Last modified: %s" % self.lastmodified)
         if hasattr(self, 'geo'):
-            meta.append("Coordinates: %s" % self.geo)
+            meta.append("Coordinates: %s" % self.Coordinates)
         return "<p metadata>%s</p>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
@@ -168,9 +173,9 @@ class WPTools:
             break
 
         if pars:
-            pars = "\n".join(pars)
-            self.g_rest['html'] = pars
-            return self.__postprocess_lead(pars)
+            html = "\n".join(pars)
+            self.g_rest['html'] = html
+            return self.__postprocess_lead(html)
 
     def __postprocess_lead(self, html):
         """
@@ -199,9 +204,9 @@ class WPTools:
         """
         try:
             data = json.loads(self.g_parse['response'])
-        except:
+        except ValueError:
             self.fatal = True
-            stderr("Could not load JSON response for query: %s"
+            stderr("Could not load query response: %s"
                    % self.g_parse['query'])
             return
 
@@ -213,8 +218,8 @@ class WPTools:
             return
 
         parsetree = pdata.get('parsetree')
-        self.infobox = self.__get_infobox(parsetree)
-        self.links = self.__get_links(pdata.get('iwlinks'))
+        self.infobox = get_infobox(parsetree)
+        self.links = get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
         self.parsetree = parsetree
         self.title = pdata.get('title').replace(' ', '_')
@@ -227,9 +232,9 @@ class WPTools:
         """
         try:
             data = json.loads(self.g_query['response'])
-        except:
+        except ValueError:
             self.fatal = True
-            stderr("Could not load JSON response for query: %s"
+            stderr("Could not load query response: %s"
                    % self.g_query['query'])
             return
 
@@ -244,12 +249,9 @@ class WPTools:
         extract = page.get('extract')
         if extract:
             self.extract = extract
-            try:
-                extext = html2text.html2text(self.extract)
-                if extext.strip():
-                    self.extext = extext
-            except:
-                pass
+            extext = html2text.html2text(self.extract)
+            if extext:
+                self.extext = extext.strip()
 
         images = {}
         pageimage = page.get('pageimage')
@@ -287,9 +289,9 @@ class WPTools:
         try:
             data = json.loads(self.g_rest['response'])
             url = urlparse.urlparse(self.g_rest['query'])
-        except:
+        except ValueError:
             self.fatal = True
-            stderr("Could not load JSON response for query: %s"
+            stderr("Could not load query response: %s"
                    % self.g_rest['query'])
             return
 
@@ -342,29 +344,29 @@ class WPTools:
 
         claimattr = {}
 
-        P17 = claims.get('P17')  # P17 country
-        if P17:
-            country = P17[0].get('mainsnak').get('datavalue').get('value')
+        p17 = claims.get('P17')  # P17 country
+        if p17:
+            country = p17[0].get('mainsnak').get('datavalue').get('value')
             if country:
                 claimattr[country.get('id')] = 'Country'
 
-        P18 = claims.get('P18')  # P18 image
-        if P18:
-            image = P18[0].get('mainsnak').get('datavalue').get('value')
+        p18 = claims.get('P18')  # P18 image
+        if p18:
+            image = p18[0].get('mainsnak').get('datavalue').get('value')
             if image:
                 self.Image = utils.media_url(image)
             if self.images:
                 self.images['wimage'] = image
 
-        P30 = claims.get('P30')  # P30 continent
-        if P30:
-            cont = P30[0].get('mainsnak').get('datavalue').get('value')
+        p30 = claims.get('P30')  # P30 continent
+        if p30:
+            cont = p30[0].get('mainsnak').get('datavalue').get('value')
             if cont:
                 claimattr[cont.get('id')] = 'Continent'
 
-        P625 = claims.get('P625')  # P625 coordinate location
-        if P625:
-            geo = P625[0].get('mainsnak').get('datavalue').get('value')
+        p625 = claims.get('P625')  # P625 coordinate location
+        if p625:
+            geo = p625[0].get('mainsnak').get('datavalue').get('value')
             if geo:
                 self.Coordinates = "%s,%s" % (geo.get('latitude'),
                                               geo.get('longitude'))
@@ -379,7 +381,7 @@ class WPTools:
         try:
             data = json.loads(self.g_wikidata['response'])
             entities = data.get('entities')
-        except:
+        except ValueError:
             self.fatal = True
             stderr("Could not load query response: %s"
                    % self.g_wikidata['query'])
@@ -399,14 +401,14 @@ class WPTools:
         if descriptions:
             try:
                 self.Description = descriptions.get(self.lang).get('value')
-            except:
+            except AttributeError:
                 self.Description = descriptions.get('value')
 
         labels = item.get('labels')
         if labels:
             try:
                 self.Label = labels.get(self.lang).get('value')
-            except:
+            except AttributeError:
                 self.Label = labels.get('value')
 
         if hasattr(self, 'Label') and not self.title:
@@ -538,9 +540,9 @@ class WPTools:
         response = self.__fetch.curl(query)
         try:
             rdata = json.loads(response).get('query').get('random')[0]
-        except:
+        except ValueError:
             self.fatal = True
-            stderr("Could not load JSON response for query: %s" % query)
+            stderr("Could not load query response: %s" % query)
             return
         self.pageid = rdata.get('id')
         self.title = rdata.get('title').replace(' ', '_')
@@ -619,15 +621,13 @@ class WPTools:
         """
         maxlen = 72
 
-        def ptrunc(prefix, tail):  # pretty truncate
+        def ptrunc(prefix, tail):
+            """pretty truncate"""
             pad = 8
             _str = tail[:maxlen - (len(prefix) + pad)]
             if len(prefix) + len(tail) + pad >= maxlen:
                 _str += '...'
-            try:
-                return str(_str)
-            except:
-                return _str
+            return str(_str)
 
         data = {}
         for item in self.__getattrs():
@@ -649,7 +649,7 @@ class WPTools:
                 prop = re.sub(' +', ' ', prop)
                 try:
                     prop = str(prop.encode('utf-8'))
-                except:
+                except UnicodeDecodeError:
                     prop = str(prop)
                 if len(prop) > maxlen and not prop.startswith('http'):
                     prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
@@ -669,6 +669,28 @@ class WPTools:
         stderr("}", self.silent)
 
 
+def get_infobox(ptree):
+    """
+    returns infobox <type 'dict'> from parse/parsetreee
+    """
+    for item in lxml.etree.fromstring(ptree).xpath("//template"):
+        if "box" in item.find('title').text:
+            return utils.template_to_dict(item)
+
+
+def get_links(iwlinks):
+    """
+    returns list of interwiki links from parse/iwlinks
+    """
+    links = []
+    for item in iwlinks:
+        links.append(item['url'])
+    if len(links) == 1:
+        return links[0]
+    return sorted(links) if links else None
+
+
 def stderr(msg, silent=False):
+    """write msg to stderr if not silent"""
     if not silent:
         print(msg, file=sys.stderr)
