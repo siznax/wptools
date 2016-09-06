@@ -332,10 +332,8 @@ make all requests necessary to populate all the things
 
 Wikidata:API (action=wbgetentities) for labels of claims
 
-..
-
-  |  e.g. turns claim {'Q298': 'Country'} into self.Country: Chile
-  |  use get_wikidata() to populate claims
+- turns claim {'Q298': 'Country'} into Country: Chile
+- use get_wikidata() to populate claims
 
 
 **get_parse** (self)
