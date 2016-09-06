@@ -637,14 +637,14 @@ class WPTools:
             data[item] = prop
             if item is None:
                 continue
-            if type(prop) is dict:
+            if isinstance(prop, dict):
                 keys = sorted(prop.keys())
                 klen = len(keys)
                 kstr = ', '.join(keys)
                 data[item] = ptrunc(item, "<dict(%d)> {%s}" % (klen, kstr))
-            if type(prop) is list:
+            if isinstance(prop, list):
                 data[item] = "<list(%d)>" % len(prop)
-            if type(prop) is str or type(prop) is unicode:
+            if isinstance(prop, basestring):
                 prop = prop.strip().replace("\n", '')
                 prop = re.sub(' +', ' ', prop)
                 try:
