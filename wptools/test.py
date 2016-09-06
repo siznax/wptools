@@ -201,7 +201,7 @@ def language():
     """
     returns random language code from selections
     """
-    return random.choice(WPToolsTestTitles.featured.keys())
+    return random.choice(list(WPToolsTestTitles.featured))
 
 
 def title(lang=None):

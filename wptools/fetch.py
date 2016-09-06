@@ -112,21 +112,18 @@ class WPToolsFetch(object):
         """
         performs HTTP GET and returns body of response
         """
-        try:
-            bfr = BytesIO()
-            crl.setopt(crl.WRITEFUNCTION, bfr.write)
-            crl.perform()
-            info = curl_info(crl)
-            if info:
-                if self.verbose and not self.silent:
-                    for item in sorted(info):
-                        print("  %s: %s" % (item, info[item]), file=sys.stderr)
-                self.info = info
-            body = bfr.getvalue()
-            bfr.close()
-            return body
-        except Exception as detail:
-            return "Caught exception: %s" % detail
+        bfr = BytesIO()
+        crl.setopt(crl.WRITEFUNCTION, bfr.write)
+        crl.perform()
+        info = curl_info(crl)
+        if info:
+            if self.verbose and not self.silent:
+                for item in sorted(info):
+                    print("  %s: %s" % (item, info[item]), file=sys.stderr)
+            self.info = info
+        body = bfr.getvalue()
+        bfr.close()
+        return body
 
     def curl_setup(self):
         """

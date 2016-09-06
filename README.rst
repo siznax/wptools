@@ -174,7 +174,7 @@ Get a representative image:
 .. code-block:: python
 
     >>> frida = wptools.page("Frida Kahlo").get()
-    >>> frida.Image
+    >>> frida.image
 
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
 
@@ -234,7 +234,7 @@ Get geographic coordinates:
 .. code-block:: python
 
     >>> paris = wptools.page('Paris').get_wikidata()
-    >>> paris.Coordinates
+    >>> paris.coordinates
     '48.8565777778,2.35182777778'
 
 
@@ -254,8 +254,8 @@ Resolve wikidata claims_:
     en.wikipedia.org (action=wikidata) Q48|Q668
     Madurai (en)
     {
-      Continent: Asia (Q48)
-      Country: India (Q668)
+      continent: Asia (Q48)
+      country: India (Q668)
       ...
     }
 
@@ -286,8 +286,8 @@ Get all the things by *wikibase*:
 
     Jill_Lepore (en)
     {
-      Description: American historian
-      Label: Jill Lepore
+      description: American historian
+      label: Jill Lepore
       extext: <str(1018)> **Jill Lepore** (born August 27, 1966) is an A...
       extract: <str(1109)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
       g_parse: <dict(3)> {info, query, response}
@@ -332,7 +332,7 @@ make all requests necessary to populate all the things
 
 Wikidata:API (action=wbgetentities) for labels of claims
 
-- turns claim {'Q298': 'Country'} into Country: Chile
+- e.g. turns claim {'Q298': 'country'} into country: Chile
 - use get_wikidata() to populate claims
 
 
@@ -385,7 +385,7 @@ MediaWiki:API `action=query`_ request for:
 
 RESTBase_ ``/page/mobile-text/`` request for:
 
-- Description: <unicode> apparently, Wikidata description
+- description: <unicode> apparently, Wikidata description
 - images: <dict> {rimage, rthumb}
 - lastmodified: <str> ISO8601 date and time
 - lead: <str> encyclopedia-like `lead section`_
@@ -397,9 +397,9 @@ RESTBase_ ``/page/mobile-text/`` request for:
 The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
 
 - ``<p heading>`` wiki-linked title and description
-- ``<img {type}>`` {Image, pageimage, or thumbnail}
+- ``<img {type}>`` {image, pageimage, or thumbnail}
 - ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
-- ``<p metadata>`` available metadata (e.g. Last modified, Coordinates)
+- ``<p metadata>`` available metadata (e.g. Last modified, coordinates)
 
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
@@ -409,11 +409,12 @@ The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
 
 Wikidata:API `action=wbgetentities`_ request for:
 
-- Description: <unicode> Wikidata description
-- Image: <unicode> Wikidata Property:P18_ image URL
-- Label: <unicode> Wikidata label
-- geo: <str> P625_ Geographic coordinates (lat,lon)
+- claims: <dict> Wikidata claims (see get_claims)
+- coordinates: <str> P625_ Geographic coordinates (lat,lon)
+- description: <unicode> Wikidata description
+- image: <unicode> Wikidata Property:P18_ image URL
 - images: <dict> {wimage}
+- label: <unicode> Wikidata label
 
 .. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
@@ -432,6 +433,7 @@ Requests
 
 Detailed request info can be found in these instance attributes:
 
+- g_claims: <dict> {info, query, response}
 - g_parse: <dict> {info, query, response}
 - g_query: <dict> {info, query, response}
 - g_rest: <dict> {html, info, query, response}

@@ -70,13 +70,13 @@ class WPToolsPickTest(unittest.TestCase):
         Get wikidata geographic coordinates
         """
         p = wptools.page('Paris').get_wikidata(False)
-        self.assertTrue(p.Coordinates is not None)
+        self.assertTrue(p.coordinates is not None)
 
     def test_wikidata_claims(self):
         p = wptools.page('Paris').get_wikidata(False)
         p.get_claims(False)
-        self.assertTrue(p.Continent == 'Europe')
-        self.assertTrue(p.Country == 'France')
+        self.assertTrue(p.continent == 'Europe')
+        self.assertTrue(p.country == 'France')
 
     def test_mixed_lang(self):
         """

@@ -6,12 +6,15 @@ WPTools core module.
 """
 
 from __future__ import print_function
+try:  # python2
+    from urllib import quote
+    from urlparse import urlparse
+except ImportError:  # python3
+    from urllib.parse import quote, urlparse
 
 import json
 import re
 import sys
-import urllib
-import urlparse
 
 import lxml
 import html2text
@@ -28,13 +31,13 @@ class WPTools(object):
     _skipmap = {
         'get_parse': {'parsetree', 'wikibase', 'wikitext'},
         'get_query': {'extract', 'pageid', 'random'},
-        'get_wikidata': {'Label'}
+        'get_wikidata': {'label'}
     }
 
-    Coordinates = None
-    Description = None
-    Image = None
-    Label = None
+    coordinates = None
+    description = None
+    image = None
+    label = None
 
     claims = {}
     extext = None
@@ -113,8 +116,8 @@ class WPTools(object):
         if not hasattr(self, 'url') or not hasattr(self, 'title'):
             return
         heading = "<a href=\"%s\">%s</a>" % (self.url, self.title)
-        if hasattr(self, 'Description') and self.Description:
-            heading += "&mdash;<i>%s</i>" % self.Description
+        if hasattr(self, 'description') and self.description:
+            heading += "&mdash;<i>%s</i>" % self.description
         return "<p heading>%s</p>" % heading
 
     def __get_lead_image(self):
@@ -122,14 +125,14 @@ class WPTools(object):
         returns <img> HTML from image attributes
         """
         alt = self.title
-        if hasattr(self, 'Label') and self.Label:
-            alt = self.Label
+        if hasattr(self, 'label') and self.label:
+            alt = self.label
 
         src = None
         cls = None
-        if hasattr(self, 'Image') and self.Image:
-            src = self.Image
-            cls = 'Image'
+        if hasattr(self, 'image') and self.image:
+            src = self.image
+            cls = 'image'
         elif hasattr(self, 'pageimage') and self.pageimage:
             src = self.pageimage
             cls = 'pageimage'
@@ -150,7 +153,7 @@ class WPTools(object):
         if hasattr(self, 'lastmodified'):
             meta.append("Last modified: %s" % self.lastmodified)
         if hasattr(self, 'geo'):
-            meta.append("Coordinates: %s" % self.Coordinates)
+            meta.append("coordinates: %s" % self.coordinates)
         return "<p metadata>%s</p>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
@@ -183,7 +186,7 @@ class WPTools(object):
         """
         snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
         snip = "<p snipped>%s</p>" % snip
-        url = urlparse.urlparse(self.g_rest['query'])
+        url = urlparse(self.g_rest['query'])
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
@@ -203,7 +206,7 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=parse)
         """
         try:
-            data = json.loads(self.g_parse['response'])
+            data = json_loads(self.g_parse['response'])
         except ValueError:
             self.fatal = True
             stderr("Could not load query response: %s"
@@ -231,7 +234,7 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=query)
         """
         try:
-            data = json.loads(self.g_query['response'])
+            data = json_loads(self.g_query['response'])
         except ValueError:
             self.fatal = True
             stderr("Could not load query response: %s"
@@ -287,8 +290,8 @@ class WPTools(object):
         set attributes derived from RESTBase
         """
         try:
-            data = json.loads(self.g_rest['response'])
-            url = urlparse.urlparse(self.g_rest['query'])
+            data = json_loads(self.g_rest['response'])
+            url = urlparse(self.g_rest['query'])
         except ValueError:
             self.fatal = True
             stderr("Could not load query response: %s"
@@ -301,13 +304,13 @@ class WPTools(object):
                 stderr("RESTBase error: %s" % error)
                 return
 
-        self.__setattr('Description', data.get('description'), 'rest')
+        self.__setattr('description', data.get('description'), 'rest')
 
         image = data.get('image')
         if image:
             self.images['rimage'] = image
             image_file = utils.media_url(image.get('file'))
-            # apparently get_query pageimage or get_wikidata Image
+            # apparently get_query pageimage or get_wikidata image
             # self.__setattr('pageimage', image_file, 'rest')
             self.pageimage = image_file
 
@@ -348,13 +351,13 @@ class WPTools(object):
         if p17:
             country = p17[0].get('mainsnak').get('datavalue').get('value')
             if country:
-                claimattr[country.get('id')] = 'Country'
+                claimattr[country.get('id')] = 'country'
 
         p18 = claims.get('P18')  # P18 image
         if p18:
             image = p18[0].get('mainsnak').get('datavalue').get('value')
             if image:
-                self.Image = utils.media_url(image)
+                self.image = utils.media_url(image)
             if self.images:
                 self.images['wimage'] = image
 
@@ -362,13 +365,13 @@ class WPTools(object):
         if p30:
             cont = p30[0].get('mainsnak').get('datavalue').get('value')
             if cont:
-                claimattr[cont.get('id')] = 'Continent'
+                claimattr[cont.get('id')] = 'continent'
 
         p625 = claims.get('P625')  # P625 coordinate location
         if p625:
             geo = p625[0].get('mainsnak').get('datavalue').get('value')
             if geo:
-                self.Coordinates = "%s,%s" % (geo.get('latitude'),
+                self.coordinates = "%s,%s" % (geo.get('latitude'),
                                               geo.get('longitude'))
 
         if claimattr:
@@ -379,7 +382,7 @@ class WPTools(object):
         set attributes derived from Wikidata (action=wbentities)
         """
         try:
-            data = json.loads(self.g_wikidata['response'])
+            data = json_loads(self.g_wikidata['response'])
             entities = data.get('entities')
         except ValueError:
             self.fatal = True
@@ -387,7 +390,8 @@ class WPTools(object):
                    % self.g_wikidata['query'])
             return
 
-        item = entities.get(entities.keys()[0])
+        item = entities.get(next(iter(entities)))
+
         if 'id' not in item:
             if 'title' in item:
                 stderr("Wikidata missing title: %s" % item['title'])
@@ -400,19 +404,19 @@ class WPTools(object):
         descriptions = item.get('descriptions')
         if descriptions:
             try:
-                self.Description = descriptions.get(self.lang).get('value')
+                self.description = descriptions.get(self.lang).get('value')
             except AttributeError:
-                self.Description = descriptions.get('value')
+                self.description = descriptions.get('value')
 
         labels = item.get('labels')
         if labels:
             try:
-                self.Label = labels.get(self.lang).get('value')
+                self.label = labels.get(self.lang).get('value')
             except AttributeError:
-                self.Label = labels.get('value')
+                self.label = labels.get('value')
 
-        if hasattr(self, 'Label') and not self.title:
-            self.title = self.Label.replace(' ', '_')
+        if hasattr(self, 'label') and not self.title:
+            self.title = self.label.replace(' ', '_')
 
     def _skip_get(self, action):
         """
@@ -449,8 +453,8 @@ class WPTools(object):
     def get_claims(self, show=True):
         """
         Wikidata:API (action=wbgetentities) for labels of claims
-        e.g. turns claim {'Q298': 'Country'} into self.Country: Chile
-        use get_wikidata() to populate selected claims
+        - e.g. turns claim {'Q298': 'country'} into country: Chile
+        - use get_wikidata() to populate selected claims
         """
         if not self.claims:
             return
@@ -464,7 +468,7 @@ class WPTools(object):
         g_claims['info'] = self.__fetch.info
         self.g_claims = g_claims
 
-        data = json.loads(self.g_claims['response'])
+        data = json_loads(self.g_claims['response'])
         entities = data.get('entities')
         for item in entities:
             attr = self.claims[item]
@@ -507,9 +511,9 @@ class WPTools(object):
         - extract: <unicode> HTML extract via Extension:TextExtract
         - images: <dict> {qimage, qthumb}
         - pageid: <int> Wikipedia database ID
-        - pageimage: <unicode> pageimage URL via Extension:PageImages
+        - pageimage: <unicode> pageimage URL via Extension:Pageimages
         - random: <unicode> a random article title with every request!
-        - thumbnail: <unicode> thumbnail URL via Extension:PageImages
+        - thumbnail: <unicode> thumbnail URL via Extension:Pageimages
         - url: <unicode> the canonical wiki URL
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
@@ -538,14 +542,18 @@ class WPTools(object):
         """
         query = self.__fetch.query('random', None)
         response = self.__fetch.curl(query)
+
         try:
-            rdata = json.loads(response).get('query').get('random')[0]
+            data = json_loads(response)
+            rdata = data.get('query').get('random')[0]
         except ValueError:
             self.fatal = True
             stderr("Could not load query response: %s" % query)
             return
+
         self.pageid = rdata.get('id')
         self.title = rdata.get('title').replace(' ', '_')
+
         if show:
             self.show()
         return self
@@ -553,7 +561,7 @@ class WPTools(object):
     def get_rest(self, show=True):
         """
         RESTBase (/page/mobile-text/)
-        - Description: <unicode> apparently, Wikidata description
+        - description: <unicode> apparently, Wikidata description
         - images: <dict> {rimage, rthumb}
         - lastmodified: <str> ISO8601 date and time
         - lead: <str> encyclopedia-like lead section
@@ -564,9 +572,9 @@ class WPTools(object):
         https://en.wikipedia.org/api/rest_v1/
         """
         try:
-            title = urllib.quote(self.title)
+            title = quote(self.title)
         except KeyError:
-            title = urllib.quote(self.title.encode('utf-8'))
+            title = quote(self.title.encode('utf-8'))
         query = self.__fetch.query('/page/mobile-text/', title)
         rest = {}
         rest['query'] = query
@@ -581,12 +589,12 @@ class WPTools(object):
     def get_wikidata(self, show=True):
         """
         Wikidata:API (action=wbgetentities) for:
-        - Coordinates: <str> Wikidata Property:P625 coordinates (lat,lon)
-        - Description: <unicode> Wikidata description
-        - Image: <unicode> Wikidata Property:P18 image URL
-        - Label: <unicode> Wikidata label
         - claims: <dict> Wikidata claims (see get_claims)
+        - coordinates: <str> Wikidata Property:P625 coordinates (lat,lon)
+        - description: <unicode> Wikidata description
+        - image: <unicode> Wikidata Property:P18 image URL
         - images: <dict> {wimage}
+        - label: <unicode> Wikidata label
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if self._skip_get('get_wikidata'):
@@ -622,37 +630,37 @@ class WPTools(object):
         maxlen = 72
 
         def ptrunc(prefix, tail):
-            """pretty truncate"""
+            """pretty truncate text"""
             pad = 8
-            _str = tail[:maxlen - (len(prefix) + pad)]
+            text = tail[:maxlen - (len(prefix) + pad)]
             if len(prefix) + len(tail) + pad >= maxlen:
-                _str += '...'
-            return str(_str)
+                text += '...'
+            return text
 
         data = {}
         for item in self.__getattrs():
             if item.startswith("_WPTools"):
                 continue
-            prop = self.__dict__[item]
-            data[item] = prop
+
             if item is None:
                 continue
+
+            prop = self.__dict__[item]
+
             if isinstance(prop, dict):
                 keys = sorted(prop.keys())
                 klen = len(keys)
                 kstr = ', '.join(keys)
                 data[item] = ptrunc(item, "<dict(%d)> {%s}" % (klen, kstr))
-            if isinstance(prop, list):
+            elif isinstance(prop, list):
                 data[item] = "<list(%d)>" % len(prop)
-            if isinstance(prop, basestring):
+            elif is_text(prop):
                 prop = prop.strip().replace("\n", '')
                 prop = re.sub(' +', ' ', prop)
-                try:
-                    prop = str(prop.encode('utf-8'))
-                except UnicodeDecodeError:
-                    prop = str(prop)
                 if len(prop) > maxlen and not prop.startswith('http'):
                     prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
+                data[item] = prop
+            else:
                 data[item] = prop
 
         header = None
@@ -688,6 +696,29 @@ def get_links(iwlinks):
     if len(links) == 1:
         return links[0]
     return sorted(links) if links else None
+
+
+def is_text(obj, name=None):
+    """
+    returns True if object is text-like
+    """
+    try:  # python2
+        ans = isinstance(obj, basestring)
+    except NameError:  # python3
+        ans = isinstance(obj, str)
+    if name:
+        stderr("is_text: (%s) %s = %s" % (ans, name, obj.__class__))
+    return ans
+
+
+def json_loads(data):
+    """
+    python-version safe json.loads
+    """
+    try:  # python2
+        return json.loads(data)
+    except TypeError:  # python3
+        return json.loads(data.decode('utf-8'))
 
 
 def stderr(msg, silent=False):

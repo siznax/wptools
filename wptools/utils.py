@@ -5,13 +5,17 @@ WPTools Utilities module.
 """
 
 from __future__ import print_function
+try:  # python2
+    from urllib import quote
+except ImportError:  # python3
+    from urllib.parse import quote
+
 
 import re
 import sys
 
 import hashlib
 import json
-import urllib
 
 from collections import defaultdict
 
@@ -25,13 +29,14 @@ def media_url(fname, namespace='commons',
     return Wikimedia File/Image URL from name
     """
     name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
+
     try:
         digest = hashlib.md5(name).hexdigest()
-        path = "/".join([digest[:1], digest[:2], name])
-    except UnicodeEncodeError:
-        name = name.encode('utf-8')
-        digest = hashlib.md5(name).hexdigest()
-        path = urllib.quote("/".join([digest[:1], digest[:2], name]))
+    except (UnicodeEncodeError, TypeError):
+        digest = hashlib.md5(name.encode('utf-8')).hexdigest()
+
+    path = quote("/".join([digest[:1], digest[:2], name]))
+
     return "/".join([wiki, namespace, path])
 
 
@@ -56,9 +61,6 @@ def snip_html(text, verbose=0):
         1 = show replacements (stderr)
         2 = inspect descendants (stderr)
     """
-
-    if isinstance(text, str):
-        text = text.decode('utf-8')
 
     def _inspect(elem, sub=False):
         if verbose > 1:
@@ -120,7 +122,10 @@ def snip_html(text, verbose=0):
 
         keep.append(elem)
 
-    return text.split('<')[0] + lxml.html.tostring(keep)
+    leading_text = text.split('<')[0]
+    keep_html = lxml.html.tostring(keep, encoding='unicode')
+
+    return leading_text + keep_html
 
 
 def span_classes(frag):
@@ -170,7 +175,7 @@ def template_to_dict(tree):
                     obj['infobox'] = text
                 else:
                     obj[name] = text
-        except:
+        finally:
             errors.append(lxml.etree.tostring(item))
     if errors:
         obj['errors'] = errors
