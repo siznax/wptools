@@ -511,9 +511,9 @@ class WPTools(object):
         - extract: <unicode> HTML extract via Extension:TextExtract
         - images: <dict> {qimage, qthumb}
         - pageid: <int> Wikipedia database ID
-        - pageimage: <unicode> pageimage URL via Extension:Pageimages
+        - pageimage: <unicode> pageimage URL via Extension:PageImages
         - random: <unicode> a random article title with every request!
-        - thumbnail: <unicode> thumbnail URL via Extension:Pageimages
+        - thumbnail: <unicode> thumbnail URL via Extension:PageImages
         - url: <unicode> the canonical wiki URL
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
