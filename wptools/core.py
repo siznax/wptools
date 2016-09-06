@@ -30,8 +30,9 @@ class WPTools:
         'get_wikidata': {'Label'}
     }
 
+    claims = {}
     fatal = False
-    images = dict()
+    images = {}
     pageid = None
     title = None
     wikibase = None
@@ -50,6 +51,25 @@ class WPTools:
         else:
             self.show()
         self.verbose = verbose
+
+    def __getattrs(self):
+        """
+        returns list of "public" attributes
+        """
+        return [x for x in self.__dict__
+                if getattr(self, x)
+                and not x.startswith("__")]
+
+    def __get_claim_label(self, item):
+        """
+        returns label value from Wikidata claim item
+        """
+        labels = item.get('labels')
+        if labels:
+            try:
+                return labels.get(self.lang).get('value')
+            except AttributeError:
+                return labels.get('value')
 
     def __get_links(self, iwlinks):
         """
@@ -231,7 +251,7 @@ class WPTools:
             except:
                 pass
 
-        images = dict()
+        images = {}
         pageimage = page.get('pageimage')
         if pageimage:
             images['qimage'] = pageimage
@@ -313,29 +333,46 @@ class WPTools:
             if lead:
                 self.lead = lead
 
-    def _set_wikibase_claims(self, claims):
+    def _set_wikidata_claims(self, claims):
         """
         set selected Wikidata claims attributes
         """
         if not claims:
             return
 
-        # P17  country
+        claimattr = {}
+
+        P17 = claims.get('P17')  # P17 country
+        if P17:
+            country = P17[0].get('mainsnak').get('datavalue').get('value')
+            if country:
+                claimattr[country.get('id')] = 'Country'
+
         P18 = claims.get('P18')  # P18 image
         if P18:
             image = P18[0].get('mainsnak').get('datavalue').get('value')
-            self.Image = utils.media_url(image)
+            if image:
+                self.Image = utils.media_url(image)
             if self.images:
                 self.images['wimage'] = image
-        # P585 point in time
+
+        P30 = claims.get('P30')  # P30 continent
+        if P30:
+            cont = P30[0].get('mainsnak').get('datavalue').get('value')
+            if cont:
+                claimattr[cont.get('id')] = 'Continent'
+
         P625 = claims.get('P625')  # P625 coordinate location
         if P625:
             geo = P625[0].get('mainsnak').get('datavalue').get('value')
             if geo:
-                self.geo = "%s,%s" % (geo.get('latitude'),
-                                      geo.get('longitude'))
+                self.Coordinates = "%s,%s" % (geo.get('latitude'),
+                                              geo.get('longitude'))
 
-    def _set_wikibase_data(self):
+        if claimattr:
+            self.claims = claimattr
+
+    def _set_wikidata(self):
         """
         set attributes derived from Wikidata (action=wbentities)
         """
@@ -344,7 +381,7 @@ class WPTools:
             entities = data.get('entities')
         except:
             self.fatal = True
-            stderr("Could not load JSON response for query: %s"
+            stderr("Could not load query response: %s"
                    % self.g_wikidata['query'])
             return
 
@@ -356,7 +393,7 @@ class WPTools:
 
         self.wikibase = "https://www.wikidata.org/wiki/%s" % item.get('id')
 
-        self._set_wikibase_claims(item.get('claims'))
+        self._set_wikidata_claims(item.get('claims'))
 
         descriptions = item.get('descriptions')
         if descriptions:
@@ -371,6 +408,7 @@ class WPTools:
                 self.Label = labels.get(self.lang).get('value')
             except:
                 self.Label = labels.get('value')
+
         if hasattr(self, 'Label') and not self.title:
             self.title = self.Label.replace(' ', '_')
 
@@ -404,6 +442,36 @@ class WPTools:
             self.get_query(show=False)
             self.get_parse(show=False)
             self.get_wikidata()
+        return self
+
+    def get_claims(self, show=True):
+        """
+        Wikidata:API (action=wbgetentities) for labels of claims
+        e.g. turns claim {'Q298': 'Country'} into self.Country: Chile
+        use get_wikidata() to populate selected claims
+        """
+        if not self.claims:
+            return
+
+        thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
+        query = self.__fetch.query('wikidata', thing)
+
+        g_claims = {}
+        g_claims['query'] = query
+        g_claims['response'] = self.__fetch.curl(query)
+        g_claims['info'] = self.__fetch.info
+        self.g_claims = g_claims
+
+        data = json.loads(self.g_claims['response'])
+        entities = data.get('entities')
+        for item in entities:
+            attr = self.claims[item]
+            value = self.__get_claim_label(entities[item])
+            if value:
+                setattr(self, attr, value)
+
+        if show:
+            self.show()
         return self
 
     def get_parse(self, show=True):
@@ -511,10 +579,11 @@ class WPTools:
     def get_wikidata(self, show=True):
         """
         Wikidata:API (action=wbgetentities) for:
+        - Coordinates: <str> Wikidata Property:P625 coordinates (lat,lon)
         - Description: <unicode> Wikidata description
         - Image: <unicode> Wikidata Property:P18 image URL
         - Label: <unicode> Wikidata label
-        - geo: <str> P625 Geographic coordinates (lat,lon)
+        - claims: <dict> Wikidata claims (see get_claims)
         - images: <dict> {wimage}
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
@@ -539,7 +608,7 @@ class WPTools:
         wdata['response'] = self.__fetch.curl(query)
         wdata['info'] = self.__fetch.info
         self.g_wikidata = wdata
-        self._set_wikibase_data()
+        self._set_wikidata()
         if show:
             self.show()
         return self
@@ -561,9 +630,7 @@ class WPTools:
                 return _str
 
         data = {}
-        attrs = [x for x in self.__dict__ if getattr(self, x)
-                 and not x.startswith("__")]
-        for item in attrs:
+        for item in self.__getattrs():
             if item.startswith("_WPTools"):
                 continue
             prop = self.__dict__[item]

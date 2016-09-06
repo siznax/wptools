@@ -70,7 +70,13 @@ class WPToolsPickTest(unittest.TestCase):
         Get wikidata geographic coordinates
         """
         p = wptools.page('Paris').get_wikidata(False)
-        self.assertTrue(p.geo is not None)
+        self.assertTrue(p.Coordinates is not None)
+
+    def test_wikidata_claims(self):
+        p = wptools.page('Paris').get_wikidata(False)
+        p.get_claims(False)
+        self.assertTrue(p.Continent == 'Europe')
+        self.assertTrue(p.Country == 'France')
 
     def test_mixed_lang(self):
         """
@@ -84,7 +90,7 @@ class WPToolsPickTest(unittest.TestCase):
         Successfully populate complex infobox dict
         """
         p = wptools.page('Abe Lincoln').get_parse(False)
-        self.assertGreaterEqual(len(p.infobox), 42)
+        self.assertGreaterEqual(len(p.infobox), 32)
 
 
 class WPToolsRandomTest(unittest.TestCase):
@@ -133,6 +139,7 @@ class WPToolsToolTest(unittest.TestCase):
 
     def test_wptool(self):
         from scripts.wptool import main
+        # main()
 
 
 if __name__ == '__main__':

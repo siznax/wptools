@@ -37,12 +37,12 @@ class WPToolsFetch:
             "&inprop=displaytitle|url|watchers"
             "&list=random"
             "&pithumbsize=240"
-            "&prop=extracts|images|info|pageimages|pageprops"
             "&ppprop=wikibase_item"
+            "&prop=extracts|images|info|pageimages|pageprops"
+            "&redirects"
             "&rnlimit=1"
             "&rnnamespace=0"
-            "&titles=${thing}"
-            "&redirects")),
+            "&titles=${thing}")),
         "random": Template((
             "https://${WIKI}/w/api.php?action=query"
             "&format=json"
@@ -55,11 +55,12 @@ class WPToolsFetch:
         "wikidata": Template((
             "https://${WIKI}/w/api.php?action=wbgetentities"
             "&format=json"
-            "&ids=${thing}"
-            "&sites=${site}"
-            "&titles=${title}"
+            "&formatversion=2"
+            "&ids=${ids}"
             "&languages=${lang}"
-            "&props=info|claims|descriptions|labels|sitelinks"))
+            "&props=${props}"
+            "&sites=${site}"
+            "&titles=${title}"))
     }
 
     silent = False
@@ -127,8 +128,7 @@ class WPToolsFetch:
         """
         kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
         url = crl.getinfo(crl.EFFECTIVE_URL)
-        url = url.replace("&format=json", '')
-        url = url.replace("&formatversion=2", '')
+        url = url.replace("&format=json", '').replace("&formatversion=2", '')
         return {"url": url,
                 "user-agent": self.user_agent(),
                 "content": crl.getinfo(crl.CONTENT_TYPE),
@@ -164,16 +164,26 @@ class WPToolsFetch:
                 entrypoint=action,
                 title=thing)
         elif action == 'wikidata':
+            ids = ''
+            site = ''
+            title = ''
+            props = "info|claims|descriptions|labels|sitelinks"
+            if thing.get('props'):
+                props = thing['props']
+            if thing.get('id'):
+                ids = thing.get('id')
+                thing = ids
+            else:
+                site = thing.get('site')
+                title = thing.get('title')
+                thing = title
             qry = self.ACTION[action].substitute(
                 WIKI="www.wikidata.org",
+                ids=ids,
                 lang=self.lang,
-                site=thing['site'],
-                title=thing['title'],
-                thing=thing['id'])
-            if thing['id']:
-                thing = thing['id']
-            else:
-                thing = thing['title']
+                props=props,
+                site=site,
+                title=title)
         else:
             qry = self.ACTION[action].substitute(
                 WIKI=self.wiki,

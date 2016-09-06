@@ -234,8 +234,32 @@ Get geographic coordinates:
 .. code-block:: python
 
     >>> paris = wptools.page('Paris').get_wikidata()
-    >>> paris.geo
+    >>> paris.Coordinates
     '48.8565777778,2.35182777778'
+
+
+Resolve wikidata claims_:
+
+.. code-block:: python
+
+    >>> m = wptools.page('Madurai').get_wikidata()
+    en.wikipedia.org (action=wikidata) Madurai
+    Madurai (en)
+    {
+      claims: <dict(2)> {Q48, Q668}
+      ...
+    }
+
+    >>> m.get_claims()
+    en.wikipedia.org (action=wikidata) Q48|Q668
+    Madurai (en)
+    {
+      Continent: Asia (Q48)
+      Country: India (Q668)
+      ...
+    }
+
+.. _claims: https://www.wikidata.org/wiki/Wikidata:Glossary#Claims_and_statements
 
 
 Get *special* `lead section`_ HTML:
@@ -302,6 +326,16 @@ make all requests necessary to populate all the things
 - get_query()
 - get_parse()
 - get_wikidata()
+
+
+**get_claims** (self)
+
+Wikidata:API (action=wbgetentities) for labels of claims
+
+..
+
+  |  e.g. turns claim {'Q298': 'Country'} into self.Country: Chile
+  |  use get_wikidata() to populate claims
 
 
 **get_parse** (self)
