@@ -32,10 +32,13 @@ def media_url(fname, namespace='commons',
 
     try:
         digest = hashlib.md5(name).hexdigest()
-    except (UnicodeEncodeError, TypeError):
+    except (TypeError, UnicodeEncodeError):
         digest = hashlib.md5(name.encode('utf-8')).hexdigest()
 
-    path = quote("/".join([digest[:1], digest[:2], name]))
+    try:
+        path = quote("/".join([digest[:1], digest[:2], name]))
+    except KeyError:
+        path = "/".join([digest[:1], digest[:2], name])
 
     return "/".join([wiki, namespace, path])
 
