@@ -4,7 +4,7 @@ Wikipedia tools (for Humans)
 .. image:: https://img.shields.io/pypi/v/wptools.svg
         :target: https://pypi.python.org/pypi/wptools/
 
-Python and command-line MediaWiki access for Humans:
+Python and command-line MediaWiki access for Humans.
 
 - get an HTML or plain text "extract" (lead or summary)
 - get a representative image, pageimage, thumbnail
