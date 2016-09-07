@@ -12,14 +12,16 @@ import time
 import textwrap
 import wptools
 
+from wptools.fetch import WPToolsFetch
+
 
 def _html_image(item):
     source = _image(item)
     if not source:
         return
     alt = item.title
-    if item.Label:
-        alt = item.Label
+    if item.label:
+        alt = item.label
     img = "<img src=\"%s\"" % source
     img += " alt=\"%s\" title=\"%s\" " % (alt, alt)
     img += "align=\"right\" width=\"240\">"
@@ -70,28 +72,32 @@ def _item_text(item, nowrap=False):
     if nowrap:
         pars = item.extext
     else:
-        pars = []
+        parlist = []
         for par in item.extext.split("\n\n"):
-            pars.append("\n".join(textwrap.wrap(par)))
-        pars = "\n\n".join(pars)
+            parlist.append("\n".join(textwrap.wrap(par)))
+        pars = "\n\n".join(parlist)
 
     txt = []
     txt.append(title)
     txt.append(img)
     txt.append(pars)
-    txt = "\n\n".join([x for x in txt if x])
 
-    tail = item.url
+    head = "\n\n".join([x for x in txt if x])
+
+    tail = "\n\n" + item.url
     if item.wikibase:
         tail += "\n" + item.wikibase
 
-    return txt + tail
+    return head + tail
 
 
 def _safe_exit(output):
     """exit without breaking pipes."""
     try:
         sys.stdout.write(output)
+        sys.stdout.flush()
+    except TypeError:  # python3
+        sys.stdout.write(str(output, 'utf-8'))
         sys.stdout.flush()
     except IOError:
         pass
@@ -100,8 +106,8 @@ def _safe_exit(output):
 def _text_image(item):
     img = None
     alt = item.title
-    if item.Label:
-        alt = item.Label
+    if item.label:
+        alt = item.label
     source = _image(item)
     if source:
         img = "![%s](%s)" % (alt, source)
@@ -113,11 +119,10 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
     start = time.time()
 
     if query:
-        f = wptools.fetch.WPToolsFetch(lang=lang, verbose=verbose,
-                                       wiki=wiki)
+        fetch = WPToolsFetch(lang=lang, verbose=verbose, wiki=wiki)
         if title:
-            return f.query('query', title)
-        return f.query('random', None)
+            return fetch.query('query', title)
+        return fetch.query('random', None)
 
     item = wptools.page(title=title, lang=lang, silent=silent,
                         verbose=verbose, wiki=wiki)
@@ -135,11 +140,14 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
 
     try:
         return out.encode('utf-8')
-    except:
+    except KeyError:
         return out
 
 
 def main():
+    """
+    wptool main() function
+    """
     description = (
         "Get Wikipedia article info and Wikidata via MediaWiki APIs.\n\n"
         "Gets a random English Wikipedia article by default, or in the\n"
