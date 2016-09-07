@@ -25,10 +25,13 @@ class WPToolsCoreTestCase(unittest.TestCase):
 
     def test_caching(self):
         abc = wptools.page('abc')
+        abc.claims = {'Q1'}
+        abc.g_claims = {'response'}
         abc.g_parse = {'response'}
         abc.g_query = {'response'}
         abc.g_wikidata = {'response'}
         abc.g_rest = {'response'}
+        abc.get_claims()
         abc.get_parse()
         abc.get_query()
         abc.get_wikidata()

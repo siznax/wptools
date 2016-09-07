@@ -438,6 +438,9 @@ class WPTools(object):
         """
         if not self.claims:
             return
+        if self.g_claims:
+            stderr("Request cached in g_claims.")
+            return
 
         thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
         query = self.__fetch.query('wikidata', thing)
