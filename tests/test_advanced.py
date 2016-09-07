@@ -19,8 +19,8 @@ class WPToolsBadTest(unittest.TestCase):
         """
         Get redirected
         """
-        b = wptools.page('Abe Lincoln').get_query(False)
-        self.assertEqual(b.title, "Abraham_Lincoln")
+        b = wptools.page('Ben Franklin').get_query(False)
+        self.assertEqual(b.title, 'Benjamin_Franklin')
 
     def test_missing(self):
         """
@@ -35,7 +35,7 @@ class WPToolsBadTest(unittest.TestCase):
         """
         # "jp" Wikinews (unknown language code)
         b = wptools.page(wiki='jp.wikinews.org')
-        self.assertTrue(hasattr(b, 'fatal'))
+        self.assertTrue(b.fatal)
 
 
 class WPToolsPickTest(unittest.TestCase):
@@ -49,14 +49,14 @@ class WPToolsPickTest(unittest.TestCase):
         """
         t = wptools.test.title()
         p = wptools.page(t['title'], lang=t['lang']).get_query(False)
-        self.assertTrue(hasattr(p, 'pageid'))
+        self.assertTrue(p.pageid is not None)
 
     def test_wikibase(self):
         """
         Get everything wikibase only
         """
         p = wptools.page(wikibase='Q43303').get_wikidata(False)
-        self.assertEqual(p.title, "Malcolm_X")
+        self.assertEqual(p.title, 'Malcolm_X')
 
     def test_wikidata_title(self):
         """
@@ -75,21 +75,21 @@ class WPToolsPickTest(unittest.TestCase):
     def test_wikidata_claims(self):
         p = wptools.page('Paris').get_wikidata(False)
         p.get_claims(False)
-        self.assertTrue(p.continent == 'Europe')
-        self.assertTrue(p.country == 'France')
+        self.assertEqual(p.continent, 'Europe')
+        self.assertEqual(p.country, 'France')
 
     def test_mixed_lang(self):
         """
         Get mixed language
         """
         p = wptools.page('Abraham Lincoln', lang='zh').get_query(False)
-        self.assertEqual(p.wikibase, "Q91")
+        self.assertEqual(p.wikibase, 'Q91')
 
     def test_complex_infobox(self):
         """
         Successfully populate complex infobox dict
         """
-        p = wptools.page('Abe Lincoln').get_parse(False)
+        p = wptools.page('Aung San Suu Kyi').get_parse(False)
         self.assertGreaterEqual(len(p.infobox), 32)
 
     def test_thumbnail(self):
@@ -110,21 +110,21 @@ class WPToolsRandomTest(unittest.TestCase):
         Get a random title
         """
         r = wptools.page()
-        self.assertTrue(hasattr(r, 'pageid'))
+        self.assertTrue(r.pageid is not None)
 
     def test_random_lang(self):
         """
         Get random title by language
         """
         r = wptools.page(lang=random.choice(lang))
-        self.assertTrue(hasattr(r, 'pageid'))
+        self.assertTrue(r.pageid is not None)
 
     def test_random_wiki(self):
         """
         Get random title by wiki
         """
         r = wptools.page(wiki='commons.wikimedia.org')
-        self.assertTrue(hasattr(r, 'pageid'))
+        self.assertTrue(r.pageid is not None)
 
 
 class WPToolsRestBaseTest(unittest.TestCase):
@@ -136,7 +136,7 @@ class WPToolsRestBaseTest(unittest.TestCase):
         t = wptools.test.title()
         r = wptools.page(t['title'], lang=t['lang'])
         r.get_rest(show=False)
-        self.assertTrue(hasattr(r, 'lead'))
+        self.assertTrue(r.lead is not None)
 
 
 class WPToolsToolTest(unittest.TestCase):
