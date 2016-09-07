@@ -16,14 +16,24 @@ class WPToolsTestCase(unittest.TestCase):
         wptools.core
         wptools.fetch
         wptools.utils
+        wptools.test
 
         from scripts.wptool import main
 
 
 class WPToolsCoreTestCase(unittest.TestCase):
 
-    def test(self):
-        pass
+    def test_caching(self):
+        abc = wptools.page('abc')
+        abc.g_parse = {'response'}
+        abc.g_query = {'response'}
+        abc.g_wikidata = {'response'}
+        abc.g_rest = {'response'}
+        abc.get_parse()
+        abc.get_query()
+        abc.get_wikidata()
+        abc.get_rest()
+        self.assertTrue(not abc.pageid)
 
 
 class WPtoolsFetchTestCase(unittest.TestCase):

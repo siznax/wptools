@@ -28,18 +28,9 @@ class WPTools(object):
     A user-created :class:WPTools object.
     """
 
-    _skipmap = {
-        'get_parse': {'parsetree', 'wikibase', 'wikitext'},
-        'get_query': {'extract', 'pageid', 'random'},
-        'get_wikidata': {'label'}
-    }
-
+    claims = {}
     coordinates = None
     description = None
-    image = None
-    label = None
-
-    claims = {}
     extext = None
     extract = None
     fatal = False
@@ -48,8 +39,10 @@ class WPTools(object):
     g_query = None
     g_rest = None
     g_wikidata = None
+    image = None
     images = {}
     infobox = None
+    label = None
     lastmodified = None
     lead = None
     links = None
@@ -420,21 +413,6 @@ class WPTools(object):
         if hasattr(self, 'label') and not self.title:
             self.title = self.label.replace(' ', '_')
 
-    def _skip_get(self, action):
-        """
-        returns true if additional request is likely not needed
-        """
-        if self.fatal:
-            return True
-        for attr in self._skipmap[action]:
-            has_attr = hasattr(self, attr)
-            if not has_attr:
-                return False
-            if has_attr and not getattr(self, attr):
-                return False
-        stderr("skipping %s" % action, self.silent)
-        return True
-
     def get(self):
         """
         make all requests necessary to populate all the things:
@@ -493,7 +471,8 @@ class WPTools(object):
         - wikitext: <unicode> raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
-        if self._skip_get('get_parse'):
+        if self.g_parse:
+            stderr("Request cached in g_parse.")
             return
         query = self.__fetch.query('parse', self.title)
         parse = {}
@@ -520,7 +499,8 @@ class WPTools(object):
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
-        if self._skip_get('get_query'):
+        if self.g_query:
+            stderr("Request cached in g_query.")
             return
         qry = self.__fetch.query('query', self.title)
         if self.pageid:
@@ -573,6 +553,9 @@ class WPTools(object):
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/api/rest_v1/
         """
+        if self.g_rest:
+            stderr("Request cached in g_rest.")
+            return
         try:
             title = quote(self.title)
         except KeyError:
@@ -599,7 +582,8 @@ class WPTools(object):
         - label: <unicode> Wikidata label
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        if self._skip_get('get_wikidata'):
+        if self.g_wikidata:
+            stderr("Request cached in g_wikidata.")
             return
 
         thing = {'id': '', 'site': '', 'title': ''}
@@ -681,7 +665,7 @@ class WPTools(object):
 
 def get_infobox(ptree):
     """
-    returns infobox <type 'dict'> from parse/parsetreee
+    returns infobox <type 'dict'> from get_parse:parsetreee
     """
     for item in lxml.etree.fromstring(ptree).xpath("//template"):
         if "box" in item.find('title').text:
@@ -690,7 +674,7 @@ def get_infobox(ptree):
 
 def get_links(iwlinks):
     """
-    returns list of interwiki links from parse/iwlinks
+    returns list of interwiki links get_parse/iwlinks
     """
     links = []
     for item in iwlinks:
