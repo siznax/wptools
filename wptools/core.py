@@ -265,7 +265,9 @@ class WPTools(object):
         thumbnail = page.get('thumbnail')
         if thumbnail:
             images['qthumb'] = thumbnail
-            self.thumbnail = thumbnail
+            source = thumbnail.get('source')
+            if source:
+                self.thumbnail = source
 
         self.images = images
 

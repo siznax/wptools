@@ -92,6 +92,13 @@ class WPToolsPickTest(unittest.TestCase):
         p = wptools.page('Abe Lincoln').get_parse(False)
         self.assertGreaterEqual(len(p.infobox), 32)
 
+    def test_thumbnail(self):
+        """
+        Get a thumbnail image URL
+        """
+        p = wptools.page('Frida Kahlo').get_rest(False)
+        self.assertTrue(p.thumbnail.startswith('http'))
+
 
 class WPToolsRandomTest(unittest.TestCase):
     """
