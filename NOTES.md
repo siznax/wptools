@@ -185,12 +185,10 @@ https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
 Properties
 
-* [P17](https://www.wikidata.org/wiki/Property:P17): country
-* [P18](https://www.wikidata.org/wiki/Property:P18): image
-* [P30](https://www.wikidata.org/wiki/Property:P30): continent
-* [P585](https://www.wikidata.org/wiki/Property:P585): point in time
-* [P625](https://www.wikidata.org/wiki/Property:P625): coordinate location
-* [P1343](https://www.wikidata.org/wiki/Property:P1343): described by source
+* https://www.wikidata.org/wiki/Wikidata:List_of_properties/all
+* https://www.wikidata.org/wiki/Wikidata:List_of_properties/Generic
+* https://www.wikidata.org/wiki/Wikidata:List_of_properties/Person
+
 
 
 Wikitext
