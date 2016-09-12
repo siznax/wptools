@@ -28,8 +28,38 @@ class WPTools(object):
     A user-created :class:WPTools object.
     """
 
+    WIKIPROPS = {'P17': 'country',
+                 'P18': 'image',
+                 'P27': 'citizenship',
+                 'P30': 'continent',
+                 'P31': 'class',
+                 'P50': 'author',
+                 'P57': 'director',
+                 'P86': 'composer',
+                 'P110': 'illustrator',
+                 'P123': 'publisher',
+                 'P170': 'creator',
+                 'P175': 'performer',
+                 'P176': 'material',
+                 'P212': 'ISBN',
+                 'P301': 'topic',
+                 'P345': 'IMDB',
+                 'P276': 'location',
+                 'P279': 'subclass',
+                 'P569': 'birth',
+                 'P570': 'death',
+                 'P577': 'pubdate',
+                 'P585': 'datetime',
+                 'P625': 'coordinates',
+                 'P655': 'translator',
+                 'P658': 'tracklist',
+                 'P800': 'work',
+                 'P856': 'website',
+                 'P910': 'category',
+                 'P1773': 'attribution',
+                 'P1779': 'creator'}
+
     claims = {}
-    coordinates = None
     description = None
     extext = None
     extract = None
@@ -49,6 +79,7 @@ class WPTools(object):
     pageid = None
     pageimage = None
     parsetree = None
+    props = {}
     random = None
     thumbnail = None
     title = None
@@ -56,6 +87,7 @@ class WPTools(object):
     urlraw = None
     wikibase = None
     wikitext = None
+    wikidata = {}
 
     def __init__(self, title='', lang='en', wikibase=None,
                  silent=False, verbose=False, wiki=None):
@@ -80,16 +112,15 @@ class WPTools(object):
                 if getattr(self, x)
                 and not x.startswith("__")]
 
-    def __get_claim_label(self, item):
+    def __get_entity_prop(self, entity, prop):
         """
-        returns label value from Wikidata claim item
+        returns Wikidata entity property value
         """
-        labels = item.get('labels')
-        if labels:
+        if entity.get(prop):
             try:
-                return labels.get(self.lang).get('value')
+                return entity.get(prop).get(self.lang).get('value')
             except AttributeError:
-                return labels.get('value')
+                return entity.get(prop).get('value')
 
     def __get_lead(self, data):
         """
@@ -145,8 +176,6 @@ class WPTools(object):
         meta = []
         if hasattr(self, 'lastmodified'):
             meta.append("Last modified: %s" % self.lastmodified)
-        if hasattr(self, 'geo'):
-            meta.append("coordinates: %s" % self.coordinates)
         return "<p metadata>%s</p>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
@@ -160,9 +189,6 @@ class WPTools(object):
                 if _type == 'hatnote' or _type == 'image':
                     continue
                 if 'text' in item:
-                    ids = utils.span_ids(item['text'])
-                    if ids and ids == ['coordinates']:
-                        continue
                     pars.append(item['text'])
                 else:
                     pars.append(", ".join(item.keys()))
@@ -183,6 +209,16 @@ class WPTools(object):
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
+
+    def __postprocess_wikidata(self):
+        """
+        transform selected wikidata items
+        """
+        if 'coordinates' in self.wikidata:
+            data = self.wikidata['coordinates']
+            if 'latitude' in data:
+                geo = "%s,%s" % (data['latitude'], data['longitude'])
+                self.wikidata['coordinates'] = geo
 
     def __setattr(self, attr, value, suffix):
         """
@@ -266,9 +302,9 @@ class WPTools(object):
 
         self.pageid = page.get('pageid')
 
-        props = page.get('pageprops')
-        if props:
-            wikibase = props.get('wikibase_item')
+        pageprops = page.get('pageprops')
+        if pageprops:
+            wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.wikibase = wikibase
 
@@ -333,44 +369,32 @@ class WPTools(object):
             if lead:
                 self.lead = lead
 
-    def _set_wikidata_claims(self, claims):
+    def _process_claims(self, item_claims):
         """
-        set selected Wikidata claims attributes
+        set Wikidata properties and Q claims from claims
         """
-        if not claims:
-            return
+        clams = {}
+        props = {}
+        wdata = {}
 
-        claimattr = {}
+        for pid in item_claims:
+            if pid in self.WIKIPROPS:
+                props[pid] = wikidata_property(item_claims, pid)
 
-        p17 = claims.get('P17')  # P17 country
-        if p17:
-            country = p17[0].get('mainsnak').get('datavalue').get('value')
-            if country:
-                claimattr[country.get('id')] = 'country'
+        for item in props:
+            label = self.WIKIPROPS[item]
+            if is_text(props[item]) and props[item].startswith('Q'):
+                clams[props[item]] = label
+            else:
+                wdata[label] = props[item]
 
-        p18 = claims.get('P18')  # P18 image
-        if p18:
-            image = p18[0].get('mainsnak').get('datavalue').get('value')
-            if image:
-                self.image = utils.media_url(image)
-            if self.images:
-                self.images['wimage'] = image
-
-        p30 = claims.get('P30')  # P30 continent
-        if p30:
-            cont = p30[0].get('mainsnak').get('datavalue').get('value')
-            if cont:
-                claimattr[cont.get('id')] = 'continent'
-
-        p625 = claims.get('P625')  # P625 coordinate location
-        if p625:
-            geo = p625[0].get('mainsnak').get('datavalue').get('value')
-            if geo:
-                self.coordinates = "%s,%s" % (geo.get('latitude'),
-                                              geo.get('longitude'))
-
-        if claimattr:
-            self.claims = claimattr
+        if clams:
+            self.claims = clams
+        if props:
+            self.props = props
+        if wdata:
+            self.wikidata = wdata
+            self.__postprocess_wikidata()
 
     def _set_wikidata(self):
         """
@@ -394,21 +418,18 @@ class WPTools(object):
 
         self.wikibase = "https://www.wikidata.org/wiki/%s" % item.get('id')
 
-        self._set_wikidata_claims(item.get('claims'))
+        self._process_claims(item.get('claims'))
 
-        descriptions = item.get('descriptions')
+        descriptions = self.__get_entity_prop(item, 'descriptions')
         if descriptions:
-            try:
-                self.description = descriptions.get(self.lang).get('value')
-            except AttributeError:
-                self.description = descriptions.get('value')
+            self.description = descriptions
 
-        labels = item.get('labels')
+        if 'image' in self.wikidata:
+            self.image = utils.media_url(self.wikidata['image'])
+
+        labels = self.__get_entity_prop(item, 'labels')
         if labels:
-            try:
-                self.label = labels.get(self.lang).get('value')
-            except AttributeError:
-                self.label = labels.get('value')
+            self.label = labels
 
         if hasattr(self, 'label') and not self.title:
             self.title = self.label.replace(' ', '_')
@@ -434,7 +455,7 @@ class WPTools(object):
         """
         Wikidata:API (action=wbgetentities) for labels of claims
         - e.g. turns claim {'Q298': 'country'} into country: Chile
-        - use get_wikidata() to populate selected claims
+        - use get_wikidata() to populate claims
         """
         if not self.claims:
             return
@@ -455,9 +476,9 @@ class WPTools(object):
         entities = data.get('entities')
         for item in entities:
             attr = self.claims[item]
-            value = self.__get_claim_label(entities[item])
+            value = self.__get_entity_prop(entities[item], 'labels')
             if value:
-                setattr(self, attr, value)
+                self.wikidata[attr] = value
 
         if show:
             self.show()
@@ -574,15 +595,17 @@ class WPTools(object):
             self.show()
         return self
 
-    def get_wikidata(self, show=True):
+    def get_wikidata(self, show=True, get_claims=True):
         """
         Wikidata:API (action=wbgetentities) for:
-        - claims: <dict> Wikidata claims (see get_claims)
-        - coordinates: <str> Wikidata Property:P625 coordinates (lat,lon)
+        - claims: <dict> Wikidata claims (resolve with get_claims)
         - description: <unicode> Wikidata description
         - image: <unicode> Wikidata Property:P18 image URL
         - images: <dict> {wimage}
         - label: <unicode> Wikidata label
+        - props: <dict> Wikidata properties
+        - wikibase: <str> Wikidata URL
+        - wikidata: <dict> resolved Wikidata properties and claims
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if self.g_wikidata:
@@ -608,6 +631,8 @@ class WPTools(object):
         wdata['info'] = self.__fetch.info
         self.g_wikidata = wdata
         self._set_wikidata()
+        if self.claims and get_claims:
+            self.get_claims(False)
         if show:
             self.show()
         return self
@@ -714,3 +739,18 @@ def stderr(msg, silent=False):
     """write msg to stderr if not silent"""
     if not silent:
         print(msg, file=sys.stderr)
+
+
+def wikidata_property(claims, pid):
+    """
+    returns Wikidata property value from claims
+    """
+    prop = claims.get(pid)[0]
+    if prop:
+        val = prop.get('mainsnak').get('datavalue').get('value')
+        if isinstance(val, dict):
+            if 'id' in val:
+                return val['id']
+            if 'time' in val:
+                return val['time']
+        return val

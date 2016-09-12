@@ -55,28 +55,21 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Get everything wikibase only
         """
-        p = wptools.page(wikibase='Q43303').get_wikidata(False)
+        p = wptools.page(wikibase='Q43303').get_wikidata(False, False)
         self.assertEqual(p.title, 'Malcolm_X')
 
     def test_wikidata_title(self):
         """
         Get wikidata from title only
         """
-        w = wptools.page('Les Misérables').get_wikidata(False)
+        w = wptools.page('Les Misérables').get_wikidata(False, False)
         self.assertTrue(w.wikibase is not None)
-
-    def test_wikidata_geo(self):
-        """
-        Get wikidata geographic coordinates
-        """
-        p = wptools.page('Paris').get_wikidata(False)
-        self.assertTrue(p.coordinates is not None)
 
     def test_wikidata_claims(self):
         p = wptools.page('Paris').get_wikidata(False)
-        p.get_claims(False)
-        self.assertEqual(p.continent, 'Europe')
-        self.assertEqual(p.country, 'France')
+        self.assertTrue(p.wikidata['coordinates'] is not None)
+        self.assertEqual(p.wikidata['continent'], 'Europe')
+        self.assertEqual(p.wikidata['country'], 'France')
 
     def test_mixed_lang(self):
         """
