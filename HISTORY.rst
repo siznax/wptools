@@ -3,6 +3,13 @@
 Release History
 ---------------
 
+0.1.5 (2016-09-12)
+++++++++++++++++++
+
+* Enabled fetch of ANY Wikidata properties
+* Improved cache checking
+
+
 0.1.4 (2016-09-06)
 ++++++++++++++++++
 
