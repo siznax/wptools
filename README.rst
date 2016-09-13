@@ -181,6 +181,10 @@ Get a representative image:
 
     ``frida.thumbnail``
 
+**Note**: A page's image can come from an Infobox, query ``pageimage``
+or ``thumbnail``, a RESTBase request, or from Wikidata Property:P18.
+See Methods_ for more details.
+
 
 Get a text (or HTML) extract:
 
@@ -374,6 +378,8 @@ Wikidata:API `action=wbgetentities`_ for labels of claims
 
 MediaWiki:API `action=parse`_ request for:
 
+- image: <str> Infobox_ image URL
+- images: <dict> {pimage}
 - infobox: <dict> Infobox_ data as python dictionary
 - links: <list> interwiki links (iwlinks_)
 - pageid: <int> MediaWiki database ID
