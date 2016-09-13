@@ -250,7 +250,15 @@ class WPTools(object):
             return
 
         parsetree = pdata.get('parsetree')
-        self.infobox = get_infobox(parsetree)
+        infobox = get_infobox(parsetree)
+        if infobox:
+            self.infobox = infobox
+            if 'image' in infobox:
+                if not self.image:
+                    self.image = utils.media_url(infobox['image'])
+                if self.images:
+                    self.images['pimage'] = infobox['image']
+
         self.links = get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
         self.parsetree = parsetree
@@ -424,8 +432,11 @@ class WPTools(object):
         if descriptions:
             self.description = descriptions
 
-        if 'image' in self.wikidata:
-            self.image = utils.media_url(self.wikidata['image'])
+        if self.wikidata and 'image' in self.wikidata:
+            if not self.image:
+                self.image = utils.media_url(self.wikidata['image'])
+            if self.images:
+                self.images['wimage'] = self.wikidata['image']
 
         labels = self.__get_entity_prop(item, 'labels')
         if labels:
@@ -487,6 +498,8 @@ class WPTools(object):
     def get_parse(self, show=True):
         """
         MediaWiki:API action=parse request for:
+        - image: <unicode> Infobox image URL
+        - images: <dict> {pimage}
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
         - pageid: <int> Wikipedia database ID
