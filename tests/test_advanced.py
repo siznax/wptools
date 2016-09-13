@@ -84,6 +84,7 @@ class WPToolsPickTest(unittest.TestCase):
         """
         p = wptools.page('Aung San Suu Kyi').get_parse(False)
         self.assertGreaterEqual(len(p.infobox), 32)
+        self.assertTrue('errors' not in p.infobox)
 
     def test_thumbnail(self):
         """
