@@ -178,7 +178,7 @@ def template_to_dict(tree):
                     obj['infobox'] = text
                 else:
                     obj[name] = text
-        finally:
+        except:
             errors.append(lxml.etree.tostring(item))
     if errors:
         obj['errors'] = errors
