@@ -383,7 +383,7 @@ class WPTools(object):
 
         for item in props:
             label = self.WIKIPROPS[item]
-            if is_text(props[item]) and props[item].startswith('Q'):
+            if is_text(props[item]) and re.match(r'^Q\d+', props[item]):
                 clams[props[item]] = label
             else:
                 wdata[label] = props[item]
@@ -454,7 +454,7 @@ class WPTools(object):
     def get_claims(self, show=True):
         """
         Wikidata:API (action=wbgetentities) for labels of claims
-        - e.g. turns claim {'Q298': 'country'} into country: Chile
+        - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
         - use get_wikidata() to populate claims
         """
         if not self.claims:
@@ -598,7 +598,7 @@ class WPTools(object):
     def get_wikidata(self, show=True, get_claims=True):
         """
         Wikidata:API (action=wbgetentities) for:
-        - claims: <dict> Wikidata claims (resolve with get_claims)
+        - claims: <dict> Wikidata claims (to be resolved)
         - description: <unicode> Wikidata description
         - image: <unicode> Wikidata Property:P18 image URL
         - images: <dict> {wimage}
