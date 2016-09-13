@@ -9,8 +9,7 @@ Python and command-line MediaWiki access for Humans.
 - get an HTML or plain text "extract" (lead or summary)
 - get a representative image, pageimage, thumbnail
 - get an Infobox as a python dictionary
-- get selected Wikidata properties
-- get a Wikidata item by title
+- get any/all Wikidata by title
 - get info in any language
 - get random info
 
@@ -29,7 +28,6 @@ especially contributions_ are welcome!
 - Usage_
 - Examples_
 - Methods_
-- Requests_
 - wptool_
 
 
@@ -140,7 +138,6 @@ Or, another *wiki* site:
 
     >>> m = wptools.page(wiki='en.wikiquote.org')
     en.wikiquote.org (action=random) None
-
     Malala_Yousafzai (en)
     {
       lang: en
@@ -173,9 +170,9 @@ Get a representative image:
 
 .. code-block:: python
 
-    >>> frida = wptools.page("Frida Kahlo").get()
-    >>> frida.image
-
+    >>> frida = wptools.page("Frida Kahlo").get_query()
+    en.wikipedia.org (action=query) Frida_Kahlo
+    >>> frida.pageimage
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
 
 ..
@@ -190,8 +187,8 @@ Get a text (or HTML) extract:
 .. code-block:: python
 
     >>> ella = wptools.page('Ella Fitzgerald').get_query()
+    en.wikipedia.org (action=query) Ella_Fitzgerald
     >>> print ella.extext
-
     **Ella Jane Fitzgerald** (April 25, 1917 – June 15, 1996) was an
     American jazz singer often referred to as the First Lady of Song,
     Queen of Jazz and Lady Ella. She was noted for her purity of tone,
@@ -200,7 +197,6 @@ Get a text (or HTML) extract:
     ...
 
     >>> print ella.extract
-
     <p><b>Ella Jane Fitzgerald</b> (April 25, 1917 – June 15, 1996) was an
     American jazz singer often referred to as the First Lady of Song,
     Queen of Jazz and Lady Ella. She was noted for her purity of tone,
@@ -214,50 +210,53 @@ Get an Infobox_ as a python object:
 .. code-block:: python
 
     >>> fela = wptools.page('Fela Kuti').get_parse()
+    en.wikipedia.org (action=parse) Fela_Kuti
     >>> fela.infobox['instrument']
-
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
 
-Get wikidata by title:
+Get wikidata by *title*:
 
 .. code-block:: python
 
     >>> fry = wptools.page('Stephen Fry').get_wikidata()
-    >>> fry.wikibase
+    en.wikipedia.org (action=wikidata) Stephen_Fry
+    en.wikipedia.org (action=wikidata) Q8817795|Q6581097|Q145|Q5
+    Stephen_Fry (en)
+    {
+      claims: <dict(4)> {Q145, Q5, Q6581097, Q8817795}
+      description: English comedian, actor, writer, presenter, and activist
+      g_claims: <dict(3)> {info, query, response}
+      g_wikidata: <dict(3)> {info, query, response}
+      image: https://upload.wikimedia.org/wikipedia/commons/1/15/Stephen_Fry_cropped.jpg
+      label: Stephen Fry
+      lang: en
+      props: <dict(8)> {P18, P21, P27, P31, P345, P569, P856, P910}
+      title: Stephen_Fry
+      wikibase: https://www.wikidata.org/wiki/Q192912
+      wikidata: <dict(8)> {IMDB, birth, category, citizenship, class, ge...
+    }
 
-    u'https://www.wikidata.org/wiki/Q192912'
+**Note**: Resolved properties and claims are stored in the ``wikidata``
+attribute. Wikidata claims are processed via ``WPTools.WIKIPROPS``.
+Properties (e.g. P17: country) are stored in ``props`` and those properties
+that have Wikidata entities for values (e.g. Q142 instead of France) are
+stored in ``claims`` and resolved by another Wikidata API call (as
+shown above).
 
 
-Get geographic coordinates:
+Extend Wikidata claims_ to be resolved:
 
 .. code-block:: python
 
-    >>> paris = wptools.page('Paris').get_wikidata()
-    >>> paris.coordinates
-    '48.8565777778,2.35182777778'
+    >>> simone = wptools.page('Simone de Beauvoir')
+    >>> simone.WIKIPROPS['P21'] = 'gender'
+    >>> simone.get_wikidata()
+    en.wikipedia.org (action=wikidata) Simone_de_Beauvoir
+    en.wikipedia.org (action=wikidata) Q142|Q8745624|Q1214721|Q6581072|Q5
+    >>> simone.wikidata['gender']
+    'female'
 
-
-Resolve wikidata claims_:
-
-.. code-block:: python
-
-    >>> m = wptools.page('Madurai').get_wikidata()
-    en.wikipedia.org (action=wikidata) Madurai
-    Madurai (en)
-    {
-      claims: <dict(2)> {Q48, Q668}
-      ...
-    }
-
-    >>> m.get_claims()
-    en.wikipedia.org (action=wikidata) Q48|Q668
-    Madurai (en)
-    {
-      continent: Asia (Q48)
-      country: India (Q668)
-      ...
-    }
 
 .. _claims: https://www.wikidata.org/wiki/Wikidata:Glossary#Claims_and_statements
 
@@ -266,9 +265,9 @@ Get *special* `lead section`_ HTML:
 
 .. code-block:: python
 
-    >>> b = wptools.page("Buddha")
-    >>> b.get_rest()
-    >>> b.lead
+    >>> buddha = wptools.page("Buddha").get_rest()
+    en.wikipedia.org (action=/page/mobile-text/) Buddha
+    >>> buddha.lead
     u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
     <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
     <p snipped><span><b>Gautama Buddha</b>, also known as <b>Siddh&#2...
@@ -276,34 +275,69 @@ Get *special* `lead section`_ HTML:
     Gautama is the primary figure in Buddhism. He is recognized by Bu...
     <p metadata>Last modified: 2016-09-01T08:15:49Z</p>'
 
+**Note**: The *lead* attribute contains the assembled stand-alone,
+encyclopedia-like HTML fragment:
 
-Get all the things by *wikibase*:
+- ``<p heading>`` wiki-linked title and description
+- ``<img {type}>`` {image, pageimage, or thumbnail}
+- ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
+- ``<p metadata>`` available metadata (e.g. Last modified, coordinates)
+
+
+Get all the things:
 
 .. code-block:: python
 
-    >>> jill = wptools.page(wikibase='Q6192915').get()
-    >>> jill.show()
-
+    >>> jill = wptools.page('Jill Lepore').get()
+    en.wikipedia.org (action=query) Jill_Lepore
+    en.wikipedia.org (action=parse) Jill_Lepore
+    en.wikipedia.org (action=wikidata) Q6192915
+    en.wikipedia.org (action=wikidata) Q30|Q5
     Jill_Lepore (en)
     {
+      claims: <dict(2)> {Q30, Q5}
       description: American historian
-      label: Jill Lepore
-      extext: <str(1018)> **Jill Lepore** (born August 27, 1966) is an A...
-      extract: <str(1109)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
+      extext: <str(1016)> **Jill Lepore** (born August 27, 1966) is an A...
+      extract: <str(1107)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
+      g_claims: <dict(3)> {info, query, response}
       g_parse: <dict(3)> {info, query, response}
       g_query: <dict(3)> {info, query, response}
       g_wikidata: <dict(3)> {info, query, response}
       infobox: <dict(39)> {academic_advisors, alma_mater, alt, author_ab...
+      label: Jill Lepore
       lang: en
       pageid: 22469182
-      parsetree: <str(19661)> <root><template><title>Infobox scientist</...
-      random: Spanish immigration to Chile
+      parsetree: <str(20662)> <root><template><title>Infobox scientist</...
+      props: <dict(3)> {P27, P31, P569}
+      random: Kunming Medical University
       title: Jill_Lepore
       url: https://en.wikipedia.org/wiki/Jill_Lepore
       urlraw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
-      wikibase: Q6192915
-      wikitext: <str(13011)> {{Infobox scientist| name = Jill Lepore| na...
+      wikibase: https://www.wikidata.org/wiki/Q6192915
+      wikidata: <dict(3)> {birth, citizenship, class}
+      wikitext: <str(13872)> {{Infobox scientist| name = Jill Lepore| na...
     }
+
+
+Query results are always cached:
+
+.. code-block:: python
+
+    >>> jill.get()
+    Request cached in g_query.
+    Request cached in g_parse.
+    Request cached in g_wikidata.
+
+
+The ``wptools`` user-agent_ will look like this:
+
+..
+
+    wptools/*version* (https://github.com/siznax/wptools) *pycurl libs*
+
+.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
+
+
 
 
 .. _Methods:
@@ -330,9 +364,9 @@ make all requests necessary to populate all the things
 
 **get_claims** (self)
 
-Wikidata:API (action=wbgetentities) for labels of claims
+Wikidata:API `action=wbgetentities`_ for labels of claims
 
-- e.g. turns claim {'Q298': 'country'} into country: Chile
+- e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
 - use get_wikidata() to populate claims
 
 
@@ -394,13 +428,6 @@ RESTBase_ ``/page/mobile-text/`` request for:
 - url: <unicode> the canonical wiki URL
 - urlraw: <unicode> ostensible raw wikitext URL
 
-The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
-
-- ``<p heading>`` wiki-linked title and description
-- ``<img {type}>`` {image, pageimage, or thumbnail}
-- ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
-- ``<p metadata>`` available metadata (e.g. Last modified, coordinates)
-
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
 
@@ -409,12 +436,14 @@ The *lead* attribute assembles a stand-alone, encyclopedia-like HTML fragment:
 
 Wikidata:API `action=wbgetentities`_ request for:
 
-- claims: <dict> Wikidata claims (see get_claims)
-- coordinates: <str> P625_ Geographic coordinates (lat,lon)
+- claims: <dict> Wikidata claims (to be resolved)
 - description: <unicode> Wikidata description
 - image: <unicode> Wikidata Property:P18_ image URL
 - images: <dict> {wimage}
 - label: <unicode> Wikidata label
+- props: <dict> Wikidata properties
+- wikibase: <str> Wikidata URL
+- wikidata: <dict> resolved Wikidata properties and claims
 
 .. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
@@ -423,28 +452,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 
 **show** (self)
 
-pretty-print instance attributes
-
-
-.. _Requests:
-
-Requests
---------
-
-Detailed request info can be found in these instance attributes:
-
-- g_claims: <dict> {info, query, response}
-- g_parse: <dict> {info, query, response}
-- g_query: <dict> {info, query, response}
-- g_rest: <dict> {html, info, query, response}
-- g_wikidata: <dict> {info, query, response}
-
-
-The ``wptools`` user-agent_ will look like this:
-
-wptools/*version* (https://github.com/siznax/wptools) *pycurl libs*
-
-.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
+Pretty-print instance attributes.
 
 
 .. _wptool:
