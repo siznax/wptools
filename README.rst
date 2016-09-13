@@ -4,6 +4,9 @@ Wikipedia tools (for Humans)
 .. image:: https://img.shields.io/pypi/v/wptools.svg
         :target: https://pypi.python.org/pypi/wptools/
 
+.. image:: https://img.shields.io/badge/license-MIT-green.svg
+        :target: https://github.com/siznax/wptools/blob/master/LICENSE
+
 Python and command-line MediaWiki access for Humans.
 
 - get an HTML or plain text "extract" (lead or summary)
