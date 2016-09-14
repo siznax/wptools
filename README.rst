@@ -176,6 +176,7 @@ Get a representative image:
 
     >>> frida = wptools.page('Frida Kahlo').get_query()
     en.wikipedia.org (action=query) Frida_Kahlo
+
     >>> frida.pageimage
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
 
@@ -196,6 +197,7 @@ Get a text (or HTML) extract:
 
     >>> ella = wptools.page('Ella Fitzgerald').get_query()
     en.wikipedia.org (action=query) Ella_Fitzgerald
+
     >>> print ella.extext
     **Ella Jane Fitzgerald** (April 25, 1917 – June 15, 1996) was an
     American jazz singer often referred to as the First Lady of Song,
@@ -219,6 +221,7 @@ Get an Infobox_ as a python object:
 
     >>> fela = wptools.page('Fela Kuti').get_parse()
     en.wikipedia.org (action=parse) Fela_Kuti
+
     >>> fela.infobox['instrument']
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
@@ -262,6 +265,7 @@ Extend Wikidata claims_ to be resolved:
     >>> simone.get_wikidata()
     en.wikipedia.org (action=wikidata) Simone_de_Beauvoir
     en.wikipedia.org (action=wikidata) Q142|Q8745624|Q1214721|Q6581072|Q5
+
     >>> simone.wikidata['gender']
     'female'
 
@@ -275,6 +279,7 @@ Get *special* `lead section`_ HTML:
 
     >>> buddha = wptools.page('Buddha').get_rest()
     en.wikipedia.org (action=/page/mobile-text/) Buddha
+
     >>> buddha.lead
     u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
     <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
