@@ -50,6 +50,16 @@ class WPToolsTestTitles(object):
         }
     }
 
+    art = {
+        "en":{
+            "Eight Elvises",
+            "Guennol Lioness",
+            "Portrait of Dr. Gachet",
+            "The Great Wave off Kanagawa",
+            "The Scream"
+        }
+    }
+
     # these are somewhat random, but should be high-quality articles
     featured = {
         "en": {
