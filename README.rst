@@ -173,7 +173,7 @@ Get a representative image:
 
 .. code-block:: python
 
-    >>> frida = wptools.page("Frida Kahlo").get_query()
+    >>> frida = wptools.page('Frida Kahlo').get_query()
     en.wikipedia.org (action=query) Frida_Kahlo
     >>> frida.pageimage
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
@@ -272,7 +272,7 @@ Get *special* `lead section`_ HTML:
 
 .. code-block:: python
 
-    >>> buddha = wptools.page("Buddha").get_rest()
+    >>> buddha = wptools.page('Buddha').get_rest()
     en.wikipedia.org (action=/page/mobile-text/) Buddha
     >>> buddha.lead
     u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
