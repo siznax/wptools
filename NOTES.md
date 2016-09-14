@@ -188,7 +188,7 @@ Properties
 * https://www.wikidata.org/wiki/Wikidata:List_of_properties/all
 * https://www.wikidata.org/wiki/Wikidata:List_of_properties/Generic
 * https://www.wikidata.org/wiki/Wikidata:List_of_properties/Person
-
+* https://www.wikidata.org/wiki/Wikidata:WikiProject_Taxonomy#Properties_each_item_.28that_deals_with_a_taxon.29_should_have
 
 
 Wikitext

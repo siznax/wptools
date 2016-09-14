@@ -32,16 +32,19 @@ class WPTools(object):
                  'P18': 'image',
                  'P27': 'citizenship',
                  'P30': 'continent',
-                 'P31': 'class',
+                 'P31': 'instance',
                  'P50': 'author',
                  'P57': 'director',
                  'P86': 'composer',
+                 'P105': 'taxon rank',
                  'P110': 'illustrator',
                  'P123': 'publisher',
                  'P170': 'creator',
+                 'P171': 'parent taxon',
                  'P175': 'performer',
                  'P176': 'material',
                  'P212': 'ISBN',
+                 'P225': 'taxon name',
                  'P301': 'topic',
                  'P345': 'IMDB',
                  'P276': 'location',
@@ -445,7 +448,7 @@ class WPTools(object):
         if hasattr(self, 'label') and not self.title:
             self.title = self.label.replace(' ', '_')
 
-    def get(self):
+    def get(self, show=True):
         """
         make all requests necessary to populate all the things:
         - get_query()
@@ -455,11 +458,11 @@ class WPTools(object):
         if self.wikibase and not self.title:
             self.get_wikidata(show=False)
             self.get_query(show=False)
-            self.get_parse()
+            self.get_parse(show)
         else:
             self.get_query(show=False)
             self.get_parse(show=False)
-            self.get_wikidata()
+            self.get_wikidata(show)
         return self
 
     def get_claims(self, show=True):
