@@ -117,7 +117,7 @@ def snip_html(text, verbose=0):
             desc_class = desc.get('class')
             if desc_class:
                 if _exclude(desc_class):
-                    elem.remove(desc)
+                    desc.getparent().remove(desc)
                     span = _span('removed', desc.tail or '')
                     _note(desc, span)
                     elem.append(span)
