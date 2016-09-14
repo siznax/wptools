@@ -144,6 +144,7 @@ Or, another *wiki* site:
     Malala_Yousafzai (en)
     {
       lang: en
+      pageid: 146817
       title: Malala_Yousafzai
     }
 
