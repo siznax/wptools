@@ -30,8 +30,8 @@ def _html_image(item):
 
 def _html_title(item):
     link = "<a href=\"%s\">%s</a>" % (item.url, item.title)
-    if item.Description:
-        link += "&mdash;<i>%s</i>" % item.Description
+    if item.description:
+        link += "&mdash;<i>%s</i>" % item.description
     else:
         link += "&mdash;<i>description</i>"
     if link:
@@ -63,8 +63,8 @@ def _item_html(item):
 
 def _item_text(item, nowrap=False):
     title = item.title.upper()
-    if hasattr(item, 'Description') and item.Description:
-        title += u'\u2014' + "_%s_" % item.Description
+    if hasattr(item, 'description') and item.description:
+        title += u'\u2014' + "%s" % item.description
     title = "\n".join(textwrap.wrap(title))
 
     img = _text_image(item)
@@ -84,9 +84,9 @@ def _item_text(item, nowrap=False):
 
     head = "\n\n".join([x for x in txt if x])
 
-    tail = "\n\n" + item.url
+    tail = "\n\n<%s>\n" % item.url
     if item.wikibase:
-        tail += "\n" + item.wikibase
+        tail += "<%s>\n" % item.wikibase
 
     return head + tail
 
