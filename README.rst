@@ -249,7 +249,7 @@ Get wikidata by *title*:
     }
 
 **Note**: Resolved properties and claims are stored in the ``wikidata``
-attribute. Wikidata claims are processed via ``WPTools.WIKIPROPS``.
+attribute. Wikidata claims are processed via ``WPTools._WIKIPROPS``.
 Properties (e.g. P17: country) are stored in ``props`` and those properties
 that have Wikidata entities for values (e.g. Q142 instead of France) are
 stored in ``claims`` and resolved by another Wikidata API call (as
@@ -261,7 +261,7 @@ Extend Wikidata claims_ to be resolved:
 .. code-block:: python
 
     >>> simone = wptools.page('Simone de Beauvoir')
-    >>> simone.WIKIPROPS['P21'] = 'gender'
+    >>> simone._WIKIPROPS['P21'] = 'gender'
     >>> simone.get_wikidata()
     en.wikipedia.org (action=wikidata) Simone_de_Beauvoir
     en.wikipedia.org (action=wikidata) Q142|Q8745624|Q1214721|Q6581072|Q5
