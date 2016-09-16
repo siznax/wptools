@@ -28,45 +28,45 @@ class WPTools(object):
     A user-created :class:WPTools object.
     """
 
-    WIKIPROPS = {'P17': 'country',
-                 'P18': 'image',
-                 'P27': 'citizenship',
-                 'P30': 'continent',
-                 'P31': 'instance',
-                 'P50': 'author',
-                 'P57': 'director',
-                 'P86': 'composer',
-                 'P105': 'taxon rank',
-                 'P110': 'illustrator',
-                 'P123': 'publisher',
-                 'P135': 'movement',
-                 'P136': 'genre',
-                 'P144': 'based on',
-                 'P161': 'cast',
-                 'P170': 'creator',
-                 'P171': 'parent taxon',
-                 'P175': 'performer',
-                 'P186': 'material',
-                 'P195': 'collection',
-                 'P212': 'ISBN',
-                 'P225': 'taxon name',
-                 'P301': 'topic',
-                 'P345': 'IMDB',
-                 'P217': 'inventory',
-                 'P276': 'location',
-                 'P279': 'subclass',
-                 'P569': 'birth',
-                 'P570': 'death',
-                 'P577': 'pubdate',
-                 'P585': 'datetime',
-                 'P625': 'coordinates',
-                 'P655': 'translator',
-                 'P658': 'tracklist',
-                 'P800': 'work',
-                 'P856': 'website',
-                 'P910': 'category',
-                 'P1773': 'attribution',
-                 'P1779': 'creator'}
+    _WIKIPROPS = {'P17': 'country',
+                  'P18': 'image',
+                  'P27': 'citizenship',
+                  'P30': 'continent',
+                  'P31': 'instance',
+                  'P50': 'author',
+                  'P57': 'director',
+                  'P86': 'composer',
+                  'P105': 'taxon rank',
+                  'P110': 'illustrator',
+                  'P123': 'publisher',
+                  'P135': 'movement',
+                  'P136': 'genre',
+                  'P144': 'based on',
+                  'P161': 'cast',
+                  'P170': 'creator',
+                  'P171': 'parent taxon',
+                  'P175': 'performer',
+                  'P186': 'material',
+                  'P195': 'collection',
+                  'P212': 'ISBN',
+                  'P225': 'taxon name',
+                  'P301': 'topic',
+                  'P345': 'IMDB',
+                  'P217': 'inventory',
+                  'P276': 'location',
+                  'P279': 'subclass',
+                  'P569': 'birth',
+                  'P570': 'death',
+                  'P577': 'pubdate',
+                  'P585': 'datetime',
+                  'P625': 'coordinates',
+                  'P655': 'translator',
+                  'P658': 'tracklist',
+                  'P800': 'work',
+                  'P856': 'website',
+                  'P910': 'category',
+                  'P1773': 'attribution',
+                  'P1779': 'creator'}
 
     claims = {}
     description = None
@@ -112,14 +112,6 @@ class WPTools(object):
         else:
             self.show()
         self.verbose = verbose
-
-    def __getattrs(self):
-        """
-        returns list of "public" attributes
-        """
-        return [x for x in self.__dict__
-                if getattr(self, x)
-                and not x.startswith("__")]
 
     def __get_entity_prop(self, entity, prop):
         """
@@ -396,11 +388,11 @@ class WPTools(object):
         wdata = {}
 
         for pid in item_claims:
-            if pid in self.WIKIPROPS:
+            if pid in self._WIKIPROPS:
                 props[pid] = wikidata_property(item_claims, pid)
 
         for item in props:
-            label = self.WIKIPROPS[item]
+            label = self._WIKIPROPS[item]
             if is_text(props[item]) and re.match(r'^Q\d+', props[item]):
                 clams[props[item]] = label
             else:
@@ -675,15 +667,10 @@ class WPTools(object):
             return text
 
         data = {}
-        for item in self.__getattrs():
-            if item.startswith("_WPTools"):
+        for item in dir(self):
+            prop = getattr(self, item)
+            if not prop or callable(prop) or item.startswith('_'):
                 continue
-
-            if item is None:
-                continue
-
-            prop = self.__dict__[item]
-
             if isinstance(prop, dict):
                 keys = sorted(prop.keys())
                 klen = len(keys)
