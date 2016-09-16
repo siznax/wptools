@@ -507,7 +507,7 @@ For example:
 .. code-block:: bash
 
     $ wptool -t "Jeanne d'Arc" -l fr -s
-    JEANNE_D'ARC—_sainte et héroïne de l'histoire de France_
+    JEANNE_D'ARC—sainte et héroïne de l'histoire de France
 
     ![Jeanne d'Arc](https://upload.wikimedia.org/wikipedia/commons/3/39/...)
 
@@ -522,8 +522,8 @@ For example:
     nation française_ ».
     ...
 
-    https://fr.wikipedia.org/wiki/Jeanne_d%27Arc
-    https://www.wikidata.org/wiki/Q7226
+    <https://fr.wikipedia.org/wiki/Jeanne_d%27Arc>
+    <https://www.wikidata.org/wiki/Q7226>
 
 
 Please enjoy!
