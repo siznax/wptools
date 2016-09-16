@@ -263,10 +263,11 @@ class WPTools(object):
         if infobox:
             self.infobox = infobox
             if 'image' in infobox:
+                image = infobox['image']
+                image = image.replace('[[', '').replace(']]', '')
                 if not self.image:
-                    self.image = utils.media_url(infobox['image'])
-                if self.images:
-                    self.images['pimage'] = infobox['image']
+                    self.image = utils.media_url(image)
+                self.images['pimage'] = image
 
         self.links = get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
@@ -442,10 +443,10 @@ class WPTools(object):
             self.description = descriptions
 
         if self.wikidata and 'image' in self.wikidata:
+            image = self.wikidata['image']
             if not self.image:
-                self.image = utils.media_url(self.wikidata['image'])
-            if self.images:
-                self.images['wimage'] = self.wikidata['image']
+                self.image = utils.media_url(image)
+            self.images['wimage'] = image
 
         labels = self.__get_entity_prop(item, 'labels')
         if labels:
