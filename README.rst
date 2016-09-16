@@ -63,7 +63,7 @@ An instance can be initialized by:
 - ``lang``: <str> MediaWiki `language code`_ (default='en')
 - ``title``: <unicode> a MediaWiki article title
 - ``wiki``: <str> any MediaWiki site
-- ``wikibase``: <str> Wikidata `entity ID`_
+- ``wikibase``: <str> Wikidata item `entity ID`_
 
 .. _`language code`: https://meta.wikimedia.org/wiki/Table_of_Wikimedia_projects
 .. _`entity ID`: https://www.wikidata.org/wiki/Wikidata:Glossary#Entities.2C_items.2C_properties_and_queries
@@ -294,7 +294,7 @@ encyclopedia-like HTML fragment:
 - ``<p heading>`` wiki-linked title and description
 - ``<img {type}>`` {image, pageimage, or thumbnail}
 - ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
-- ``<p metadata>`` available metadata (e.g. Last modified, coordinates)
+- ``<p metadata>`` available metadata (e.g. Last modified)
 
 
 Get all the things:

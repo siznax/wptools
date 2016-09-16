@@ -1,8 +1,6 @@
 WPTools NOTES
 =============
 
-This is the current wptools knowledge base.
-
 _“For reading, there will never be enough time” —Harold Bloom_
 
 * https://www.mediawiki.org/wiki/API:Main_page
@@ -10,26 +8,26 @@ _“For reading, there will never be enough time” —Harold Bloom_
 * https://www.wikidata.org/wiki/Wikidata:Data_access
 * https://en.wikipedia.org/wiki/Wikipedia:Wikipedia_records
 
-This project is listed here as "wptools":
+This project is listed in the MediaWiki API docs as "wptools":  
 https://www.mediawiki.org/wiki/API:Client_code#Python
 
 
 Table of Contents
 -----------------
 
-* DBPedia
-* Extracts
-* Hovercards
-* Humans
-* Images
-* Infobox
-* Language Codes and Wikisites
-* MediaWiki API
-* Parse tree
-* RESTBase
-* URL Shortener
-* WikiData
-* Wikitext
+* [DBPedia](#dbpedia)
+* [Extracts](#extracts)
+* [Hovercards](#hovercards)
+* [Humans](#humans)
+* [Images](#images)
+* [Infobox](#infobox)
+* [Language Codes and Wikisites](#language-codes-and-wikisites)
+* [MediaWiki API](#mediawiki-api)
+* [Parse tree](#parse-tree)
+* [RESTBase](#restbase)
+* [URL Shortener](#url-shortener)
+* [WikiData](#wikidata)
+* [Wikitext](#wikitext)
 
 
 DBPedia
@@ -91,8 +89,10 @@ examples.
 8. Ella Fitzgerald - American jazz singer
 9. Fela Kuti - Nigerian musician and activist
 10. Stephen Fry - English comedian, actor, writer, presenter, and activist
-11. Jill Lepore - American historian
-12. Jeann d'Arc - folk heroine and Roman Catholic saint
+11. Simone de Beauvoir - French writer, intellectual, existentialist philosopher, political activist, feminist, and social theorist
+12. Guatama Buddha - Nepalese (Madhesi) spiritual teacher on whose teachings Buddhism was founded
+13. Jill Lepore - American historian
+14. Jeann d'Arc - folk heroine and Roman Catholic saint
 
 
 Images
@@ -116,10 +116,10 @@ a dict with ``wptools.utils.template_to_dict(ptree)``.
 Language Codes and Wikisites
 ----------------------------
 
-Here's a list of language codes (even non-standard ones) currently in use:
+Here's a list of language codes (even non-standard ones) currently in use:  
 https://meta.wikimedia.org/wiki/Table_of_Wikimedia_projects
 
-Another list sorted by number of articles
+Another list sorted by number of articles:  
 https://meta.wikimedia.org/wiki/List_of_Wikipedias
 
 
@@ -175,7 +175,7 @@ It would be especially useful for commons media URLs.
 WikiData
 --------
 
-We get wikidata through (action=wbgetentities)
+We get wikidata through (action=wbgetentities)  
 https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
 * https://www.mediawiki.org/wiki/Wikibase/DataModel#Overview_of_the_data_model
@@ -194,16 +194,15 @@ Properties
 Wikitext
 --------
 
-We get wikitext by ``action=parse`` and put it in the _wikitext_
-attribute.
+We get wikitext by ``action=parse`` and put it in the _wikitext_ attribute.
 
 * https://www.mediawiki.org/wiki/API:Data_formats
 * https://www.mediawiki.org/wiki/API:Parsing_wikitext
 
-Probably the most direct way to get to wikitext:
+The most direct way to get to wikitext is to add ``action=raw``:  
 https://en.wikipedia.org/wiki/Abraham_Lincoln?action=raw&section=0
 
-But fails if there is '.' in the title:
+But this seems to fail if there is '.' in the title, e.g.  
 https://en.wikipedia.org/wiki/J._R._R._Tolkien?action=raw
 
 
