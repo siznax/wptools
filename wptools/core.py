@@ -225,7 +225,7 @@ class WPTools(object):
         """
         set attribute, append suffix if clobber
         """
-        if hasattr(self, attr):
+        if hasattr(self, attr) and getattr(self, attr):
             extant = getattr(self, attr)
             if extant != value:
                 attr = "%s_%s" % (attr, suffix)
@@ -345,7 +345,10 @@ class WPTools(object):
                 stderr("RESTBase error: %s" % error)
                 return
 
-        self.__setattr('description', data.get('description'), 'rest')
+        description = data.get('description')
+        if description:
+            # self.__setattr('description', data.get('description'), 'rest')
+            self.description = description
 
         image = data.get('image')
         if image:
