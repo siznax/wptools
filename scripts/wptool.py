@@ -43,8 +43,8 @@ def _image(item):
     """
     returns (preferred) image from wptools object
     """
-    if hasattr(item, 'Image') and item.Image:
-        return item.Image
+    if hasattr(item, 'image') and item.image:
+        return item.image
     elif hasattr(item, 'pageimage') and item.pageimage:
         return item.pageimage
     elif hasattr(item, 'thumbnail') and item.thumbnail:
