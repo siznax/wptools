@@ -155,19 +155,19 @@ class WPTools(object):
 
         src = None
         cls = None
-        if hasattr(self, 'image') and self.image:
-            src = self.image
-            cls = 'image'
+        if hasattr(self, 'thumbnail') and self.thumbnail:
+            src = self.thumbnail
+            cls = 'thumbnail'
         elif hasattr(self, 'pageimage') and self.pageimage:
             src = self.pageimage
             cls = 'pageimage'
-        elif hasattr(self, 'thumbnail') and self.thumbnail:
-            src = self.thumbnail
-            cls = 'thumbnail'
+        elif hasattr(self, 'image') and self.image:
+            src = self.image
+            cls = 'image'
         if src:
             img = ("<img %s src=\"%s\" alt=\"%s\" title=\"%s\" "
                    % (cls, src, alt, alt))
-            img += "align=right width=240>"
+            img += "align=right width=120>"
             return img
 
     def __get_lead_metadata(self):
