@@ -96,7 +96,8 @@ def snip_html(text, verbose=0):
         return ('metadata' in _class
                 or 'noexcerpt' in _class
                 or 'noprint' in _class
-                or 'reference' in _class)
+                or 'reference' in _class
+                or 'haudio' in _class)
 
     keep = lxml.html.Element("span")
     for elem in lxml.html.fromstring(text):
