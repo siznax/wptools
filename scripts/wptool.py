@@ -16,6 +16,9 @@ from wptools.fetch import WPToolsFetch
 
 
 def _html_image(item):
+    """
+    returns HTML img tag
+    """
     source = _image(item)
     if not source:
         return
@@ -29,6 +32,9 @@ def _html_image(item):
 
 
 def _html_title(item):
+    """
+    returns Wiki-linked HTML title
+    """
     link = "<a href=\"%s\">%s</a>" % (item.url, item.title)
     if item.description:
         link += "&mdash;<i>%s</i>" % item.description
@@ -54,6 +60,9 @@ def _image(item):
 
 
 def _item_html(item):
+    """
+    returns assembled HTML output
+    """
     out = []
     out.append(_html_title(item))
     out.append(_html_image(item))
@@ -62,6 +71,9 @@ def _item_html(item):
 
 
 def _item_text(item, nowrap=False):
+    """
+    returns assembled text output
+    """
     title = item.title.upper()
     if hasattr(item, 'description') and item.description:
         title += u'\u2014' + "%s" % item.description
@@ -92,7 +104,9 @@ def _item_text(item, nowrap=False):
 
 
 def _safe_exit(output):
-    """exit without breaking pipes."""
+    """
+    exit without breaking pipes
+    """
     try:
         sys.stdout.write(output)
         sys.stdout.flush()
@@ -104,6 +118,9 @@ def _safe_exit(output):
 
 
 def _text_image(item):
+    """
+    returns text image URL
+    """
     img = None
     alt = item.title
     if item.label:
@@ -114,8 +131,20 @@ def _text_image(item):
     return img
 
 
-def get(html, lang, nowrap, query, silent, title, verbose, wiki):
-    """wptools.get() and emit selected output"""
+def get(args):
+    """
+    invoke wptools and assemble selected output
+    """
+
+    html = args.H
+    lang = args.l
+    nowrap = args.n
+    query = args.q
+    silent = args.s
+    title = args.t
+    verbose = args.v
+    wiki = args.w
+
     start = time.time()
 
     if query:
@@ -144,9 +173,9 @@ def get(html, lang, nowrap, query, silent, title, verbose, wiki):
         return out
 
 
-def main():
+def parse_args():
     """
-    wptool main() function
+    parse main() args
     """
     description = (
         "Get Wikipedia article info and Wikidata via MediaWiki APIs.\n\n"
@@ -174,12 +203,16 @@ def main():
                       help="HTTP status to stderr")
     argp.add_argument("-w", "-wiki",
                       help="use alternative wikisite")
+    return argp.parse_args()
 
-    args = argp.parse_args()
 
-    _safe_exit(get(args.H, args.l, args.n, args.q, args.s, args.t,
-                   args.v, args.w))
+def main(args):
+    """
+    invoke wptools and exit safely
+    """
+    _safe_exit(get(args))
 
 
 if __name__ == "__main__":
-    main()
+    args = parse_args()
+    main(args)

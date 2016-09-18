@@ -140,7 +140,11 @@ class WPToolsToolTest(unittest.TestCase):
 
     def test_wptool(self):
         from scripts.wptool import main
-        # main()
+        from collections import namedtuple
+        args = namedtuple('Args', ['H', 'l', 'n', 'q', 's', 't', 'v', 'w'])
+        cli = {'H': False, 'l': 'en', 'n': False, 'q': False, 's': True,
+               't': '', 'v': False, 'w': ''}
+        main(args(**cli))
 
 
 if __name__ == '__main__':

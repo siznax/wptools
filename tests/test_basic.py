@@ -38,6 +38,14 @@ class WPToolsCoreTestCase(unittest.TestCase):
         abc.get_rest()
         self.assertTrue(not abc.pageid)
 
+    def test_wptool(self):
+        from scripts.wptool import main
+        from collections import namedtuple
+        args = namedtuple('Args', ['H', 'l', 'n', 'q', 's', 't', 'v', 'w'])
+        cli = {'H': False, 'l': 'en', 'n': False, 'q': True, 's': True,
+               't': '', 'v': False, 'w': ''}
+        main(args(**cli))
+
 
 class WPtoolsFetchTestCase(unittest.TestCase):
 
