@@ -128,8 +128,8 @@ class WPTools(object):
         returns lead HTML with heading and image and refs removed
         """
         lead = []
-        lead.append(self.__get_lead_heading())
         lead.append(self.__get_lead_image())
+        lead.append(self.__get_lead_heading())
         lead.append(self.__get_lead_rest(data))
         lead.append(self.__get_lead_metadata())
         return "\n".join([x for x in lead if x])
@@ -142,8 +142,10 @@ class WPTools(object):
             return
         heading = "<a href=\"%s\">%s</a>" % (self.url, self.title)
         if hasattr(self, 'description') and self.description:
-            heading += "&mdash;<i>%s</i>" % self.description
-        return "<p heading>%s</p>" % heading
+            heading += "&mdash;<i>%s</i>. " % self.description
+        else:
+            heading += ':'
+        return "<span heading>%s</span>" % heading
 
     def __get_lead_image(self):
         """
@@ -177,7 +179,7 @@ class WPTools(object):
         meta = []
         if hasattr(self, 'lastmodified'):
             meta.append("Last modified: %s" % self.lastmodified)
-        return "<p metadata>%s</p>" % "\n".join([x for x in meta if x])
+        return "<span metadata>%s</span>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
         """
@@ -205,7 +207,7 @@ class WPTools(object):
         snip and base href lead HTML
         """
         snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
-        snip = "<p snipped>%s</p>" % snip
+        snip = "<span snipped>%s</span>" % snip
         url = urlparse(self.g_rest['query'])
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
