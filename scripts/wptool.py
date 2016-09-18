@@ -49,12 +49,12 @@ def _image(item):
     """
     returns (preferred) image from wptools object
     """
-    if hasattr(item, 'image') and item.image:
-        return item.image
+    if hasattr(item, 'thumbnail') and item.thumbnail:
+        return item.thumbnail
     elif hasattr(item, 'pageimage') and item.pageimage:
         return item.pageimage
-    elif hasattr(item, 'thumbnail') and item.thumbnail:
-        return item.thumbnail
+    elif hasattr(item, 'image') and item.image:
+        return item.image
     else:
         return None
 
@@ -214,5 +214,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main(parse_args())
