@@ -256,7 +256,7 @@ class WPTools(object):
         infobox = get_infobox(parsetree)
         if infobox:
             self.infobox = infobox
-            if 'image' in infobox:
+            if 'image' in infobox and infobox['image']:
                 image = infobox['image']
                 image = image.replace('[[', '').replace(']]', '')
                 if not self.image:
