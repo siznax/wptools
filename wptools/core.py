@@ -79,6 +79,8 @@ class WPTools(object):
     g_rest = None
     g_wikidata = None
     image = None
+    image_infobox = None
+    image_wikidata = None
     images = {}
     infobox = None
     label = None
@@ -264,7 +266,9 @@ class WPTools(object):
             """
             image = dic[key]
             image = image.replace('[[', '').replace(']]', '')
-            if not self.image:
+            if self.image:
+                self.image_infobox = utils.media_url(image, namespace=self.lang)
+            else:
                 self.image = utils.media_url(image, namespace=self.lang)
             self.images['pimage'] = image
 
@@ -453,7 +457,9 @@ class WPTools(object):
 
         if self.wikidata and 'image' in self.wikidata:
             image = self.wikidata['image']
-            if not self.image:
+            if self.image:
+                self.image_wikidata = utils.media_url(image)
+            else:
                 self.image = utils.media_url(image)
             self.images['wimage'] = image
 
