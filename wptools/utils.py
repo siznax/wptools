@@ -29,6 +29,7 @@ def media_url(fname, namespace='commons',
     return Wikimedia File/Image URL from name
     """
     name = re.sub(r'^(File|Image):', '', fname).replace(' ', '_')
+    name = re.sub(r'^(file|image):', '', fname).replace(' ', '_')
 
     try:
         digest = hashlib.md5(name).hexdigest()
