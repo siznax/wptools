@@ -5,14 +5,23 @@ WPToolsTestTitles module.
 """
 
 # animals
-# https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status
+#     https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status
+# books
+#     https://en.wikipedia.org/wiki/Man_Booker_Prize
+#     https://en.wikipedia.org/wiki/Man_Booker_International_Prize
+#     https://en.wikipedia.org/wiki/Pulitzer_Prize_for_Fiction
+# music
+#     https://en.wikipedia.org/wiki/Grammy_Award_for_Album_of_the_Year
+# film
+#     https://en.wikipedia.org/wiki/List_of_Academy_Award-winning_films
+#     https://en.wikipedia.org/wiki/List_of_films_considered_the_best
 # featured
-# https://en.wikipedia.org/wiki/Wikipedia:Today%27s_featured_article/Most_viewed
-# https://ja.wikipedia.org/wiki/Wikipedia:%E7%A7%80%E9%80%B8%E3%81%AA%E8%A8%98%E4%BA%8B
-# https://ru.wikipedia.org/wiki/%D0%92%D0%B8%D0%BA%D0%B8%D0%BF%D0%B5%D0%B4%D0%B8%D1%8F:%D0%98%D0%B7%D0%B1%D1%80%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5_%D1%81%D1%82%D0%B0%D1%82%D1%8C%D0%B8
-# https://zh.wikipedia.org/wiki/Wikipedia:%E7%89%B9%E8%89%B2%E6%9D%A1%E7%9B%AE
+#     https://en.wikipedia.org/wiki/Wikipedia:Today%27s_featured_article/Most_viewed
+#     https://ja.wikipedia.org/wiki/Wikipedia:%E7%A7%80%E9%80%B8%E3%81%AA%E8%A8%98%E4%BA%8B
+#     https://ru.wikipedia.org/wiki/%D0%92%D0%B8%D0%BA%D0%B8%D0%BF%D0%B5%D0%B4%D0%B8%D1%8F:%D0%98%D0%B7%D0%B1%D1%80%D0%B0%D0%BD%D0%BD%D1%8B%D0%B5_%D1%81%D1%82%D0%B0%D1%82%D1%8C%D0%B8
+#     https://zh.wikipedia.org/wiki/Wikipedia:%E7%89%B9%E8%89%B2%E6%9D%A1%E7%9B%AE
 # places
-# https://en.wikipedia.org/wiki/List_of_cities_proper_by_population
+#     https://en.wikipedia.org/wiki/List_of_cities_proper_by_population
 
 import random
 
@@ -51,12 +60,42 @@ class WPToolsTestTitles(object):
     }
 
     art = {
-        "en":{
+        "en": {
             "Eight Elvises",
             "Guennol Lioness",
             "Portrait of Dr. Gachet",
             "The Great Wave off Kanagawa",
             "The Scream"
+        }
+    }
+
+    books = {
+        "en": {
+            "A Brief History of Seven Killings",
+            "Bring Up the Bodies",
+            "MaddAddam",
+            "The Sympathizer",
+            "The Vegetarian",
+        }
+    }
+
+    film = {
+        "en": {
+            "Casablanca (film)",
+            "Himala",
+            "Raise the Red Lantern",
+            "Seven Samurai",
+            "Spotlight (film)",
+        }
+    }
+
+    music = {
+        "en": {
+            "1989 (Taylor Swift album)",
+            "Beauty Behind the Madness",
+            "Giant Steps",
+            "Kind of Blue",
+            "To Pimp a Butterfly",
         }
     }
 
@@ -212,6 +251,17 @@ def language():
     returns random language code from selections
     """
     return random.choice(list(WPToolsTestTitles.featured))
+
+
+def media(lang='en'):
+    """
+    returns random media title
+    """
+    titles = set()
+    titles = titles.union(WPToolsTestTitles.books[lang])
+    titles = titles.union(WPToolsTestTitles.music[lang])
+    titles = titles.union(WPToolsTestTitles.film[lang])
+    return {'lang': lang, 'title': random.choice(list(titles))}
 
 
 def title(lang=None):
