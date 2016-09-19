@@ -226,6 +226,20 @@ Get an Infobox_ as a python object:
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
 
+Get a cover image:
+
+.. code-block:: python
+
+    >>> m = wptools.page('The Sympathizer')
+    >>> m.get_parse()
+    >>> m.image
+    'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
+
+..
+
+    .. image:: https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/The_Sympathizer_-_book_cover.jpg/120px-The_Sympathizer_-_book_cover.jpg
+
+
 Get wikidata by *title*:
 
 .. code-block:: python
