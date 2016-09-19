@@ -42,21 +42,18 @@ def _html_title(item):
         link += "&mdash;<i>description</i>"
     if link:
         return "<p>%s</p>" % link
-    return None
 
 
 def _image(item):
     """
     returns (preferred) image from wptools object
     """
-    if hasattr(item, 'thumbnail') and item.thumbnail:
-        return item.thumbnail
+    if hasattr(item, 'image') and item.image:
+        return item.image
     elif hasattr(item, 'pageimage') and item.pageimage:
         return item.pageimage
-    elif hasattr(item, 'image') and item.image:
-        return item.image
-    else:
-        return None
+    elif hasattr(item, 'thumbnail') and item.thumbnail:
+        return item.thumbnail
 
 
 def _item_html(item):

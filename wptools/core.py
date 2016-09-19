@@ -223,6 +223,9 @@ class WPTools(object):
                 geo = "%s,%s" % (data['latitude'], data['longitude'])
                 self.wikidata['coordinates'] = geo
 
+    def __set_infobox_image(self):
+        pass
+
     def __setattr(self, attr, value, suffix):
         """
         set attribute, append suffix if clobber
@@ -254,14 +257,23 @@ class WPTools(object):
 
         parsetree = pdata.get('parsetree')
         infobox = get_infobox(parsetree)
+
+        def set_pimage(dic, key):
+            """
+            set parse image by preferred key
+            """
+            image = dic[key]
+            image = image.replace('[[', '').replace(']]', '')
+            if not self.image:
+                self.image = utils.media_url(image, namespace=self.lang)
+            self.images['pimage'] = image
+
         if infobox:
             self.infobox = infobox
-            if 'image' in infobox and infobox['image']:
-                image = infobox['image']
-                image = image.replace('[[', '').replace(']]', '')
-                if not self.image:
-                    self.image = utils.media_url(image)
-                self.images['pimage'] = image
+            if 'image' in infobox:
+                set_pimage(infobox, 'image')
+            elif 'Cover' in infobox:
+                set_pimage(infobox, 'Cover')
 
         self.links = get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
