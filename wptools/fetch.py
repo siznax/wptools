@@ -63,6 +63,7 @@ class WPToolsFetch(object):
             "&ids=${ids}"
             "&languages=${lang}"
             "&props=${props}"
+            "&redirects=yes"
             "&sites=${site}"
             "&titles=${title}"))
     }
