@@ -3,10 +3,12 @@
 Release History
 ---------------
 
-0.1.6 (2016-09-13)
+0.1.7 (2016-09-20)
 ++++++++++++++++++
 
-* Enabled fetch of ANY Wikidata properties
+* Minor fixes
+* Provide local SSL certs with python-certifi
+* Enabled extending Wikidata properties
 * Improved cache checking
 
 
