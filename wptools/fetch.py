@@ -9,6 +9,7 @@ from __future__ import print_function
 from io import BytesIO
 from string import Template
 
+import certifi
 import sys
 import pycurl
 
@@ -134,6 +135,7 @@ class WPToolsFetch(object):
         crl.setopt(pycurl.USERAGENT, user_agent())
         crl.setopt(pycurl.FOLLOWLOCATION, True)
         crl.setopt(pycurl.CONNECTTIMEOUT, self.timeout)
+        crl.setopt(pycurl.CAINFO, certifi.where())
         self.cobj = crl
 
     def query(self, action, thing, pageid=False):
