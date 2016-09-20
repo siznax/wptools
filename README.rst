@@ -225,14 +225,27 @@ Get an Infobox_ as a python object:
     >>> fela.infobox['instrument']
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
+**Note**: Getting data from Infoboxen may be unavoidable, but getting
+Wikidata (via ``get_wikidata()``) is preferred. Wikidata is
+structured_ but (sometimes) data poor, while Infoboxen are
+unstructured and (frequently) data rich. Please consider updating_
+Wikidata if the information you want is only available in a MediaWiki
+instance so that others may benefit from open, `linked data`_.
 
-Get a cover image:
+.. _structured: https://www.wikidata.org/wiki/Wikidata:Introduction
+.. _updating: https://www.wikidata.org/wiki/Wikidata:Contribute
+.. _`linked data`: https://en.wikipedia.org/wiki/Linked_data
+
+
+Get an (album, book, film, etc.) cover image:
 
 .. code-block:: python
 
-    >>> m = wptools.page('The Sympathizer')
-    >>> m.get_parse()
-    >>> m.image
+    >>> p = wptools.page('The Sympathizer')
+    >>> p.get_parse()
+    en.wikipedia.org (action=parse) The_Sympathizer
+
+    >>> p.image
     'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
 
 ..
