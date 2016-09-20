@@ -17,26 +17,11 @@ Release History
 
 * Python 3 support!
 * Implemented get_claims()
-
-
-0.1.3 (2016-09-04)
-++++++++++++++++++
-
 * Patch get_rest() path, tests/test_advanced
 * Implemented get_wikidata() by title, lang
 * Geo coordinates Property:P625 from Wikidata
-
-
-0.1.2 (2016-09-02)
-++++++++++++++++++
-
-* added RESTBase support, lead attribute
-
-
-0.1.1 (2016-08-25)
-++++++++++++++++++
-
-* Made wptools.page() the atomic object.
+* Added RESTBase support, lead attribute
+* Made wptools.page() the atomic object
 
 
 0.1.0 (2016-08-25)
@@ -85,11 +70,6 @@ Release History
 * Added wptools.api to simplify python i/f and CLI scripts.
 * Merged @0x9900's CLI dist fixes.
 * A little more test coverage.
-
-
-0.0.2 (2016-08-02)
-++++++++++++++++++
-
 * Starting to look like a legit module.
 
 
