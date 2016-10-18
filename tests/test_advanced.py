@@ -93,6 +93,13 @@ class WPToolsPickTest(unittest.TestCase):
         p = wptools.page('Frida Kahlo').get_rest(False)
         self.assertTrue(p.thumbnail.startswith('http'))
 
+    def test_pageid(self):
+        """
+        Get a page by pageid
+        """
+        p = wptools.page(pageid=851640).get_query(False)
+        self.assertTrue(p.title == 'Helianthus')
+
 
 class WPToolsRandomTest(unittest.TestCase):
     """

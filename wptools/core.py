@@ -100,20 +100,25 @@ class WPTools(object):
     wikitext = None
     wikidata = {}
 
-    def __init__(self, title='', lang='en', wikibase=None,
+    def __init__(self, title='', lang='en', wikibase=None, pageid=None,
                  silent=False, verbose=False, wiki=None):
-        self.silent = silent
-        self.lang = lang
-        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki)
-        if wikibase:
-            self.wikibase = wikibase
+        if pageid:
+            self.pageid = pageid
         if title:
             self.title = title.replace(' ', '_')
-        if not wikibase and not title:
+        if wikibase:
+            self.wikibase = wikibase
+
+        self.lang = lang
+        self.silent = silent
+        self.verbose = verbose
+
+        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki)
+
+        if not wikibase and not title and not pageid:
             self.get_random()
         else:
             self.show()
-        self.verbose = verbose
 
     def __get_entity_prop(self, entity, prop):
         """
@@ -536,7 +541,10 @@ class WPTools(object):
         if self.g_parse:
             stderr("Request cached in g_parse.")
             return
-        query = self.__fetch.query('parse', self.title)
+        if self.pageid:
+            query = self.__fetch.query('parse', self.pageid, pageid=True)
+        else:
+            query = self.__fetch.query('parse', self.title)
         parse = {}
         parse['query'] = query
         parse['response'] = self.__fetch.curl(query)
@@ -564,9 +572,10 @@ class WPTools(object):
         if self.g_query:
             stderr("Request cached in g_query.")
             return
-        qry = self.__fetch.query('query', self.title)
         if self.pageid:
             qry = self.__fetch.query('query', self.pageid, pageid=True)
+        else:
+            qry = self.__fetch.query('query', self.title)
         query = {}
         query['query'] = qry
         query['response'] = self.__fetch.curl(qry)

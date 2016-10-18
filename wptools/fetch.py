@@ -9,8 +9,9 @@ from __future__ import print_function
 from io import BytesIO
 from string import Template
 
-import certifi
 import sys
+
+import certifi
 import pycurl
 
 from . import __title__, __contact__, __version__
@@ -172,6 +173,9 @@ class WPToolsFetch(object):
             qry = self.QUERY[action].substitute(
                 WIKI=self.wiki,
                 thing=thing)
+
+        if action == 'parse' and pageid:
+            qry = qry.replace('&page=', '&pageid=').replace('&redirects', '')
 
         if action == 'query' and pageid:
             qry = qry.replace('&titles=', '&pageids=')
