@@ -68,6 +68,7 @@ class WPTools(object):
                   'P1773': 'attribution',
                   'P1779': 'creator'}
 
+    _proxy = None
     claims = {}
     description = None
     extext = None
@@ -113,7 +114,8 @@ class WPTools(object):
         self.silent = silent
         self.verbose = verbose
 
-        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki)
+        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki,
+                                          self._proxy)
 
         if not wikibase and not title and not pageid:
             self.get_random()

@@ -77,14 +77,15 @@ class WPToolsFetch(object):
     timeout = 15
     title = None
 
-    def __init__(self, lang='en', silent=False, verbose=False, wiki=None):
+    def __init__(self, lang='en', silent=False, verbose=False, wiki=None,
+                 proxy=None):
         self.lang = lang
         self.wiki = "%s.wikipedia.org" % lang
         if wiki:
             self.wiki = wiki
         self.silent = silent
         self.verbose = verbose
-        self.curl_setup()
+        self.curl_setup(proxy)
 
     def __del__(self):
         self.cobj.close()
@@ -128,15 +129,18 @@ class WPToolsFetch(object):
         bfr.close()
         return body
 
-    def curl_setup(self):
+    def curl_setup(self, proxy=None):
         """
         set curl options
         """
+
         crl = pycurl.Curl()
         crl.setopt(pycurl.USERAGENT, user_agent())
         crl.setopt(pycurl.FOLLOWLOCATION, True)
         crl.setopt(pycurl.CONNECTTIMEOUT, self.timeout)
         crl.setopt(pycurl.CAINFO, certifi.where())
+        if proxy:
+            crl.setopt(pycurl.PROXY, proxy)
         self.cobj = crl
 
     def query(self, action, thing, pageid=False):

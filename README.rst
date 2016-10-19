@@ -61,6 +61,7 @@ An instance can be initialized by:
 
 - ``None``: <NoneType>
 - ``lang``: <str> MediaWiki `language code`_ (default='en')
+- ``pageid``: <int> a MediaWiki Page ID
 - ``title``: <unicode> a MediaWiki article title
 - ``wiki``: <str> any MediaWiki site
 - ``wikibase``: <str> Wikidata item `entity ID`_
@@ -162,6 +163,13 @@ Request details echo to *stderr* with ``verbose=True``:
 .. code-block:: python
 
     >>> r = wptools.page(verbose=True)
+
+
+You can set a proxy server like this:
+
+.. code-block:: python
+
+    >>> wptools.page._proxy = 'http://example.com:80'
 
 
 
