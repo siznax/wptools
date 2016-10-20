@@ -80,6 +80,7 @@ class WPToolsFetch(object):
     def __init__(self, **kwargs):
         self.lang = kwargs.get('lang')
         self.silent = kwargs.get('silent') or False
+        self.variant = kwargs.get('variant')
         self.verbose = kwargs.get('verbose') or False
         self.wiki = kwargs.get('wiki') or "%s.wikipedia.org" % self.lang
 
@@ -181,6 +182,9 @@ class WPToolsFetch(object):
 
         if action == 'query' and pageid:
             qry = qry.replace('&titles=', '&pageids=')
+
+        if self.variant:
+            qry += '&variant=' + self.variant
 
         self.action = action
         self.thing = thing

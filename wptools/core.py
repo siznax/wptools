@@ -117,6 +117,7 @@ class WPTools(object):
         self.__fetch = fetch.WPToolsFetch(
             lang=self.lang,
             silent=self.silent,
+            variant=self.variant,
             verbose=self.verbose,
             wiki=self.wiki,
             proxy=self._proxy)

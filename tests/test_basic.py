@@ -49,6 +49,10 @@ class WPToolsCoreTestCase(unittest.TestCase):
 
 class WPtoolsFetchTestCase(unittest.TestCase):
 
+    def test_variant(self):
+        f = wptools.fetch.WPToolsFetch(variant='zh-cn')
+        self.assertTrue(f.query('query', 'a').endswith('&variant=zh-cn'))
+
     def test_set_proxy(self):
         wptools.set_proxy('test_proxy')
 
