@@ -101,23 +101,26 @@ class WPTools(object):
     wikitext = None
     wikidata = {}
 
-    def __init__(self, title='', lang='en', wikibase=None, pageid=None,
-                 silent=False, verbose=False, wiki=None):
-        if pageid:
-            self.pageid = pageid
-        if title:
-            self.title = title.replace(' ', '_')
-        if wikibase:
-            self.wikibase = wikibase
+    def __init__(self, *args, **kwargs):
 
-        self.lang = lang
-        self.silent = silent
-        self.verbose = verbose
+        if len(args) > 0:
+            self.title = args[0].replace(' ', '_')
 
-        self.__fetch = fetch.WPToolsFetch(self.lang, silent, verbose, wiki,
+        self.lang = kwargs.get('lang') or 'en'
+        self.pageid = kwargs.get('pageid')
+        self.silent = kwargs.get('silent') or False
+        self.variant = kwargs.get('variant')
+        self.verbose = kwargs.get('verbose') or False
+        self.wiki = kwargs.get('wiki')
+        self.wikibase = kwargs.get('wikibase')
+
+        self.__fetch = fetch.WPToolsFetch(self.lang,
+                                          self.silent,
+                                          self.verbose,
+                                          self.wiki,
                                           self._proxy)
 
-        if not wikibase and not title and not pageid:
+        if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
         else:
             self.show()
