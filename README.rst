@@ -169,7 +169,7 @@ You can set a proxy server like this:
 
 .. code-block:: python
 
-    >>> wptools.page._proxy = 'http://example.com:80'
+    >>> wptools.set_proxy('http://example.com:80')
 
 
 

@@ -779,6 +779,10 @@ def json_loads(data):
         return json.loads(data.decode('utf-8'))
 
 
+def set_proxy(proxy):
+    WPTools._proxy = proxy
+
+
 def stderr(msg, silent=False):
     """write msg to stderr if not silent"""
     if not silent:
