@@ -474,7 +474,7 @@ class WPTools(object):
         if labels:
             self.label = labels
 
-        if hasattr(self, 'label') and not self.title:
+        if hasattr(self, 'label') and self.label and not self.title:
             self.title = self.label.replace(' ', '_')
 
     def get(self, show=True):
@@ -780,6 +780,9 @@ def json_loads(data):
 
 
 def set_proxy(proxy):
+    '''
+    set WPTools proxy class variable
+    '''
     WPTools._proxy = proxy
 
 
