@@ -49,8 +49,14 @@ class WPToolsCoreTestCase(unittest.TestCase):
 
 class WPtoolsFetchTestCase(unittest.TestCase):
 
-    def test(self):
-        pass
+    def test_set_proxy(self):
+        wptools.set_proxy('test_proxy')
+
+        a = wptools.page('a', silent=True)
+        self.assertTrue(a._proxy == 'test_proxy')
+
+        b = wptools.page('b', silent=True)
+        self.assertTrue(b._proxy == 'test_proxy')
 
 
 class WPToolsUtilsTestCase(unittest.TestCase):
