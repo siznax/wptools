@@ -77,15 +77,13 @@ class WPToolsFetch(object):
     timeout = 15
     title = None
 
-    def __init__(self, lang='en', silent=False, verbose=False, wiki=None,
-                 proxy=None):
-        self.lang = lang
-        self.wiki = "%s.wikipedia.org" % lang
-        if wiki:
-            self.wiki = wiki
-        self.silent = silent
-        self.verbose = verbose
-        self.curl_setup(proxy)
+    def __init__(self, **kwargs):
+        self.lang = kwargs.get('lang')
+        self.silent = kwargs.get('silent') or False
+        self.verbose = kwargs.get('verbose') or False
+        self.wiki = kwargs.get('wiki') or "%s.wikipedia.org" % self.lang
+
+        self.curl_setup(kwargs.get('proxy'))
 
     def __del__(self):
         self.cobj.close()

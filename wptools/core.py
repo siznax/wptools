@@ -114,11 +114,12 @@ class WPTools(object):
         self.wiki = kwargs.get('wiki')
         self.wikibase = kwargs.get('wikibase')
 
-        self.__fetch = fetch.WPToolsFetch(self.lang,
-                                          self.silent,
-                                          self.verbose,
-                                          self.wiki,
-                                          self._proxy)
+        self.__fetch = fetch.WPToolsFetch(
+            lang=self.lang,
+            silent=self.silent,
+            verbose=self.verbose,
+            wiki=self.wiki,
+            proxy=self._proxy)
 
         if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
@@ -277,7 +278,8 @@ class WPTools(object):
             image = dic[key]
             image = image.replace('[[', '').replace(']]', '')
             if self.image:
-                self.image_infobox = utils.media_url(image, namespace=self.lang)
+                self.image_infobox = utils.media_url(image,
+                                                     namespace=self.lang)
             else:
                 self.image = utils.media_url(image, namespace=self.lang)
             self.images['pimage'] = image
