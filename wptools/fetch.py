@@ -82,7 +82,7 @@ class WPToolsFetch(object):
         self.silent = kwargs.get('silent') or False
         self.variant = kwargs.get('variant')
         self.verbose = kwargs.get('verbose') or False
-        self.wiki = kwargs.get('wiki') or "%s.wikipedia.org" % self.lang
+        self.wiki = kwargs.get('wiki')
 
         self.curl_setup(kwargs.get('proxy'))
 
@@ -146,6 +146,8 @@ class WPToolsFetch(object):
         """
         returns API query string
         """
+        if not self.wiki or self.wiki == 'www.wikidata.org':
+            self.wiki = "%s.wikipedia.org" % self.lang
         if action.startswith('/'):
             qry = self.QUERY['rest'].substitute(
                 WIKI=self.wiki,
@@ -156,6 +158,8 @@ class WPToolsFetch(object):
             site = ''
             title = ''
             props = "info|claims|descriptions|labels|sitelinks"
+            self.wiki= 'www.wikidata.org'
+
             if thing.get('props'):
                 props = thing['props']
             if thing.get('id'):
@@ -165,10 +169,11 @@ class WPToolsFetch(object):
                 site = thing.get('site')
                 title = thing.get('title')
                 thing = title
+
             qry = self.QUERY[action].substitute(
-                WIKI="www.wikidata.org",
+                WIKI=self.wiki,
                 ids=ids,
-                lang=self.lang,
+                lang=self.variant or self.lang,
                 props=props,
                 site=site,
                 title=title)

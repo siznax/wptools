@@ -100,6 +100,7 @@ class WPTools(object):
     wikibase = None
     wikitext = None
     wikidata = {}
+    wikidata_url = None
 
     def __init__(self, *args, **kwargs):
 
@@ -240,6 +241,18 @@ class WPTools(object):
     def __set_infobox_image(self):
         pass
 
+    def __set_title_wikidata(self, item):
+        """
+        attempt to set title from wikidata
+        """
+        if hasattr(self, 'label') and self.label and not self.title:
+            self.title = self.label.replace(' ', '_')
+
+        if not self.title and 'sitelinks' in item:
+            for link in item['sitelinks']:
+                if link == "%swiki" % self.lang:
+                    self.title = item['sitelinks'][link]['title']
+
     def __setattr(self, attr, value, suffix):
         """
         set attribute, append suffix if clobber
@@ -297,6 +310,7 @@ class WPTools(object):
         self.parsetree = parsetree
         self.title = pdata.get('title').replace(' ', '_')
         self.wikibase = pdata.get('properties').get('wikibase_item')
+        self.wikidata_url = wikidata_url(self.wikibase)
         self.wikitext = pdata.get('wikitext')
 
     def _set_query_data(self):
@@ -348,6 +362,7 @@ class WPTools(object):
             wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.wikibase = wikibase
+                self.wikidata_url = wikidata_url(self.wikibase)
 
         self.random = qdata.get('random')[0]["title"]
         self.title = page.get('title').replace(' ', '_')
@@ -455,12 +470,12 @@ class WPTools(object):
 
         item = entities.get(next(iter(entities)))
 
-        if 'id' not in item:
-            if 'title' in item:
-                stderr("Wikidata missing title: %s" % item['title'])
+        if 'id' not in item and 'title' in item:
+            stderr("Wikidata missing title: %s" % item['title'])
             return
 
-        self.wikibase = "https://www.wikidata.org/wiki/%s" % item.get('id')
+        self.wikibase = item.get('id')
+        self.wikidata_url = wikidata_url(self.wikibase)
 
         self._process_claims(item.get('claims'))
 
@@ -480,8 +495,7 @@ class WPTools(object):
         if labels:
             self.label = labels
 
-        if hasattr(self, 'label') and self.label and not self.title:
-            self.title = self.label.replace(' ', '_')
+        self.__set_title_wikidata(item)
 
     def get(self, show=True):
         """
@@ -727,11 +741,17 @@ class WPTools(object):
             else:
                 data[item] = prop
 
-        header = None
-        if hasattr(self, 'title') and self.title:
-            header = "%s (%s)" % (self.title, self.lang)
-        elif hasattr(self, 'wikibase') and self.wikibase:
-            header = "%s (%s)" % (self.wikibase, self.lang)
+        lang = self.lang
+        if self.variant:
+            lang = "%s/%s" % (self.lang, self.variant)
+
+        thing = self.title
+        if self.wikibase:
+            thing = self.wikibase
+            if thing.startswith('http'):
+                thing = thing.split('/')[-1]
+
+        header = "%s (%s)" % (thing, lang)
 
         # NOTE: json.dumps and pprint show unicode literals
         stderr(header, self.silent)
@@ -811,3 +831,11 @@ def wikidata_property(claims, pid):
             if 'time' in val:
                 return val['time']
         return val
+
+
+def wikidata_url(wikibase):
+    '''
+    returns Wikidata URL from wikibase
+    '''
+    if wikibase:
+        return 'https://www.wikidata.org/wiki/' + wikibase
