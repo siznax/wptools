@@ -24,10 +24,13 @@ class WPToolsBadTest(unittest.TestCase):
 
     def test_missing(self):
         """
-        Get missing title
+        Get missing page
         """
-        b = wptools.page('_____').get_query(False)
-        self.assertTrue(b.pageid is None)
+        try:
+            wptools.page(pageid=1).get(False)
+            self.fail("failed to get missing page")
+        except LookupError as detail:
+            print(detail)
 
     def test_unknown_lang(self):
         """

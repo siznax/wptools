@@ -277,10 +277,10 @@ class WPTools(object):
 
         pdata = data.get('parse')
         if not pdata:
-            error = data.get('error')
-            if error:
-                stderr("MediaWiki:API error: %s" % error)
-            return
+            msg = "%s %s" % (
+                data.get('error').get('info'),
+                self.g_parse['query'].replace('&format=json', ''))
+            raise LookupError(msg)
 
         parsetree = pdata.get('parsetree')
         infobox = get_infobox(parsetree)
@@ -329,8 +329,10 @@ class WPTools(object):
         page = qdata.get('pages')[0]
 
         if page.get('missing'):
-            stderr("MediaWiki:API missing title: %s" % page.get('title'))
-            return
+            msg = "missing %s %s" % (
+                self.title or self.pageid,
+                self.g_query['query'].replace('&format=json', ''))
+            raise LookupError(msg)
 
         extext = None
         extract = page.get('extract')
@@ -471,8 +473,10 @@ class WPTools(object):
         item = entities.get(next(iter(entities)))
 
         if 'id' not in item and 'title' in item:
-            stderr("Wikidata missing title: %s" % item['title'])
-            return
+            msg = "missing title %s %s" % (
+                item['title'],
+                self.g_wikidata['query'].replace('&format=json', ''))
+            raise LookupError(''.join(msg))
 
         self.wikibase = item.get('id')
         self.wikidata_url = wikidata_url(self.wikibase)

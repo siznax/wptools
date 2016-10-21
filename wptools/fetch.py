@@ -158,7 +158,7 @@ class WPToolsFetch(object):
             site = ''
             title = ''
             props = "info|claims|descriptions|labels|sitelinks"
-            self.wiki= 'www.wikidata.org'
+            self.wiki = 'www.wikidata.org'
 
             if thing.get('props'):
                 props = thing['props']
