@@ -249,8 +249,7 @@ Get an (album, book, film, etc.) cover image:
 
 .. code-block:: python
 
-    >>> p = wptools.page('The Sympathizer')
-    >>> p.get_parse()
+    >>> p = wptools.page('The Sympathizer').get_parse()
     en.wikipedia.org (action=parse) The_Sympathizer
 
     >>> p.image
@@ -297,6 +296,7 @@ Extend Wikidata claims_ to be resolved:
 
     >>> simone = wptools.page('Simone de Beauvoir')
     >>> simone._WIKIPROPS['P21'] = 'gender'
+
     >>> simone.get_wikidata()
     en.wikipedia.org (action=wikidata) Simone_de_Beauvoir
     en.wikipedia.org (action=wikidata) Q142|Q8745624|Q1214721|Q6581072|Q5
