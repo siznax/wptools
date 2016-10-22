@@ -105,7 +105,8 @@ class WPTools(object):
     def __init__(self, *args, **kwargs):
 
         if len(args) > 0:
-            self.title = args[0].replace(' ', '_')
+            if args[0]:
+                self.title = args[0].replace(' ', '_')
 
         self.lang = kwargs.get('lang') or 'en'
         self.pageid = kwargs.get('pageid')
