@@ -20,7 +20,7 @@ class WPToolsBadTest(unittest.TestCase):
         Get redirected
         """
         b = wptools.page('Ben Franklin').get_query(False)
-        self.assertEqual(b.title, 'Benjamin_Franklin')
+        self.assertTrue(b.url.endswith('Benjamin_Franklin'))
 
     def test_missing(self):
         """
@@ -103,6 +103,14 @@ class WPToolsPickTest(unittest.TestCase):
         p = wptools.page(pageid=851640).get_query(False)
         self.assertTrue(p.title == 'Helianthus')
 
+    def test_disambiguation_wikibase(self):
+        """
+        Get an unambiguous page by wikibase
+        """
+        p = wptools.page(wikibase='Q528917')
+        p.get_wikidata(False).get_query(False)
+        self.assertTrue(p.pageid == 20974062)
+
 
 class WPToolsRandomTest(unittest.TestCase):
     """
@@ -139,7 +147,7 @@ class WPToolsRestBaseTest(unittest.TestCase):
     def test_get_rest(self):
         t = wptools.test.title()
         r = wptools.page(t['title'], lang=t['lang'])
-        r.get_rest(show=False)
+        r.get_rest()
         self.assertTrue(r.lead is not None)
 
 

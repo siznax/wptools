@@ -245,13 +245,14 @@ class WPTools(object):
         """
         attempt to set title from wikidata
         """
-        if hasattr(self, 'label') and self.label and not self.title:
-            self.title = self.label.replace(' ', '_')
-
         if not self.title and 'sitelinks' in item:
             for link in item['sitelinks']:
                 if link == "%swiki" % self.lang:
-                    self.title = item['sitelinks'][link]['title']
+                    title = item['sitelinks'][link]['title']
+                    self.title = title.replace(' ', '_')
+
+        if not self.title and hasattr(self, 'label') and self.label:
+            self.title = self.label.replace(' ', '_')
 
     def __setattr(self, attr, value, suffix):
         """
@@ -308,7 +309,8 @@ class WPTools(object):
         self.links = get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
         self.parsetree = parsetree
-        self.title = pdata.get('title').replace(' ', '_')
+        if not self.title:
+            self.title = pdata.get('title').replace(' ', '_')
         self.wikibase = pdata.get('properties').get('wikibase_item')
         self.wikidata_url = wikidata_url(self.wikibase)
         self.wikitext = pdata.get('wikitext')
@@ -367,7 +369,8 @@ class WPTools(object):
                 self.wikidata_url = wikidata_url(self.wikibase)
 
         self.random = qdata.get('random')[0]["title"]
-        self.title = page.get('title').replace(' ', '_')
+        if not self.title:
+            self.title = page.get('title').replace(' ', '_')
 
         url = page.get('fullurl')
         if url:
@@ -567,6 +570,11 @@ class WPTools(object):
         if self.g_parse:
             stderr("Request cached in g_parse.")
             return
+        if not self.title and not self.pageid:
+            stderr("%s: need title or pageid"
+                   % self.get_wikidata.__name__,
+                   self.silent)
+            return
         if self.pageid:
             query = self.__fetch.query('parse', self.pageid, pageid=True)
         else:
@@ -597,6 +605,11 @@ class WPTools(object):
         """
         if self.g_query:
             stderr("Request cached in g_query.")
+            return
+        if not self.title and not self.pageid:
+            stderr("%s: need title or pageid"
+                   % self.get_wikidata.__name__,
+                   self.silent)
             return
         if self.pageid:
             qry = self.__fetch.query('query', self.pageid, pageid=True)
@@ -631,7 +644,8 @@ class WPTools(object):
             return
 
         self.pageid = rdata.get('id')
-        self.title = rdata.get('title').replace(' ', '_')
+        if not self.title:
+            self.title = rdata.get('title').replace(' ', '_')
 
         if show:
             self.show()
