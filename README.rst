@@ -147,6 +147,7 @@ Or, another *wiki* site:
       lang: en
       pageid: 146817
       title: Malala_Yousafzai
+      wiki: en.wikiquote.org
     }
 
 
@@ -249,10 +250,10 @@ Get an (album, book, film, etc.) cover image:
 
 .. code-block:: python
 
-    >>> p = wptools.page('The Sympathizer').get_parse()
+    >>> sym = wptools.page('The Sympathizer').get_parse()
     en.wikipedia.org (action=parse) The_Sympathizer
 
-    >>> p.image
+    >>> sym.image
     'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
 
 ..
@@ -265,21 +266,23 @@ Get wikidata by *title*:
 .. code-block:: python
 
     >>> fry = wptools.page('Stephen Fry').get_wikidata()
-    en.wikipedia.org (action=wikidata) Stephen_Fry
-    en.wikipedia.org (action=wikidata) Q8817795|Q6581097|Q145|Q5
+    www.wikidata.org (action=wikidata) Stephen_Fry
+    www.wikidata.org (action=wikidata) Q8817795|Q5|Q7066|Q145
     Stephen_Fry (en)
     {
-      claims: <dict(4)> {Q145, Q5, Q6581097, Q8817795}
+      claims: <dict(4)> {Q145, Q5, Q7066, Q8817795}
       description: English comedian, actor, writer, presenter, and activist
       g_claims: <dict(3)> {info, query, response}
       g_wikidata: <dict(3)> {info, query, response}
       image: https://upload.wikimedia.org/wikipedia/commons/1/15/Stephen_Fry_cropped.jpg
+      images: <dict(1)> {wimage}
       label: Stephen Fry
       lang: en
-      props: <dict(8)> {P18, P21, P27, P31, P345, P569, P856, P910}
+      props: <dict(8)> {P135, P18, P27, P31, P345, P569, P856, P910}
       title: Stephen_Fry
-      wikibase: https://www.wikidata.org/wiki/Q192912
-      wikidata: <dict(8)> {IMDB, birth, category, citizenship, class, ge...
+      wikibase: Q192912
+      wikidata: <dict(8)> {IMDB, birth, category, citizenship, image, in...
+      wikidata_url: https://www.wikidata.org/wiki/Q192912
     }
 
 **Note**: Resolved properties and claims are stored in the ``wikidata``
@@ -298,8 +301,8 @@ Extend Wikidata claims_ to be resolved:
     >>> simone._WIKIPROPS['P21'] = 'gender'
 
     >>> simone.get_wikidata()
-    en.wikipedia.org (action=wikidata) Simone_de_Beauvoir
-    en.wikipedia.org (action=wikidata) Q142|Q8745624|Q1214721|Q6581072|Q5
+    www.wikidata.org (action=wikidata) Simone_de_Beauvoir
+    www.wikidata.org (action=wikidata) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
 
     >>> simone.wikidata['gender']
     'female'
@@ -316,20 +319,20 @@ Get *special* `lead section`_ HTML:
     en.wikipedia.org (action=/page/mobile-text/) Buddha
 
     >>> buddha.lead
-    u'<p heading><a href="https://en.wikipedia.org/wiki/Buddha">Buddh...
-    <img pageimage src="https://upload.wikimedia.org/wikipedia/common...
-    <p snipped><span><b>Gautama Buddha</b>, also known as <b>Siddh&#2...
-    Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Wa...
-    Gautama is the primary figure in Buddhism. He is recognized by Bu...
-    <p metadata>Last modified: 2016-09-01T08:15:49Z</p>'
+    <img thumbnail src="https://upload.wikimedia.org/wikipedia/commons/thumb...
+    <span heading><a href="https://en.wikipedia.org/wiki/Gautama_Buddha">Gau...
+    <span snipped><span><b>Gautama Buddha</b>, also known as <b>Siddhārtha G...
+    Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Way" titl...
+    Gautama is the primary figure in Buddhism. He is recognized by Buddhists...
+    <span metadata>Last modified: 2016-10-13T09:44:13Z</span>
 
 **Note**: The *lead* attribute contains the assembled stand-alone,
 encyclopedia-like HTML fragment:
 
-- ``<p heading>`` wiki-linked title and description
 - ``<img {type}>`` {image, pageimage, or thumbnail}
-- ``<p snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
-- ``<p metadata>`` available metadata (e.g. Last modified)
+- ``<span heading>`` wiki-linked title and description
+- ``<span snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
+- ``<span metadata>`` available metadata (e.g. Last modified)
 
 
 Get all the things:
@@ -338,12 +341,12 @@ Get all the things:
 
     >>> jill = wptools.page('Jill Lepore').get()
     en.wikipedia.org (action=query) Jill_Lepore
-    en.wikipedia.org (action=parse) Jill_Lepore
-    en.wikipedia.org (action=wikidata) Q6192915
-    en.wikipedia.org (action=wikidata) Q30|Q5
+    en.wikipedia.org (action=parse) 22469182
+    www.wikidata.org (action=wikidata) Q6192915
+    www.wikidata.org (action=wikidata) Q30|Q5|Q6581072
     Jill_Lepore (en)
     {
-      claims: <dict(2)> {Q30, Q5}
+      claims: <dict(3)> {Q30, Q5, Q6581072}
       description: American historian
       extext: <str(1016)> **Jill Lepore** (born August 27, 1966) is an A...
       extract: <str(1107)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
@@ -351,18 +354,19 @@ Get all the things:
       g_parse: <dict(3)> {info, query, response}
       g_query: <dict(3)> {info, query, response}
       g_wikidata: <dict(3)> {info, query, response}
-      infobox: <dict(39)> {academic_advisors, alma_mater, alt, author_ab...
+      infobox: <dict(38)> {academic_advisors, alma_mater, alt, author_ab...
       label: Jill Lepore
       lang: en
       pageid: 22469182
       parsetree: <str(20662)> <root><template><title>Infobox scientist</...
-      props: <dict(3)> {P27, P31, P569}
-      random: Kunming Medical University
+      props: <dict(4)> {P21, P27, P31, P569}
+      random: Natalia Dubrovinskaia
       title: Jill_Lepore
       url: https://en.wikipedia.org/wiki/Jill_Lepore
       urlraw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
-      wikibase: https://www.wikidata.org/wiki/Q6192915
-      wikidata: <dict(3)> {birth, citizenship, class}
+      wikibase: Q6192915
+      wikidata: <dict(4)> {birth, citizenship, gender, instance}
+      wikidata_url: https://www.wikidata.org/wiki/Q6192915
       wikitext: <str(13872)> {{Infobox scientist| name = Jill Lepore| na...
     }
 
