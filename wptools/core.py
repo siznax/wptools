@@ -206,7 +206,7 @@ class WPTools(object):
                 _type = item.get('type')
                 if _type == 'hatnote' or _type == 'image':
                     continue
-                if 'text' in item:
+                if item.get('text'):
                     pars.append(item['text'])
                 else:
                     pars.append(", ".join(item.keys()))
@@ -232,9 +232,9 @@ class WPTools(object):
         """
         transform selected wikidata items
         """
-        if 'coordinates' in self.wikidata:
+        if self.wikidata.get('coordinates'):
             data = self.wikidata['coordinates']
-            if 'latitude' in data:
+            if data.get('latitude'):
                 geo = "%s,%s" % (data['latitude'], data['longitude'])
                 self.wikidata['coordinates'] = geo
 
@@ -245,7 +245,7 @@ class WPTools(object):
         """
         attempt to set title from wikidata
         """
-        if not self.title and 'sitelinks' in item:
+        if not self.title and item.get('sitelinks'):
             for link in item['sitelinks']:
                 if link == "%swiki" % self.lang:
                     title = item['sitelinks'][link]['title']
@@ -301,9 +301,9 @@ class WPTools(object):
 
         if infobox:
             self.infobox = infobox
-            if 'image' in infobox:
+            if infobox.get('image'):
                 set_pimage(infobox, 'image')
-            elif 'Cover' in infobox:
+            elif infobox.get('Cover'):
                 set_pimage(infobox, 'Cover')
 
         self.links = get_links(pdata.get('iwlinks'))
@@ -418,7 +418,7 @@ class WPTools(object):
             self.thumbnail = thumbnail
 
         title = data.get('displaytitle')
-        if 'redirected' in data:
+        if data.get('redirected'):
             title = data['redirected']
         self.title = title.replace(' ', '_')
 
@@ -428,7 +428,7 @@ class WPTools(object):
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
         self.urlraw = self.url + '?action=raw'
 
-        if 'sections' in data:
+        if data.get('sections'):
             lead = self.__get_lead(data)
             if lead:
                 self.lead = lead
@@ -475,7 +475,7 @@ class WPTools(object):
 
         item = entities.get(next(iter(entities)))
 
-        if 'id' not in item and 'title' in item:
+        if not item.get('id') and item.get('title'):
             msg = "missing title %s %s" % (
                 item['title'],
                 self.g_wikidata['query'].replace('&format=json', ''))
@@ -490,7 +490,7 @@ class WPTools(object):
         if descriptions:
             self.description = descriptions
 
-        if self.wikidata and 'image' in self.wikidata:
+        if self.wikidata and self.wikidata.get('image'):
             image = self.wikidata['image']
             if self.image:
                 self.image_wikidata = utils.media_url(image)
@@ -844,9 +844,9 @@ def wikidata_property(claims, pid):
     if prop:
         val = prop.get('mainsnak').get('datavalue').get('value')
         if isinstance(val, dict):
-            if 'id' in val:
+            if val.get('id'):
                 return val['id']
-            if 'time' in val:
+            if val.get('time'):
                 return val['time']
         return val
 
