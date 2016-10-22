@@ -765,7 +765,7 @@ class WPTools(object):
             lang = "%s/%s" % (self.lang, self.variant)
 
         thing = self.title
-        if self.wikibase:
+        if self.wikibase and not self.title:
             thing = self.wikibase
             if thing.startswith('http'):
                 thing = thing.split('/')[-1]
