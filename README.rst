@@ -324,7 +324,7 @@ Get *special* `lead section`_ HTML:
     <span snipped><span><b>Gautama Buddha</b>, also known as <b>Siddhārtha G...
     Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Way" titl...
     Gautama is the primary figure in Buddhism. He is recognized by Buddhists...
-    <span metadata>Last modified: 2016-10-13T09:44:13Z</span>
+    <span metadata>Modified: 2016-10-13T09:44:13Z</span>
 
 **Note**: The *lead* attribute contains the assembled stand-alone,
 encyclopedia-like HTML fragment:
@@ -475,8 +475,8 @@ RESTBase_ ``/page/mobile-text/`` request for:
 
 - description: <unicode> apparently, Wikidata description
 - images: <dict> {rimage, rthumb}
-- lastmodified: <str> ISO8601 date and time
 - lead: <str> encyclopedia-like `lead section`_
+- modified: <str> ISO8601 date and time
 - pageimage: <unicode> apparently, ``action=query`` pageimage
 - thumbnail: <unicode> larger ``action=query`` thumbnail
 - url: <unicode> the canonical wiki URL
@@ -495,6 +495,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 - image: <unicode> Wikidata Property:P18_ image URL
 - images: <dict> {wimage}
 - label: <unicode> Wikidata label
+- modified: <str> ISO8601 date and time
 - props: <dict> Wikidata properties
 - wikibase: <str> Wikidata URL
 - wikidata: <dict> resolved Wikidata properties and claims

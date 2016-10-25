@@ -85,9 +85,9 @@ class WPTools(object):
     images = {}
     infobox = None
     label = None
-    lastmodified = None
     lead = None
     links = None
+    modified = None
     pageid = None
     pageimage = None
     parsetree = None
@@ -193,8 +193,8 @@ class WPTools(object):
         returns lead HTML metadata from attributes
         """
         meta = []
-        if hasattr(self, 'lastmodified'):
-            meta.append("Last modified: %s" % self.lastmodified)
+        if hasattr(self, 'modified'):
+            meta.append("Modified: %s" % self.modified)
         return "<span metadata>%s</span>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
@@ -423,7 +423,7 @@ class WPTools(object):
             title = data['redirected']
         self.title = title.replace(' ', '_')
 
-        self.lastmodified = data.get('lastmodified')
+        self.modified = data.get('lastmodified')
         self.pageid = data.get('id')
 
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
@@ -504,6 +504,8 @@ class WPTools(object):
             self.label = labels
 
         self.__set_title_wikidata(item)
+
+        self.modified = item.get('modified')
 
     def get(self, show=True):
         """
@@ -657,8 +659,8 @@ class WPTools(object):
         RESTBase (/page/mobile-text/)
         - description: <unicode> apparently, Wikidata description
         - images: <dict> {rimage, rthumb}
-        - lastmodified: <str> ISO8601 date and time
         - lead: <str> encyclopedia-like lead section
+        - modified: <str> ISO8601 date and time
         - pageimage: <unicode> apparently, action=query pageimage
         - thumbnail: <unicode> larger action=query thumbnail
         - url: <unicode> the canonical wiki URL
@@ -691,6 +693,7 @@ class WPTools(object):
         - image: <unicode> Wikidata Property:P18 image URL
         - images: <dict> {wimage}
         - label: <unicode> Wikidata label
+        - modified: <str> ISO8601 date and time
         - props: <dict> Wikidata properties
         - wikibase: <str> Wikidata URL
         - wikidata: <dict> resolved Wikidata properties and claims
