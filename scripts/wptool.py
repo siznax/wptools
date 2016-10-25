@@ -95,7 +95,7 @@ def _item_text(item, nowrap=False):
 
     tail = "\n\n<%s>\n" % item.url
     if item.wikibase:
-        tail += "<%s>\n" % item.wikibase
+        tail += "<https://wikidata.org/wiki/%s>\n" % item.wikibase
 
     return head + tail
 
@@ -150,7 +150,7 @@ def get(args):
             return fetch.query('query', title)
         return fetch.query('random', None)
 
-    item = wptools.page(title=title, lang=lang, silent=silent,
+    item = wptools.page(title, lang=lang, silent=silent,
                         verbose=verbose, wiki=wiki)
     item.get()
 
