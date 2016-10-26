@@ -568,10 +568,7 @@ class WPTools(object):
             stderr("Request cached in g_parse.")
             return
         if not self.title and not self.pageid:
-            stderr("%s: need title or pageid"
-                   % self.get_wikidata.__name__,
-                   self.silent)
-            return
+            raise LookupError("get_parse needs title or pageid")
         if self.pageid:
             query = self.__fetch.query('parse', self.pageid, pageid=True)
         else:
@@ -604,10 +601,7 @@ class WPTools(object):
             stderr("Request cached in g_query.")
             return
         if not self.title and not self.pageid:
-            stderr("%s: need title or pageid"
-                   % self.get_wikidata.__name__,
-                   self.silent)
-            return
+            raise LookupError("get_query needs title or pageid")
         if self.pageid:
             qry = self.__fetch.query('query', self.pageid, pageid=True)
         else:
@@ -664,6 +658,8 @@ class WPTools(object):
         if self.g_rest:
             stderr("Request cached in g_rest.")
             return
+        if not self.title:
+            raise LookupError("get_rest needs a title")
         try:
             title = quote(self.title)
         except KeyError:
