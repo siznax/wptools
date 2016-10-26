@@ -279,9 +279,7 @@ class WPTools(object):
 
         pdata = data.get('parse')
         if not pdata:
-            msg = "%s %s" % (
-                data.get('error').get('info'),
-                self.g_parse['query'].replace('&format=json', ''))
+            msg = self.g_parse['query'].replace('&format=json', '')
             raise LookupError(msg)
 
         parsetree = pdata.get('parsetree')
@@ -332,9 +330,7 @@ class WPTools(object):
         page = qdata.get('pages')[0]
 
         if page.get('missing'):
-            msg = "missing %s %s" % (
-                self.title or self.pageid,
-                self.g_query['query'].replace('&format=json', ''))
+            msg = self.g_query['query'].replace('&format=json', '')
             raise LookupError(msg)
 
         extext = None
@@ -477,10 +473,8 @@ class WPTools(object):
         item = entities.get(next(iter(entities)))
 
         if not item.get('id') and item.get('title'):
-            msg = "missing title %s %s" % (
-                item['title'],
-                self.g_wikidata['query'].replace('&format=json', ''))
-            raise LookupError(''.join(msg))
+            msg = self.g_wikidata['query'].replace('&format=json', '')
+            raise LookupError(msg)
 
         self.wikibase = item.get('id')
         self.wikidata_url = wikidata_url(self.wikibase)

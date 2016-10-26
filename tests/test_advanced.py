@@ -28,7 +28,7 @@ class WPToolsBadTest(unittest.TestCase):
         """
         try:
             wptools.page(pageid=1).get(False)
-            self.fail("failed to get missing page")
+            self.fail("failed to raise LookupError")
         except LookupError as detail:
             print(detail)
 
@@ -110,6 +110,16 @@ class WPToolsPickTest(unittest.TestCase):
         p = wptools.page(wikibase='Q528917')
         p.get_wikidata(False).get_query(False)
         self.assertTrue(p.pageid == 20974062)
+
+    def test_lookup_unicode_error(self):
+        """
+        Potentially raise UnicodeDecodeError on LookupError
+        """
+        try:
+            p = wptools.page('阿Vane').get(False)  # issue 29
+            self.fail("failed to raise LookupError")
+        except LookupError as detail:
+            print(detail)
 
 
 class WPToolsRandomTest(unittest.TestCase):
