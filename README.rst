@@ -166,6 +166,13 @@ Request details echo to *stderr* with ``verbose=True``:
     >>> r = wptools.page(verbose=True)
 
 
+You can set a `timeout` (in seconds) on any instance:
+
+.. code-block:: python
+
+    >>> r.set_timeout(5)
+
+
 You can set a proxy server like this:
 
 .. code-block:: python
