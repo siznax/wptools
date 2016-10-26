@@ -728,6 +728,12 @@ class WPTools(object):
             self.show()
         return self
 
+    def set_timeout(self, seconds):
+        """
+        set timeout for entire request in seconds (default=0=forever)
+        """
+        self.__fetch.curl_timeout(seconds)
+
     def show(self):
         """
         pretty-print instance attributes
@@ -828,14 +834,16 @@ def json_loads(data):
 
 
 def set_proxy(proxy):
-    '''
-    set WPTools proxy class variable
-    '''
+    """
+    set proxy for all requests
+    """
     WPTools._proxy = proxy
 
 
 def stderr(msg, silent=False):
-    """write msg to stderr if not silent"""
+    """
+    write msg to stderr if not silent
+    """
     if not silent:
         print(msg, file=sys.stderr)
 
@@ -856,8 +864,8 @@ def wikidata_property(claims, pid):
 
 
 def wikidata_url(wikibase):
-    '''
+    """
     returns Wikidata URL from wikibase
-    '''
+    """
     if wikibase:
         return 'https://www.wikidata.org/wiki/' + wikibase

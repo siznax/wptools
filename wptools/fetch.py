@@ -74,7 +74,6 @@ class WPToolsFetch(object):
     info = None
     silent = False
     thing = None
-    timeout = 15
     title = None
 
     def __init__(self, **kwargs):
@@ -109,7 +108,10 @@ class WPToolsFetch(object):
         if not self.silent:
             print("%s (action=%s) %s" % (self.wiki, self.action,
                                          self.thing), file=sys.stderr)
-        return self.curl_perform(crl)
+        try:
+            return self.curl_perform(crl)
+        except pycurl.error as detail:
+            raise RuntimeError("pycurl error %d %s" % (detail[0], detail[1]))
 
     def curl_perform(self, crl):
         """
@@ -136,11 +138,16 @@ class WPToolsFetch(object):
         crl = pycurl.Curl()
         crl.setopt(pycurl.USERAGENT, user_agent())
         crl.setopt(pycurl.FOLLOWLOCATION, True)
-        crl.setopt(pycurl.CONNECTTIMEOUT, self.timeout)
         crl.setopt(pycurl.CAINFO, certifi.where())
         if proxy:
             crl.setopt(pycurl.PROXY, proxy)
         self.cobj = crl
+
+    def curl_timeout(self, seconds):
+        """
+        set timeout for entire request in seconds (default=0=forever)
+        """
+        self.cobj.setopt(pycurl.TIMEOUT, seconds)
 
     def query(self, action, thing, pageid=False):
         """
