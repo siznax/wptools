@@ -422,7 +422,6 @@ class WPTools(object):
             if lead:
                 self.lead = lead
 
-
     def _wikidata_props(self, query_claims):
         """
         returns dict containing selected properties from Wikidata query claims
@@ -459,7 +458,7 @@ class WPTools(object):
         for propid in self.props:
             label = self._WIKIPROPS[propid]
             for val in self.props[propid]:
-                if re.match(r'^Q\d+', str(val)):
+                if is_text(val) and re.match(r'^Q\d+', val):
                     self.claims[val] = label
                 else:
                     self._update_wikidata(label, val)
