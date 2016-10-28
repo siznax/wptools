@@ -12,6 +12,7 @@ try:  # python2
 except ImportError:  # python3
     from urllib.parse import quote, urlparse
 
+import collections
 import json
 import re
 import sys
@@ -69,7 +70,6 @@ class WPTools(object):
                   'P1779': 'creator'}
 
     _proxy = None
-    claims = {}
     description = None
     extext = None
     extract = None
@@ -82,7 +82,6 @@ class WPTools(object):
     image = None
     image_infobox = None
     image_wikidata = None
-    images = {}
     infobox = None
     label = None
     lead = None
@@ -91,7 +90,6 @@ class WPTools(object):
     pageid = None
     pageimage = None
     parsetree = None
-    props = {}
     random = None
     thumbnail = None
     title = None
@@ -99,7 +97,6 @@ class WPTools(object):
     urlraw = None
     wikibase = None
     wikitext = None
-    wikidata = {}
     wikidata_url = None
 
     def __init__(self, *args, **kwargs):
@@ -123,6 +120,11 @@ class WPTools(object):
             verbose=self.verbose,
             wiki=self.wiki,
             proxy=self._proxy)
+
+        self.claims = {}
+        self.props = {}
+        self.images = {}
+        self.wikidata = {}
 
         if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
@@ -228,16 +230,6 @@ class WPTools(object):
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
-
-    def __postprocess_wikidata(self):
-        """
-        transform selected wikidata items
-        """
-        if self.wikidata.get('coordinates'):
-            data = self.wikidata['coordinates']
-            if data.get('latitude'):
-                geo = "%s,%s" % (data['latitude'], data['longitude'])
-                self.wikidata['coordinates'] = geo
 
     def __set_infobox_image(self):
         pass
@@ -430,32 +422,47 @@ class WPTools(object):
             if lead:
                 self.lead = lead
 
-    def _process_claims(self, item_claims):
+
+    def _wikidata_props(self, query_claims):
         """
-        set Wikidata properties and Q claims from claims
+        returns dict containing selected properties from Wikidata query claims
         """
-        clams = {}
-        props = {}
-        wdata = {}
+        props = collections.defaultdict(list)
 
-        for pid in item_claims:
-            if pid in self._WIKIPROPS:
-                props[pid] = wikidata_property(item_claims, pid)
+        for claim in query_claims:
+            for prop in query_claims.get(claim):
+                snak = prop.get('mainsnak').get('datavalue').get('value')
+                try:
+                    if snak.get('id'):
+                        val = snak.get('id')
+                    elif snak.get('text'):
+                        val = snak.get('text')
+                    elif snak.get('time'):
+                        val = snak.get('time')
+                    else:
+                        val = snak
+                except AttributeError:
+                    val = snak
+                if not val or not [x for x in val if x]:
+                    raise ValueError("%s %s" % (claim, prop))
+                if self._WIKIPROPS.get(claim):
+                    props[claim].append(val)
 
-        for item in props:
-            label = self._WIKIPROPS[item]
-            if is_text(props[item]) and re.match(r'^Q\d+', props[item]):
-                clams[props[item]] = label
-            else:
-                wdata[label] = props[item]
+        return dict(props)
 
-        if clams:
-            self.claims = clams
-        if props:
-            self.props = props
-        if wdata:
-            self.wikidata = wdata
-            self.__postprocess_wikidata()
+    def _marshal_claims(self, query_claims):
+        """
+        set Wikidata properties and entities from query claims
+        """
+        self.props = self._wikidata_props(query_claims)
+
+        for propid in self.props:
+            label = self._WIKIPROPS[propid]
+            for val in self.props[propid]:
+                if re.match(r'^Q\d+', str(val)):
+                    self.claims[val] = label
+                else:
+                    self._update_wikidata(label, val)
 
     def _set_wikidata(self):
         """
@@ -479,7 +486,7 @@ class WPTools(object):
         self.wikibase = item.get('id')
         self.wikidata_url = wikidata_url(self.wikibase)
 
-        self._process_claims(item.get('claims'))
+        self._marshal_claims(item.get('claims'))
 
         descriptions = self.__get_entity_prop(item, 'descriptions')
         if descriptions:
@@ -487,10 +494,12 @@ class WPTools(object):
 
         if self.wikidata and self.wikidata.get('image'):
             image = self.wikidata['image']
+            if not isinstance(image, list):
+                image = utils.media_url(image)
             if self.image:
-                self.image_wikidata = utils.media_url(image)
+                self.image_wikidata = image
             else:
-                self.image = utils.media_url(image)
+                self.image = image
             self.images['wimage'] = image
 
         labels = self.__get_entity_prop(item, 'labels')
@@ -500,6 +509,20 @@ class WPTools(object):
         self.__set_title_wikidata(item)
 
         self.modified = item.get('modified')
+
+    def _update_wikidata(self, label, value):
+        """
+        add or update Wikidata
+        """
+        if self.wikidata.get(label):
+            try:
+                self.wikidata[label].append(value)
+            except AttributeError:
+                first = self.wikidata.get(label)
+                self.wikidata[label] = [first]
+                self.wikidata[label].append(value)
+        else:
+            self.wikidata[label] = value
 
     def get(self, show=True):
         """
@@ -544,8 +567,7 @@ class WPTools(object):
         for item in entities:
             attr = self.claims[item]
             value = self.__get_entity_prop(entities[item], 'labels')
-            if value:
-                self.wikidata[attr] = value
+            self._update_wikidata(attr, value)
 
         if show:
             self.show()
@@ -836,21 +858,6 @@ def stderr(msg, silent=False):
     """
     if not silent:
         print(msg, file=sys.stderr)
-
-
-def wikidata_property(claims, pid):
-    """
-    returns Wikidata property value from claims
-    """
-    prop = claims.get(pid)[0]
-    if prop:
-        val = prop.get('mainsnak').get('datavalue').get('value')
-        if isinstance(val, dict):
-            if val.get('id'):
-                return val['id']
-            if val.get('time'):
-                return val['time']
-        return val
 
 
 def wikidata_url(wikibase):

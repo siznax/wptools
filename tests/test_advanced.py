@@ -70,9 +70,9 @@ class WPToolsPickTest(unittest.TestCase):
 
     def test_wikidata_claims(self):
         p = wptools.page('Paris').get_wikidata(False)
-        self.assertTrue(p.wikidata['coordinates'] is not None)
-        self.assertEqual(p.wikidata['continent'], 'Europe')
+        self.assertTrue('latitude' in p.wikidata['coordinates'])
         self.assertEqual(p.wikidata['country'], 'France')
+        self.assertTrue(len(p.wikidata['instance']) > 3)
 
     def test_mixed_lang(self):
         """
