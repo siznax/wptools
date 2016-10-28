@@ -13,11 +13,8 @@ except ImportError:  # python3
     from urllib.parse import quote, urlparse
 
 import collections
-import json
 import re
-import sys
 
-import lxml
 import html2text
 
 from . import fetch
@@ -262,11 +259,11 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=parse)
         """
         try:
-            data = json_loads(self.g_parse['response'])
+            data = utils.json_loads(self.g_parse['response'])
         except ValueError:
             self.fatal = True
-            stderr("Could not load query response: %s"
-                   % self.g_parse['query'])
+            utils.stderr("Could not load query response: %s"
+                         % self.g_parse['query'])
             return
 
         pdata = data.get('parse')
@@ -275,7 +272,7 @@ class WPTools(object):
             raise LookupError(msg)
 
         parsetree = pdata.get('parsetree')
-        infobox = get_infobox(parsetree)
+        infobox = utils.get_infobox(parsetree)
 
         def set_pimage(dic, key):
             """
@@ -297,13 +294,13 @@ class WPTools(object):
             elif infobox.get('Cover'):
                 set_pimage(infobox, 'Cover')
 
-        self.links = get_links(pdata.get('iwlinks'))
+        self.links = utils.get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
         self.parsetree = parsetree
         if not self.title:
             self.title = pdata.get('title').replace(' ', '_')
         self.wikibase = pdata.get('properties').get('wikibase_item')
-        self.wikidata_url = wikidata_url(self.wikibase)
+        self.wikidata_url = utils.wikidata_url(self.wikibase)
         self.wikitext = pdata.get('wikitext')
 
     def _set_query_data(self):
@@ -311,11 +308,11 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=query)
         """
         try:
-            data = json_loads(self.g_query['response'])
+            data = utils.json_loads(self.g_query['response'])
         except ValueError:
             self.fatal = True
-            stderr("Could not load query response: %s"
-                   % self.g_query['query'])
+            utils.stderr("Could not load query response: %s"
+                         % self.g_query['query'])
             return
 
         qdata = data.get('query')
@@ -355,7 +352,7 @@ class WPTools(object):
             wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.wikibase = wikibase
-                self.wikidata_url = wikidata_url(self.wikibase)
+                self.wikidata_url = utils.wikidata_url(self.wikibase)
 
         self.random = qdata.get('random')[0]["title"]
         if not self.title:
@@ -371,18 +368,18 @@ class WPTools(object):
         set attributes derived from RESTBase
         """
         try:
-            data = json_loads(self.g_rest['response'])
+            data = utils.json_loads(self.g_rest['response'])
             url = urlparse(self.g_rest['query'])
         except ValueError:
             self.fatal = True
-            stderr("Could not load query response: %s"
-                   % self.g_rest['query'])
+            utils.stderr("Could not load query response: %s"
+                         % self.g_rest['query'])
             return
 
         if data.get('detail'):
             error = data.get('detail').get('error')
             if error:
-                stderr("RESTBase error: %s" % error)
+                utils.stderr("RESTBase error: %s" % error)
                 return
 
         description = data.get('description')
@@ -458,7 +455,7 @@ class WPTools(object):
         for propid in self.props:
             label = self._WIKIPROPS[propid]
             for val in self.props[propid]:
-                if is_text(val) and re.match(r'^Q\d+', val):
+                if utils.is_text(val) and re.match(r'^Q\d+', val):
                     self.claims[val] = label
                 else:
                     self._update_wikidata(label, val)
@@ -468,12 +465,12 @@ class WPTools(object):
         set attributes derived from Wikidata (action=wbentities)
         """
         try:
-            data = json_loads(self.g_wikidata['response'])
+            data = utils.json_loads(self.g_wikidata['response'])
             entities = data.get('entities')
         except ValueError:
             self.fatal = True
-            stderr("Could not load query response: %s"
-                   % self.g_wikidata['query'])
+            utils.stderr("Could not load query response: %s"
+                         % self.g_wikidata['query'])
             return
 
         item = entities.get(next(iter(entities)))
@@ -483,7 +480,7 @@ class WPTools(object):
             raise LookupError(msg)
 
         self.wikibase = item.get('id')
-        self.wikidata_url = wikidata_url(self.wikibase)
+        self.wikidata_url = utils.wikidata_url(self.wikibase)
 
         self._marshal_claims(item.get('claims'))
 
@@ -549,7 +546,7 @@ class WPTools(object):
         if not self.claims:
             return
         if self.g_claims:
-            stderr("Request cached in g_claims.")
+            utils.stderr("Request cached in g_claims.")
             return
 
         thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
@@ -561,7 +558,7 @@ class WPTools(object):
         g_claims['info'] = self.__fetch.info
         self.g_claims = g_claims
 
-        data = json_loads(self.g_claims['response'])
+        data = utils.json_loads(self.g_claims['response'])
         entities = data.get('entities')
         for item in entities:
             attr = self.claims[item]
@@ -586,7 +583,7 @@ class WPTools(object):
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
         if self.g_parse:
-            stderr("Request cached in g_parse.")
+            utils.stderr("Request cached in g_parse.")
             return
         if not self.title and not self.pageid:
             raise LookupError("get_parse needs title or pageid")
@@ -619,7 +616,7 @@ class WPTools(object):
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
         if self.g_query:
-            stderr("Request cached in g_query.")
+            utils.stderr("Request cached in g_query.")
             return
         if not self.title and not self.pageid:
             raise LookupError("get_query needs title or pageid")
@@ -648,11 +645,11 @@ class WPTools(object):
         response = self.__fetch.curl(query)
 
         try:
-            data = json_loads(response)
+            data = utils.json_loads(response)
             rdata = data.get('query').get('random')[0]
         except ValueError:
             self.fatal = True
-            stderr("Could not load query response: %s" % query)
+            utils.stderr("Could not load query response: %s" % query)
             return
 
         self.pageid = rdata.get('id')
@@ -677,7 +674,7 @@ class WPTools(object):
         https://en.wikipedia.org/api/rest_v1/
         """
         if self.g_rest:
-            stderr("Request cached in g_rest.")
+            utils.stderr("Request cached in g_rest.")
             return
         if not self.title:
             raise LookupError("get_rest needs a title")
@@ -711,7 +708,7 @@ class WPTools(object):
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if self.g_wikidata:
-            stderr("Request cached in g_wikidata.")
+            utils.stderr("Request cached in g_wikidata.")
             return
 
         thing = {'id': '', 'site': '', 'title': ''}
@@ -721,9 +718,9 @@ class WPTools(object):
             thing['site'] = "%swiki" % self.lang
             thing['title'] = self.title
         else:
-            stderr("%s: need wikibase or lang and title"
-                   % self.get_wikidata.__name__,
-                   self.silent)
+            utils.stderr("%s: need wikibase or lang and title"
+                         % self.get_wikidata.__name__,
+                         self.silent)
             return
 
         query = self.__fetch.query('wikidata', thing)
@@ -771,7 +768,7 @@ class WPTools(object):
                 data[item] = ptrunc(item, "<dict(%d)> {%s}" % (klen, kstr))
             elif isinstance(prop, list):
                 data[item] = "<list(%d)>" % len(prop)
-            elif is_text(prop):
+            elif utils.is_text(prop):
                 prop = prop.strip().replace("\n", '')
                 prop = re.sub(' +', ' ', prop)
                 if len(prop) > maxlen and not prop.startswith('http'):
@@ -793,55 +790,11 @@ class WPTools(object):
         header = "%s (%s)" % (thing, lang)
 
         # NOTE: json.dumps and pprint show unicode literals
-        stderr(header, self.silent)
-        stderr("{", self.silent)
+        utils.stderr(header, self.silent)
+        utils.stderr("{", self.silent)
         for item in sorted(data):
-            stderr("  %s: %s" % (item, data[item]), self.silent)
-        stderr("}", self.silent)
-
-
-def get_infobox(ptree):
-    """
-    returns infobox <type 'dict'> from get_parse:parsetreee
-    """
-    for item in lxml.etree.fromstring(ptree).xpath("//template"):
-        if "box" in item.find('title').text:
-            return utils.template_to_dict(item)
-
-
-def get_links(iwlinks):
-    """
-    returns list of interwiki links get_parse/iwlinks
-    """
-    links = []
-    for item in iwlinks:
-        links.append(item['url'])
-    if len(links) == 1:
-        return links[0]
-    return sorted(links) if links else None
-
-
-def is_text(obj, name=None):
-    """
-    returns True if object is text-like
-    """
-    try:  # python2
-        ans = isinstance(obj, basestring)
-    except NameError:  # python3
-        ans = isinstance(obj, str)
-    if name:
-        stderr("is_text: (%s) %s = %s" % (ans, name, obj.__class__))
-    return ans
-
-
-def json_loads(data):
-    """
-    python-version safe json.loads
-    """
-    try:  # python2
-        return json.loads(data)
-    except TypeError:  # python3
-        return json.loads(data.decode('utf-8'))
+            utils.stderr("  %s: %s" % (item, data[item]), self.silent)
+        utils.stderr("}", self.silent)
 
 
 def set_proxy(proxy):
@@ -849,19 +802,3 @@ def set_proxy(proxy):
     set proxy for all requests
     """
     WPTools._proxy = proxy
-
-
-def stderr(msg, silent=False):
-    """
-    write msg to stderr if not silent
-    """
-    if not silent:
-        print(msg, file=sys.stderr)
-
-
-def wikidata_url(wikibase):
-    """
-    returns Wikidata URL from wikibase
-    """
-    if wikibase:
-        return 'https://www.wikidata.org/wiki/' + wikibase

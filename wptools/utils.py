@@ -23,6 +23,51 @@ import lxml.etree
 import lxml.html
 
 
+def get_infobox(ptree):
+    """
+    returns infobox <type 'dict'> from get_parse:parsetreee
+    """
+    for item in lxml.etree.fromstring(ptree).xpath("//template"):
+        if "box" in item.find('title').text:
+            return template_to_dict(item)
+
+
+def get_links(iwlinks):
+    """
+    returns list of interwiki links get_parse/iwlinks
+    """
+    links = []
+    for item in iwlinks:
+        links.append(item['url'])
+    if len(links) == 1:
+        return links[0]
+    return sorted(links) if links else None
+
+
+def is_text(obj, name=None):
+    """
+    returns True if object is text-like
+    """
+    try:  # python2
+        ans = isinstance(obj, basestring)
+    except NameError:  # python3
+        ans = isinstance(obj, str)
+    if name:
+        print("is_text: (%s) %s = %s" % (ans, name, obj.__class__),
+              file=sys.stderr)
+    return ans
+
+
+def json_loads(data):
+    """
+    python-version safe json.loads
+    """
+    try:  # python2
+        return json.loads(data)
+    except TypeError:  # python3
+        return json.loads(data.decode('utf-8'))
+
+
 def media_url(fname, namespace='commons',
               wiki='https://upload.wikimedia.org/wikipedia'):
     """
@@ -153,6 +198,14 @@ def span_ids(frag):
     return [x for x in ids if x]
 
 
+def stderr(msg, silent=False):
+    """
+    write msg to stderr if not silent
+    """
+    if not silent:
+        print(msg, file=sys.stderr)
+
+
 def template_to_dict(tree):
     """
     returns wikitext template as dict (one deep)
@@ -195,3 +248,11 @@ def template_to_text(tmpl):
     for item in tmpl.itertext():
         text.append(item)
     return "{{%s}}" % "|".join(text)
+
+
+def wikidata_url(wikibase):
+    """
+    returns Wikidata URL from wikibase
+    """
+    if wikibase:
+        return 'https://www.wikidata.org/wiki/' + wikibase
