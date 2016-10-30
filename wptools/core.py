@@ -76,16 +76,12 @@ class WPTools(object):
     g_query = None
     g_rest = None
     g_wikidata = None
-    image = None
-    image_infobox = None
-    image_wikidata = None
     infobox = None
     label = None
     lead = None
     links = None
     modified = None
     pageid = None
-    pageimage = None
     parsetree = None
     random = None
     thumbnail = None
@@ -166,21 +162,19 @@ class WPTools(object):
         """
         returns <img> HTML from image attributes
         """
-        alt = self.title
-        if hasattr(self, 'label') and self.label:
-            alt = self.label
-
+        alt = self.title or self.label
         src = None
         cls = None
-        if hasattr(self, 'thumbnail') and self.thumbnail:
-            src = self.thumbnail
-            cls = 'thumbnail'
-        elif hasattr(self, 'pageimage') and self.pageimage:
-            src = self.pageimage
-            cls = 'pageimage'
-        elif hasattr(self, 'image') and self.image:
-            src = self.image
-            cls = 'image'
+
+        if self.images.get('query-thumbnail'):
+            src = self.images['query-thumbnail']
+            cls = 'query-thumbnail'
+        elif self.images.get('query-pageimage'):
+            src = self.images['query-pageimage']
+            cls = 'query-pageimage'
+        elif self.images.get('wikidata-image'):
+            src = self.images['wikidata-image']
+            cls = 'wikidata-image'
         if src:
             img = ("<img %s src=\"%s\" alt=\"%s\" title=\"%s\" "
                    % (cls, src, alt, alt))
@@ -228,9 +222,6 @@ class WPTools(object):
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
 
-    def __set_infobox_image(self):
-        pass
-
     def __set_title_wikidata(self, item):
         """
         attempt to set title from wikidata
@@ -271,34 +262,18 @@ class WPTools(object):
             msg = self.g_parse['query'].replace('&format=json', '')
             raise LookupError(msg)
 
-        parsetree = pdata.get('parsetree')
-        infobox = utils.get_infobox(parsetree)
-
-        def set_pimage(dic, key):
-            """
-            set parse image by preferred key
-            """
-            image = dic[key]
-            image = image.replace('[[', '').replace(']]', '')
-            if self.image:
-                self.image_infobox = utils.media_url(image,
-                                                     namespace=self.lang)
-            else:
-                self.image = utils.media_url(image, namespace=self.lang)
-            self.images['pimage'] = image
-
-        if infobox:
-            self.infobox = infobox
-            if infobox.get('image'):
-                set_pimage(infobox, 'image')
-            elif infobox.get('Cover'):
-                set_pimage(infobox, 'Cover')
-
         self.links = utils.get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
-        self.parsetree = parsetree
+        self.parsetree = pdata.get('parsetree')
+        self.infobox = utils.get_infobox(self.parsetree)
+
+        if self.infobox:
+            self.images['parse-image'] = self.infobox.get('image')
+            self.images['parse-Cover'] = self.infobox.get('Cover')
+
         if not self.title:
             self.title = pdata.get('title').replace(' ', '_')
+
         self.wikibase = pdata.get('properties').get('wikibase_item')
         self.wikidata_url = utils.wikidata_url(self.wikibase)
         self.wikitext = pdata.get('wikitext')
@@ -330,20 +305,8 @@ class WPTools(object):
             if extext:
                 self.extext = extext.strip()
 
-        images = {}
-        pageimage = page.get('pageimage')
-        if pageimage:
-            images['qimage'] = pageimage
-            self.pageimage = utils.media_url(pageimage)
-
-        thumbnail = page.get('thumbnail')
-        if thumbnail:
-            images['qthumb'] = thumbnail
-            source = thumbnail.get('source')
-            if source:
-                self.thumbnail = source
-
-        self.images = images
+        self.images['query-pageimage'] = page.get('pageimage')
+        self.images['query-thumbnail'] = page.get('thumbnail')
 
         self.pageid = page.get('pageid')
 
@@ -382,26 +345,10 @@ class WPTools(object):
                 utils.stderr("RESTBase error: %s" % error)
                 return
 
-        description = data.get('description')
-        if description:
-            # self.__setattr('description', data.get('description'), 'rest')
-            self.description = description
+        self.description = data.get('description')
 
-        image = data.get('image')
-        if image:
-            self.images['rimage'] = image
-            image_file = utils.media_url(image.get('file'))
-            # apparently get_query pageimage or get_wikidata image
-            # self.__setattr('pageimage', image_file, 'rest')
-            self.pageimage = image_file
-
-        thumb = data.get('thumb')
-        if thumb:
-            self.images['rthumb'] = thumb
-            thumbnail = "%s:%s" % (url.scheme, thumb.get('url'))
-            # apparently scaled (larger) get_query thumbnail
-            # self.__setattr('thumbnail', thumbnail, 'rest')
-            self.thumbnail = thumbnail
+        self.images['rest-image'] = data.get('image')
+        self.images['rest-thumb'] = data.get('thumb')
 
         title = data.get('displaytitle')
         if data.get('redirected'):
@@ -488,15 +435,7 @@ class WPTools(object):
         if descriptions:
             self.description = descriptions
 
-        if self.wikidata and self.wikidata.get('image'):
-            image = self.wikidata['image']
-            if not isinstance(image, list):
-                image = utils.media_url(image)
-            if self.image:
-                self.image_wikidata = image
-            else:
-                self.image = image
-            self.images['wimage'] = image
+        self.images['wikidata-image'] = self.wikidata.get('image')
 
         labels = self.__get_entity_prop(item, 'labels')
         if labels:

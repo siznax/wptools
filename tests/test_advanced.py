@@ -94,7 +94,7 @@ class WPToolsPickTest(unittest.TestCase):
         Get a thumbnail image URL
         """
         p = wptools.page('Frida Kahlo').get_rest(False)
-        self.assertTrue(p.thumbnail.startswith('http'))
+        self.assertTrue('rest-thumb' in p.images)
 
     def test_pageid(self):
         """
