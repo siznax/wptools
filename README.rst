@@ -99,7 +99,7 @@ Leaving off arguments invokes a random_ lookup in English:
 .. code-block:: python
 
     >>> r = wptools.page()
-    en.wikipedia.org (action=random) None
+    en.wikipedia.org (random) None
     Sylvia_Rivera (en)
     {
       lang: en
@@ -115,7 +115,7 @@ If you give only *lang*, you get a random_ article in that language:
 .. code-block:: python
 
     >>> zh = wptools.page(lang='zh')
-    zh.wikipedia.org (action=random) None
+    zh.wikipedia.org (random) None
     哈莉特·塔布曼 (zh)
     {
       lang: zh
@@ -141,7 +141,7 @@ Or, another *wiki* site:
 .. code-block:: python
 
     >>> m = wptools.page(wiki='en.wikiquote.org')
-    en.wikiquote.org (action=random) None
+    en.wikiquote.org (random) None
     Malala_Yousafzai (en)
     {
       lang: en
@@ -191,7 +191,7 @@ Get a representative image:
 .. code-block:: python
 
     >>> frida = wptools.page('Frida Kahlo').get_query()
-    en.wikipedia.org (action=query) Frida_Kahlo
+    en.wikipedia.org (query) Frida_Kahlo
 
     >>> frida.images['query-thumbnail']['source']
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
@@ -210,7 +210,7 @@ Get a text (or HTML) extract:
 .. code-block:: python
 
     >>> ella = wptools.page('Ella Fitzgerald').get_query()
-    en.wikipedia.org (action=query) Ella_Fitzgerald
+    en.wikipedia.org (query) Ella_Fitzgerald
 
     >>> print ella.extext
     **Ella Jane Fitzgerald** (April 25, 1917 – June 15, 1996) was an
@@ -234,7 +234,7 @@ Get an Infobox_ as a python object:
 .. code-block:: python
 
     >>> fela = wptools.page('Fela Kuti').get_parse()
-    en.wikipedia.org (action=parse) Fela_Kuti
+    en.wikipedia.org (parse) Fela_Kuti
 
     >>> fela.infobox['instrument']
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
@@ -256,7 +256,7 @@ Get an (album, book, film, etc.) cover image:
 .. code-block:: python
 
     >>> sym = wptools.page('The Sympathizer').get_parse()
-    en.wikipedia.org (action=parse) The_Sympathizer
+    en.wikipedia.org (parse) The_Sympathizer
 
     >>> sym.images
     {'parse-image': {'file': 'The Sympathizer - book cover.jpg'}}
@@ -276,8 +276,8 @@ Get wikidata by *title*:
 .. code-block:: python
 
     >>> fry = wptools.page('Stephen Fry').get_wikidata()
-    www.wikidata.org (action=wikidata) Stephen_Fry
-    www.wikidata.org (action=wikidata) Q8817795|Q5|Q7066|Q145
+    www.wikidata.org (wikidata) Stephen_Fry
+    www.wikidata.org (wikidata) Q8817795|Q5|Q7066|Q145
     Stephen_Fry (en)
     {
       claims: <dict(4)> {Q145, Q5, Q7066, Q8817795}
@@ -310,8 +310,8 @@ Extend Wikidata claims_ to be resolved:
     >>> simone._WIKIPROPS['P21'] = 'gender'
 
     >>> simone.get_wikidata()
-    www.wikidata.org (action=wikidata) Simone_de_Beauvoir
-    www.wikidata.org (action=wikidata) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
+    www.wikidata.org (wikidata) Simone_de_Beauvoir
+    www.wikidata.org (wikidata) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
 
     >>> simone.wikidata['gender']
     'female'
@@ -325,7 +325,7 @@ Get *special* `lead section`_ HTML:
 .. code-block:: python
 
     >>> buddha = wptools.page('Buddha').get_rest()
-    en.wikipedia.org (action=/page/mobile-text/) Buddha
+    en.wikipedia.org (/page/mobile-text/) Buddha
 
     >>> buddha.lead
     <img query-thumbnail src="https://upload.wikimedia.org/wikipedia/commons...
@@ -349,10 +349,10 @@ Get all the things:
 .. code-block:: python
 
     >>> jill = wptools.page('Jill Lepore').get()
-    en.wikipedia.org (action=query) Jill_Lepore
-    en.wikipedia.org (action=parse) 22469182
-    www.wikidata.org (action=wikidata) Q6192915
-    www.wikidata.org (action=wikidata) Q30|Q5|Q6581072
+    en.wikipedia.org (query) Jill_Lepore
+    en.wikipedia.org (parse) 22469182
+    www.wikidata.org (wikidata) Q6192915
+    www.wikidata.org (wikidata) Q30|Q5|Q6581072
     Jill_Lepore (en)
     {
       claims: <dict(3)> {Q30, Q5, Q6581072}
