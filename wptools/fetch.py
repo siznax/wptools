@@ -23,6 +23,13 @@ class WPToolsFetch(object):
     """
 
     QUERY = {
+        "imageinfo": Template((
+            "https://${WIKI}/w/api.php?action=query"
+            "&format=json"
+            "&formatversion=2"
+            "&iiprop=size|url"
+            "&prop=imageinfo"
+            "&titles=${thing}")),
         "parse": Template((
             "https://${WIKI}/w/api.php?action=parse"
             "&contentmodel=text"
@@ -31,10 +38,10 @@ class WPToolsFetch(object):
             "&disabletoc="
             "&format=json"
             "&formatversion=2"
-            "&page=${thing}"
             "&prop="
             "text|iwlinks|parsetree|wikitext|displaytitle|properties"
-            "&redirects")),
+            "&redirects"
+            "&page=${thing}")),
         "query": Template((
             "https://${WIKI}/w/api.php?action=query"
             "&exintro"
@@ -106,8 +113,10 @@ class WPToolsFetch(object):
         except UnicodeEncodeError:
             crl.setopt(pycurl.URL, url.encode('utf-8'))
         if not self.silent:
-            print("%s (action=%s) %s" % (self.wiki, self.action,
-                                         self.thing), file=sys.stderr)
+            msg = "%s (%s) %s" % (self.wiki, self.action, self.thing)
+            if len(msg) > 80:
+                msg = msg[:72] + '...'
+            print(msg, file=sys.stderr)
         try:
             return self.curl_perform(crl)
         except pycurl.error as detail:

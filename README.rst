@@ -10,7 +10,7 @@ Wikipedia tools (for Humans)
 Python and command-line MediaWiki access for Humans.
 
 - get an HTML or plain text "extract" (lead or summary)
-- get a representative image, pageimage, thumbnail
+- get a representative image (pageimage, thumb, etc.)
 - get an Infobox as a python dictionary
 - get any/all Wikidata by title
 - get info in any language
@@ -193,18 +193,16 @@ Get a representative image:
     >>> frida = wptools.page('Frida Kahlo').get_query()
     en.wikipedia.org (action=query) Frida_Kahlo
 
-    >>> frida.pageimage
+    >>> frida.images['query-thumbnail']['source']
     u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
 
 ..
 
     .. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg/160px-Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg
 
-    ``frida.thumbnail``
-
 **Note**: A page's image can come from an Infobox, query ``pageimage``
 or ``thumbnail``, a RESTBase request, or from Wikidata Property:P18.
-See Methods_ for more details.
+Use `get_imageinfo`_ to populate file details like URL, size, etc.
 
 
 Get a text (or HTML) extract:
@@ -260,7 +258,12 @@ Get an (album, book, film, etc.) cover image:
     >>> sym = wptools.page('The Sympathizer').get_parse()
     en.wikipedia.org (action=parse) The_Sympathizer
 
-    >>> sym.image
+    >>> sym.images
+    {'parse-image': {'file': 'The Sympathizer - book cover.jpg'}}
+
+    >>> sym.get_imageinfo()
+
+    >>> sym.images['parse-image']['url']
     'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
 
 ..
@@ -281,8 +284,7 @@ Get wikidata by *title*:
       description: English comedian, actor, writer, presenter, and activist
       g_claims: <dict(3)> {info, query, response}
       g_wikidata: <dict(3)> {info, query, response}
-      image: https://upload.wikimedia.org/wikipedia/commons/1/15/Stephen_Fry_cropped.jpg
-      images: <dict(1)> {wimage}
+      images: <dict(1)> {wikidata-image}
       label: Stephen Fry
       lang: en
       props: <dict(8)> {P135, P18, P27, P31, P345, P569, P856, P910}
@@ -326,7 +328,7 @@ Get *special* `lead section`_ HTML:
     en.wikipedia.org (action=/page/mobile-text/) Buddha
 
     >>> buddha.lead
-    <img thumbnail src="https://upload.wikimedia.org/wikipedia/commons/thumb...
+    <img query-thumbnail src="https://upload.wikimedia.org/wikipedia/commons...
     <span heading><a href="https://en.wikipedia.org/wiki/Gautama_Buddha">Gau...
     <span snipped><span><b>Gautama Buddha</b>, also known as <b>Siddhārtha G...
     Gautama taught a <a href="https://en.wikipedia.org/wiki/Middle_Way" titl...
@@ -336,7 +338,7 @@ Get *special* `lead section`_ HTML:
 **Note**: The *lead* attribute contains the assembled stand-alone,
 encyclopedia-like HTML fragment:
 
-- ``<img {type}>`` {image, pageimage, or thumbnail}
+- ``<img {source-type}>`` selected image
 - ``<span heading>`` wiki-linked title and description
 - ``<span snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
 - ``<span metadata>`` available metadata (e.g. Last modified)
@@ -429,12 +431,22 @@ Wikidata:API `action=wbgetentities`_ for labels of claims
 - use get_wikidata() to populate claims
 
 
+.. _get_imageinfo:
+
+**get_imageinfo** (self)
+
+MediaWiki request for `API:Imageinfo`_
+
+- images: <dict> updates image URL, size, width, height, etc.
+
+.. _`API:Imageinfo`: https://www.mediawiki.org/wiki/API:Imageinfo
+
+
 **get_parse** (self)
 
 MediaWiki:API `action=parse`_ request for:
 
-- image: <str> Infobox_ image URL
-- images: <dict> {pimage}
+- images: <dict> {parse-image, parse-cover}
 - infobox: <dict> Infobox_ data as python dictionary
 - links: <list> interwiki links (iwlinks_)
 - pageid: <int> MediaWiki database ID
@@ -454,16 +466,13 @@ MediaWiki:API `action=query`_ request for:
 
 - extext: <unicode> plain text (Markdown_) extract
 - extract: <unicode> HTML extract via `Extension:TextExtract`_
-- images: <dict> {qimage, qthumb}
+- images: <dict> {query-pageimage, query-thumbnail}
 - pageid: <int> MediaWiki database ID
-- pageimage: <unicode> pageimage URL via `Extension:PageImages`_
 - random: <unicode> a random article title with every request!
-- thumbnail: <unicode> thumbnail URL via `Extension:PageImages`_
 - url: <unicode> the canonical wiki URL
 - urlraw: <unicode> ostensible raw wikitext URL
 
 .. _Markdown: https://en.wikipedia.org/wiki/Markdown
-.. _`Extension:PageImages`: https://www.mediawiki.org/wiki/Extension:PageImages
 .. _`Extension:TextExtract`: https://www.mediawiki.org/wiki/Extension:TextExtracts
 .. _`action=query`: https://en.wikipedia.org/w/api.php?action=help&modules=query
 
@@ -481,11 +490,9 @@ MediaWiki:API `action=query`_ request for:
 RESTBase_ ``/page/mobile-text/`` request for:
 
 - description: <unicode> apparently, Wikidata description
-- images: <dict> {rimage, rthumb}
+- images: <dict> {rest-image, rest-thumb}
 - lead: <str> encyclopedia-like `lead section`_
 - modified: <str> ISO8601 date and time
-- pageimage: <unicode> apparently, ``action=query`` pageimage
-- thumbnail: <unicode> larger ``action=query`` thumbnail
 - url: <unicode> the canonical wiki URL
 - urlraw: <unicode> ostensible raw wikitext URL
 
@@ -499,8 +506,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 
 - claims: <dict> Wikidata claims (to be resolved)
 - description: <unicode> Wikidata description
-- image: <unicode> Wikidata Property:P18_ image URL
-- images: <dict> {wimage}
+- images: <dict> {wikidata-image} Wikidata Property:P18
 - label: <unicode> Wikidata label
 - modified: <str> ISO8601 date and time
 - props: <dict> Wikidata properties

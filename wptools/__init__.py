@@ -7,7 +7,7 @@ Wikipedia tools (for Humans)
 Get Wikipedia article info and Wikidata via MediaWiki APIs:
 
 - get an HTML or plain text "extract" (lead or summary)
-- get a representative image, pageimage, thumbnail
+- get a representative image (pageimage, thumb, etc.)
 - get an Infobox as a python dictionary
 - get any/all Wikidata by title
 - get info in any language

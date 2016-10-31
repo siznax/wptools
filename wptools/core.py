@@ -114,6 +114,7 @@ class WPTools(object):
             wiki=self.wiki,
             proxy=self._proxy)
 
+        self.cache = {}
         self.claims = {}
         self.props = {}
         self.images = {}
@@ -133,6 +134,22 @@ class WPTools(object):
                 return entity.get(prop).get(self.lang).get('value')
             except AttributeError:
                 return entity.get(prop).get('value')
+
+    def __get_image_files(self):
+        files = []
+        for item in self.images.values():
+            try:
+                fname = item.get('file')
+            except AttributeError:
+                fname = item
+            if fname:
+                fname = fname.replace('_', ' ')
+                if (not fname.startswith('File')
+                        and not fname.startswith('Image')):
+                    fname = 'File:' + fname
+                if fname not in files:
+                    files.append(fname)
+        return files
 
     def __get_lead(self, data):
         """
@@ -222,6 +239,15 @@ class WPTools(object):
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
 
+    def __update_image_info(self, title, info):
+        """
+        update instance image data with get_imageinfo data
+        """
+        for image in self.images:
+            fname = self.images[image].get('file')
+            if fname and fname.replace('_', ' ') in title:
+                self.images[image].update(info)
+
     def __set_title_wikidata(self, item):
         """
         attempt to set title from wikidata
@@ -244,6 +270,26 @@ class WPTools(object):
             if extant != value:
                 attr = "%s_%s" % (attr, suffix)
                 setattr(self, attr, value)
+
+    def _set_imageinfo_data(self):
+        """
+        set image attributes from MediaWiki API:Imageinfo response
+        """
+        try:
+            data = utils.json_loads(self.cache['imageinfo']['response'])
+            pages = data['query'].get('pages')
+        except ValueError:
+            self.fatal = True
+            utils.stderr("Could not load imageinfo response: %s"
+                         % self.cache['imageinfo']['response'])
+            return
+
+        for page in pages:
+            title = page.get('title')
+            if page.get('imageinfo'):
+                for info in page['imageinfo']:
+                    info.update({'file': title})
+                    self.__update_image_info(title, info)
 
     def _set_parse_data(self):
         """
@@ -268,8 +314,10 @@ class WPTools(object):
         self.infobox = utils.get_infobox(self.parsetree)
 
         if self.infobox:
-            self.images['parse-image'] = self.infobox.get('image')
-            self.images['parse-Cover'] = self.infobox.get('Cover')
+            if self.infobox.get('image'):
+                self.images['parse-image'] = {'file': self.infobox['image']}
+            if self.infobox.get('Cover'):
+                self.images['parse-cover'] = {'file': self.infobox['Cover']}
 
         if not self.title:
             self.title = pdata.get('title').replace(' ', '_')
@@ -305,8 +353,10 @@ class WPTools(object):
             if extext:
                 self.extext = extext.strip()
 
-        self.images['query-pageimage'] = page.get('pageimage')
-        self.images['query-thumbnail'] = page.get('thumbnail')
+        if page.get('pageimage'):
+            self.images['query-pageimage'] = {'file': page['pageimage']}
+        if page.get('thumbnail'):
+            self.images['query-thumbnail'] = page['thumbnail']
 
         self.pageid = page.get('pageid')
 
@@ -435,7 +485,8 @@ class WPTools(object):
         if descriptions:
             self.description = descriptions
 
-        self.images['wikidata-image'] = self.wikidata.get('image')
+        if self.wikidata.get('image'):
+            self.images['wikidata-image'] = {'file': self.wikidata['image']}
 
         labels = self.__get_entity_prop(item, 'labels')
         if labels:
@@ -508,11 +559,43 @@ class WPTools(object):
             self.show()
         return self
 
+    def get_imageinfo(self, show=False):
+        """
+        MediaWiki request for API:Imageinfo
+        - images: <dict> updates image URL, size, width, height, etc.
+        https://www.mediawiki.org/wiki/API:Imageinfo
+        """
+        if not self.images:
+            raise LookupError("get_images needs images")
+
+        if self.cache.get('imageinfo'):
+            utils.stderr("imageinfo found in cache.")
+            return
+
+        files = self.__get_image_files()
+        try:
+            files = [quote(x) for x in files]
+        except KeyError:
+            files = [quote(x.encode('utf-8')) for x in files]
+
+        query = self.__fetch.query('imageinfo', '|'.join(files))
+
+        iinfo = {}
+        iinfo['query'] = query
+        iinfo['response'] = self.__fetch.curl(query)
+        iinfo['info'] = self.__fetch.info
+        self.cache['imageinfo'] = iinfo
+
+        self._set_imageinfo_data()
+
+        if show:
+            self.show()
+        return self
+
     def get_parse(self, show=True):
         """
         MediaWiki:API action=parse request for:
-        - image: <unicode> Infobox image URL
-        - images: <dict> {pimage}
+        - images: <dict> {parse-image, parse-cover}
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
         - pageid: <int> Wikipedia database ID
@@ -545,11 +628,9 @@ class WPTools(object):
         MediaWiki:API action=query request for:
         - extext: <unicode> plain text (Markdown) extract
         - extract: <unicode> HTML extract via Extension:TextExtract
-        - images: <dict> {qimage, qthumb}
+        - images: <dict> {query-pageimage, query-thumbnail}
         - pageid: <int> Wikipedia database ID
-        - pageimage: <unicode> pageimage URL via Extension:PageImages
         - random: <unicode> a random article title with every request!
-        - thumbnail: <unicode> thumbnail URL via Extension:PageImages
         - url: <unicode> the canonical wiki URL
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
@@ -603,11 +684,9 @@ class WPTools(object):
         """
         RESTBase (/page/mobile-text/)
         - description: <unicode> apparently, Wikidata description
-        - images: <dict> {rimage, rthumb}
+        - images: <dict> {rest-image, rest-thumb}
         - lead: <str> encyclopedia-like lead section
         - modified: <str> ISO8601 date and time
-        - pageimage: <unicode> apparently, action=query pageimage
-        - thumbnail: <unicode> larger action=query thumbnail
         - url: <unicode> the canonical wiki URL
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/api/rest_v1/
@@ -637,8 +716,7 @@ class WPTools(object):
         Wikidata:API (action=wbgetentities) for:
         - claims: <dict> Wikidata claims (to be resolved)
         - description: <unicode> Wikidata description
-        - image: <unicode> Wikidata Property:P18 image URL
-        - images: <dict> {wimage}
+        - images: <dict> {wikidata-image} Wikidata Property:P18
         - label: <unicode> Wikidata label
         - modified: <str> ISO8601 date and time
         - props: <dict> Wikidata properties

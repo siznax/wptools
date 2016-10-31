@@ -121,6 +121,14 @@ class WPToolsPickTest(unittest.TestCase):
         except LookupError as detail:
             print(detail)
 
+    def test_imageinfo(self):
+        """
+        Ensure get_imageinfo() updates images
+        """
+        a = wptools.page("Alice's Adventures in Wonderland").get_query(False)
+        a.get_imageinfo()
+        self.assertTrue('size' in a.images['query-pageimage'])
+
 
 class WPToolsRandomTest(unittest.TestCase):
     """
