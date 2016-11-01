@@ -378,7 +378,7 @@ Get all the things:
     }
 
 
-Query results are cached in the `cache` attribute:
+Query results are cached in the ``cache`` attribute:
 
 .. code-block:: python
 
