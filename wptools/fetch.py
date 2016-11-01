@@ -24,14 +24,14 @@ class WPToolsFetch(object):
 
     QUERY = {
         "imageinfo": Template((
-            "https://${WIKI}/w/api.php?action=query"
+            "${WIKI}/w/api.php?action=query"
             "&format=json"
             "&formatversion=2"
             "&iiprop=size|url"
             "&prop=imageinfo"
             "&titles=${thing}")),
         "parse": Template((
-            "https://${WIKI}/w/api.php?action=parse"
+            "${WIKI}/w/api.php?action=parse"
             "&contentmodel=text"
             "&disableeditsection="
             "&disablelimitreport="
@@ -43,11 +43,11 @@ class WPToolsFetch(object):
             "&redirects"
             "&page=${thing}")),
         "query": Template((
-            "https://${WIKI}/w/api.php?action=query"
+            "${WIKI}/w/api.php?action=query"
             "&exintro"
             "&format=json"
             "&formatversion=2"
-            "&inprop=displaytitle|url|watchers"
+            "&inprop=displaytitle|url"
             "&list=random"
             "&pithumbsize=240"
             "&ppprop=wikibase_item"
@@ -57,16 +57,16 @@ class WPToolsFetch(object):
             "&rnnamespace=0"
             "&titles=${thing}")),
         "random": Template((
-            "https://${WIKI}/w/api.php?action=query"
+            "${WIKI}/w/api.php?action=query"
             "&format=json"
             "&formatversion=2"
             "&list=random"
             "&rnlimit=1"
             "&rnnamespace=0")),
         "rest": Template((
-            "https://${WIKI}/api/rest_v1${entrypoint}${title}")),
+            "${WIKI}/api/rest_v1${entrypoint}${title}")),
         "wikidata": Template((
-            "https://${WIKI}/w/api.php?action=wbgetentities"
+            "${WIKI}/w/api.php?action=wbgetentities"
             "&format=json"
             "&formatversion=2"
             "&ids=${ids}"
@@ -164,9 +164,14 @@ class WPToolsFetch(object):
         """
         if not self.wiki or self.wiki == 'www.wikidata.org':
             self.wiki = "%s.wikipedia.org" % self.lang
+
+        tmpl_wiki = self.wiki
+        if not tmpl_wiki.startswith('http'):
+            tmpl_wiki = 'https://' + self.wiki
+
         if action.startswith('/'):
             qry = self.QUERY['rest'].substitute(
-                WIKI=self.wiki,
+                WIKI=tmpl_wiki,
                 entrypoint=action,
                 title=thing)
         elif action == 'wikidata':
@@ -175,6 +180,7 @@ class WPToolsFetch(object):
             title = ''
             props = "info|claims|descriptions|labels|sitelinks"
             self.wiki = 'www.wikidata.org'
+            tmpl_wiki = 'https://' + self.wiki
 
             if thing.get('props'):
                 props = thing['props']
@@ -187,7 +193,7 @@ class WPToolsFetch(object):
                 thing = title
 
             qry = self.QUERY[action].substitute(
-                WIKI=self.wiki,
+                WIKI=tmpl_wiki,
                 ids=ids,
                 lang=self.variant or self.lang,
                 props=props,
@@ -195,7 +201,7 @@ class WPToolsFetch(object):
                 title=title)
         else:
             qry = self.QUERY[action].substitute(
-                WIKI=self.wiki,
+                WIKI=tmpl_wiki,
                 thing=thing)
 
         if action == 'parse' and pageid:

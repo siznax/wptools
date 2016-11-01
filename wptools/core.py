@@ -292,13 +292,13 @@ class WPTools(object):
         """
         try:
             data = utils.json_loads(self.cache['parse']['response'])
+            pdata = data.get('parse')
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
                          % self.cache['parse']['query'])
             return
 
-        pdata = data.get('parse')
         if not pdata:
             msg = self.cache['parse']['query'].replace('&format=json', '')
             raise LookupError(msg)
@@ -327,14 +327,13 @@ class WPTools(object):
         """
         try:
             data = utils.json_loads(self.cache['query']['response'])
-        except ValueError:
+            qdata = data.get('query')
+            page = qdata.get('pages')[0]
+        except (KeyError, ValueError):
             self.fatal = True
             utils.stderr("Could not load query response: %s"
                          % self.cache['query']['query'])
             return
-
-        qdata = data.get('query')
-        page = qdata.get('pages')[0]
 
         if page.get('missing'):
             msg = self.cache['query']['query'].replace('&format=json', '')
@@ -459,13 +458,12 @@ class WPTools(object):
         try:
             data = utils.json_loads(self.cache['wikidata']['response'])
             entities = data.get('entities')
+            item = entities.get(next(iter(entities)))
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
                          % self.cache['wikidata']['query'])
             return
-
-        item = entities.get(next(iter(entities)))
 
         if not item.get('id') and item.get('title'):
             msg = self.cache['wikidata']['query'].replace('&format=json', '')
