@@ -382,17 +382,14 @@ Query results are cached in the `cache` attribute:
 
 .. code-block:: python
 
-    >>> [{x:y.keys()} for x,y in jill.cache.iteritems()]
-    [{'parse':    ['info', 'query', 'response']},
-     {'query':    ['info', 'query', 'response']},
-     {'wikidata': ['info', 'query', 'response']},
-     {'claims':   ['info', 'query', 'response']}]
-
-..
-
-    where `info` = HTTP request data (pycurl info)
-          `query` = HTTP request URL
-          `response` = API response (JSON)
+    >>> jill.cache['query']['info']
+    {'bytes': 1911.0,
+     'content': 'application/json; charset=utf-8',
+     'kB/s': '2.6',
+     'seconds': '0.743',
+     'status': 200,
+     'url': 'https://en.wikipedia.org/w/api.php?action=query&exintro&inprop=displaytitle|url|watchers&list=random&pithumbsize=240&ppprop=wikibase_item&prop=extracts|images|info|pageimages|pageprops&redirects&rnlimit=1&rnnamespace=0&titles=Jill_Lepore',
+     'user-agent': 'wptools/0.1.7 (https://github.com/siznax/wptools) PycURL/7.43.0 libcurl/7.49.1 SecureTransport zlib/1.2.8'}
 
 
 The ``wptools`` user-agent_ will look like this:
