@@ -262,6 +262,7 @@ Get an (album, book, film, etc.) cover image:
     {'parse-image': {'file': 'The Sympathizer - book cover.jpg'}}
 
     >>> sym.get_imageinfo()
+    en.wikipedia.org (imageinfo) File%3AThe%20Sympathizer%20-%20book%20cover.jpg
 
     >>> sym.images['parse-image']['url']
     'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
