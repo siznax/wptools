@@ -25,17 +25,19 @@ class WPToolsCoreTestCase(unittest.TestCase):
 
     def test_caching(self):
         abc = wptools.page('abc')
-        abc.claims = {'Q1'}
-        abc.g_claims = {'response'}
-        abc.g_parse = {'response'}
-        abc.g_query = {'response'}
-        abc.g_wikidata = {'response'}
-        abc.g_rest = {'response'}
+        abc.claims = {'Q1': 'test'}
+        abc.cache['claims'] = {'response'}
+        abc.cache['imageinfo'] = {'response'}
+        abc.cache['parse'] = {'response'}
+        abc.cache['query'] = {'response'}
+        abc.cache['rest'] = {'response'}
+        abc.cache['wikidata'] = {'response'}
         abc.get_claims()
+        abc.get_imageinfo()
         abc.get_parse()
         abc.get_query()
-        abc.get_wikidata()
         abc.get_rest()
+        abc.get_wikidata()
         self.assertTrue(not abc.pageid)
 
     def test_wptool(self):

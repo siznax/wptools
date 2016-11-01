@@ -71,11 +71,6 @@ class WPTools(object):
     extext = None
     extract = None
     fatal = False
-    g_claims = None
-    g_parse = None
-    g_query = None
-    g_rest = None
-    g_wikidata = None
     infobox = None
     label = None
     lead = None
@@ -225,7 +220,7 @@ class WPTools(object):
 
         if pars:
             html = "\n".join(pars)
-            self.g_rest['html'] = html
+            self.cache['rest']['html'] = html
             return self.__postprocess_lead(html)
 
     def __postprocess_lead(self, html):
@@ -234,7 +229,7 @@ class WPTools(object):
         """
         snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
         snip = "<span snipped>%s</span>" % snip
-        url = urlparse(self.g_rest['query'])
+        url = urlparse(self.cache['rest']['query'])
         base = "%s://%s" % (url.scheme, url.netloc)
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
@@ -296,16 +291,16 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=parse)
         """
         try:
-            data = utils.json_loads(self.g_parse['response'])
+            data = utils.json_loads(self.cache['parse']['response'])
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
-                         % self.g_parse['query'])
+                         % self.cache['parse']['query'])
             return
 
         pdata = data.get('parse')
         if not pdata:
-            msg = self.g_parse['query'].replace('&format=json', '')
+            msg = self.cache['parse']['query'].replace('&format=json', '')
             raise LookupError(msg)
 
         self.links = utils.get_links(pdata.get('iwlinks'))
@@ -331,18 +326,18 @@ class WPTools(object):
         set attributes derived from MediaWiki (action=query)
         """
         try:
-            data = utils.json_loads(self.g_query['response'])
+            data = utils.json_loads(self.cache['query']['response'])
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
-                         % self.g_query['query'])
+                         % self.cache['query']['query'])
             return
 
         qdata = data.get('query')
         page = qdata.get('pages')[0]
 
         if page.get('missing'):
-            msg = self.g_query['query'].replace('&format=json', '')
+            msg = self.cache['query']['query'].replace('&format=json', '')
             raise LookupError(msg)
 
         extext = None
@@ -381,12 +376,12 @@ class WPTools(object):
         set attributes derived from RESTBase
         """
         try:
-            data = utils.json_loads(self.g_rest['response'])
-            url = urlparse(self.g_rest['query'])
+            data = utils.json_loads(self.cache['rest']['response'])
+            url = urlparse(self.cache['rest']['query'])
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
-                         % self.g_rest['query'])
+                         % self.cache['rest']['query'])
             return
 
         if data.get('detail'):
@@ -462,18 +457,18 @@ class WPTools(object):
         set attributes derived from Wikidata (action=wbentities)
         """
         try:
-            data = utils.json_loads(self.g_wikidata['response'])
+            data = utils.json_loads(self.cache['wikidata']['response'])
             entities = data.get('entities')
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s"
-                         % self.g_wikidata['query'])
+                         % self.cache['wikidata']['query'])
             return
 
         item = entities.get(next(iter(entities)))
 
         if not item.get('id') and item.get('title'):
-            msg = self.g_wikidata['query'].replace('&format=json', '')
+            msg = self.cache['wikidata']['query'].replace('&format=json', '')
             raise LookupError(msg)
 
         self.wikibase = item.get('id')
@@ -533,23 +528,27 @@ class WPTools(object):
         - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
         - use get_wikidata() to populate claims
         """
+        if 'claims' in self.cache:
+            utils.stderr("get_claims result found in cache")
+            return
+
         if not self.claims:
-            return
-        if self.g_claims:
-            utils.stderr("Request cached in g_claims.")
-            return
+            utils.stderr("get_claims needs claims")
 
         thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
+
         query = self.__fetch.query('wikidata', thing)
 
-        g_claims = {}
-        g_claims['query'] = query
-        g_claims['response'] = self.__fetch.curl(query)
-        g_claims['info'] = self.__fetch.info
-        self.g_claims = g_claims
+        labels = {}
+        labels['query'] = query
+        labels['response'] = self.__fetch.curl(query)
+        labels['info'] = self.__fetch.info
 
-        data = utils.json_loads(self.g_claims['response'])
+        self.cache['claims'] = labels
+
+        data = utils.json_loads(labels['response'])
         entities = data.get('entities')
+
         for item in entities:
             attr = self.claims[item]
             value = self.__get_entity_prop(entities[item], 'labels')
@@ -557,6 +556,7 @@ class WPTools(object):
 
         if show:
             self.show()
+
         return self
 
     def get_imageinfo(self, show=False):
@@ -565,14 +565,15 @@ class WPTools(object):
         - images: <dict> updates image URL, size, width, height, etc.
         https://www.mediawiki.org/wiki/API:Imageinfo
         """
+        if 'imageinfo' in self.cache:
+            utils.stderr("get_imageinfo results found in cache")
+            return
+
         if not self.images:
             raise LookupError("get_images needs images")
 
-        if self.cache.get('imageinfo'):
-            utils.stderr("imageinfo found in cache.")
-            return
-
         files = self.__get_image_files()
+
         try:
             files = [quote(x) for x in files]
         except KeyError:
@@ -584,12 +585,14 @@ class WPTools(object):
         iinfo['query'] = query
         iinfo['response'] = self.__fetch.curl(query)
         iinfo['info'] = self.__fetch.info
+
         self.cache['imageinfo'] = iinfo
 
         self._set_imageinfo_data()
 
         if show:
             self.show()
+
         return self
 
     def get_parse(self, show=True):
@@ -604,23 +607,30 @@ class WPTools(object):
         - wikitext: <unicode> raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
-        if self.g_parse:
-            utils.stderr("Request cached in g_parse.")
+        if 'parse' in self.cache:
+            utils.stderr("get_parse results found in cache")
             return
+
         if not self.title and not self.pageid:
             raise LookupError("get_parse needs title or pageid")
+
         if self.pageid:
             query = self.__fetch.query('parse', self.pageid, pageid=True)
         else:
             query = self.__fetch.query('parse', self.title)
+
         parse = {}
         parse['query'] = query
         parse['response'] = self.__fetch.curl(query)
         parse['info'] = self.__fetch.info
-        self.g_parse = parse
+
+        self.cache['parse'] = parse
+
         self._set_parse_data()
+
         if show:
             self.show()
+
         return self
 
     def get_query(self, show=True):
@@ -635,23 +645,30 @@ class WPTools(object):
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
-        if self.g_query:
-            utils.stderr("Request cached in g_query.")
+        if 'query' in self.cache:
+            utils.stderr("get_query results found in cache")
             return
+
         if not self.title and not self.pageid:
             raise LookupError("get_query needs title or pageid")
+
         if self.pageid:
             qry = self.__fetch.query('query', self.pageid, pageid=True)
         else:
             qry = self.__fetch.query('query', self.title)
+
         query = {}
         query['query'] = qry
         query['response'] = self.__fetch.curl(qry)
         query['info'] = self.__fetch.info
-        self.g_query = query
+
+        self.cache['query'] = query
+
         self._set_query_data()
+
         if show:
             self.show()
+
         return self
 
     def get_random(self, show=True):
@@ -666,18 +683,20 @@ class WPTools(object):
 
         try:
             data = utils.json_loads(response)
-            rdata = data.get('query').get('random')[0]
+            rand = data.get('query').get('random')[0]
         except ValueError:
             self.fatal = True
             utils.stderr("Could not load query response: %s" % query)
             return
 
-        self.pageid = rdata.get('id')
+        self.pageid = rand.get('id')
+
         if not self.title:
-            self.title = rdata.get('title').replace(' ', '_')
+            self.title = rand.get('title').replace(' ', '_')
 
         if show:
             self.show()
+
         return self
 
     def get_rest(self, show=True):
@@ -691,24 +710,32 @@ class WPTools(object):
         - urlraw: <unicode> ostensible raw wikitext URL
         https://en.wikipedia.org/api/rest_v1/
         """
-        if self.g_rest:
-            utils.stderr("Request cached in g_rest.")
+        if 'rest' in self.cache:
+            utils.stderr("get_rest results found in cache")
             return
+
         if not self.title:
             raise LookupError("get_rest needs a title")
+
         try:
             title = quote(self.title)
         except KeyError:
             title = quote(self.title.encode('utf-8'))
+
         query = self.__fetch.query('/page/mobile-text/', title)
+
         rest = {}
         rest['query'] = query
         rest['response'] = self.__fetch.curl(query)
         rest['info'] = self.__fetch.info
-        self.g_rest = rest
+
+        self.cache['rest'] = rest
+
         self._set_rest_data()
+
         if show:
             self.show()
+
         return self
 
     def get_wikidata(self, show=True, get_claims=True):
@@ -724,11 +751,12 @@ class WPTools(object):
         - wikidata: <dict> resolved Wikidata properties and claims
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        if self.g_wikidata:
-            utils.stderr("Request cached in g_wikidata.")
+        if 'wikidata' in self.cache:
+            utils.stderr("get_wikidata results in cache")
             return
 
         thing = {'id': '', 'site': '', 'title': ''}
+
         if self.wikibase:
             thing['id'] = self.wikibase
         elif self.lang and self.title:
@@ -741,16 +769,22 @@ class WPTools(object):
             return
 
         query = self.__fetch.query('wikidata', thing)
+
         wdata = {}
         wdata['query'] = query
         wdata['response'] = self.__fetch.curl(query)
         wdata['info'] = self.__fetch.info
-        self.g_wikidata = wdata
+
+        self.cache['wikidata'] = wdata
+
         self._set_wikidata()
+
         if self.claims and get_claims:
             self.get_claims(False)
+
         if show:
             self.show()
+
         return self
 
     def set_timeout(self, seconds):

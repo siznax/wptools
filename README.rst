@@ -280,13 +280,13 @@ Get wikidata by *title*:
     www.wikidata.org (wikidata) Q8817795|Q5|Q7066|Q145
     Stephen_Fry (en)
     {
+      cache: <dict(2)> {claims, wikidata}
       claims: <dict(4)> {Q145, Q5, Q7066, Q8817795}
       description: English comedian, actor, writer, presenter, and activist
-      g_claims: <dict(3)> {info, query, response}
-      g_wikidata: <dict(3)> {info, query, response}
       images: <dict(1)> {wikidata-image}
       label: Stephen Fry
       lang: en
+      modified: 2016-10-31T22:02:03Z
       props: <dict(8)> {P135, P18, P27, P31, P345, P569, P856, P910}
       title: Stephen_Fry
       wikibase: Q192912
@@ -352,42 +352,47 @@ Get all the things:
     en.wikipedia.org (query) Jill_Lepore
     en.wikipedia.org (parse) 22469182
     www.wikidata.org (wikidata) Q6192915
-    www.wikidata.org (wikidata) Q30|Q5|Q6581072
+    www.wikidata.org (wikidata) Q30|Q5
     Jill_Lepore (en)
     {
-      claims: <dict(3)> {Q30, Q5, Q6581072}
+      cache: <dict(4)> {claims, parse, query, wikidata}
+      claims: <dict(2)> {Q30, Q5}
       description: American historian
       extext: <str(1016)> **Jill Lepore** (born August 27, 1966) is an A...
-      extract: <str(1107)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
-      g_claims: <dict(3)> {info, query, response}
-      g_parse: <dict(3)> {info, query, response}
-      g_query: <dict(3)> {info, query, response}
-      g_wikidata: <dict(3)> {info, query, response}
+      extract: <str(1114)> <p><b>Jill Lepore</b> (born August 27, 1966) ...
       infobox: <dict(38)> {academic_advisors, alma_mater, alt, author_ab...
       label: Jill Lepore
       lang: en
+      modified: 2016-08-11T19:53:32Z
       pageid: 22469182
-      parsetree: <str(20662)> <root><template><title>Infobox scientist</...
-      props: <dict(4)> {P21, P27, P31, P569}
-      random: Natalia Dubrovinskaia
+      parsetree: <str(50677)> <root><template><title>Infobox scientist</...
+      props: <dict(3)> {P27, P31, P569}
+      random: Ramesh Bidhuri
       title: Jill_Lepore
       url: https://en.wikipedia.org/wiki/Jill_Lepore
       urlraw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
       wikibase: Q6192915
-      wikidata: <dict(4)> {birth, citizenship, gender, instance}
+      wikidata: <dict(3)> {birth, citizenship, instance}
       wikidata_url: https://www.wikidata.org/wiki/Q6192915
-      wikitext: <str(13872)> {{Infobox scientist| name = Jill Lepore| na...
+      wikitext: <str(22540)> {{Infobox scientist| name = Jill Lepore| na...
     }
 
 
-Query results are always cached:
+Query results are cached in the `cache` attribute:
 
 .. code-block:: python
 
-    >>> jill.get()
-    Request cached in g_query.
-    Request cached in g_parse.
-    Request cached in g_wikidata.
+    >>> [{x:y.keys()} for x,y in jill.cache.iteritems()]
+    [{'parse':    ['info', 'query', 'response']},
+     {'query':    ['info', 'query', 'response']},
+     {'wikidata': ['info', 'query', 'response']},
+     {'claims':   ['info', 'query', 'response']}]
+
+..
+
+    where `info` = HTTP request data (pycurl info)
+          `query` = HTTP request URL
+          `response` = API response (JSON)
 
 
 The ``wptools`` user-agent_ will look like this:
