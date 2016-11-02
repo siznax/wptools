@@ -1,16 +1,11 @@
 WPTools NOTES
 =============
 
-_“For reading, there will never be enough time” —Harold Bloom_
-
-* https://www.mediawiki.org/wiki/API:Main_page
-* https://www.mediawiki.org/wiki/Web_APIs_hub
-* https://www.wikidata.org/wiki/Wikidata:Data_access
-* https://en.wikipedia.org/wiki/Wikipedia:Wikipedia_records
+These preliminary notes are being migrated piecemeal to our wiki:
+https://github.com/siznax/wptools/wiki
 
 This project is listed in the MediaWiki API docs as "wptools":  
 https://www.mediawiki.org/wiki/API:Client_code#Python
-
 
 Table of Contents
 -----------------
@@ -26,7 +21,7 @@ Table of Contents
 * [Parse tree](#parse-tree)
 * [RESTBase](#restbase)
 * [URL Shortener](#url-shortener)
-* [WikiData](#wikidata)
+* [WikiData](https://github.com/siznax/wptools/wiki/Wikidata)
 * [Wikitext](#wikitext)
 
 
@@ -170,25 +165,6 @@ It would be especially useful for commons media URLs.
 
 * https://www.mediawiki.org/wiki/Extension:UrlShortener
 * https://www.mediawiki.org/wiki/Requests_for_comment/URL_shortener
-
-
-WikiData
---------
-
-We get wikidata through (action=wbgetentities)  
-https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
-
-* https://www.mediawiki.org/wiki/Wikibase/DataModel#Overview_of_the_data_model
-* https://www.wikidata.org/wiki/Help:Wikidata_datamodel
-* https://www.mediawiki.org/wiki/Wikibase/API#wbgetentities
-* https://www.mediawiki.org/wiki/API:Presenting_Wikidata_knowledge
-
-Properties
-
-* https://www.wikidata.org/wiki/Wikidata:List_of_properties/all
-* https://www.wikidata.org/wiki/Wikidata:List_of_properties/Generic
-* https://www.wikidata.org/wiki/Wikidata:List_of_properties/Person
-* https://www.wikidata.org/wiki/Wikidata:WikiProject_Taxonomy#Properties_each_item_.28that_deals_with_a_taxon.29_should_have
 
 
 Wikitext
