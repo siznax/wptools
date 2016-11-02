@@ -295,12 +295,17 @@ Get wikidata by *title*:
       wikidata_url: https://www.wikidata.org/wiki/Q192912
     }
 
-**Note**: Resolved properties and claims are stored in the ``wikidata``
-attribute. Wikidata claims are processed via ``WPTools._WIKIPROPS``.
-Properties (e.g. P17: country) are stored in ``props`` and those properties
-that have Wikidata entities for values (e.g. Q142 instead of France) are
-stored in ``claims`` and resolved by another Wikidata API call (as
-shown above).
+**Note**: Resolved properties and claims are stored in the
+``wikidata`` attribute. Wikidata properties are selected by
+``_WIKIPROPS``.  Properties (e.g. P17_ "country") are stored in
+``props`` and those properties that have Wikidata items for values
+(e.g. Q142_ for "France") are stored in ``claims`` and resolved by
+another Wikidata API call (as shown above). See the `Wikidata page`_
+in our wiki for more details.
+
+.. _P17: https://www.wikidata.org/wiki/Property:P17
+.. _Q142: https://www.wikidata.org/wiki/Q142
+.. _`Wikidata page`: https://github.com/siznax/wptools/wiki/Wikidata
 
 
 Extend Wikidata claims_ to be resolved:
