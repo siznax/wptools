@@ -326,7 +326,7 @@ Extend Wikidata claims_ to be resolved:
 .. _claims: https://www.wikidata.org/wiki/Wikidata:Glossary#Claims_and_statements
 
 
-Get *special* `lead section`_ HTML:
+Get special (experimental) `lead section`_ HTML:
 
 .. code-block:: python
 
@@ -341,10 +341,10 @@ Get *special* `lead section`_ HTML:
     Gautama is the primary figure in Buddhism. He is recognized by Buddhists...
     <span metadata>Modified: 2016-10-13T09:44:13Z</span>
 
-**Note**: The *lead* attribute contains the assembled stand-alone,
+**Note**: The *lead* attribute contains an assembled stand-alone,
 encyclopedia-like HTML fragment:
 
-- ``<img {source-type}>`` selected image
+- ``<img {kind}>`` selected image
 - ``<span heading>`` wiki-linked title and description
 - ``<span snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
 - ``<span metadata>`` available metadata (e.g. Last modified)
@@ -402,10 +402,9 @@ The ``wptools`` user-agent_ will look like this:
 
 ..
 
-    wptools/*version* (https://github.com/siznax/wptools) *pycurl libs*
+    wptools/*version* (https://github.com/siznax/wptools) *libs*
 
 .. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
-
 
 
 
@@ -424,7 +423,7 @@ Get help on instance methods like this:
 
 **get** (self)
 
-make all requests necessary to populate all the things
+make all requests necessary to populate all the things, probably:
 
 - get_query()
 - get_parse()
@@ -438,8 +437,6 @@ Wikidata:API `action=wbgetentities`_ for labels of claims
 - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
 - use get_wikidata() to populate claims
 
-
-.. _get_imageinfo:
 
 **get_imageinfo** (self)
 
@@ -528,12 +525,13 @@ Wikidata:API `action=wbgetentities`_ request for:
 
 **image** (self, token)
 
-Returns first image info with kind containing token
+Returns first image info with kind containing token (e.g. 'thumb')
 
 
 **show** (self)
 
 Pretty-print instance attributes.
+
 
 
 .. _wptool:
