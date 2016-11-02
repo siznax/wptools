@@ -3,6 +3,20 @@
 Release History
 ---------------
 
+0.1.8 (2016-11-01)
+++++++++++++++++++
+
+* Many fixes with help of @seansay (thank you!)
+* Consolidated images and caches
+* Automatically get_imageinfo() via MediaWiki API:Imageinfo
+* Added timeout support via set_timeout()
+* Added proxy support via set_proxy()
+* Support for non-https wikis via wiki='http://example.com'
+* Support for language variants (e.g. variant='zh-cn')
+* Support get_query() by pageid
+* Raise LookupError on API missing page/title
+
+
 0.1.7 (2016-09-20)
 ++++++++++++++++++
 
