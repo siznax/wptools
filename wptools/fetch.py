@@ -120,10 +120,7 @@ class WPToolsFetch(object):
         if not self.silent:
             print(self.status_line(), file=sys.stderr)
 
-        try:
-            return self.curl_perform(crl)
-        except pycurl.error as detail:
-            raise RuntimeError("pycurl error %d %s" % (detail[0], detail[1]))
+        return self.curl_perform(crl)
 
     def curl_perform(self, crl):
         """
