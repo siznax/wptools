@@ -469,9 +469,11 @@ MediaWiki:API `action=parse`_ request for:
 
 MediaWiki:API `action=query`_ request for:
 
+- description: <unicode> Wikidata description (via pageterms)
 - extext: <unicode> plain text (Markdown_) extract
 - extract: <unicode> HTML extract via `Extension:TextExtract`_
 - images: <dict> {query-pageimage, query-thumbnail}
+- label: <unicode> Wikidata label (via pageterms)
 - pageid: <int> MediaWiki database ID
 - random: <unicode> a random article title with every request!
 - url: <unicode> the canonical wiki URL

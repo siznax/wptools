@@ -55,7 +55,7 @@ class WPToolsFetch(object):
             "&list=random"
             "&pithumbsize=240"
             "&ppprop=wikibase_item"
-            "&prop=extracts|images|info|pageimages|pageprops"
+            "&prop=extracts|images|info|pageimages|pageprops|pageterms"
             "&redirects"
             "&rnlimit=1"
             "&rnnamespace=0"

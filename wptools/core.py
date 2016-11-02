@@ -326,28 +326,46 @@ class WPTools(object):
         try:
             data = utils.json_loads(self.cache['query']['response'])
             qdata = data.get('query')
-            page = qdata.get('pages')[0]
         except (KeyError, ValueError):
             self.fatal = True
             utils.stderr("Could not load query response: %s"
                          % self.cache['query']['query'])
             return
 
+        page = qdata.get('pages')[0]
         if page.get('missing'):
             msg = self.cache['query']['query'].replace('&format=json', '')
             raise LookupError(msg)
 
-        extext = None
-        extract = page.get('extract')
-        if extract:
-            self.extract = extract
+        self.pageid = page.get('pageid')
+        self.random = qdata.get('random')[0]["title"]
+        self.title = page.get('title').replace(' ', '_')
+
+        if page.get('extract'):
+            self.extract = page['extract']
             extext = html2text.html2text(self.extract)
             if extext:
                 self.extext = extext.strip()
 
+        if page.get('fullurl'):
+            self.url = page['fullurl']
+            self.urlraw = self.url + '?action=raw'
+
         if page.get('pageimage'):
             self.images.append({'kind': 'query-pageimage',
                                 'file': page['pageimage']})
+
+        if page.get('pageprops'):
+            wikibase = page['pageprops'].get('wikibase_item')
+            if wikibase:
+                self.wikibase = wikibase
+                self.wikidata_url = utils.wikidata_url(self.wikibase)
+
+        if page.get('terms'):
+            if page['terms'].get('description'):
+                self.description = ''.join(page['terms']['description'])
+            if page['terms'].get('label'):
+                self.label = ''.join(page['terms']['label'])
 
         if page.get('thumbnail'):
             qthumb = {'kind': 'query-thumbnail'}
@@ -356,24 +374,6 @@ class WPTools(object):
             del qthumb['source']
             qthumb['file'] = qthumb['url'].split('/')[-2]
             self.images.append(qthumb)
-
-        self.pageid = page.get('pageid')
-
-        pageprops = page.get('pageprops')
-        if pageprops:
-            wikibase = pageprops.get('wikibase_item')
-            if wikibase:
-                self.wikibase = wikibase
-                self.wikidata_url = utils.wikidata_url(self.wikibase)
-
-        self.random = qdata.get('random')[0]["title"]
-        if not self.title:
-            self.title = page.get('title').replace(' ', '_')
-
-        url = page.get('fullurl')
-        if url:
-            self.url = url
-            self.urlraw = url + '?action=raw'
 
     def _set_rest_data(self):
         """
@@ -651,9 +651,11 @@ class WPTools(object):
     def get_query(self, show=True):
         """
         MediaWiki:API action=query request for:
+        - description: <unicode> Wikidata description (via pageterms)
         - extext: <unicode> plain text (Markdown) extract
         - extract: <unicode> HTML extract via Extension:TextExtract
         - images: <dict> {query-pageimage, query-thumbnail}
+        - label: <unicode> Wikidata label (via pageterms)
         - pageid: <int> Wikipedia database ID
         - random: <unicode> a random article title with every request!
         - url: <unicode> the canonical wiki URL
