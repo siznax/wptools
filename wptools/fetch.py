@@ -5,6 +5,10 @@ WPTools Fetch module.
 """
 
 from __future__ import print_function
+try:  # python2
+    from urllib import unquote
+except ImportError:  # python3
+    from urllib.parse import unquote
 
 from io import BytesIO
 from string import Template
@@ -112,11 +116,10 @@ class WPToolsFetch(object):
             crl.setopt(pycurl.URL, url)
         except UnicodeEncodeError:
             crl.setopt(pycurl.URL, url.encode('utf-8'))
+
         if not self.silent:
-            msg = "%s (%s) %s" % (self.wiki, self.action, self.thing)
-            if len(msg) > 80:
-                msg = msg[:72] + '...'
-            print(msg, file=sys.stderr)
+            print(self.status_line(), file=sys.stderr)
+
         try:
             return self.curl_perform(crl)
         except pycurl.error as detail:
@@ -216,6 +219,22 @@ class WPToolsFetch(object):
         self.action = action
         self.thing = thing
         return qry
+
+    def status_line(self):
+        """
+        returns request status line
+        """
+        try:
+            thing = unquote(self.thing)
+        except (AttributeError, TypeError):
+            thing = self.thing
+
+        status = "%s (%s) %s" % (self.wiki, self.action, thing)
+
+        if len(status) > 80:
+            status = status[:72] + '...'
+
+        return status
 
 
 def curl_info(crl):

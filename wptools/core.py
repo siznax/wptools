@@ -112,7 +112,7 @@ class WPTools(object):
         self.cache = {}
         self.claims = {}
         self.props = {}
-        self.images = {}
+        self.images = []
         self.wikidata = {}
 
         if not self.pageid and not self.title and not self.wikibase:
@@ -131,19 +131,17 @@ class WPTools(object):
                 return entity.get(prop).get('value')
 
     def __get_image_files(self):
+        """
+        returns normalized list of image filenames
+        """
         files = []
-        for item in self.images.values():
-            try:
-                fname = item.get('file')
-            except AttributeError:
-                fname = item
-            if fname:
-                fname = fname.replace('_', ' ')
-                if (not fname.startswith('File')
-                        and not fname.startswith('Image')):
-                    fname = 'File:' + fname
-                if fname not in files:
-                    files.append(fname)
+        for item in [x['file'] for x in self.images if x.get('file')]:
+            fname = item.replace('_', ' ')
+            if (not fname.startswith('File')
+                    and not fname.startswith('Image')):
+                fname = 'File:' + fname
+            if fname not in files:
+                files.append(fname)
         return files
 
     def __get_lead(self, data):
@@ -163,34 +161,31 @@ class WPTools(object):
         """
         if not hasattr(self, 'url') or not hasattr(self, 'title'):
             return
+
         heading = "<a href=\"%s\">%s</a>" % (self.url, self.title)
         if hasattr(self, 'description') and self.description:
             heading += "&mdash;<i>%s</i>. " % self.description
         else:
             heading += ':'
+
         return "<span heading>%s</span>" % heading
 
     def __get_lead_image(self):
         """
         returns <img> HTML from image attributes
         """
-        alt = self.title or self.label
         src = None
-        cls = None
+        for kind in ['cover', 'wikidata', 'thumbnail', 'thumb', 'page']:
+            if self.image(kind):
+                src = self.image(kind)['url']
+                cls = kind
+                break
 
-        if self.images.get('query-thumbnail'):
-            src = self.images['query-thumbnail']
-            cls = 'query-thumbnail'
-        elif self.images.get('query-pageimage'):
-            src = self.images['query-pageimage']
-            cls = 'query-pageimage'
-        elif self.images.get('wikidata-image'):
-            src = self.images['wikidata-image']
-            cls = 'wikidata-image'
         if src:
-            img = ("<img %s src=\"%s\" alt=\"%s\" title=\"%s\" "
-                   % (cls, src, alt, alt))
-            img += "align=right width=120>"
+            alt = self.title or self.label
+            img = "<img %s" % (cls)
+            img += " src=\"%s\"" % (src)
+            img += " alt=\"%s\" title=\"%s\">" % (alt, alt)
             return img
 
     def __get_lead_metadata(self):
@@ -236,12 +231,13 @@ class WPTools(object):
 
     def __update_image_info(self, title, info):
         """
-        update instance image data with get_imageinfo data
+        update images with get_imageinfo data
         """
-        for image in self.images:
-            fname = self.images[image].get('file')
-            if fname and fname.replace('_', ' ') in title:
-                self.images[image].update(info)
+        for i, image in enumerate(self.images):
+            if image.get('file'):
+                fname = image.get('file').replace('_', ' ')
+                if fname in title and image['kind'] != 'query-thumbnail':
+                    self.images[i].update(info)
 
     def __set_title_wikidata(self, item):
         """
@@ -310,9 +306,11 @@ class WPTools(object):
 
         if self.infobox:
             if self.infobox.get('image'):
-                self.images['parse-image'] = {'file': self.infobox['image']}
+                self.images.append({'kind': 'parse-image',
+                                    'file': self.infobox['image']})
             if self.infobox.get('Cover'):
-                self.images['parse-cover'] = {'file': self.infobox['Cover']}
+                self.images.append({'kind': 'parse-cover',
+                                    'file': self.infobox['Cover']})
 
         if not self.title:
             self.title = pdata.get('title').replace(' ', '_')
@@ -348,9 +346,16 @@ class WPTools(object):
                 self.extext = extext.strip()
 
         if page.get('pageimage'):
-            self.images['query-pageimage'] = {'file': page['pageimage']}
+            self.images.append({'kind': 'query-pageimage',
+                                'file': page['pageimage']})
+
         if page.get('thumbnail'):
-            self.images['query-thumbnail'] = page['thumbnail']
+            qthumb = {'kind': 'query-thumbnail'}
+            qthumb.update(page['thumbnail'])
+            qthumb['url'] = page['thumbnail']['source']
+            del qthumb['source']
+            qthumb['file'] = qthumb['url'].split('/')[-2]
+            self.images.append(qthumb)
 
         self.pageid = page.get('pageid')
 
@@ -391,13 +396,21 @@ class WPTools(object):
 
         self.description = data.get('description')
 
-        self.images['rest-image'] = data.get('image')
-        self.images['rest-thumb'] = data.get('thumb')
+        if data.get('image'):
+            rimg = {'kind': 'rest-image'}
+            rimg.update(data.get('image'))
+            self.images.append(rimg)
 
-        title = data.get('displaytitle')
-        if data.get('redirected'):
-            title = data['redirected']
-        self.title = title.replace(' ', '_')
+        if data.get('thumb'):
+            rthumb = {'kind': 'rest-thumb'}
+            rthumb.update(data.get('thumb'))
+            self.images.append(rthumb)
+
+        title = (data.get('redirected')
+                 or data.get('normalizedtitle')
+                 or data.get('displaytitle'))
+        if title:
+            self.title = title.replace(' ', '_')
 
         self.modified = data.get('lastmodified')
         self.pageid = data.get('id')
@@ -479,7 +492,8 @@ class WPTools(object):
             self.description = descriptions
 
         if self.wikidata.get('image'):
-            self.images['wikidata-image'] = {'file': self.wikidata['image']}
+            self.images.append({'kind': 'wikidata-image',
+                                'file': self.wikidata['image']})
 
         labels = self.__get_entity_prop(item, 'labels')
         if labels:
@@ -505,7 +519,7 @@ class WPTools(object):
 
     def get(self, show=True):
         """
-        make all requests necessary to populate all the things:
+        make most requests to populate all the things:
         - get_query()
         - get_parse()
         - get_wikidata()
@@ -527,7 +541,7 @@ class WPTools(object):
         - use get_wikidata() to populate claims
         """
         if 'claims' in self.cache:
-            utils.stderr("get_claims result found in cache")
+            utils.stderr("claims results in cache")
             return
 
         if not self.claims:
@@ -557,18 +571,18 @@ class WPTools(object):
 
         return self
 
-    def get_imageinfo(self, show=False):
+    def get_imageinfo(self, show=True):
         """
         MediaWiki request for API:Imageinfo
-        - images: <dict> updates image URL, size, width, height, etc.
+        - images: <dict> updates image URLs, sizes, etc.
         https://www.mediawiki.org/wiki/API:Imageinfo
         """
-        if 'imageinfo' in self.cache:
-            utils.stderr("get_imageinfo results found in cache")
-            return
-
         if not self.images:
             raise LookupError("get_images needs images")
+
+        if not self.missing_imageinfo() and 'imageinfo' in self.cache:
+            utils.stderr("complete imageinfo in cache")
+            return
 
         files = self.__get_image_files()
 
@@ -606,7 +620,7 @@ class WPTools(object):
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
         if 'parse' in self.cache:
-            utils.stderr("get_parse results found in cache")
+            utils.stderr("parse results in cache")
             return
 
         if not self.title and not self.pageid:
@@ -626,6 +640,9 @@ class WPTools(object):
 
         self._set_parse_data()
 
+        if self.missing_imageinfo():
+            self.get_imageinfo(False)
+
         if show:
             self.show()
 
@@ -644,7 +661,7 @@ class WPTools(object):
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
         if 'query' in self.cache:
-            utils.stderr("get_query results found in cache")
+            utils.stderr("query results in cache")
             return
 
         if not self.title and not self.pageid:
@@ -663,6 +680,9 @@ class WPTools(object):
         self.cache['query'] = query
 
         self._set_query_data()
+
+        if self.missing_imageinfo():
+            self.get_imageinfo(False)
 
         if show:
             self.show()
@@ -709,7 +729,7 @@ class WPTools(object):
         https://en.wikipedia.org/api/rest_v1/
         """
         if 'rest' in self.cache:
-            utils.stderr("get_rest results found in cache")
+            utils.stderr("rest results in cache")
             return
 
         if not self.title:
@@ -731,6 +751,9 @@ class WPTools(object):
 
         self._set_rest_data()
 
+        if self.missing_imageinfo():
+            self.get_imageinfo(False)
+
         if show:
             self.show()
 
@@ -750,7 +773,7 @@ class WPTools(object):
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if 'wikidata' in self.cache:
-            utils.stderr("get_wikidata results in cache")
+            utils.stderr("wikidata results in cache")
             return
 
         thing = {'id': '', 'site': '', 'title': ''}
@@ -780,10 +803,27 @@ class WPTools(object):
         if self.claims and get_claims:
             self.get_claims(False)
 
+        if self.missing_imageinfo():
+            self.get_imageinfo(False)
+
         if show:
             self.show()
 
         return self
+
+    def image(self, token):
+        """
+        returns first image info with kind containing token
+        """
+        for img in self.images:
+            if token in img.get('kind'):
+                return img
+
+    def missing_imageinfo(self):
+        """
+        returns images missing info
+        """
+        return [x for x in self.images if not x.get('url')]
 
     def set_timeout(self, seconds):
         """

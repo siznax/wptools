@@ -192,17 +192,24 @@ Get a representative image:
 
     >>> frida = wptools.page('Frida Kahlo').get_query()
     en.wikipedia.org (query) Frida_Kahlo
+    en.wikipedia.org (imageinfo) File:Frida Kahlo, by Guillermo Kahlo.jpg|Fi...
 
-    >>> frida.images['query-thumbnail']['source']
-    u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo,_by_Guillermo_Kahlo.jpg'
+    >>> frida.image('page')['url']
+    u'https://upload.wikimedia.org/wikipedia/commons/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg'
+
+    >>> frida.image('thumb')['url']
+    u'https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg/160px-Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg'
 
 ..
 
     .. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg/160px-Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg
 
-**Note**: A page's image can come from an Infobox, query ``pageimage``
-or ``thumbnail``, a RESTBase request, or from Wikidata Property:P18.
-Use `get_imageinfo`_ to populate file details like URL, size, etc.
+**Note**: A page's image can come from the ``pageimage`` or
+``thumbnail`` (via ``get_query()``), from an Infobox (via
+``get_parse()``), from Wikidata Property:P18_ (via
+``get_wikidata()``), or from the RESTBase ``image`` or ``thumb`` (via
+``get_rest()``). All images are stored in the ``images`` attribute,
+and can be queried with the ``image()`` method.
 
 
 Get a text (or HTML) extract:
@@ -255,21 +262,14 @@ Get an (album, book, film, etc.) cover image:
 
 .. code-block:: python
 
-    >>> sym = wptools.page('The Sympathizer').get_parse()
-    en.wikipedia.org (parse) The_Sympathizer
+    >>> blue = wptools.page('Blue Train (album)').get_parse()
 
-    >>> sym.images
-    {'parse-image': {'file': 'The Sympathizer - book cover.jpg'}}
-
-    >>> sym.get_imageinfo()
-    en.wikipedia.org (imageinfo) File%3AThe%20Sympathizer%20-%20book%20cover.jpg
-
-    >>> sym.images['parse-image']['url']
-    'https://upload.wikimedia.org/wikipedia/en/e/e8/The_Sympathizer_-_book_cover.jpg'
+    >>> blue.image('cover')['url']
+    u'https://upload.wikimedia.org/wikipedia/en/6/68/John_Coltrane_-_Blue_Train.jpg'
 
 ..
 
-    .. image:: https://upload.wikimedia.org/wikipedia/en/thumb/e/e8/The_Sympathizer_-_book_cover.jpg/120px-The_Sympathizer_-_book_cover.jpg
+    .. image:: https://upload.wikimedia.org/wikipedia/en/6/68/John_Coltrane_-_Blue_Train.jpg
 
 
 Get wikidata by *title*:
@@ -440,7 +440,7 @@ Wikidata:API `action=wbgetentities`_ for labels of claims
 
 MediaWiki request for `API:Imageinfo`_
 
-- images: <dict> updates image URL, size, width, height, etc.
+- images: <dict> updates image URLs, sizes, etc.
 
 .. _`API:Imageinfo`: https://www.mediawiki.org/wiki/API:Imageinfo
 
@@ -519,6 +519,11 @@ Wikidata:API `action=wbgetentities`_ request for:
 .. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+
+
+**image** (self, token)
+
+Returns first image info with kind containing token
 
 
 **show** (self)

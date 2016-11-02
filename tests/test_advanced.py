@@ -93,8 +93,8 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Get a thumbnail image URL
         """
-        p = wptools.page('Frida Kahlo').get_rest(False)
-        self.assertTrue('rest-thumb' in p.images)
+        p = wptools.page('Frida Kahlo').get_query(False)
+        self.assertTrue('url' in p.image('thumb'))
 
     def test_pageid(self):
         """
@@ -126,8 +126,7 @@ class WPToolsPickTest(unittest.TestCase):
         Ensure get_imageinfo() updates images
         """
         a = wptools.page("Alice's Adventures in Wonderland").get_query(False)
-        a.get_imageinfo()
-        self.assertTrue('size' in a.images['query-pageimage'])
+        self.assertTrue('url' in a.image('pageimage'))
 
 
 class WPToolsRandomTest(unittest.TestCase):

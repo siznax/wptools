@@ -28,6 +28,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         abc.claims = {'Q1': 'test'}
         abc.cache['claims'] = {'response'}
         abc.cache['imageinfo'] = {'response'}
+        abc.images = [{'url': 'URL'}]
         abc.cache['parse'] = {'response'}
         abc.cache['query'] = {'response'}
         abc.cache['rest'] = {'response'}
