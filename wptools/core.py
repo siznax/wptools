@@ -229,15 +229,16 @@ class WPTools(object):
         snip = snip.replace('href="/', "href=\"%s/" % base)
         return snip
 
-    def __update_image_info(self, title, info):
+    def __update_imageinfo(self, title, info):
         """
         update images with get_imageinfo data
         """
         for i, image in enumerate(self.images):
             if image.get('file'):
                 fname = image.get('file').replace('_', ' ')
-                if fname in title and image['kind'] != 'query-thumbnail':
-                    self.images[i].update(info)
+                if fname.lower() in title.lower():
+                    if image['kind'] != 'query-thumbnail':
+                        self.images[i].update(info)
 
     def __set_title_wikidata(self, item):
         """
@@ -280,7 +281,7 @@ class WPTools(object):
             if page.get('imageinfo'):
                 for info in page['imageinfo']:
                     info.update({'file': title})
-                    self.__update_image_info(title, info)
+                    self.__update_imageinfo(title, info)
 
     def _set_parse_data(self):
         """
