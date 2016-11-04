@@ -272,7 +272,7 @@ Get wikidata by *title*:
 
     >>> fry = wptools.page('Stephen Fry').get_wikidata()
     www.wikidata.org (wikidata) Stephen_Fry
-    www.wikidata.org (wikidata) Q8817795|Q5|Q7066|Q145
+    www.wikidata.org (claims) Q8817795|Q5|Q7066|Q145
     Stephen_Fry (en)
     {
       cache: <dict(2)> {claims, wikidata}
@@ -311,7 +311,7 @@ Extend Wikidata claims_ to be resolved:
 
     >>> simone.get_wikidata()
     www.wikidata.org (wikidata) Simone_de_Beauvoir
-    www.wikidata.org (wikidata) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
+    www.wikidata.org (claims) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
 
     >>> simone.wikidata['gender']
     'female'
@@ -352,7 +352,7 @@ Get all the things:
     en.wikipedia.org (query) Jill_Lepore
     en.wikipedia.org (parse) 22469182
     www.wikidata.org (wikidata) Q6192915
-    www.wikidata.org (wikidata) Q30|Q5
+    www.wikidata.org (claims) Q30|Q5
     Jill_Lepore (en)
     {
       cache: <dict(4)> {claims, parse, query, wikidata}
