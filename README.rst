@@ -212,6 +212,7 @@ Get a text (or HTML) extract:
 
     >>> ella = wptools.page('Ella Fitzgerald').get_query()
     en.wikipedia.org (query) Ella_Fitzgerald
+    en.wikipedia.org (imageinfo) File:Ella Fitzgerald (Gottlieb 02871).jpg|F...
 
     >>> print ella.extext
     **Ella Jane Fitzgerald** (April 25, 1917 – June 15, 1996) was an
@@ -236,6 +237,7 @@ Get an Infobox_ as a python object:
 
     >>> fela = wptools.page('Fela Kuti').get_parse()
     en.wikipedia.org (parse) Fela_Kuti
+    en.wikipedia.org (imageinfo) File:Fela Kuti.jpg
 
     >>> fela.infobox['instrument']
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
@@ -257,6 +259,8 @@ Get an (album, book, film, etc.) cover image:
 .. code-block:: python
 
     >>> blue = wptools.page('Blue Train (album)').get_parse()
+    en.wikipedia.org (parse) Blue_Train_(album)
+    en.wikipedia.org (imageinfo) File:John Coltrane - Blue Train.jpg
 
     >>> blue.image('cover')['url']
     u'https://upload.wikimedia.org/wikipedia/en/6/68/John_Coltrane_-_Blue_Train.jpg'
@@ -273,6 +277,7 @@ Get wikidata by *title*:
     >>> fry = wptools.page('Stephen Fry').get_wikidata()
     www.wikidata.org (wikidata) Stephen_Fry
     www.wikidata.org (claims) Q8817795|Q5|Q7066|Q145
+    en.wikipedia.org (imageinfo) File:Stephen Fry cropped.jpg
     Stephen_Fry (en)
     {
       cache: <dict(2)> {claims, wikidata}
@@ -308,10 +313,10 @@ Extend Wikidata claims_ to be resolved:
 
     >>> simone = wptools.page('Simone de Beauvoir')
     >>> simone._WIKIPROPS['P21'] = 'gender'
-
     >>> simone.get_wikidata()
     www.wikidata.org (wikidata) Simone_de_Beauvoir
-    www.wikidata.org (claims) Q142|Q5|Q1214721|Q7066|Q8745624|Q6581072
+    www.wikidata.org (claims) Q142|Q5|Q3411417|Q859773|Q151578|Q1214721|Q470...
+    en.wikipedia.org (imageinfo) File:Simone de Beauvoir.jpg
 
     >>> simone.wikidata['gender']
     'female'
@@ -326,6 +331,7 @@ Get special (experimental) `lead section`_ HTML:
 
     >>> buddha = wptools.page('Buddha').get_rest()
     en.wikipedia.org (/page/mobile-text/) Buddha
+    en.wikipedia.org (imageinfo) File:Buddha in Sarnath Museum (Dhammajak Mutra).jpg
 
     >>> buddha.lead
     <img query-thumbnail src="https://upload.wikimedia.org/wikipedia/commons...
