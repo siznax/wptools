@@ -167,18 +167,11 @@ Request details echo to *stderr* with ``verbose=True``:
     >>> r = wptools.page(verbose=True)
 
 
-You can set a `timeout` (in seconds) on any instance:
+All API entrypoints support setting `proxy` and `timeout` (in seconds):
 
 .. code-block:: python
 
-    >>> r.set_timeout(5)
-
-
-You can set a proxy server like this:
-
-.. code-block:: python
-
-    >>> wptools.set_proxy('http://example.com:80')
+    >>> r.get(proxy='http://example.com:80', timeout=5)
 
 
 

@@ -94,7 +94,7 @@ class WPToolsFetch(object):
         self.verbose = kwargs.get('verbose') or False
         self.wiki = kwargs.get('wiki')
 
-        self.curl_setup(kwargs.get('proxy'))
+        self.curl_setup(kwargs.get('proxy'), kwargs.get('timeout'))
 
     def __del__(self):
         self.cobj.close()
@@ -107,7 +107,6 @@ class WPToolsFetch(object):
         # consistently faster than requests by 3x
         #
         # r = requests.get(url,
-        #                  timeout=self.TIMEOUT,
         #                  headers={'User-Agent': self.user_agent})
         # return r.text
 
@@ -139,7 +138,7 @@ class WPToolsFetch(object):
         bfr.close()
         return body
 
-    def curl_setup(self, proxy=None):
+    def curl_setup(self, proxy=None, timeout=0):
         """
         set curl options
         """
@@ -148,15 +147,13 @@ class WPToolsFetch(object):
         crl.setopt(pycurl.USERAGENT, user_agent())
         crl.setopt(pycurl.FOLLOWLOCATION, True)
         crl.setopt(pycurl.CAINFO, certifi.where())
+
         if proxy:
             crl.setopt(pycurl.PROXY, proxy)
-        self.cobj = crl
+        if timeout:  # 0 = wait forever
+            crl.setopt(pycurl.TIMEOUT, timeout)
 
-    def curl_timeout(self, seconds):
-        """
-        set timeout for entire request in seconds (default=0=forever)
-        """
-        self.cobj.setopt(pycurl.TIMEOUT, seconds)
+        self.cobj = crl
 
     def query(self, action, thing, pageid=False):
         """
@@ -174,7 +171,7 @@ class WPToolsFetch(object):
                 WIKI=tmpl_wiki,
                 entrypoint=action,
                 title=thing)
-        elif action == 'wikidata':
+        elif action == 'wikidata' or action == 'claims':
             ids = ''
             site = ''
             title = ''
@@ -192,7 +189,7 @@ class WPToolsFetch(object):
                 title = thing.get('title')
                 thing = title
 
-            qry = self.QUERY[action].substitute(
+            qry = self.QUERY['wikidata'].substitute(
                 WIKI=tmpl_wiki,
                 ids=ids,
                 lang=self.variant or self.lang,

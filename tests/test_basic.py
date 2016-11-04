@@ -56,16 +56,6 @@ class WPtoolsFetchTestCase(unittest.TestCase):
         f = wptools.fetch.WPToolsFetch(variant='zh-cn')
         self.assertTrue(f.query('query', 'a').endswith('&variant=zh-cn'))
 
-    def test_set_proxy(self):
-        wptools.set_proxy('test_proxy')
-
-        a = wptools.page('a', silent=True)
-        self.assertTrue(a._proxy == 'test_proxy')
-
-        b = wptools.page('b', silent=True)
-        self.assertTrue(b._proxy == 'test_proxy')
-
-
 class WPToolsUtilsTestCase(unittest.TestCase):
 
     def test_snip_html_metadata(self):

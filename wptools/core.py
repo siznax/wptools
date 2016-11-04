@@ -101,14 +101,6 @@ class WPTools(object):
         self.wiki = kwargs.get('wiki')
         self.wikibase = kwargs.get('wikibase')
 
-        self.__fetch = fetch.WPToolsFetch(
-            lang=self.lang,
-            silent=self.silent,
-            variant=self.variant,
-            verbose=self.verbose,
-            wiki=self.wiki,
-            proxy=self._proxy)
-
         self.cache = {}
         self.claims = {}
         self.props = {}
@@ -524,24 +516,38 @@ class WPTools(object):
         else:
             self.wikidata[label] = value
 
-    def get(self, show=True):
+    def fetcher(self, proxy, timeout):
         """
-        make most requests to populate all the things:
+        returns wptools.fetch object for making HTTP requests
+        """
+        return fetch.WPToolsFetch(
+            lang=self.lang,
+            silent=self.silent,
+            variant=self.variant,
+            verbose=self.verbose,
+            wiki=self.wiki,
+            proxy=proxy,
+            timeout=timeout)
+
+    def get(self, show=True, proxy=None, timeout=0):
+        """
+        make requests needed to populate most the things.
+        some sequence of:
         - get_query()
         - get_parse()
         - get_wikidata()
         """
         if self.wikibase and not self.title:
-            self.get_wikidata(show=False)
-            self.get_query(show=False)
-            self.get_parse(show)
+            self.get_wikidata(False, proxy, timeout)
+            self.get_query(False, proxy, timeout)
+            self.get_parse(show, proxy, timeout)
         else:
-            self.get_query(show=False)
-            self.get_parse(show=False)
-            self.get_wikidata(show)
+            self.get_query(False, proxy, timeout)
+            self.get_parse(False, proxy, timeout)
+            self.get_wikidata(show, proxy, timeout)
         return self
 
-    def get_claims(self, show=True):
+    def get_claims(self, show=True, proxy=None, timeout=0):
         """
         Wikidata:API (action=wbgetentities) for labels of claims
         - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
@@ -556,12 +562,13 @@ class WPTools(object):
 
         thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
 
-        query = self.__fetch.query('wikidata', thing)
+        gfetch = self.fetcher(proxy, timeout)
+        query = gfetch.query('claims', thing)
 
         labels = {}
         labels['query'] = query
-        labels['response'] = self.__fetch.curl(query)
-        labels['info'] = self.__fetch.info
+        labels['response'] = gfetch.curl(query)
+        labels['info'] = gfetch.info
 
         self.cache['claims'] = labels
 
@@ -578,7 +585,7 @@ class WPTools(object):
 
         return self
 
-    def get_imageinfo(self, show=True):
+    def get_imageinfo(self, show=False, proxy=None, timeout=0):
         """
         MediaWiki request for API:Imageinfo
         - images: <dict> updates image URLs, sizes, etc.
@@ -598,12 +605,13 @@ class WPTools(object):
         except KeyError:
             files = [quote(x.encode('utf-8')) for x in files]
 
-        query = self.__fetch.query('imageinfo', '|'.join(files))
+        gfetch = self.fetcher(proxy, timeout)
+        query = gfetch.query('imageinfo', '|'.join(files))
 
         iinfo = {}
         iinfo['query'] = query
-        iinfo['response'] = self.__fetch.curl(query)
-        iinfo['info'] = self.__fetch.info
+        iinfo['response'] = gfetch.curl(query)
+        iinfo['info'] = gfetch.info
 
         self.cache['imageinfo'] = iinfo
 
@@ -614,7 +622,7 @@ class WPTools(object):
 
         return self
 
-    def get_parse(self, show=True):
+    def get_parse(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki:API action=parse request for:
         - images: <dict> {parse-image, parse-cover}
@@ -633,15 +641,16 @@ class WPTools(object):
         if not self.title and not self.pageid:
             raise LookupError("get_parse needs title or pageid")
 
+        gfetch = self.fetcher(proxy, timeout)
         if self.pageid:
-            query = self.__fetch.query('parse', self.pageid, pageid=True)
+            query = gfetch.query('parse', self.pageid, pageid=True)
         else:
-            query = self.__fetch.query('parse', self.title)
+            query = gfetch.query('parse', self.title)
 
         parse = {}
         parse['query'] = query
-        parse['response'] = self.__fetch.curl(query)
-        parse['info'] = self.__fetch.info
+        parse['response'] = gfetch.curl(query)
+        parse['info'] = gfetch.info
 
         self.cache['parse'] = parse
 
@@ -655,7 +664,7 @@ class WPTools(object):
 
         return self
 
-    def get_query(self, show=True):
+    def get_query(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki:API action=query request for:
         - description: <unicode> Wikidata description (via pageterms)
@@ -676,15 +685,16 @@ class WPTools(object):
         if not self.title and not self.pageid:
             raise LookupError("get_query needs title or pageid")
 
+        gfetch = self.fetcher(proxy, timeout)
         if self.pageid:
-            qry = self.__fetch.query('query', self.pageid, pageid=True)
+            qry = gfetch.query('query', self.pageid, pageid=True)
         else:
-            qry = self.__fetch.query('query', self.title)
+            qry = gfetch.query('query', self.title)
 
         query = {}
         query['query'] = qry
-        query['response'] = self.__fetch.curl(qry)
-        query['info'] = self.__fetch.info
+        query['response'] = gfetch.curl(qry)
+        query['info'] = gfetch.info
 
         self.cache['query'] = query
 
@@ -698,15 +708,16 @@ class WPTools(object):
 
         return self
 
-    def get_random(self, show=True):
+    def get_random(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki:API (action=query) request for:
         - pageid: <int> Wikipedia database ID
         - title: <unicode> article title
         https://www.mediawiki.org/wiki/API:Random
         """
-        query = self.__fetch.query('random', None)
-        response = self.__fetch.curl(query)
+        gfetch = self.fetcher(proxy, timeout)
+        query = gfetch.query('random', None)
+        response = gfetch.curl(query)
 
         try:
             data = utils.json_loads(response)
@@ -726,7 +737,7 @@ class WPTools(object):
 
         return self
 
-    def get_rest(self, show=True):
+    def get_rest(self, show=True, proxy=None, timeout=0):
         """
         RESTBase (/page/mobile-text/)
         - description: <unicode> apparently, Wikidata description
@@ -749,12 +760,13 @@ class WPTools(object):
         except KeyError:
             title = quote(self.title.encode('utf-8'))
 
-        query = self.__fetch.query('/page/mobile-text/', title)
+        gfetch = self.fetcher(proxy, timeout)
+        query = gfetch.query('/page/mobile-text/', title)
 
         rest = {}
         rest['query'] = query
-        rest['response'] = self.__fetch.curl(query)
-        rest['info'] = self.__fetch.info
+        rest['response'] = gfetch.curl(query)
+        rest['info'] = gfetch.info
 
         self.cache['rest'] = rest
 
@@ -768,7 +780,7 @@ class WPTools(object):
 
         return self
 
-    def get_wikidata(self, show=True, get_claims=True):
+    def get_wikidata(self, show=True, proxy=None, timeout=0):
         """
         Wikidata:API (action=wbgetentities) for:
         - claims: <dict> Wikidata claims (to be resolved)
@@ -798,18 +810,19 @@ class WPTools(object):
                          self.silent)
             return
 
-        query = self.__fetch.query('wikidata', thing)
+        gfetch = self.fetcher(proxy, timeout)
+        query = gfetch.query('wikidata', thing)
 
         wdata = {}
         wdata['query'] = query
-        wdata['response'] = self.__fetch.curl(query)
-        wdata['info'] = self.__fetch.info
+        wdata['response'] = gfetch.curl(query)
+        wdata['info'] = gfetch.info
 
         self.cache['wikidata'] = wdata
 
         self._set_wikidata()
 
-        if self.claims and get_claims:
+        if self.claims:
             self.get_claims(False)
 
         if self.missing_imageinfo():
@@ -833,12 +846,6 @@ class WPTools(object):
         returns images missing info
         """
         return [x for x in self.images if not x.get('url')]
-
-    def set_timeout(self, seconds):
-        """
-        set timeout for entire request in seconds (default=0=forever)
-        """
-        self.__fetch.curl_timeout(seconds)
 
     def show(self):
         """
@@ -893,10 +900,3 @@ class WPTools(object):
         for item in sorted(data):
             utils.stderr("  %s: %s" % (item, data[item]), self.silent)
         utils.stderr("}", self.silent)
-
-
-def set_proxy(proxy):
-    """
-    set proxy for all requests
-    """
-    WPTools._proxy = proxy

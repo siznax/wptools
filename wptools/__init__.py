@@ -24,5 +24,4 @@ from . import fetch
 from . import utils
 from . import test
 
-from .core import set_proxy
 from .core import WPTools as page
