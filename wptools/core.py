@@ -429,10 +429,16 @@ class WPTools(object):
         returns dict containing selected properties from Wikidata query claims
         """
         props = collections.defaultdict(list)
-
         for claim in query_claims:
+            if not self._WIKIPROPS.get(claim):
+                continue
             for prop in query_claims.get(claim):
-                snak = prop.get('mainsnak').get('datavalue').get('value')
+                try:
+                    snak = prop.get('mainsnak').get('datavalue').get('value')
+                except AttributeError:
+                    props[claim] = []
+                    continue
+
                 try:
                     if snak.get('id'):
                         val = snak.get('id')
@@ -446,9 +452,7 @@ class WPTools(object):
                     val = snak
                 if not val or not [x for x in val if x]:
                     raise ValueError("%s %s" % (claim, prop))
-                if self._WIKIPROPS.get(claim):
-                    props[claim].append(val)
-
+                props[claim].append(val)
         return dict(props)
 
     def _marshal_claims(self, query_claims):
