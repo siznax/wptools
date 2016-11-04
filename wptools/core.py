@@ -66,7 +66,6 @@ class WPTools(object):
                   'P1773': 'attribution',
                   'P1779': 'creator'}
 
-    _proxy = None
     description = None
     extext = None
     extract = None
@@ -75,11 +74,9 @@ class WPTools(object):
     label = None
     lead = None
     links = None
-    modified = None
     pageid = None
     parsetree = None
     random = None
-    thumbnail = None
     title = None
     url = None
     url_raw = None
@@ -103,8 +100,9 @@ class WPTools(object):
 
         self.cache = {}
         self.claims = {}
-        self.props = {}
         self.images = []
+        self.modified = {}
+        self.props = {}
         self.wikidata = {}
 
         if not self.pageid and not self.title and not self.wikibase:
@@ -186,7 +184,7 @@ class WPTools(object):
         """
         meta = []
         if hasattr(self, 'modified'):
-            meta.append("Modified: %s" % self.modified)
+            meta.append("Modified: %s" % self.modified['page'])
         return "<span metadata>%s</span>" % "\n".join([x for x in meta if x])
 
     def __get_lead_rest(self, data):
@@ -340,6 +338,7 @@ class WPTools(object):
             return
 
         page = qdata.get('pages')[0]
+
         if page.get('missing'):
             msg = self.cache['query']['query'].replace('&format=json', '')
             raise LookupError(msg)
@@ -382,6 +381,9 @@ class WPTools(object):
             qthumb['file'] = qthumb['url'].split('/')[-2]
             self.images.append(qthumb)
 
+        if page.get('touched'):
+            self.modified['page'] = page['touched']
+
     def _set_rest_data(self):
         """
         set attributes derived from RESTBase
@@ -419,7 +421,7 @@ class WPTools(object):
         if title:
             self.title = title.replace(' ', '_')
 
-        self.modified = data.get('lastmodified')
+        self.modified['page'] = data.get('lastmodified')
         self.pageid = data.get('id')
 
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
@@ -467,7 +469,7 @@ class WPTools(object):
 
         self.__set_title_wikidata(item)
 
-        self.modified = item.get('modified')
+        self.modified['wikidata'] = item.get('modified')
 
     def _update_wikidata(self, label, value):
         """

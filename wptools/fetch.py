@@ -31,7 +31,7 @@ class WPToolsFetch(object):
             "${WIKI}/w/api.php?action=query"
             "&format=json"
             "&formatversion=2"
-            "&iiprop=size|url"
+            "&iiprop=size|url|timestamp"
             "&prop=imageinfo"
             "&titles=${thing}")),
         "parse": Template((
