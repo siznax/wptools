@@ -286,7 +286,7 @@ Get wikidata by *title*:
       images: <dict(1)> {wikidata-image}
       label: Stephen Fry
       lang: en
-      modified: 2016-10-31T22:02:03Z
+      modified: <dict(1)> {wikidata}
       props: <dict(8)> {P135, P18, P27, P31, P345, P569, P856, P910}
       title: Stephen_Fry
       wikibase: Q192912
@@ -369,7 +369,7 @@ Get all the things:
       infobox: <dict(38)> {academic_advisors, alma_mater, alt, author_ab...
       label: Jill Lepore
       lang: en
-      modified: 2016-08-11T19:53:32Z
+      modified: <dict(2)> {page, wikidata}
       pageid: 22469182
       parsetree: <str(50677)> <root><template><title>Infobox scientist</...
       props: <dict(3)> {P27, P31, P569}
@@ -474,6 +474,7 @@ MediaWiki:API `action=query`_ request for:
 - extract: <str> HTML extract via `Extension:TextExtract`_
 - images: <dict> {query-pageimage, query-thumbnail}
 - label: <str> Wikidata label (via pageterms)
+- modified (page): <str> ISO8601 date and time
 - pageid: <int> MediaWiki database ID
 - random: <str> a random article title with every request!
 - url: <str> the canonical wiki URL
@@ -499,7 +500,7 @@ RESTBase_ ``/page/mobile-text/`` request for:
 - description: <str> apparently, Wikidata description
 - images: <dict> {rest-image, rest-thumb}
 - lead: <str> encyclopedia-like `lead section`_
-- modified: <str> ISO8601 date and time
+- modified (page): <str> ISO8601 date and time
 - url: <str> the canonical wiki URL
 - url_raw: <str> ostensible raw wikitext URL
 
@@ -515,7 +516,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 - description: <str> Wikidata description
 - images: <dict> {wikidata-image} Wikidata Property:P18
 - label: <str> Wikidata label
-- modified: <str> ISO8601 date and time
+- modified (wikidata): <str> ISO8601 date and time
 - props: <dict> Wikidata properties
 - wikibase: <str> Wikidata item ID
 - wikidata: <dict> resolved Wikidata properties

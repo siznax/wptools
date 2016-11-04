@@ -674,6 +674,7 @@ class WPTools(object):
         - extract: <str> HTML extract via Extension:TextExtract
         - images: <dict> {query-pageimage, query-thumbnail}
         - label: <str> Wikidata label (via pageterms)
+        - modified (page): <str> ISO8601 date and time
         - pageid: <int> Wikipedia database ID
         - random: <str> a random article title with every request!
         - url: <str> the canonical wiki URL
@@ -745,7 +746,7 @@ class WPTools(object):
         - description: <str> apparently, Wikidata description
         - images: <dict> {rest-image, rest-thumb}
         - lead: <str> encyclopedia-like lead section
-        - modified: <str> ISO8601 date and time
+        - modified (page): <str> ISO8601 date and time
         - url: <str> the canonical wiki URL
         - url_raw: <str> ostensible raw wikitext URL
         https://en.wikipedia.org/api/rest_v1/
@@ -789,7 +790,7 @@ class WPTools(object):
         - description: <str> Wikidata description
         - images: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
-        - modified: <str> ISO8601 date and time
+        - modified (wikidata): <str> ISO8601 date and time
         - props: <dict> Wikidata properties
         - wikibase: <str> Wikidata item ID
         - wikidata: <dict> resolved Wikidata properties
