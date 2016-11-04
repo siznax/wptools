@@ -82,10 +82,10 @@ class WPTools(object):
     thumbnail = None
     title = None
     url = None
-    urlraw = None
+    url_raw = None
     wikibase = None
-    wikitext = None
     wikidata_url = None
+    wikitext = None
 
     def __init__(self, *args, **kwargs):
 
@@ -255,6 +255,20 @@ class WPTools(object):
                 attr = "%s_%s" % (attr, suffix)
                 setattr(self, attr, value)
 
+    def _marshal_claims(self, query_claims):
+        """
+        set Wikidata properties and entities from query claims
+        """
+        self.props = self._wikidata_props(query_claims)
+
+        for propid in self.props:
+            label = self._WIKIPROPS[propid]
+            for val in self.props[propid]:
+                if utils.is_text(val) and re.match(r'^Q\d+', val):
+                    self.claims[val] = label
+                else:
+                    self._update_wikidata(label, val)
+
     def _set_imageinfo_data(self):
         """
         set image attributes from MediaWiki API:Imageinfo response
@@ -342,7 +356,7 @@ class WPTools(object):
 
         if page.get('fullurl'):
             self.url = page['fullurl']
-            self.urlraw = self.url + '?action=raw'
+            self.url_raw = self.url + '?action=raw'
 
         if page.get('pageimage'):
             self.images.append({'kind': 'query-pageimage',
@@ -409,59 +423,12 @@ class WPTools(object):
         self.pageid = data.get('id')
 
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
-        self.urlraw = self.url + '?action=raw'
+        self.url_raw = self.url + '?action=raw'
 
         if data.get('sections'):
             lead = self.__get_lead(data)
             if lead:
                 self.lead = lead
-
-    def _wikidata_props(self, query_claims):
-        """
-        returns dict containing selected properties from Wikidata query claims
-        """
-        props = collections.defaultdict(list)
-        for claim in query_claims:
-            for prop in query_claims.get(claim):
-                try:
-                    snak = prop.get('mainsnak').get('datavalue').get('value')
-                except AttributeError:
-                    if self._WIKIPROPS.get(claim):
-                        props[claim] = None
-                        continue
-                try:
-                    if snak.get('id'):
-                        val = snak.get('id')
-                    elif snak.get('text'):
-                        val = snak.get('text')
-                    elif snak.get('time'):
-                        val = snak.get('time')
-                    else:
-                        val = snak
-                except AttributeError:
-                    val = snak
-
-                if not val or not [x for x in val if x]:
-                    raise ValueError("%s %s" % (claim, prop))
-
-                if self._WIKIPROPS.get(claim):
-                    props[claim].append(val)
-
-        return dict(props)
-
-    def _marshal_claims(self, query_claims):
-        """
-        set Wikidata properties and entities from query claims
-        """
-        self.props = self._wikidata_props(query_claims)
-
-        for propid in self.props:
-            label = self._WIKIPROPS[propid]
-            for val in self.props[propid]:
-                if utils.is_text(val) and re.match(r'^Q\d+', val):
-                    self.claims[val] = label
-                else:
-                    self._update_wikidata(label, val)
 
     def _set_wikidata(self):
         """
@@ -515,6 +482,39 @@ class WPTools(object):
                 self.wikidata[label].append(value)
         else:
             self.wikidata[label] = value
+
+    def _wikidata_props(self, query_claims):
+        """
+        returns dict containing selected properties from Wikidata query claims
+        """
+        props = collections.defaultdict(list)
+        for claim in query_claims:
+            for prop in query_claims.get(claim):
+                try:
+                    snak = prop.get('mainsnak').get('datavalue').get('value')
+                except AttributeError:
+                    if self._WIKIPROPS.get(claim):
+                        props[claim] = None
+                        continue
+                try:
+                    if snak.get('id'):
+                        val = snak.get('id')
+                    elif snak.get('text'):
+                        val = snak.get('text')
+                    elif snak.get('time'):
+                        val = snak.get('time')
+                    else:
+                        val = snak
+                except AttributeError:
+                    val = snak
+
+                if not val or not [x for x in val if x]:
+                    raise ValueError("%s %s" % (claim, prop))
+
+                if self._WIKIPROPS.get(claim):
+                    props[claim].append(val)
+
+        return dict(props)
 
     def fetcher(self, proxy, timeout):
         """
@@ -629,9 +629,9 @@ class WPTools(object):
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
         - pageid: <int> Wikipedia database ID
-        - parsetree: <unicode> XML parse tree
-        - wikibase: <unicode> Wikidata entity ID or wikidata URL
-        - wikitext: <unicode> raw wikitext URL
+        - parsetree: <str> XML parse tree
+        - wikibase: <str> Wikidata entity ID or wikidata URL
+        - wikitext: <str> raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
         if 'parse' in self.cache:
@@ -667,15 +667,15 @@ class WPTools(object):
     def get_query(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki:API action=query request for:
-        - description: <unicode> Wikidata description (via pageterms)
-        - extext: <unicode> plain text (Markdown) extract
-        - extract: <unicode> HTML extract via Extension:TextExtract
+        - description: <str> Wikidata description (via pageterms)
+        - extext: <str> plain text (Markdown) extract
+        - extract: <str> HTML extract via Extension:TextExtract
         - images: <dict> {query-pageimage, query-thumbnail}
-        - label: <unicode> Wikidata label (via pageterms)
+        - label: <str> Wikidata label (via pageterms)
         - pageid: <int> Wikipedia database ID
-        - random: <unicode> a random article title with every request!
-        - url: <unicode> the canonical wiki URL
-        - urlraw: <unicode> ostensible raw wikitext URL
+        - random: <str> a random article title with every request!
+        - url: <str> the canonical wiki URL
+        - url_raw: <str> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
         if 'query' in self.cache:
@@ -712,7 +712,7 @@ class WPTools(object):
         """
         MediaWiki:API (action=query) request for:
         - pageid: <int> Wikipedia database ID
-        - title: <unicode> article title
+        - title: <str> article title
         https://www.mediawiki.org/wiki/API:Random
         """
         gfetch = self.fetcher(proxy, timeout)
@@ -740,12 +740,12 @@ class WPTools(object):
     def get_rest(self, show=True, proxy=None, timeout=0):
         """
         RESTBase (/page/mobile-text/)
-        - description: <unicode> apparently, Wikidata description
+        - description: <str> apparently, Wikidata description
         - images: <dict> {rest-image, rest-thumb}
         - lead: <str> encyclopedia-like lead section
         - modified: <str> ISO8601 date and time
-        - url: <unicode> the canonical wiki URL
-        - urlraw: <unicode> ostensible raw wikitext URL
+        - url: <str> the canonical wiki URL
+        - url_raw: <str> ostensible raw wikitext URL
         https://en.wikipedia.org/api/rest_v1/
         """
         if 'rest' in self.cache:
@@ -784,13 +784,14 @@ class WPTools(object):
         """
         Wikidata:API (action=wbgetentities) for:
         - claims: <dict> Wikidata claims (to be resolved)
-        - description: <unicode> Wikidata description
+        - description: <str> Wikidata description
         - images: <dict> {wikidata-image} Wikidata Property:P18
-        - label: <unicode> Wikidata label
+        - label: <str> Wikidata label
         - modified: <str> ISO8601 date and time
         - props: <dict> Wikidata properties
-        - wikibase: <str> Wikidata URL
-        - wikidata: <dict> resolved Wikidata properties and claims
+        - wikibase: <str> Wikidata item ID
+        - wikidata: <dict> resolved Wikidata properties
+        - wikidata_url: <str> Wikidata URL
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         if 'wikidata' in self.cache:

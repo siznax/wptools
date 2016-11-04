@@ -63,7 +63,7 @@ An instance can be initialized by:
 - ``None``: <NoneType>
 - ``lang``: <str> MediaWiki `language code`_ (default='en')
 - ``pageid``: <int> a MediaWiki Page ID
-- ``title``: <unicode> a MediaWiki article title
+- ``title``: <str> a MediaWiki article title
 - ``wiki``: <str> any MediaWiki site
 - ``wikibase``: <str> Wikidata item `entity ID`_
 
@@ -167,7 +167,7 @@ Request details echo to *stderr* with ``verbose=True``:
     >>> r = wptools.page(verbose=True)
 
 
-All API entrypoints support setting `proxy` and `timeout` (in seconds):
+All API entrypoints support setting ``proxy`` and ``timeout`` (in seconds):
 
 .. code-block:: python
 
@@ -370,7 +370,7 @@ Get all the things:
       random: Ramesh Bidhuri
       title: Jill_Lepore
       url: https://en.wikipedia.org/wiki/Jill_Lepore
-      urlraw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
+      url_raw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
       wikibase: Q6192915
       wikidata: <dict(3)> {birth, citizenship, instance}
       wikidata_url: https://www.wikidata.org/wiki/Q6192915
@@ -449,9 +449,9 @@ MediaWiki:API `action=parse`_ request for:
 - infobox: <dict> Infobox_ data as python dictionary
 - links: <list> interwiki links (iwlinks_)
 - pageid: <int> MediaWiki database ID
-- parsetree: <unicode> `XML parse tree`_
-- wikibase: <unicode> Wikidata `entity ID`_ or wikidata URL
-- wikitext: <unicode> raw wikitext URL
+- parsetree: <str> `XML parse tree`_
+- wikibase: <str> Wikidata `entity ID`_ or wikidata URL
+- wikitext: <str> raw wikitext URL
 
 .. _Infobox: https://en.wikipedia.org/wiki/Template:Infobox
 .. _`XML parse tree`: https://www.mediawiki.org/wiki/User:Kephir/XML_parse_tree
@@ -463,15 +463,15 @@ MediaWiki:API `action=parse`_ request for:
 
 MediaWiki:API `action=query`_ request for:
 
-- description: <unicode> Wikidata description (via pageterms)
-- extext: <unicode> plain text (Markdown_) extract
-- extract: <unicode> HTML extract via `Extension:TextExtract`_
+- description: <str> Wikidata description (via pageterms)
+- extext: <str> plain text (Markdown_) extract
+- extract: <str> HTML extract via `Extension:TextExtract`_
 - images: <dict> {query-pageimage, query-thumbnail}
-- label: <unicode> Wikidata label (via pageterms)
+- label: <str> Wikidata label (via pageterms)
 - pageid: <int> MediaWiki database ID
-- random: <unicode> a random article title with every request!
-- url: <unicode> the canonical wiki URL
-- urlraw: <unicode> ostensible raw wikitext URL
+- random: <str> a random article title with every request!
+- url: <str> the canonical wiki URL
+- url_raw: <str> ostensible raw wikitext URL
 
 .. _Markdown: https://en.wikipedia.org/wiki/Markdown
 .. _`Extension:TextExtract`: https://www.mediawiki.org/wiki/Extension:TextExtracts
@@ -483,19 +483,19 @@ MediaWiki:API `action=query`_ request for:
 MediaWiki:API `action=query`_ request for:
 
 - pageid: <int> MediaWiki database ID
-- title: <unicode> article title
+- title: <str> article title
 
 
 **get_rest** (self)
 
 RESTBase_ ``/page/mobile-text/`` request for:
 
-- description: <unicode> apparently, Wikidata description
+- description: <str> apparently, Wikidata description
 - images: <dict> {rest-image, rest-thumb}
 - lead: <str> encyclopedia-like `lead section`_
 - modified: <str> ISO8601 date and time
-- url: <unicode> the canonical wiki URL
-- urlraw: <unicode> ostensible raw wikitext URL
+- url: <str> the canonical wiki URL
+- url_raw: <str> ostensible raw wikitext URL
 
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
@@ -506,13 +506,14 @@ RESTBase_ ``/page/mobile-text/`` request for:
 Wikidata:API `action=wbgetentities`_ request for:
 
 - claims: <dict> Wikidata claims (to be resolved)
-- description: <unicode> Wikidata description
+- description: <str> Wikidata description
 - images: <dict> {wikidata-image} Wikidata Property:P18
-- label: <unicode> Wikidata label
+- label: <str> Wikidata label
 - modified: <str> ISO8601 date and time
 - props: <dict> Wikidata properties
-- wikibase: <str> Wikidata URL
-- wikidata: <dict> resolved Wikidata properties and claims
+- wikibase: <str> Wikidata item ID
+- wikidata: <dict> resolved Wikidata properties
+- wikidata_url: <str> Wikidata URL
 
 .. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
