@@ -1,10 +1,10 @@
 Contributing to wptools
 =======================
 
-See how it works
-----------------
+Check out our wiki
+------------------
 
-https://github.com/siznax/wptools/blob/master/NOTES.md
+https://github.com/siznax/wptools/wiki
 
 
 Report a bug
@@ -23,7 +23,7 @@ Submit code
 1. Fork the repo into it
 1. Install requirements
 1. Advanced tests should pass
-1. At least ``flake8`` your contribution
+1. ``flake8`` and ``pylint`` your contribution
 1. Make sure advanced tests still pass
 1. Submit a pull request
 
