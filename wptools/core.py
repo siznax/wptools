@@ -66,6 +66,8 @@ class WPTools(object):
                   'P1773': 'attribution',
                   'P1779': 'creator'}
 
+    _defer_imageinfo = False
+
     description = None
     extext = None
     extract = None
@@ -355,7 +357,7 @@ class WPTools(object):
                 self.get_claims(False)
 
         if action in ['parse', 'query', 'rest', 'wikidata']:
-            if self._missing_imageinfo():
+            if self._missing_imageinfo() and not self._defer_imageinfo:
                 self.get_imageinfo(False)
 
         if show:
@@ -633,12 +635,16 @@ class WPTools(object):
         - get_wikidata()
         """
         if self.wikibase and not self.title:
+            self._defer_imageinfo = True
             self.get_wikidata(False, proxy, timeout)
             self.get_query(False, proxy, timeout)
+            self._defer_imageinfo = False
             self.get_parse(show, proxy, timeout)
         else:
+            self._defer_imageinfo = True
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
+            self._defer_imageinfo = False
             self.get_wikidata(show, proxy, timeout)
         return self
 
