@@ -37,8 +37,11 @@ class WPToolsBadTest(unittest.TestCase):
         Mediawiki site function not supported
         """
         # "jp" Wikinews (unknown language code)
-        b = wptools.page(wiki='jp.wikinews.org')
-        self.assertTrue(b.fatal)
+        try:
+            wptools.page(wiki='jp.wikinews.org')
+            self.fail("failed to raise LookupError")
+        except LookupError as detail:
+            print(detail)
 
 
 class WPToolsPickTest(unittest.TestCase):

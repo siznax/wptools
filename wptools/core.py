@@ -268,6 +268,29 @@ class WPTools(object):
             proxy=proxy,
             timeout=timeout)
 
+    def _load_response(self, action):
+        """
+        returns API reponse from cache or raises ValueError
+        """
+        try:
+            query = self.cache[action]['query'].replace('&format=json', '')
+            data = utils.json_loads(self.cache[action]['response'])
+
+            if action == 'parse' and not data.get('parse'):
+                raise LookupError
+
+            if action == 'query':
+                if [x for x in data['query']['pages'] if x.get('missing')]:
+                    raise LookupError
+
+            if action == 'wikidata' and '-1' in data.get('entities'):
+                raise LookupError
+
+            return data
+
+        except LookupError:
+            raise LookupError(query)
+
     def _missing_imageinfo(self):
         """
         returns images missing info
@@ -342,7 +365,7 @@ class WPTools(object):
         self.cache[action] = req
 
         if action == 'claims':
-            self._set_claims_data(req['response'])
+            self._set_claims_data()
         elif action == 'imageinfo':
             self._set_imageinfo_data()
         elif action == 'parse':
@@ -363,13 +386,12 @@ class WPTools(object):
         if show:
             self.show()
 
-    def _set_claims_data(self, response):
+    def _set_claims_data(self):
         """
         set property claim labels from get_claims()
         """
-        data = utils.json_loads(response)
+        data = self._load_response('claims')
         entities = data.get('entities')
-
         for item in entities:
             attr = self.claims[item]
             value = self.__get_entity_prop(entities[item], 'labels')
@@ -379,15 +401,8 @@ class WPTools(object):
         """
         set image attributes from MediaWiki API:Imageinfo response
         """
-        try:
-            data = utils.json_loads(self.cache['imageinfo']['response'])
-            pages = data['query'].get('pages')
-        except ValueError:
-            self.fatal = True
-            utils.stderr("Could not load imageinfo response: %s"
-                         % self.cache['imageinfo']['response'])
-            return
-
+        data = self._load_response('imageinfo')
+        pages = data['query'].get('pages')
         for page in pages:
             title = page.get('title')
             if page.get('imageinfo'):
@@ -399,23 +414,19 @@ class WPTools(object):
         """
         set attributes derived from MediaWiki (action=parse)
         """
-        try:
-            data = utils.json_loads(self.cache['parse']['response'])
-            pdata = data.get('parse')
-        except ValueError:
-            self.fatal = True
-            utils.stderr("Could not load query response: %s"
-                         % self.cache['parse']['query'])
-            return
+        pdata = self._load_response('parse')['parse']
 
-        if not pdata:
-            msg = self.cache['parse']['query'].replace('&format=json', '')
-            raise LookupError(msg)
-
-        self.links = utils.get_links(pdata.get('iwlinks'))
         self.pageid = pdata.get('pageid')
         self.parsetree = pdata.get('parsetree')
+        self.wikibase = pdata.get('properties').get('wikibase_item')
+        self.wikitext = pdata.get('wikitext')
+
         self.infobox = utils.get_infobox(self.parsetree)
+        self.links = utils.get_links(pdata.get('iwlinks'))
+        self.wikidata_url = utils.wikidata_url(self.wikibase)
+
+        if not self.title:
+            self.title = pdata.get('title').replace(' ', '_')
 
         if self.infobox:
             if self.infobox.get('image'):
@@ -425,34 +436,16 @@ class WPTools(object):
                 self.images.append({'kind': 'parse-cover',
                                     'file': self.infobox['Cover']})
 
-        if not self.title:
-            self.title = pdata.get('title').replace(' ', '_')
-
-        self.wikibase = pdata.get('properties').get('wikibase_item')
-        self.wikidata_url = utils.wikidata_url(self.wikibase)
-        self.wikitext = pdata.get('wikitext')
-
     def _set_query_data(self):
         """
         set attributes derived from MediaWiki (action=query)
         """
-        try:
-            data = utils.json_loads(self.cache['query']['response'])
-            qdata = data.get('query')
-        except (KeyError, ValueError):
-            self.fatal = True
-            utils.stderr("Could not load query response: %s"
-                         % self.cache['query']['query'])
-            return
+        data = self._load_response('query')
+        page = data['query']['pages'][0]
 
-        page = qdata.get('pages')[0]
-
-        if page.get('missing'):
-            msg = self.cache['query']['query'].replace('&format=json', '')
-            raise LookupError(msg)
-
+        self.modified['page'] = page.get('touched')
         self.pageid = page.get('pageid')
-        self.random = qdata.get('random')[0]["title"]
+        self.random = data['query']['random'][0]["title"]
         self.title = page.get('title').replace(' ', '_')
 
         if page.get('extract'):
@@ -489,21 +482,15 @@ class WPTools(object):
             qthumb['file'] = qthumb['url'].split('/')[-2]
             self.images.append(qthumb)
 
-        if page.get('touched'):
-            self.modified['page'] = page['touched']
-
     def _set_rest_data(self):
         """
         set attributes derived from RESTBase
         """
-        try:
-            data = utils.json_loads(self.cache['rest']['response'])
-            url = urlparse(self.cache['rest']['query'])
-        except ValueError:
-            self.fatal = True
-            utils.stderr("Could not load query response: %s"
-                         % self.cache['rest']['query'])
-            return
+        data = self._load_response('rest')
+
+        self.description = data.get('description')
+        self.modified['page'] = data.get('lastmodified')
+        self.pageid = data.get('id')
 
         if data.get('detail'):
             error = data.get('detail').get('error')
@@ -511,17 +498,10 @@ class WPTools(object):
                 utils.stderr("RESTBase error: %s" % error)
                 return
 
-        self.description = data.get('description')
-
         if data.get('image'):
             rimg = {'kind': 'rest-image'}
             rimg.update(data.get('image'))
             self.images.append(rimg)
-
-        if data.get('thumb'):
-            rthumb = {'kind': 'rest-thumb'}
-            rthumb.update(data.get('thumb'))
-            self.images.append(rthumb)
 
         title = (data.get('redirected')
                  or data.get('normalizedtitle')
@@ -529,55 +509,39 @@ class WPTools(object):
         if title:
             self.title = title.replace(' ', '_')
 
-        self.modified['page'] = data.get('lastmodified')
-        self.pageid = data.get('id')
+        if data.get('sections'):
+            self.lead = self.__get_lead(data)
 
+        if data.get('thumb'):
+            rthumb = {'kind': 'rest-thumb'}
+            rthumb.update(data.get('thumb'))
+            self.images.append(rthumb)
+
+        url = urlparse(self.cache['rest']['query'])
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
         self.url_raw = self.url + '?action=raw'
-
-        if data.get('sections'):
-            lead = self.__get_lead(data)
-            if lead:
-                self.lead = lead
 
     def _set_wikidata(self):
         """
         set attributes derived from Wikidata (action=wbentities)
         """
-        try:
-            data = utils.json_loads(self.cache['wikidata']['response'])
-            entities = data.get('entities')
-            item = entities.get(next(iter(entities)))
-        except ValueError:
-            self.fatal = True
-            utils.stderr("Could not load query response: %s"
-                         % self.cache['wikidata']['query'])
-            return
+        data = self._load_response('wikidata')
+        entities = data.get('entities')
+        item = entities.get(next(iter(entities)))
 
-        if not item.get('id') and item.get('title'):
-            msg = self.cache['wikidata']['query'].replace('&format=json', '')
-            raise LookupError(msg)
-
+        self.modified['wikidata'] = item.get('modified')
         self.wikibase = item.get('id')
         self.wikidata_url = utils.wikidata_url(self.wikibase)
-
-        self._marshal_claims(item.get('claims'))
-
-        descriptions = self.__get_entity_prop(item, 'descriptions')
-        if descriptions:
-            self.description = descriptions
 
         if self.wikidata.get('image'):
             self.images.append({'kind': 'wikidata-image',
                                 'file': self.wikidata['image']})
 
-        labels = self.__get_entity_prop(item, 'labels')
-        if labels:
-            self.label = labels
+        self.description = self.__get_entity_prop(item, 'descriptions')
+        self.label = self.__get_entity_prop(item, 'labels')
 
+        self._marshal_claims(item.get('claims'))
         self.__set_title_wikidata(item)
-
-        self.modified['wikidata'] = item.get('modified')
 
     def _update_wikidata(self, label, value):
         """
@@ -726,18 +690,16 @@ class WPTools(object):
         - title: <str> article title
         https://www.mediawiki.org/wiki/API:Random
         """
-        gfetch = self._fetch(proxy, timeout)
-        query = gfetch.query('random', None)
-        response = gfetch.curl(query)
+        _fetch = self._fetch(proxy, timeout)
+        query = _fetch.query('random', None)
+        response = _fetch.curl(query)
 
         try:
             data = utils.json_loads(response)
-            rand = data.get('query').get('random')[0]
         except ValueError:
-            self.fatal = True
-            utils.stderr("Could not load query response: %s" % query)
-            return
+            raise LookupError(query.replace('&format=json', ''))
 
+        rand = data.get('query').get('random')[0]
         self.pageid = rand.get('id')
 
         if not self.title:
