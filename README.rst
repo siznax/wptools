@@ -19,7 +19,7 @@ Python and command-line MediaWiki access for Humans.
 This package is intended to make it as easy as possible to get data
 from MediaWiki instances, expose more Wikidata, and extend the
 MediaWiki API just for kicks. We say "(for Humans)" because that is a
-goal_. Please see our wiki_ for details. Questions, feedback, and
+goal_. See our wiki_ to learn more. Questions, feedback, and
 especially contributions_ are welcome!
 
 .. _NOTES: https://github.com/siznax/wptools/blob/master/NOTES.md
