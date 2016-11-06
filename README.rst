@@ -22,7 +22,6 @@ MediaWiki API just for kicks. We say "(for Humans)" because that is a
 goal_. See our wiki_ to learn more. Questions, feedback, and
 especially contributions_ are welcome!
 
-.. _NOTES: https://github.com/siznax/wptools/blob/master/NOTES.md
 .. _contributions: https://github.com/siznax/wptools/blob/master/CONTRIBUTING.md
 .. _goal: http://docs.python-requests.org/en/master/user/intro/
 .. _wiki: https://github.com/siznax/wptools/wiki
@@ -35,8 +34,6 @@ especially contributions_ are welcome!
 - wptool_
 
 
-.. _Install:
-
 Install
 -------
 
@@ -46,7 +43,6 @@ Install
     ✨🦄✨
 
 
-.. _Usage:
 
 Usage
 -----
@@ -174,8 +170,6 @@ All API entrypoints support setting ``proxy`` and ``timeout`` (in seconds):
     >>> r.get(proxy='http://example.com:80', timeout=5)
 
 
-
-.. _Examples:
 
 Examples
 --------
@@ -410,8 +404,6 @@ The ``wptools`` user-agent_ will look like this:
 
 
 
-.. _Methods:
-
 Methods
 -------
 
@@ -540,8 +532,6 @@ Returns first image info with kind containing token (e.g. 'thumb')
 Pretty-print instance attributes.
 
 
-
-.. _wptool:
 
 wptool
 ------
