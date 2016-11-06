@@ -82,6 +82,7 @@ class WPTools(object):
     title = None
     url = None
     url_raw = None
+    what = None
     wikibase = None
     wikidata_url = None
     wikitext = None
@@ -396,6 +397,8 @@ class WPTools(object):
             attr = self.claims[item]
             value = self.__get_entity_prop(entities[item], 'labels')
             self._update_wikidata(attr, value)
+
+        self.what = self.wikidata.get('instance')
 
     def _set_imageinfo_data(self):
         """
@@ -737,6 +740,7 @@ class WPTools(object):
         - label: <str> Wikidata label
         - modified (wikidata): <str> ISO8601 date and time
         - props: <dict> Wikidata properties
+        - what: <str> Wikidata Property:P31 "instance of"
         - wikibase: <str> Wikidata item ID
         - wikidata: <dict> resolved Wikidata properties
         - wikidata_url: <str> Wikidata URL

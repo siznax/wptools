@@ -289,6 +289,7 @@ Get wikidata by *title*:
       modified: <dict(1)> {wikidata}
       props: <dict(8)> {P135, P18, P27, P31, P345, P569, P856, P910}
       title: Stephen_Fry
+      what: human
       wikibase: Q192912
       wikidata: <dict(8)> {IMDB, birth, category, citizenship, image, in...
       wikidata_url: https://www.wikidata.org/wiki/Q192912
@@ -377,6 +378,7 @@ Get all the things:
       title: Jill_Lepore
       url: https://en.wikipedia.org/wiki/Jill_Lepore
       url_raw: https://en.wikipedia.org/wiki/Jill_Lepore?action=raw
+      what: human
       wikibase: Q6192915
       wikidata: <dict(3)> {birth, citizenship, instance}
       wikidata_url: https://www.wikidata.org/wiki/Q6192915
@@ -518,12 +520,14 @@ Wikidata:API `action=wbgetentities`_ request for:
 - label: <str> Wikidata label
 - modified (wikidata): <str> ISO8601 date and time
 - props: <dict> Wikidata properties
+- what: <str> Wikidata Property:P31_ "instance of"
 - wikibase: <str> Wikidata item ID
 - wikidata: <dict> resolved Wikidata properties
 - wikidata_url: <str> Wikidata URL
 
 .. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
+.. _Property:P31: https://www.wikidata.org/wiki/Property:P31
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
 
