@@ -3,18 +3,18 @@
 Release History
 ---------------
 
-0.1.8 (2016-11-01)
+0.1.9 (2016-11-06)
 ++++++++++++++++++
 
-* Many fixes with help of @seansay (thank you!)
-* Consolidated images and caches
-* Automatically get_imageinfo() via MediaWiki API:Imageinfo
-* Added timeout support via set_timeout()
-* Added proxy support via set_proxy()
-* Support for non-https wikis via wiki='http://example.com'
-* Support for language variants (e.g. variant='zh-cn')
-* Support get_query() by pageid
+* Many fixes/improvements with help of @seansay (thank you!)
 * Raise LookupError on API missing page/title
+* Consolidated images and caches
+* Support get_query() by pageid
+* Support proxy, timeout on all API entrypoints
+* Support for language variants (e.g. variant='zh-cn')
+* Support for non-https wikis via wiki='http://example.com'
+* Automatically get_imageinfo() via MediaWiki API:Imageinfo
+* moved NOTES.md to wiki
 
 
 0.1.7 (2016-09-20)
