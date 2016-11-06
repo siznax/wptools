@@ -516,7 +516,7 @@ Wikidata:API `action=wbgetentities`_ request for:
 
 - claims: <dict> Wikidata claims (to be resolved)
 - description: <str> Wikidata description
-- images: <dict> {wikidata-image} Wikidata Property:P18
+- images: <dict> {wikidata-image} Wikidata Property:P18_
 - label: <str> Wikidata label
 - modified (wikidata): <str> ISO8601 date and time
 - props: <dict> Wikidata properties
@@ -525,7 +525,6 @@ Wikidata:API `action=wbgetentities`_ request for:
 - wikidata: <dict> resolved Wikidata properties
 - wikidata_url: <str> Wikidata URL
 
-.. _P625: https://www.wikidata.org/wiki/Property:P625
 .. _Property:P18: https://www.wikidata.org/wiki/Property:P18
 .. _Property:P31: https://www.wikidata.org/wiki/Property:P31
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
