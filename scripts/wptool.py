@@ -48,12 +48,10 @@ def _image(item):
     """
     returns (preferred) image from wptools object
     """
-    if hasattr(item, 'image') and item.image:
-        return item.image
-    elif hasattr(item, 'pageimage') and item.pageimage:
-        return item.pageimage
-    elif hasattr(item, 'thumbnail') and item.thumbnail:
-        return item.thumbnail
+    try:
+        return item.image('image')['url']
+    except TypeError:
+        return None
 
 
 def _item_html(item):
@@ -152,7 +150,7 @@ def get(args):
 
     item = wptools.page(title, lang=lang, silent=silent,
                         verbose=verbose, wiki=wiki)
-    item.get()
+    item.get_query()
 
     if not hasattr(item, 'extract') or not item.extract:
         return "NOT_FOUND"
