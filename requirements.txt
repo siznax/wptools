@@ -1,5 +1,4 @@
 certifi==2016.8.31
 html2text==2016.5.29
-html5lib==0.999999999
 lxml==3.6.1
 pycurl==7.43.0
