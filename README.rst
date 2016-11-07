@@ -396,9 +396,9 @@ All API queries and results are cached in the ``cache`` attribute:
 
 The ``wptools`` user-agent_ will look like this:
 
-..
+.. code-block::
 
-    wptools/*version* (https://github.com/siznax/wptools) *libs*
+    wptools/<version> (https://github.com/siznax/wptools) <libs>
 
 .. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
 
