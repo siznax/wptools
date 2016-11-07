@@ -536,15 +536,15 @@ class WPTools(object):
         self.wikibase = item.get('id')
         self.wikidata_url = utils.wikidata_url(self.wikibase)
 
-        if self.wikidata.get('image'):
-            self.images.append({'kind': 'wikidata-image',
-                                'file': self.wikidata['image']})
-
         self.description = self.__get_entity_prop(item, 'descriptions')
         self.label = self.__get_entity_prop(item, 'labels')
 
         self._marshal_claims(item.get('claims'))
         self.__set_title_wikidata(item)
+
+        if self.wikidata.get('image'):
+            self.images.append({'kind': 'wikidata-image',
+                                'file': self.wikidata['image']})
 
     def _update_wikidata(self, label, value):
         """

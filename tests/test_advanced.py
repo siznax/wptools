@@ -61,14 +61,20 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Get everything wikibase only
         """
-        p = wptools.page(wikibase='Q43303').get_wikidata(False, False)
+        p = wptools.page(wikibase='Q43303').get_wikidata(False)
         self.assertEqual(p.title, 'Malcolm_X')
+        self.assertEqual(p.what, 'human')
+        self.assertEqual(p.wikibase, 'Q43303')
+        self.assertTrue(p.label is not None)
+        self.assertTrue(p.description is not None)
+        self.assertTrue(p.images.pop()['file'] is not None)
+        self.assertTrue(len(p.wikidata) > 5)
 
     def test_wikidata_title(self):
         """
         Get wikidata from title only
         """
-        w = wptools.page('Les Misérables').get_wikidata(False, False)
+        w = wptools.page('Les Misérables').get_wikidata(False)
         self.assertTrue(w.wikibase is not None)
 
     def test_wikidata_claims(self):
