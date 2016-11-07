@@ -196,8 +196,9 @@ Get a representative image:
 ``thumbnail`` (via ``get_query()``), from an Infobox (via
 ``get_parse()``), from Wikidata Property:P18_ (via
 ``get_wikidata()``), or from the RESTBase ``image`` or ``thumb`` (via
-``get_rest()``). All images are stored in the ``images`` attribute,
-and can be queried with the ``image()`` method.
+``get_rest()``). See the Images_ wiki page for details.
+
+.. _Images: https://github.com/siznax/wptools/wiki/Images
 
 
 Get a text (or HTML) extract:
@@ -341,8 +342,8 @@ encyclopedia-like HTML fragment:
 
 - ``<img {kind}>`` selected image
 - ``<span heading>`` wiki-linked title and description
-- ``<span snipped>`` lead paragraphs with (noprint, reference, &c.) snipped
-- ``<span metadata>`` available metadata (e.g. Last modified)
+- ``<span snipped>`` lead paragraphs with noprint, reference, etc. snipped
+- ``<span metadata>`` available metadata (e.g. modified date)
 
 
 Get all the things:
@@ -380,19 +381,18 @@ Get all the things:
     }
 
 
-Query results are cached in the ``cache`` attribute:
+All API queries and results are cached in the ``cache`` attribute:
 
-.. code-block:: python
+.. code-block::
 
-    >>> jill.cache['query']['info']
-    {'bytes': 1911.0,
-     'content': 'application/json; charset=utf-8',
-     'kB/s': '2.6',
-     'seconds': '0.743',
-     'status': 200,
-     'url': 'https://en.wikipedia.org/w/api.php?action=query&exintro&inprop=displaytitle|url|watchers&list=random&pithumbsize=240&ppprop=wikibase_item&prop=extracts|images|info|pageimages|pageprops&redirects&rnlimit=1&rnnamespace=0&titles=Jill_Lepore',
-     'user-agent': 'wptools/0.1.7 (https://github.com/siznax/wptools) PycURL/7.43.0 libcurl/7.49.1 SecureTransport zlib/1.2.8'}
-
+    page.cache
+    {
+      claims:    {query, response, info},
+      imageinfo: {query, response, info},
+      parse:     {query, response, info},
+      query:     {query, response, info},
+      wikidata:  {query, response, info}
+    }
 
 The ``wptools`` user-agent_ will look like this:
 
