@@ -10,7 +10,7 @@ with open('HISTORY.rst') as f:
 
 setup(
     name='wptools',
-    version='0.1.9',
+    version='0.2.0',
     description='Wikipedia tools (for Humans)',
     long_description=readme + '\n\n' + history,
     url='https://github.com/siznax/wptools/',
@@ -19,7 +19,7 @@ setup(
     author_email='steve@siznax.net',
     py_modules=['wptools'],
     packages=find_packages(exclude=['tests']),
-    install_requires=['certifi', 'html2text', 'html5lib', 'lxml', 'pycurl'],
+    install_requires=['certifi', 'html2text', 'lxml', 'pycurl'],
     include_package_data=True,
     entry_points={
         'console_scripts': ['wptool=scripts.wptool:main'],

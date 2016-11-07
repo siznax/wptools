@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.1.9 (2016-11-06)
+0.2.0 (2016-11-06)
 ++++++++++++++++++
 
 * Many fixes/improvements with help of @seansay (thank you!)
