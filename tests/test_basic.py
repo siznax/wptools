@@ -22,6 +22,24 @@ class WPToolsTestCase(unittest.TestCase):
 
 class WPToolsCoreTestCase(unittest.TestCase):
 
+    def test_get_rest(self):
+        import rest
+        page = wptools.page('test_get_rest')
+        page.cache['rest'] = rest.cache
+        page._set_rest_data()
+        self.assertEqual(page.description, 'English writer and humorist')
+        self.assertEqual(page.lang, 'en')
+        self.assertEqual(len(page.images), 2)
+        self.assertEqual(page.image('image')['kind'], 'rest-image')
+        self.assertEqual(page.image('thumb')['kind'], 'rest-thumb')
+        self.assertTrue(len(page.lead) > 1024 * 3)
+        self.assertTrue(page.lead.startswith('<span'))
+        self.assertTrue('page' in page.modified)
+        self.assertEqual(page.pageid, 8091)
+        self.assertEqual(str(page.title), 'Douglas_Adams')
+        self.assertTrue(page.url.endswith('Adams'))
+        self.assertTrue('Douglas_Adams' in page.url_raw)
+
     def test_get_wikidata(self):
         import wikidata
         page = wptools.page('test_get_wikidata')
@@ -37,7 +55,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(str(page.wikibase), 'Q42')
         self.assertEqual(len(page.wikidata), 5)
         self.assertTrue(str(page.wikidata['birth']).startswith('+1952'))
-        self.assertTrue(page.wikidata_url.startswith('http'))
+        self.assertTrue(page.wikidata_url.endswith('Q42'))
 
     def test_get_parse(self):
         import parse
@@ -45,6 +63,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         page.cache['parse'] = parse.cache
         page._set_parse_data()
         self.assertEqual(len(page.infobox), 15)
+        self.assertTrue('satire' in page.infobox['genre'])
         self.assertEqual(page.lang, 'en')
         self.assertEqual(len(page.links), 2)
         self.assertEqual(page.pageid, 8091)
@@ -69,10 +88,10 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(page.pageid, 8091)
         self.assertTrue(wptools.utils.is_text(page.random))
         self.assertEqual(page.title, 'Douglas_Adams')
-        self.assertTrue(page.url.startswith('http'))
-        self.assertTrue(page.url_raw.startswith('http'))
+        self.assertTrue(page.url.endswith('Adams'))
+        self.assertTrue('Douglas_Adams' in page.url_raw)
         self.assertEqual(str(page.wikibase), 'Q42')
-        self.assertTrue(page.wikidata_url.startswith('http'))
+        self.assertTrue(page.wikidata_url.endswith('Q42'))
 
     def test_caching(self):
         abc = wptools.page('test_caching')
