@@ -40,6 +40,21 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(page.url.endswith('Adams'))
         self.assertTrue('Douglas_Adams' in page.url_raw)
 
+    def test_get_imageinfo(self):
+        import claims, imageinfo
+        page = wptools.page('test_get_imageinfo')
+        page.images = [{'file': 'Douglas adams portrait cropped.jpg',
+                        'kind': 'test'}]
+        page.cache['imageinfo'] = imageinfo.cache
+        page._set_imageinfo_data()
+        image = page.images[0]
+        self.assertTrue(image['file'].startswith('File:'))
+        self.assertTrue('/c/c0/' in image['url'])
+        self.assertTrue('/commons.' in image['descriptionurl'])
+        self.assertTrue(image['size'] > 1024)
+        self.assertTrue(image['width'] > 240)
+        self.assertTrue(image['height'] > 320)
+
     def test_get_claims(self):
         import claims, wikidata
         page = wptools.page('test_get_claims')
