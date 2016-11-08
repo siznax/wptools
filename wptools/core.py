@@ -428,8 +428,8 @@ class WPTools(object):
         self.links = utils.get_links(pdata.get('iwlinks'))
         self.wikidata_url = utils.wikidata_url(self.wikibase)
 
-        if not self.title:
-            self.title = pdata.get('title').replace(' ', '_')
+        if pdata.get('title'):
+            self.title = pdata['title'].replace(' ', '_')
 
         if self.infobox:
             if self.infobox.get('image'):
@@ -706,8 +706,8 @@ class WPTools(object):
         rand = data['query']['random'][0]
         self.pageid = rand.get('id')
 
-        if not self.title:
-            self.title = rand.get('title').replace(' ', '_')
+        if rand.get('title'):
+            self.title = rand['title'].replace(' ', '_')
 
         if show:
             self.show()

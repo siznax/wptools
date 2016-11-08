@@ -2,7 +2,7 @@
 
 query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&format=json&formatversion=2&inprop=displaytitle|url&list=random&pithumbsize=240&ppprop=wikibase_item&prop=extracts|images|info|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas_Adams'
 
-response = r'''
+response = r"""
 {
   "continue": {
     "rncontinue": "0.650501181948|0.650501197613|15741865|0",
@@ -110,6 +110,6 @@ response = r'''
     ]
   }
 }
-'''
+"""
 
 cache = {'query': query, 'response': response}

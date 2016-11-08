@@ -22,6 +22,21 @@ class WPToolsTestCase(unittest.TestCase):
 
 class WPToolsCoreTestCase(unittest.TestCase):
 
+    def test_get_parse(self):
+        import parse
+        page = wptools.page('test_get_parse')
+        page.cache['parse'] = parse.cache
+        page._set_parse_data()
+        self.assertEqual(len(page.infobox), 15)
+        self.assertEqual(page.lang, 'en')
+        self.assertEqual(len(page.links), 2)
+        self.assertEqual(page.pageid, 8091)
+        self.assertTrue(len(page.parsetree) > 1024 * 64)
+        self.assertEqual(str(page.title), 'Douglas_Adams')
+        self.assertEqual(str(page.wikibase), 'Q42')
+        self.assertTrue(page.wikidata_url.startswith('http'))
+        self.assertTrue(len(page.wikitext) > 1024 * 64)
+
     def test_get_query(self):
         import query
         page = wptools.page('test_get_query')
