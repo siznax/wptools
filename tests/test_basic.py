@@ -22,6 +22,23 @@ class WPToolsTestCase(unittest.TestCase):
 
 class WPToolsCoreTestCase(unittest.TestCase):
 
+    def test_get_wikidata(self):
+        import wikidata
+        page = wptools.page('test_get_wikidata')
+        page.cache['wikidata'] = wikidata.cache
+        page._set_wikidata()
+        self.assertEqual(len(page.claims), 11)
+        self.assertEqual(page.description, 'English writer and humorist')
+        self.assertEqual(page.label, 'Douglas Adams')
+        self.assertEqual(page.images[0]['kind'], 'wikidata-image')
+        self.assertTrue('wikidata' in page.modified)
+        self.assertEqual(len(page.props), 10)
+        self.assertEqual(str(page.title), 'Douglas_Adams')
+        self.assertEqual(str(page.wikibase), 'Q42')
+        self.assertEqual(len(page.wikidata), 5)
+        self.assertTrue(str(page.wikidata['birth']).startswith('+1952'))
+        self.assertTrue(page.wikidata_url.startswith('http'))
+
     def test_get_parse(self):
         import parse
         page = wptools.page('test_get_parse')

@@ -237,13 +237,13 @@ class WPTools(object):
         """
         attempt to set title from wikidata
         """
-        if not self.title and item.get('sitelinks'):
+        if item.get('sitelinks'):
             for link in item['sitelinks']:
                 if link == "%swiki" % self.lang:
                     title = item['sitelinks'][link]['title']
                     self.title = title.replace(' ', '_')
 
-        if not self.title and hasattr(self, 'label') and self.label:
+        if not self.title and self.label:
             self.title = self.label.replace(' ', '_')
 
     def __setattr(self, attr, value, suffix):
