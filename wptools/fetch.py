@@ -152,6 +152,8 @@ class WPToolsFetch(object):
             crl.setopt(pycurl.PROXY, proxy)
         if timeout:  # 0 = wait forever
             crl.setopt(pycurl.TIMEOUT, timeout)
+        if self.verbose and not self.silent:
+            crl.setopt(pycurl.VERBOSE, True)
 
         self.cobj = crl
 
