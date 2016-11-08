@@ -172,6 +172,28 @@ All API entrypoints support setting ``proxy`` and ``timeout`` (in seconds):
     >>> r.get(proxy='http://example.com:80', timeout=5)
 
 
+All API queries and results are cached in the ``cache`` attribute:
+
+.. code-block::
+
+    <page>.cache
+    {
+      claims:    {query, response, info},
+      imageinfo: {query, response, info},
+      parse:     {query, response, info},
+      query:     {query, response, info},
+      wikidata:  {query, response, info}
+    }
+
+The ``wptools`` user-agent_ will look like this:
+
+.. code-block::
+
+    wptools/<version> (https://github.com/siznax/wptools) <libs>
+
+.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
+
+
 
 Examples
 --------
@@ -297,12 +319,12 @@ Get wikidata by *title*:
 ``_WIKIPROPS``.  Properties (e.g. P17_ "country") are stored in
 ``props`` and those properties that have Wikidata items for values
 (e.g. Q142_ for "France") are stored in ``claims`` and resolved by
-another Wikidata API call (as shown above). See the `Wikidata page`_
-in our wiki for more details.
+another Wikidata API call (as shown above). See the Wikidata_
+page in our wiki for more details.
 
 .. _P17: https://www.wikidata.org/wiki/Property:P17
-.. _Q142: https://www.wikidata.org/wiki/Q142
-.. _`Wikidata page`: https://github.com/siznax/wptools/wiki/Wikidata
+.. _Q142: https://www.wikidata.org/wiki/
+.. _Wikidata: https://github.com/siznax/wptools/wiki/Wikidata
 
 
 Extend Wikidata claims_ to be resolved:
@@ -381,28 +403,6 @@ Get all the things:
       wikidata_url: https://www.wikidata.org/wiki/Q6192915
       wikitext: <str(22540)> {{Infobox scientist| name = Jill Lepore| na...
     }
-
-
-All API queries and results are cached in the ``cache`` attribute:
-
-.. code-block::
-
-    page.cache
-    {
-      claims:    {query, response, info},
-      imageinfo: {query, response, info},
-      parse:     {query, response, info},
-      query:     {query, response, info},
-      wikidata:  {query, response, info}
-    }
-
-The ``wptools`` user-agent_ will look like this:
-
-.. code-block::
-
-    wptools/<version> (https://github.com/siznax/wptools) <libs>
-
-.. _user-agent: https://meta.wikimedia.org/wiki/User-Agent_policy
 
 
 
