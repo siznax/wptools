@@ -1,11 +1,13 @@
 Wikipedia tools (for Humans)
 ============================
 
+🐝 See you at the `Wikimedia Developer Summit`_ 9-11 Jan 2017 in
+San Francisco.
+
+.. _`Wikimedia Developer Summit`: https://www.mediawiki.org/wiki/Wikimedia_Developer_Summit
+
 .. image:: https://img.shields.io/pypi/v/wptools.svg
         :target: https://pypi.python.org/pypi/wptools/
-
-.. image:: https://img.shields.io/badge/license-MIT-green.svg
-        :target: https://github.com/siznax/wptools/blob/master/LICENSE
 
 Python and command-line MediaWiki access for Humans.
 
