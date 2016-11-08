@@ -40,6 +40,19 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(page.url.endswith('Adams'))
         self.assertTrue('Douglas_Adams' in page.url_raw)
 
+    def test_get_claims(self):
+        import claims, wikidata
+        page = wptools.page('test_get_claims')
+        page.cache['wikidata'] = wikidata.cache
+        page._set_wikidata()
+        page.cache['claims'] = claims.cache
+        page._set_claims_data()
+        self.assertEqual(len(page.claims), 11)
+        self.assertEqual(len(page.props), 10)
+        self.assertTrue(str(page.what), 'human')
+        self.assertTrue('science' in page.wikidata['genre'].lower())
+        self.assertTrue('Mostly Harmless' in page.wikidata['work'])
+
     def test_get_wikidata(self):
         import wikidata
         page = wptools.page('test_get_wikidata')
