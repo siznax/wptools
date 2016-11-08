@@ -76,14 +76,12 @@ class WPTools(object):
     label = None
     lead = None
     links = None
-    pageid = None
     parsetree = None
     random = None
     title = None
     url = None
     url_raw = None
     what = None
-    wikibase = None
     wikidata_url = None
     wikitext = None
 
