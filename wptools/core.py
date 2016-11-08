@@ -94,6 +94,7 @@ class WPTools(object):
         self.lang = kwargs.get('lang') or 'en'
         self.pageid = kwargs.get('pageid')
         self.silent = kwargs.get('silent') or False
+        self.skip = kwargs.get('skip') or ''
         self.variant = kwargs.get('variant')
         self.verbose = kwargs.get('verbose') or False
         self.wiki = kwargs.get('wiki')
@@ -353,6 +354,10 @@ class WPTools(object):
             if action != 'imageinfo':
                 utils.stderr("%s results in cache" % action)
                 return
+
+        if action in self.skip:
+            utils.stderr("skipping %s" % action)
+            return
 
         _fetch = self._fetch(proxy, timeout)
         query = self._query(action, _fetch)

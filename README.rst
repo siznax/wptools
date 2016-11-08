@@ -172,6 +172,13 @@ All API entrypoints support setting ``proxy`` and ``timeout`` (in seconds):
     >>> r.get(proxy='http://example.com:80', timeout=5)
 
 
+You can skip requests using the ``skip`` attribute:
+
+.. code-block:: python
+
+    >>> r = wptools.page(skip='claims imageinfo')
+
+
 All API queries and results are cached in the ``cache`` attribute:
 
 .. code-block::
@@ -182,6 +189,7 @@ All API queries and results are cached in the ``cache`` attribute:
       imageinfo: {query, response, info},
       parse:     {query, response, info},
       query:     {query, response, info},
+      rest:      {query, response, info},
       wikidata:  {query, response, info}
     }
 
