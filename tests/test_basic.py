@@ -20,11 +20,30 @@ class WPToolsTestCase(unittest.TestCase):
 
         from scripts.wptool import main
 
-
 class WPToolsCoreTestCase(unittest.TestCase):
 
+    def test_get_query(self):
+        import query
+        page = wptools.page('test_get_query')
+        page.cache['query'] = query.cache
+        page._set_query_data()
+        self.assertEqual(page.description, 'English writer and humorist')
+        self.assertTrue(page.extext.startswith('**Douglas'))
+        self.assertTrue(page.extract.startswith('<p><b>Douglas'))
+        self.assertTrue(len(page.images) > 1)
+        self.assertEqual(page.label, 'Douglas Adams')
+        self.assertEqual(page.lang, 'en')
+        self.assertTrue('page' in page.modified)
+        self.assertEqual(page.pageid, 8091)
+        self.assertTrue(wptools.utils.is_text(page.random))
+        self.assertEqual(page.title, 'Douglas_Adams')
+        self.assertTrue(page.url.startswith('http'))
+        self.assertTrue(page.url_raw.startswith('http'))
+        self.assertEqual(str(page.wikibase), 'Q42')
+        self.assertTrue(page.wikidata_url.startswith('http'))
+
     def test_caching(self):
-        abc = wptools.page('abc')
+        abc = wptools.page('test_caching')
         abc.claims = {'Q1': 'test'}
         abc.cache['claims'] = {'response'}
         abc.cache['imageinfo'] = {'response'}
@@ -41,6 +60,16 @@ class WPToolsCoreTestCase(unittest.TestCase):
         abc.get_wikidata()
         self.assertTrue(not abc.pageid)
 
+
+class WPToolsFetchTestCase(unittest.TestCase):
+
+    def test_variant(self):
+        f = wptools.fetch.WPToolsFetch(variant='zh-cn')
+        self.assertTrue(f.query('query', 'a').endswith('&variant=zh-cn'))
+
+
+class WPToolsToolTestCase(unittest.TestCase):
+
     def test_wptool(self):
         from scripts.wptool import main
         from collections import namedtuple
@@ -49,12 +78,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
                't': '', 'v': False, 'w': ''}
         main(args(**cli))
 
-
-class WPtoolsFetchTestCase(unittest.TestCase):
-
-    def test_variant(self):
-        f = wptools.fetch.WPToolsFetch(variant='zh-cn')
-        self.assertTrue(f.query('query', 'a').endswith('&variant=zh-cn'))
 
 class WPToolsUtilsTestCase(unittest.TestCase):
 
