@@ -217,12 +217,13 @@ Get a representative image:
     .. image:: https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg/160px-Frida_Kahlo%2C_by_Guillermo_Kahlo.jpg
 
 **Note**: A page's image can come from the ``pageimage`` or
-``thumbnail`` (via ``get_query()``), from an Infobox (via
+``thumbnail`` (via ``get_query()``), from an Infobox_ (via
 ``get_parse()``), from Wikidata Property:P18_ (via
-``get_wikidata()``), or from the RESTBase ``image`` or ``thumb`` (via
+``get_wikidata()``), or from the RESTBase_ ``image`` or ``thumb`` (via
 ``get_rest()``). See the Images_ wiki page for details.
 
 .. _Images: https://github.com/siznax/wptools/wiki/Images
+.. _Infobox: https://en.wikipedia.org/wiki/Template:Infobox
 
 
 Get a text (or HTML) extract:
@@ -261,12 +262,14 @@ Get an Infobox_ as a python object:
     >>> fela.infobox['instrument']
     'Saxophone, vocals, keyboards, trumpet, guitar, drums'
 
-**Note**: Getting data from Infoboxen may be unavoidable, but getting
-Wikidata (via ``get_wikidata()``) is preferred. Wikidata is
+**Note**: Getting data from Infoboxes__ may be unavoidable, but getting
+Wikidata_ (via ``get_wikidata()``) is preferred. Wikidata is
 structured_ but (sometimes) data poor, while Infoboxen are
 unstructured and (frequently) data rich. Please consider updating_
 Wikidata if the information you want is only available in a MediaWiki
 instance so that others may benefit from open, `linked data`_.
+
+__ Infobox_
 
 .. _structured: https://www.wikidata.org/wiki/Wikidata:Introduction
 .. _updating: https://www.wikidata.org/wiki/Wikidata:Contribute
@@ -455,7 +458,6 @@ MediaWiki:API `action=parse`_ request for:
 - wikibase: <str> Wikidata `entity ID`_ or wikidata URL
 - wikitext: <str> raw wikitext URL
 
-.. _Infobox: https://en.wikipedia.org/wiki/Template:Infobox
 .. _`XML parse tree`: https://www.mediawiki.org/wiki/User:Kephir/XML_parse_tree
 .. _`action=parse`: https://en.wikipedia.org/w/api.php?action=help&modules=parse
 .. _iwlinks: https://www.mediawiki.org/wiki/API:Iwlinks
