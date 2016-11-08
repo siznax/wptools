@@ -22,6 +22,5 @@ __version__ = "0.2.1"
 
 from . import fetch
 from . import utils
-from . import test
 
 from .core import WPTools as page

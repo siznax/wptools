@@ -16,9 +16,7 @@ class WPToolsTestCase(unittest.TestCase):
         wptools.core
         wptools.fetch
         wptools.utils
-        wptools.test
 
-        from scripts.wptool import main
 
 class WPToolsCoreTestCase(unittest.TestCase):
 
@@ -41,7 +39,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue('Douglas_Adams' in page.url_raw)
 
     def test_get_imageinfo(self):
-        import claims, imageinfo
+        import imageinfo
         page = wptools.page('test_get_imageinfo')
         page.images = [{'file': 'Douglas adams portrait cropped.jpg',
                         'kind': 'test'}]
@@ -56,7 +54,8 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(image['height'] > 320)
 
     def test_get_claims(self):
-        import claims, wikidata
+        import claims
+        import wikidata
         page = wptools.page('test_get_claims')
         page.cache['wikidata'] = wikidata.cache
         page._set_wikidata()

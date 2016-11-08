@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 
-"""
-WPToolsTestTitles module.
-"""
+'''
+selected titles by language for WPTools tests
+'''
 
 # animals
 #     https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status

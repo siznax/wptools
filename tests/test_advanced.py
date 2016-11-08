@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
+'''
+WPTools advanced tests
+'''
+
+from __future__ import print_function
+
 import argparse
 import random
 import unittest
+
+import titles
 import wptools
 
-
-lang = ['de', 'es', 'fr', 'hi', 'it', 'ja', 'nl', 'ru', 'sv', 'vi', 'zh']
+LANG = ['de', 'es', 'fr', 'hi', 'it', 'ja', 'nl', 'ru', 'sv', 'vi', 'zh']
 
 
 class WPToolsBadTest(unittest.TestCase):
@@ -53,7 +60,7 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Get selected title
         """
-        t = wptools.test.title()
+        t = titles.title()
         p = wptools.page(t['title'], lang=t['lang']).get_query(False)
         self.assertTrue(p.pageid is not None)
 
@@ -78,6 +85,9 @@ class WPToolsPickTest(unittest.TestCase):
         self.assertTrue(w.wikibase is not None)
 
     def test_wikidata_claims(self):
+        '''
+        Get wikidata claims
+        '''
         p = wptools.page('Paris').get_wikidata(False)
         self.assertTrue('latitude' in p.wikidata['coordinates'])
         self.assertEqual(p.wikidata['country'], 'France')
@@ -125,7 +135,7 @@ class WPToolsPickTest(unittest.TestCase):
         Potentially raise UnicodeDecodeError on LookupError
         """
         try:
-            p = wptools.page('阿Vane').get(False)  # issue 29
+            wptools.page('阿Vane').get(False)  # issue 29
             self.fail("failed to raise LookupError")
         except LookupError as detail:
             print(detail)
@@ -155,7 +165,7 @@ class WPToolsRandomTest(unittest.TestCase):
         """
         Get random title by language
         """
-        r = wptools.page(lang=random.choice(lang))
+        r = wptools.page(lang=random.choice(LANG))
         self.assertTrue(r.pageid is not None)
 
     def test_random_wiki(self):
@@ -172,7 +182,10 @@ class WPToolsRestBaseTest(unittest.TestCase):
     """
 
     def test_get_rest(self):
-        t = wptools.test.title()
+        '''
+        Get random RESTBase
+        '''
+        t = titles.title()
         r = wptools.page(t['title'], lang=t['lang'])
         r.get_rest()
         self.assertTrue(r.lead is not None)
@@ -184,6 +197,9 @@ class WPToolsToolTest(unittest.TestCase):
     """
 
     def test_wptool(self):
+        '''
+        Get random page via wptool
+        '''
         from scripts.wptool import main
         from collections import namedtuple
         args = namedtuple('Args', ['H', 'l', 'n', 'q', 's', 't', 'v', 'w'])
