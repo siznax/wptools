@@ -118,10 +118,11 @@ class WPTools(object):
         returns Wikidata entity property value
         """
         if entity.get(prop):
+            ent = entity[prop]
             try:
-                return entity.get(prop).get(self.lang).get('value')
+                return ent[self.variant or self.lang].get('value')
             except AttributeError:
-                return entity.get(prop).get('value')
+                return ent.get('value')
 
     def __get_image_files(self):
         """
