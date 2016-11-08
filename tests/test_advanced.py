@@ -149,6 +149,7 @@ class WPToolsRandomTest(unittest.TestCase):
         """
         r = wptools.page()
         self.assertTrue(r.pageid is not None)
+        self.assertTrue(r.title is not None)
 
     def test_random_lang(self):
         """

@@ -472,10 +472,11 @@ class WPTools(object):
                 self.wikidata_url = utils.wikidata_url(self.wikibase)
 
         if page.get('terms'):
-            if page['terms'].get('description'):
-                self.description = ''.join(page['terms']['description'])
-            if page['terms'].get('label'):
-                self.label = ''.join(page['terms']['label'])
+            terms = page['terms']
+            if terms.get('description'):
+                self.description = next(iter(terms['description']), None)
+            if terms.get('label'):
+                self.label = next(iter(terms['label']), None)
 
         if page.get('thumbnail'):
             qthumb = {'kind': 'query-thumbnail'}
@@ -702,7 +703,7 @@ class WPTools(object):
         except ValueError:
             raise LookupError(query.replace('&format=json', ''))
 
-        rand = data.get('query').get('random')[0]
+        rand = data['query']['random'][0]
         self.pageid = rand.get('id')
 
         if not self.title:
