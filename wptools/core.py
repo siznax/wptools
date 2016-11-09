@@ -766,6 +766,18 @@ class WPTools(object):
             if token in img.get('kind'):
                 return img
 
+    def info(self, action):
+        '''returns cache[action]['info']'''
+        return self.cache[action]['info']
+
+    def query(self, action):
+        '''returns cache[action]['query'] without &format=json'''
+        return self.cache[action]['query'].replace('&format=json', '')
+
+    def response(self, action):
+        '''returns cache[action]['response'] as dict'''
+        return utils.json_loads(self.cache[action]['response'])
+
     def show(self):
         """
         pretty-print instance attributes
