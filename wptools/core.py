@@ -107,6 +107,11 @@ class WPTools(object):
         self.props = {}
         self.wikidata = {}
 
+        if self.title:
+            ttl = self.title
+            if ttl.startswith('File:') or ttl.startswith('Image:'):
+                self.images = [{'file': self.title}]
+
         if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
         else:
@@ -230,7 +235,7 @@ class WPTools(object):
             if image.get('file'):
                 fname = image.get('file').replace('_', ' ')
                 if fname.lower() in title.lower():
-                    if image['kind'] != 'query-thumbnail':
+                    if image.get('kind') != 'query-thumbnail':
                         self.images[i].update(info)
 
     def __set_title_wikidata(self, item):
@@ -382,11 +387,11 @@ class WPTools(object):
         elif action == 'wikidata':
             self._set_wikidata()
             if self.claims:
-                self.get_claims(False)
+                self.get_claims(show=False)
 
         if action in ['parse', 'query', 'rest', 'wikidata']:
             if self._missing_imageinfo() and not self._defer_imageinfo:
-                self.get_imageinfo(False)
+                self.get_imageinfo(show=False)
 
         if show:
             self.show()
@@ -633,7 +638,7 @@ class WPTools(object):
 
         return self
 
-    def get_imageinfo(self, show=False, proxy=None, timeout=0):
+    def get_imageinfo(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki request for API:Imageinfo
         - images: <dict> updates image URLs, sizes, etc.
