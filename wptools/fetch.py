@@ -225,7 +225,8 @@ class WPToolsFetch(object):
         except (AttributeError, TypeError):
             thing = self.thing
 
-        status = "%s (%s) %s" % (self.wiki, self.action, thing)
+        status = "%s (%s) %s" % (self.wiki, self.action,
+                                 thing or u'\U0001f355')
 
         if len(status) > 80:
             status = status[:72] + '...'
