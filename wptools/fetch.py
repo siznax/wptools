@@ -13,6 +13,7 @@ except ImportError:  # python3
 from io import BytesIO
 from string import Template
 
+import random
 import sys
 
 import certifi
@@ -25,6 +26,14 @@ class WPToolsFetch(object):
     """
     Supports MediaWiki:API, RESTBase, Wikidata API HTTP requests
     """
+
+    EMOJI = [
+        u'\U0001f355',
+        u'\U0001f35c',
+        u'\U0001f363',
+        u'\U0001f36a',
+        u'\U0001f370',
+    ]
 
     QUERY = {
         "imageinfo": Template((
@@ -226,7 +235,7 @@ class WPToolsFetch(object):
             thing = self.thing
 
         status = "%s (%s) %s" % (self.wiki, self.action,
-                                 thing or u'\U0001f355')
+                                 thing or random.choice(self.EMOJI))
 
         if len(status) > 80:
             status = status[:72] + '...'
