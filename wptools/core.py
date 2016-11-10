@@ -587,7 +587,7 @@ class WPTools(object):
                     snak = prop.get('mainsnak').get('datavalue').get('value')
                 except AttributeError:
                     if self._WIKIPROPS.get(claim):
-                        props[claim] = None
+                        props[claim] = []
                         continue
                 try:
                     if snak.get('id'):
