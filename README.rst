@@ -56,7 +56,7 @@ Usage
 
 An instance can be initialized by:
 
-**wptools.page** (self)
+**wptools.page**
 
 - ``None``: <NoneType>
 - ``lang``: <str> MediaWiki `language code`_ (default='en')
@@ -420,7 +420,8 @@ Get all the things:
 Methods
 -------
 
-Get help on instance methods like this:
+There are more a few more methods than we describe here. Get help on
+additional methods like this:
 
 .. code-block:: python
 
@@ -428,7 +429,7 @@ Get help on instance methods like this:
     >>> help(<instance>)
 
 
-**get** (self)
+**get**
 
 make all requests necessary to populate all the things, probably:
 
@@ -437,7 +438,7 @@ make all requests necessary to populate all the things, probably:
 - get_wikidata()
 
 
-**get_claims** (self)
+**get_claims**
 
 Wikidata:API `action=wbgetentities`_ for labels of claims
 
@@ -445,7 +446,7 @@ Wikidata:API `action=wbgetentities`_ for labels of claims
 - use get_wikidata() to populate claims
 
 
-**get_imageinfo** (self)
+**get_imageinfo**
 
 MediaWiki request for `API:Imageinfo`_
 
@@ -454,7 +455,7 @@ MediaWiki request for `API:Imageinfo`_
 .. _`API:Imageinfo`: https://www.mediawiki.org/wiki/API:Imageinfo
 
 
-**get_parse** (self)
+**get_parse**
 
 MediaWiki:API `action=parse`_ request for:
 
@@ -471,7 +472,7 @@ MediaWiki:API `action=parse`_ request for:
 .. _iwlinks: https://www.mediawiki.org/wiki/API:Iwlinks
 
 
-**get_query** (self)
+**get_query**
 
 MediaWiki:API `action=query`_ request for:
 
@@ -491,7 +492,7 @@ MediaWiki:API `action=query`_ request for:
 .. _`action=query`: https://en.wikipedia.org/w/api.php?action=help&modules=query
 
 
-**get_random** (self)
+**get_random**
 
 MediaWiki:API `action=query`_ request for:
 
@@ -499,7 +500,7 @@ MediaWiki:API `action=query`_ request for:
 - title: <str> article title
 
 
-**get_rest** (self)
+**get_rest**
 
 RESTBase_ ``/page/mobile-text/`` request for:
 
@@ -514,7 +515,7 @@ RESTBase_ ``/page/mobile-text/`` request for:
 .. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
 
 
-**get_wikidata** (self)
+**get_wikidata**
 
 Wikidata:API `action=wbgetentities`_ request for:
 
@@ -534,12 +535,12 @@ Wikidata:API `action=wbgetentities`_ request for:
 .. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
 
-**image** (self, token)
+**image** (token)
 
 Returns first image info with kind containing token (e.g. 'thumb')
 
 
-**show** (self)
+**show**
 
 Pretty-print instance attributes.
 
