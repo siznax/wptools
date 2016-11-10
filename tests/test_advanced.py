@@ -208,6 +208,16 @@ class WPToolsToolTest(unittest.TestCase):
         main(args(**cli))
 
 
+class WPToolsWikidataTest(unittest.TestCase):
+
+    def test_wikidata_images(self):
+        import wikidata_images
+        page = wptools.page('test_wikidata_images')
+        page.cache['wikidata'] = wikidata_images.cache
+        page._set_wikidata()
+        self.assertEqual(len(page.images), 3)
+
+
 if __name__ == '__main__':
     # unittest.main()
 
@@ -218,6 +228,7 @@ if __name__ == '__main__':
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
         'rest': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
         'tool': TestLoader().loadTestsFromTestCase(WPToolsToolTest),
+        'wikidata': TestLoader().loadTestsFromTestCase(WPToolsWikidataTest),
     }
     suites['all'] = unittest.TestSuite(suites.values())
 

@@ -318,6 +318,9 @@ class WPTools(object):
                     self._update_wikidata(label, val)
 
     def _query(self, action, _fetch):
+        """
+        returns WPToolsFetch query based on action
+        """
         if action == 'query' or action == 'parse':
             if self.pageid:
                 return _fetch.query(action, self.pageid, pageid=True)
@@ -553,8 +556,11 @@ class WPTools(object):
         self.__set_title_wikidata(item)
 
         if self.wikidata.get('image'):
-            self.images.append({'kind': 'wikidata-image',
-                                'file': self.wikidata['image']})
+            images = self.wikidata['image']
+            if not isinstance(images, list):
+                images = [images]
+            for image in images:
+                self.images.append({'kind': 'wikidata-image', 'file': image})
 
     def _update_wikidata(self, label, value):
         """
