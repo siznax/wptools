@@ -98,7 +98,7 @@ Leaving off arguments invokes a random_ lookup in English:
 .. code-block:: python
 
     >>> r = wptools.page()
-    en.wikipedia.org (random) None
+    en.wikipedia.org (random) 🍜
     Sylvia_Rivera (en)
     {
       lang: en
@@ -114,7 +114,7 @@ If you give only *lang*, you get a random_ article in that language:
 .. code-block:: python
 
     >>> zh = wptools.page(lang='zh')
-    zh.wikipedia.org (random) None
+    zh.wikipedia.org (random) 🍰
     哈莉特·塔布曼 (zh)
     {
       lang: zh
@@ -140,7 +140,7 @@ Or, another *wiki* site:
 .. code-block:: python
 
     >>> m = wptools.page(wiki='en.wikiquote.org')
-    en.wikiquote.org (random) None
+    en.wikiquote.org (random) 🍪
     Malala_Yousafzai (en)
     {
       lang: en
