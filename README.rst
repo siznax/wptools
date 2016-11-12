@@ -342,8 +342,7 @@ Extend Wikidata claims_ to be resolved:
 
 .. code-block:: python
 
-    >>> simone = wptools.page('Simone de Beauvoir')
-    >>> simone._WIKIPROPS['P21'] = 'gender'
+    >>> simone = wptools.page('Simone de Beauvoir', props={'P21': 'gender'})
     >>> simone.get_wikidata()
     www.wikidata.org (wikidata) Simone_de_Beauvoir
     www.wikidata.org (claims) Q142|Q5|Q3411417|Q859773|Q151578|Q1214721|Q470...
