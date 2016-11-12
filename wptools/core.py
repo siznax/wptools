@@ -91,6 +91,7 @@ class WPTools(object):
             if args[0]:
                 self.title = args[0].replace(' ', '_')
 
+        self.argprops = kwargs.get('props')
         self.lang = kwargs.get('lang') or 'en'
         self.pageid = kwargs.get('pageid')
         self.silent = kwargs.get('silent') or False
@@ -111,6 +112,9 @@ class WPTools(object):
             ttl = self.title
             if ttl.startswith('File:') or ttl.startswith('Image:'):
                 self.images = [{'file': self.title}]
+
+        if self.argprops:
+            self.update_wikiprops(self.argprops)
 
         if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
@@ -842,3 +846,9 @@ class WPTools(object):
         for item in sorted(data):
             utils.stderr("  %s: %s" % (item, data[item]), self.silent)
         utils.stderr("}", self.silent)
+
+    def update_wikiprops(self, props):
+        """
+        updates _WIKIPROPS dict with props
+        """
+        self._WIKIPROPS.update(props)
