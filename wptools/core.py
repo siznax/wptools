@@ -298,7 +298,7 @@ class WPTools(object):
 
             return data
 
-        except LookupError:
+        except (LookupError, ValueError):
             raise LookupError(query)
 
     def _missing_imageinfo(self):
