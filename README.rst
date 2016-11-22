@@ -19,10 +19,10 @@ Python and command-line MediaWiki access for Humans.
 - get random info
 
 This package is intended to make it as easy as possible to get data
-from MediaWiki instances, expose more Wikidata, and extend the
-MediaWiki API just for kicks. We say "(for Humans)" because that is a
-goal_. See our wiki_ to learn more. Questions, feedback, and
-especially contributions_ are welcome!
+from MediaWiki instances, expose more Wikidata, and extend Wikimedia
+APIs just for kicks. We say (for Humans) because that is a goal_. See
+our wiki_ to learn more. Questions, feedback, and especially
+contributions_ are welcome!
 
 .. _contributions: https://github.com/siznax/wptools/blob/master/CONTRIBUTING.md
 .. _goal: http://docs.python-requests.org/en/master/user/intro/
