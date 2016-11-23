@@ -19,6 +19,7 @@ setup(
     author_email='steve@siznax.net',
     py_modules=['wptools'],
     packages=find_packages(exclude=['tests']),
+    test_suite='tests.test_basic',
     install_requires=['certifi', 'html2text', 'lxml', 'pycurl'],
     include_package_data=True,
     entry_points={

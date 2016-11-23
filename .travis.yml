@@ -2,5 +2,13 @@ language: python
 python:
   - "2.7"
   - "3.5"
-install: "pip install -r requirements.txt"
-script: nosetests tests/test_basic.py
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+script:
+  # https://travis-ci.org/siznax/wptools
+  nosetests tests/test_basic.py
+  # https://coveralls.io/github/siznax/wptools
+  coverage run --source=wptools setup.py test
+after_success:
+  coveralls
