@@ -8,6 +8,13 @@ Basic tests for WPTools.
 import unittest
 import wptools
 
+from . import claims
+from . import imageinfo
+from . import parse
+from . import query
+from . import rest
+from . import wikidata
+
 
 class WPToolsTestCase(unittest.TestCase):
 
@@ -21,7 +28,6 @@ class WPToolsTestCase(unittest.TestCase):
 class WPToolsCoreTestCase(unittest.TestCase):
 
     def test_get_rest(self):
-        import rest
         page = wptools.page('test_get_rest')
         page.cache['rest'] = rest.cache
         page._set_rest_data()
@@ -39,7 +45,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue('Douglas_Adams' in page.url_raw)
 
     def test_get_imageinfo(self):
-        import imageinfo
         page = wptools.page('test_get_imageinfo')
         page.images = [{'file': 'Douglas adams portrait cropped.jpg',
                         'kind': 'test'}]
@@ -54,8 +59,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(image['height'] > 320)
 
     def test_get_claims(self):
-        import claims
-        import wikidata
         page = wptools.page('test_get_claims')
         page.cache['wikidata'] = wikidata.cache
         page._set_wikidata()
@@ -68,7 +71,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue('Mostly Harmless' in page.wikidata['work'])
 
     def test_get_wikidata(self):
-        import wikidata
         page = wptools.page('test_get_wikidata')
         page.cache['wikidata'] = wikidata.cache
         page._set_wikidata()
@@ -85,7 +87,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(page.wikidata_url.endswith('Q42'))
 
     def test_get_parse(self):
-        import parse
         page = wptools.page('test_get_parse')
         page.cache['parse'] = parse.cache
         page._set_parse_data()
@@ -101,7 +102,6 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(len(page.wikitext) > 1024 * 64)
 
     def test_get_query(self):
-        import query
         page = wptools.page('test_get_query')
         page.cache['query'] = query.cache
         page._set_query_data()
