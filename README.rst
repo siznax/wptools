@@ -9,6 +9,12 @@ Wikipedia tools (for Humans)
 .. image:: https://img.shields.io/pypi/v/wptools.svg
         :target: https://pypi.python.org/pypi/wptools/
 
+.. image:: https://travis-ci.org/siznax/wptools.svg?branch=master
+        :target: https://travis-ci.org/siznax/wptools
+
+.. image:: https://coveralls.io/repos/github/siznax/wptools/badge.svg?branch=master
+        :target: https://coveralls.io/github/siznax/wptools
+
 Python and command-line MediaWiki access for Humans.
 
 - get an HTML or plain text "extract" (lead or summary)
