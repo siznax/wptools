@@ -7,8 +7,8 @@ install:
   - pip install coveralls
 script:
   # https://travis-ci.org/siznax/wptools
-  nosetests tests/test_basic.py
+  - nosetests tests/test_basic.py
   # https://coveralls.io/github/siznax/wptools
-  coverage run --source=wptools setup.py test
+  - coverage run --source=wptools setup.py test
 after_success:
   coveralls
