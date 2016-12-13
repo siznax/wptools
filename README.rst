@@ -38,7 +38,6 @@ contributions_ are welcome!
 - Install_
 - Usage_
 - Examples_
-- Methods_
 - wptool_
 
 .. _Methods: https://github.com/siznax/wptools/wiki/Methods
