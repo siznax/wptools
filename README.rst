@@ -40,8 +40,6 @@ contributions_ are welcome!
 - Examples_
 - wptool_
 
-.. _Methods: https://github.com/siznax/wptools/wiki/Methods
-
 
 Install
 -------
@@ -214,6 +212,7 @@ Examples
 --------
 
 Get a representative image:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -244,6 +243,7 @@ Get a representative image:
 
 
 Get a text (or HTML) extract:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -269,6 +269,7 @@ Get a text (or HTML) extract:
 
 
 Get an Infobox_ as a python object:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -294,6 +295,7 @@ __ Infobox_
 
 
 Get an (album, book, film, etc.) cover image:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -310,6 +312,7 @@ Get an (album, book, film, etc.) cover image:
 
 
 Get wikidata by *title*:
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -348,6 +351,7 @@ page in our wiki for more details.
 
 
 Extend Wikidata claims_ to be resolved:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
@@ -364,7 +368,8 @@ Extend Wikidata claims_ to be resolved:
 .. _claims: https://www.wikidata.org/wiki/Wikidata:Glossary#Claims_and_statements
 
 
-Get special (experimental) `lead section`_ HTML:
+Get a special (experimental) `lead section`_:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
 
@@ -392,6 +397,7 @@ encyclopedia-like HTML fragment:
 
 
 Get all the things:
+~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
