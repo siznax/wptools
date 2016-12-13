@@ -41,6 +41,8 @@ contributions_ are welcome!
 - Methods_
 - wptool_
 
+.. _Methods: https://github.com/siznax/wptools/wiki/Methods
+
 
 Install
 -------
@@ -238,6 +240,8 @@ Get a representative image:
 
 .. _Images: https://github.com/siznax/wptools/wiki/Images
 .. _Infobox: https://en.wikipedia.org/wiki/Template:Infobox
+.. _Property:P18: https://www.wikidata.org/wiki/Property:P18
+.. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
 
 
 Get a text (or HTML) extract:
@@ -363,6 +367,8 @@ Extend Wikidata claims_ to be resolved:
 
 Get special (experimental) `lead section`_ HTML:
 
+.. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
+
 .. code-block:: python
 
     >>> buddha = wptools.page('Buddha').get_rest()
@@ -419,135 +425,6 @@ Get all the things:
       wikidata_url: https://www.wikidata.org/wiki/Q6192915
       wikitext: <str(22540)> {{Infobox scientist| name = Jill Lepore| na...
     }
-
-
-
-Methods
--------
-
-There are more a few more methods than we describe here. Get help on
-additional methods like this:
-
-.. code-block:: python
-
-    >>> help(wptools.core)
-    >>> help(<instance>)
-
-
-**get**
-
-make all requests necessary to populate all the things, probably:
-
-- get_query()
-- get_parse()
-- get_wikidata()
-
-
-**get_claims**
-
-Wikidata:API `action=wbgetentities`_ for labels of claims
-
-- e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
-- use get_wikidata() to populate claims
-
-
-**get_imageinfo**
-
-MediaWiki request for `API:Imageinfo`_
-
-- images: <dict> updates image URLs, sizes, etc.
-
-.. _`API:Imageinfo`: https://www.mediawiki.org/wiki/API:Imageinfo
-
-
-**get_parse**
-
-MediaWiki:API `action=parse`_ request for:
-
-- images: <dict> {parse-image, parse-cover}
-- infobox: <dict> Infobox_ data as python dictionary
-- links: <list> interwiki links (iwlinks_)
-- pageid: <int> MediaWiki database ID
-- parsetree: <str> `XML parse tree`_
-- wikibase: <str> Wikidata `entity ID`_ or wikidata URL
-- wikitext: <str> raw wikitext URL
-
-.. _`XML parse tree`: https://www.mediawiki.org/wiki/User:Kephir/XML_parse_tree
-.. _`action=parse`: https://en.wikipedia.org/w/api.php?action=help&modules=parse
-.. _iwlinks: https://www.mediawiki.org/wiki/API:Iwlinks
-
-
-**get_query**
-
-MediaWiki:API `action=query`_ request for:
-
-- description: <str> Wikidata description (via pageterms)
-- extext: <str> plain text (Markdown_) extract
-- extract: <str> HTML extract via `Extension:TextExtract`_
-- images: <dict> {query-pageimage, query-thumbnail}
-- label: <str> Wikidata label (via pageterms)
-- modified (page): <str> ISO8601 date and time
-- pageid: <int> MediaWiki database ID
-- random: <str> a random article title with every request!
-- url: <str> the canonical wiki URL
-- url_raw: <str> ostensible raw wikitext URL
-
-.. _Markdown: https://en.wikipedia.org/wiki/Markdown
-.. _`Extension:TextExtract`: https://www.mediawiki.org/wiki/Extension:TextExtracts
-.. _`action=query`: https://en.wikipedia.org/w/api.php?action=help&modules=query
-
-
-**get_random**
-
-MediaWiki:API `action=query`_ request for:
-
-- pageid: <int> MediaWiki database ID
-- title: <str> article title
-
-
-**get_rest**
-
-RESTBase_ ``/page/mobile-text/`` request for:
-
-- description: <str> apparently, Wikidata description
-- images: <dict> {rest-image, rest-thumb}
-- lead: <str> encyclopedia-like `lead section`_
-- modified (page): <str> ISO8601 date and time
-- url: <str> the canonical wiki URL
-- url_raw: <str> ostensible raw wikitext URL
-
-.. _`lead section`: https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Lead_section
-.. _RESTBase: https://www.mediawiki.org/wiki/RESTBase
-
-
-**get_wikidata**
-
-Wikidata:API `action=wbgetentities`_ request for:
-
-- claims: <dict> Wikidata claims (to be resolved)
-- description: <str> Wikidata description
-- images: <dict> {wikidata-image} Wikidata Property:P18_
-- label: <str> Wikidata label
-- modified (wikidata): <str> ISO8601 date and time
-- props: <dict> Wikidata properties
-- what: <str> Wikidata Property:P31_ "instance of"
-- wikibase: <str> Wikidata item ID
-- wikidata: <dict> resolved Wikidata properties
-- wikidata_url: <str> Wikidata URL
-
-.. _Property:P18: https://www.wikidata.org/wiki/Property:P18
-.. _Property:P31: https://www.wikidata.org/wiki/Property:P31
-.. _`action=wbgetentities`: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
-
-
-**image** (token)
-
-Returns first image info with kind containing token (e.g. 'thumb')
-
-
-**show**
-
-Pretty-print instance attributes.
 
 
 
