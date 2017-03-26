@@ -144,8 +144,8 @@ class WPToolsPickTest(unittest.TestCase):
         """
         Ensure get_imageinfo() updates images
         """
-        a = wptools.page("Alice's Adventures in Wonderland").get_query(False)
-        self.assertTrue('url' in a.image('pageimage'))
+        a = wptools.page('Aardvark').get_query(False)
+        self.assertTrue('url' in a.image('thumb'))
 
 
 class WPToolsRandomTest(unittest.TestCase):
