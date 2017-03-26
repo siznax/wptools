@@ -217,6 +217,7 @@ class WPTools(object):
 
         if pars:
             html = "\n".join(pars)
+            self.exhtml = html
             self.cache['rest']['html'] = html
             return self.__postprocess_lead(html)
 

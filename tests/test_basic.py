@@ -42,6 +42,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(page.pageid, 8091)
         self.assertEqual(str(page.title), 'Douglas_Adams')
         self.assertTrue(page.url.endswith('Adams'))
+        self.assertTrue(page.exhtml.startswith('<'))
         self.assertTrue('Douglas_Adams' in page.url_raw)
 
     def test_get_imageinfo(self):
