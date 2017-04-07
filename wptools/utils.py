@@ -21,6 +21,8 @@ from collections import defaultdict
 
 import lxml.etree
 import lxml.html
+from lxml.etree import tostring
+from itertools import chain
 
 
 def get_infobox(ptree):
@@ -222,7 +224,7 @@ def template_to_dict(tree):
             if tmpl is not None:
                 value = template_to_text(tmpl)
             else:
-                value = item.findtext('value')
+                value = text_with_children(item.find('value'))
             if name and value:
                 obj[name] = value.strip()
         except AttributeError:
@@ -238,6 +240,13 @@ def template_to_dict(tree):
     if errors:
         obj['errors'] = errors
     return dict(obj)
+
+
+def text_with_children(node):
+    parts = ([node.text] +
+             list(chain(*([tostring(c, with_tail=False), c.tail] for c in node.getchildren()))) +
+             [node.tail])
+    return ''.join(filter(None, parts))
 
 
 def template_to_text(tmpl):
