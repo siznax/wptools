@@ -18,11 +18,12 @@ import hashlib
 import json
 
 from collections import defaultdict
+from itertools import chain
 
 import lxml.etree
 import lxml.html
+
 from lxml.etree import tostring
-from itertools import chain
 
 
 def get_infobox(ptree):
@@ -243,9 +244,14 @@ def template_to_dict(tree):
 
 
 def text_with_children(node):
+    """
+    return text content, with children if present
+    """
     parts = ([node.text] +
-             list(chain(*([tostring(c, with_tail=False), c.tail] for c in node.getchildren()))) +
-             [node.tail])
+             list(chain(
+                 *([tostring(c, with_tail=False),
+                    c.tail] for c in node.getchildren())))
+             + [node.tail])
     return ''.join(filter(None, parts))
 
 
