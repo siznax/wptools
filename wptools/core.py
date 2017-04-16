@@ -69,6 +69,7 @@ class WPTools(object):
     _defer_imageinfo = False
 
     description = None
+    exhtml = None
     extext = None
     extract = None
     fatal = False
