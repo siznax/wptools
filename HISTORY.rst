@@ -3,9 +3,12 @@
 Release History
 ---------------
 
-0.2.1 (2016-11-07)
+0.2.2 (2017-04-16)
 ++++++++++++++++++
 
+* Merge @aplz improvement: fetch full lists in infobox values (#62)
+* Get extract as HTML
+* Fix AttributeError bug (#47)
 * Refactoring fixes
 
 

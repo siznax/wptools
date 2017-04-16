@@ -1,8 +1,3 @@
-🐝 See you at the `Wikimedia Developer Summit
-<https://www.mediawiki.org/wiki/Wikimedia_Developer_Summit>`_ 9-11 Jan
-2017 in San Francisco.
-
-
 Wikipedia tools (for Humans)
 ============================
 
