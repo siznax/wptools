@@ -3,7 +3,7 @@
 Release History
 ---------------
 
-0.2.2 (2017-04-16)
+0.2.3 (2017-04-17)
 ++++++++++++++++++
 
 * Merge @aplz improvement: fetch full lists in infobox values (#62)
