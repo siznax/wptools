@@ -691,7 +691,7 @@ class WPTools(object):
         MediaWiki:API action=query request for:
         - description: <str> Wikidata description (via pageterms)
         - extext: <str> plain text (Markdown) extract
-        - extract: <str> HTML extract via Extension:TextExtract
+        - extract: <str> HTML extract from Extension:TextExtract
         - images: <dict> {query-pageimage, query-thumbnail}
         - label: <str> Wikidata label (via pageterms)
         - modified (page): <str> ISO8601 date and time
@@ -739,6 +739,7 @@ class WPTools(object):
         """
         RESTBase (/page/mobile-text/)
         - description: <str> apparently, Wikidata description
+        - exhtml: <str> HTML extract from RESTBase (includes wikilinks)
         - images: <dict> {rest-image, rest-thumb}
         - lead: <str> encyclopedia-like lead section
         - modified (page): <str> ISO8601 date and time
