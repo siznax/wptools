@@ -7,7 +7,7 @@ Release History
 ++++++++++++++++++
 
 * Merge @aplz improvement: fetch full lists in infobox values (#62)
-* Get extract as HTML
+* Put HTML extract with wikilinks into 'exhtml'
 * Fix AttributeError bug (#47)
 * Refactoring fixes
 
