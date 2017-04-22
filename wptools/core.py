@@ -68,6 +68,7 @@ class WPTools(object):
 
     _defer_imageinfo = False
 
+    actions = ['parse', 'query', 'wikidata', 'rest', 'claims', 'imageinfo']
     description = None
     exhtml = None
     extext = None
@@ -784,17 +785,32 @@ class WPTools(object):
             if token in img.get('kind'):
                 return img
 
-    def info(self, action):
-        '''returns cache[action]['info']'''
-        return self.cache[action]['info']
+    def info(self, action=None):
+        '''
+        returns cached query info for given action,
+        or list of cached actions
+        '''
+        if action in self.actions and action in self.cache:
+            return self.cache[action]['info']
+        return self.cache.keys() or None
 
-    def query(self, action):
-        '''returns cache[action]['query'] without &format=json'''
-        return self.cache[action]['query'].replace('&format=json', '')
+    def query(self, action=None):
+        '''
+        returns cached query (without &format=json) for given action,
+        or list of cached actions
+        '''
+        if action in self.actions and action in self.cache:
+            return self.cache[action]['query'].replace('&format=json', '')
+        return self.cache.keys() or None
 
-    def response(self, action):
-        '''returns cache[action]['response'] as dict'''
-        return utils.json_loads(self.cache[action]['response'])
+    def response(self, action=None):
+        '''
+        returns cached query response (as dict) for given action,
+        or list of cached actions
+        '''
+        if action in self.actions and action in self.cache:
+            return utils.json_loads(self.cache[action]['response'])
+        return self.cache.keys() or None
 
     def show(self):
         """
