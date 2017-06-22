@@ -11,7 +11,8 @@ import argparse
 import random
 import unittest
 
-import titles
+import tests.titles as titles
+import tests.wikidata_images as wikidata_images
 import wptools
 
 LANG = ['de', 'es', 'fr', 'hi', 'it', 'ja', 'nl', 'ru', 'sv', 'vi', 'zh']
@@ -99,14 +100,6 @@ class WPToolsPickTest(unittest.TestCase):
         """
         p = wptools.page('Abraham Lincoln', lang='zh').get_query(False)
         self.assertEqual(p.wikibase, 'Q91')
-
-    def test_complex_infobox(self):
-        """
-        Successfully populate complex infobox dict
-        """
-        p = wptools.page('Aung San Suu Kyi').get_parse(False)
-        self.assertGreaterEqual(len(p.infobox), 32)
-        self.assertTrue('errors' not in p.infobox)
 
     def test_thumbnail(self):
         """
@@ -196,7 +189,8 @@ class WPToolsToolTest(unittest.TestCase):
     WPTOOL TESTS
     """
 
-    def test_wptool(self):
+    @staticmethod
+    def test_wptool():
         '''
         Get random page via wptool
         '''
@@ -208,10 +202,43 @@ class WPToolsToolTest(unittest.TestCase):
         main(args(**cli))
 
 
+class WPToolsUtilsTest(unittest.TestCase):
+    """
+    Utils Tests
+    """
+
+    def test_infobox_subelements(self):
+        """
+        Get infobox data with sub-elements. Issue #66
+        """
+        p = wptools.page("ONE OK ROCK", lang='ja').get_parse()
+        self.assertGreater(len(p.infobox['Genre'].split('<br')), 5)
+
+    def test_infobox_children(self):
+        """
+        Get infobox data with list values. Issue #62
+        """
+        p = wptools.page('Lewisit', lang='de').get_parse()
+        self.assertGreater(len(p.infobox['Dichte'].split('*')), 1)
+
+    def test_complex_infobox(self):
+        """
+        Successfully populate complex infobox dict
+        """
+        p = wptools.page('Aung San Suu Kyi').get_parse(False)
+        self.assertGreaterEqual(len(p.infobox), 32)
+        self.assertTrue('errors' not in p.infobox)
+
+
 class WPToolsWikidataTest(unittest.TestCase):
+    """
+    Wikidata Tests
+    """
 
     def test_wikidata_images(self):
-        import wikidata_images
+        """
+        Get wikidata images from cache.
+        """
         page = wptools.page('test_wikidata_images')
         page.cache['wikidata'] = wikidata_images.cache
         page._set_wikidata()
@@ -228,6 +255,7 @@ if __name__ == '__main__':
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
         'rest': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
         'tool': TestLoader().loadTestsFromTestCase(WPToolsToolTest),
+        'utils': TestLoader().loadTestsFromTestCase(WPToolsUtilsTest),
         'wikidata': TestLoader().loadTestsFromTestCase(WPToolsWikidataTest),
     }
     suites['all'] = unittest.TestSuite(suites.values())

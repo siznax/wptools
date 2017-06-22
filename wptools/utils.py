@@ -245,14 +245,22 @@ def template_to_dict(tree):
 
 def text_with_children(node):
     """
-    return text content, with children if present
+    return text content with children (#62), sub-elements (#66)
+    https://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml
     """
-    parts = ([node.text] +
-             list(chain(
-                 *([tostring(c, with_tail=False),
-                    c.tail] for c in node.getchildren())))
-             + [node.tail])
-    return ''.join(filter(None, parts))
+    if sys.version.startswith('3'):  # py3 needs encoding=str
+        parts = ([node.text] +
+                 list(chain(
+                     *([tostring(c, with_tail=False, encoding=str),
+                        c.tail] for c in node.getchildren())))
+                 + [node.tail])
+    else:
+        parts = ([node.text] +
+                 list(chain(
+                     *([tostring(c, with_tail=False),
+                        c.tail] for c in node.getchildren())))
+                 + [node.tail])
+    return ''.join(filter(lambda x: x or isinstance(x, str), parts))
 
 
 def template_to_text(tmpl):
