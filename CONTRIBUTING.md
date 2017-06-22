@@ -22,7 +22,7 @@ Submit code
 1. Create a ``virtualenv``
 1. Fork the repo into it
 1. Install requirements
-1. Advanced tests should pass
+1. Basic and advanced tests should pass
 1. ``flake8`` and ``pylint`` your contribution
 1. Make sure advanced tests still pass
 1. Submit a pull request
@@ -34,6 +34,13 @@ Submit code
 [env]$ pip install -r requirements.txt
 ```
 
+### Basic tests
+
+Travis uses `nosetests` (see `.travis.yml`)
+
+```shell
+[env]$ nosetests tests/test_basic.py
+```
 
 ### Advanced tests
 
