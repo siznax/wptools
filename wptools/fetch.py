@@ -77,7 +77,7 @@ class WPToolsFetch(object):
             "&rnlimit=1"
             "&rnnamespace=0")),
         "rest": Template((
-            "${WIKI}/api/rest_v1${entrypoint}${title}")),
+            "${WIKI}/api/rest_v1${entrypoint}")),
         "wikidata": Template((
             "${WIKI}/w/api.php?action=wbgetentities"
             "&format=json"
@@ -178,11 +178,9 @@ class WPToolsFetch(object):
         if not tmpl_wiki.startswith('http'):
             tmpl_wiki = 'https://' + self.wiki
 
-        if action.startswith('/'):
-            qry = self.QUERY['rest'].substitute(
-                WIKI=tmpl_wiki,
-                entrypoint=action,
-                title=thing)
+        if action == 'rest':
+            qry = self.QUERY['rest'].substitute(WIKI=tmpl_wiki,
+                                                entrypoint=thing)
         elif action == 'wikidata' or action == 'claims':
             ids = ''
             site = ''

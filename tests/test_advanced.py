@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-'''
+"""
 WPTools advanced tests
-'''
+"""
 
 from __future__ import print_function
 
@@ -86,9 +86,9 @@ class WPToolsPickTest(unittest.TestCase):
         self.assertTrue(w.wikibase is not None)
 
     def test_wikidata_claims(self):
-        '''
+        """
         Get wikidata claims
-        '''
+        """
         p = wptools.page('Paris').get_wikidata(False)
         self.assertTrue('latitude' in p.wikidata['coordinates'])
         self.assertEqual(p.wikidata['country'], 'France')
@@ -175,13 +175,42 @@ class WPToolsRestBaseTest(unittest.TestCase):
     """
 
     def test_get_rest(self):
-        '''
-        Get random RESTBase
-        '''
-        t = titles.title()
-        r = wptools.page(t['title'], lang=t['lang'])
-        r.get_rest()
-        self.assertTrue(r.lead is not None)
+        """
+        Get RESTBase entry points
+        """
+        page = wptools.page('test')
+        page.get_rest()
+        self.assertEqual(page.endpoint, '/page/')
+
+    def test_get_rest_html(self):
+        """
+        Get RESTBase HTML
+        """
+        page = wptools.page()
+        page.get_rest('html')
+        self.assertTrue('/html/' in page.endpoint)
+        self.assertTrue(page.html.startswith('<!DOCTYPE'))
+        self.assertTrue(page.html.endswith('</html>'))
+
+    def test_get_rest_lead(self):
+        """
+        Get RESTBase lead section
+        """
+        page = wptools.page()
+        page.get_rest('mobile-sections-lead')
+        self.assertTrue(page.lead.startswith('<span'))
+        self.assertTrue('page' in page.modified)
+        self.assertTrue(page.pageid is not None)
+        self.assertTrue(page.wikibase is not None)
+
+    def test_get_rest_summary(self):
+        """
+        Get RESTBase page summary
+        """
+        page = wptools.page()
+        page.get_rest('summary')
+        self.assertTrue(page.exhtml.startswith('<p>'))
+        self.assertTrue(page.pageid is not None)
 
 
 class WPToolsToolTest(unittest.TestCase):

@@ -70,16 +70,20 @@ class WPTools(object):
 
     actions = ['parse', 'query', 'wikidata', 'rest', 'claims', 'imageinfo']
     description = None
+    endpoint = None
     exhtml = None
+    exrest = None
     extext = None
     extract = None
     fatal = False
+    html = None
     infobox = None
     label = None
     lead = None
     links = None
     parsetree = None
     random = None
+    silent = False
     title = None
     url = None
     url_raw = None
@@ -147,92 +151,6 @@ class WPTools(object):
             if fname not in files:
                 files.append(fname)
         return files
-
-    def __get_lead(self, data):
-        """
-        returns lead HTML with heading and image and refs removed
-        """
-        lead = []
-        lead.append(self.__get_lead_image())
-        lead.append(self.__get_lead_heading())
-        lead.append(self.__get_lead_rest(data))
-        lead.append(self.__get_lead_metadata())
-        return "\n".join([x for x in lead if x])
-
-    def __get_lead_heading(self):
-        """
-        returns lead section HTML heading
-        """
-        if not hasattr(self, 'url') or not hasattr(self, 'title'):
-            return
-
-        heading = "<a href=\"%s\">%s</a>" % (self.url, self.title)
-        if hasattr(self, 'description') and self.description:
-            heading += "&mdash;<i>%s</i>. " % self.description
-        else:
-            heading += ':'
-
-        return "<span heading>%s</span>" % heading
-
-    def __get_lead_image(self):
-        """
-        returns <img> HTML from image attributes
-        """
-        src = None
-        for kind in ['cover', 'wikidata', 'thumbnail', 'thumb', 'page']:
-            if self.image(kind):
-                src = self.image(kind)['url']
-                cls = kind
-                break
-
-        if src:
-            alt = self.title or self.label
-            img = "<img %s" % (cls)
-            img += " src=\"%s\"" % (src)
-            img += " alt=\"%s\" title=\"%s\">" % (alt, alt)
-            return img
-
-    def __get_lead_metadata(self):
-        """
-        returns lead HTML metadata from attributes
-        """
-        meta = []
-        if hasattr(self, 'modified'):
-            meta.append("Modified: %s" % self.modified['page'])
-        return "<span metadata>%s</span>" % "\n".join([x for x in meta if x])
-
-    def __get_lead_rest(self, data):
-        """
-        returns lead section HTML from RESTBase:/page/mobile-text/
-        """
-        pars = []
-        for section in data['sections']:
-            for item in section['items']:
-                _type = item.get('type')
-                if _type == 'hatnote' or _type == 'image':
-                    continue
-                if item.get('text'):
-                    pars.append(item['text'])
-                else:
-                    pars.append(", ".join(item.keys()))
-            break
-
-        if pars:
-            html = "\n".join(pars)
-            self.exhtml = html
-            self.cache['rest']['html'] = html
-            return self.__postprocess_lead(html)
-
-    def __postprocess_lead(self, html):
-        """
-        snip and base href lead HTML
-        """
-        snip = utils.snip_html(html, verbose=1 if self.verbose else 0)
-        snip = "<span snipped>%s</span>" % snip
-        url = urlparse(self.cache['rest']['query'])
-        base = "%s://%s" % (url.scheme, url.netloc)
-        snip = snip.replace('href="/', "href=\"%s/" % base)
-        return snip
 
     def __update_imageinfo(self, title, info):
         """
@@ -344,14 +262,14 @@ class WPTools(object):
 
         elif action == 'rest':
             try:
-                title = quote(self.title)
+                thing = quote(self.endpoint)
             except KeyError:
-                title = quote(self.title.encode('utf-8'))
-            return _fetch.query('/page/mobile-text/', title)
+                thing = quote(self.endpoint.encode('utf-8'))
+            return _fetch.query(action, thing)
 
         elif action == 'claims':
             thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
-            return _fetch.query('claims', thing)
+            return _fetch.query(action, thing)
 
         elif action == 'imageinfo':
             files = self.__get_image_files()
@@ -359,7 +277,7 @@ class WPTools(object):
                 files = [quote(x) for x in files]
             except KeyError:
                 files = [quote(x.encode('utf-8')) for x in files]
-            return _fetch.query('imageinfo', '|'.join(files))
+            return _fetch.query(action, '|'.join(files))
 
     def _request(self, action, show, proxy, timeout):
         """
@@ -367,7 +285,7 @@ class WPTools(object):
         """
         if action in self.cache:
             if action != 'imageinfo':
-                utils.stderr("%s results in cache" % action)
+                utils.stderr("%s results in cache" % action, self.silent)
                 return
 
         if action in self.skip:
@@ -509,36 +427,65 @@ class WPTools(object):
         """
         set attributes derived from RESTBase
         """
+        if self.cache['rest']['info']['content'].startswith('text/html'):
+            html = self.cache['rest']['response']
+            if isinstance(html, bytes):
+                html = html.decode('utf-8')
+            self.html = html
+            return
+
         data = self._load_response('rest')
 
+        if self.endpoint == '/page/':
+            msg = "RESTBase /page/ entry points: %s" % data.get('items')
+            utils.stderr(msg)
+            return
+
+        if self.cache['rest']['info']['status'] == 404:
+            raise LookupError(data.get('detail'))
+
         self.description = data.get('description')
-        self.modified['page'] = data.get('lastmodified')
-        self.pageid = data.get('id')
+        self.pageid = (data.get('id') or data.get('pageid'))
+        self.exrest = data.get('extract')
+        self.exhtml = data.get('extract_html')
 
-        if data.get('detail'):
-            error = data.get('detail').get('error')
-            if error:
-                utils.stderr("RESTBase error: %s" % error)
-                return
-
-        if data.get('image'):
+        if data.get('image'):  # /page/mobile-sections-lead
             rimg = {'kind': 'rest-image'}
             rimg.update(data.get('image'))
             self.images.append(rimg)
 
-        title = (data.get('redirected')
-                 or data.get('normalizedtitle')
-                 or data.get('displaytitle'))
+        lastmodified = data.get('lastmodified')
+        if lastmodified:
+            self.modified['page'] = lastmodified
+
+        originalimage = data.get('originalimage')  # /page/summary
+        if originalimage:
+            rimg = {'kind': 'rest-image'}
+            rimg.update(originalimage)
+            if originalimage.get('source'):
+                rimg.update({'url': originalimage.get('source')})
+            self.images.append(rimg)
+
+        if data.get('sections'):
+            lead = data.get('sections')[0]
+            self.lead = lead.get('text')
+
+        thumbnail = data.get('thumbnail')  # /page/summary
+        if thumbnail:
+            rimg = {'kind': 'rest-thumb'}
+            rimg.update(thumbnail)
+            if thumbnail.get('source'):
+                rimg.update({'url': thumbnail.get('source')})
+            self.images.append(rimg)
+
+        title = (data.get('title') or data.get('normalizedtitle'))
         if title:
             self.title = title.replace(' ', '_')
 
-        if data.get('sections'):
-            self.lead = self.__get_lead(data)
-
-        if data.get('thumb'):
-            rthumb = {'kind': 'rest-thumb'}
-            rthumb.update(data.get('thumb'))
-            self.images.append(rthumb)
+        wikibase = data.get('wikibase_item')
+        if wikibase:
+            self.wikibase = wikibase
+            self.wikidata_url = utils.wikidata_url(wikibase)
 
         url = urlparse(self.cache['rest']['query'])
         self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
@@ -661,7 +608,7 @@ class WPTools(object):
             raise LookupError("get_images needs images")
 
         if not self._missing_imageinfo() and 'imageinfo' in self.cache:
-            utils.stderr("complete imageinfo in cache")
+            utils.stderr("complete imageinfo in cache", self.silent)
             return
 
         self._request('imageinfo', show, proxy, timeout)
@@ -736,20 +683,46 @@ class WPTools(object):
 
         return self
 
-    def get_rest(self, show=True, proxy=None, timeout=0):
+    def get_rest(self, endpoint=None, show=True, proxy=None, timeout=0):
         """
-        RESTBase (/page/mobile-text/)
-        - description: <str> apparently, Wikidata description
-        - exhtml: <str> HTML extract from RESTBase (includes wikilinks)
+        RESTBase /page endpoints needing only {title}
+        for example:
+            /page/html
+            /page/summary
+            /page/mobile-sections-lead
+
+        Arguments:
+        - endpoint: the RESTBase entry point
+
+        Without arguments, lists RESTBase /page/ entry points
+
+        Attributes affected:
+        - exhtml: <str> "extract_html" from /page/summary
+        - exrest: <str> "extract" from /page/summary
+        - html: <str> from /page/html
         - images: <dict> {rest-image, rest-thumb}
-        - lead: <str> encyclopedia-like lead section
+        - lead: <str> section[0] from /page/mobile-sections-lead
         - modified (page): <str> ISO8601 date and time
+        - title: <str> the article title
         - url: <str> the canonical wiki URL
-        - url_raw: <str> ostensible raw wikitext URL
-        https://en.wikipedia.org/api/rest_v1/
+        - url_raw: <str> probable raw wikitext URL
+        - wikibase: <str> Wikidata item ID
+        - wikidata_url: <str> Wikidata URL
+
+        See https://en.wikipedia.org/api/rest_v1/
         """
         if not self.title:
             raise LookupError("get_rest needs a title")
+
+        if not endpoint:
+            self.endpoint = '/page/'
+        else:
+            parts = endpoint.split('/')
+            parts = [x for x in parts if x]
+            if not parts[0] == 'page':
+                parts.insert(0, 'page')
+            parts.append(self.title)
+            self.endpoint = '/' + '/'.join(parts)
 
         self._request('rest', show, proxy, timeout)
 
@@ -816,6 +789,7 @@ class WPTools(object):
         """
         pretty-print instance attributes
         """
+        excludes = ['actions']
         maxlen = 72
 
         def ptrunc(prefix, tail):
@@ -829,7 +803,8 @@ class WPTools(object):
         data = {}
         for item in dir(self):
             prop = getattr(self, item)
-            if not prop or callable(prop) or item.startswith('_'):
+            if (not prop or callable(prop) or item.startswith('_')
+                    or item in excludes):
                 continue
             if isinstance(prop, dict):
                 keys = sorted(prop.keys())

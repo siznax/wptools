@@ -1,7 +1,9 @@
 *.pyc
 *.sw?
 *~
+.*
+_*
 /build/
 /dist/
-*.egg-info
+
 
