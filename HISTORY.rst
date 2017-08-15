@@ -3,6 +3,15 @@
 Release History
 ---------------
 
+0.3 (2017-08-13)
+++++++++++++++++
+
+* Implemented general RESTBase /page/ access (#67)
+* Merged @rikima's contrib plus py3 patch (#66)
+* Made page.info(), query(), response() methods useable
+* Improved wiki documentation (see Actions, Attributes)
+
+
 0.2.3 (2017-04-17)
 ++++++++++++++++++
 
@@ -12,7 +21,7 @@ Release History
 * Refactoring fixes
 
 
-0.2.0 (2016-11-06)
+0.2 (2016-11-06)
 ++++++++++++++++++
 
 * Many fixes/improvements with help of @seansay (thank you!)
