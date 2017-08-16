@@ -23,4 +23,5 @@ __version__ = "0.3"
 from . import fetch
 from . import utils
 
+from .category import WPToolsCategory as cat
 from .core import WPTools as page

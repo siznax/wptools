@@ -36,6 +36,11 @@ class WPToolsFetch(object):
     ]
 
     QUERY = {
+        "list": Template((
+            "${WIKI}/w/api.php?action=query"
+            "&format=json"
+            "&formatversion=2"
+            "&list=${_list}")),
         "imageinfo": Template((
             "${WIKI}/w/api.php?action=query"
             "&format=json"
@@ -181,6 +186,25 @@ class WPToolsFetch(object):
         if action == 'rest':
             qry = self.QUERY['rest'].substitute(WIKI=tmpl_wiki,
                                                 entrypoint=thing)
+        elif action == 'category':
+            qry = self.QUERY['list'].substitute(WIKI=tmpl_wiki,
+                                                _list='categorymembers')
+
+            limit = thing.get('limit')
+            namespace = thing.get('namespace')
+            pageid = thing.get('pageid')
+            title = thing.get('title')
+
+            if limit:
+                qry += "&cmlimit=%d" % limit
+            if namespace is not None and namespace >= 0:
+                qry += "&cmnamespace=%d" % namespace
+            if pageid:
+                qry += "&cmpageid=%d" % pageid
+                thing = pageid
+            if title:
+                qry += "&cmtitle=" + title
+                thing = title
         elif action == 'wikidata' or action == 'claims':
             ids = ''
             site = ''

@@ -8,11 +8,11 @@ Basic tests for WPTools.
 import unittest
 import wptools
 
+from . import category
 from . import claims
 from . import imageinfo
 from . import parse
 from . import query
-from . import rest
 from . import rest_lead
 from . import rest_html
 from . import rest_summary
@@ -26,6 +26,20 @@ class WPToolsTestCase(unittest.TestCase):
         wptools.core
         wptools.fetch
         wptools.utils
+
+
+class WPToolsCategoryTestCase(unittest.TestCase):
+
+    def test_category_init(self):
+        self.assertRaises(ValueError, wptools.cat)
+        self.assertRaises(ValueError, wptools.cat, pageid='not int')
+        self.assertRaises(ValueError, wptools.cat, 'Test', pageid=123)
+
+    def test_category_get_members(self):
+        cat = wptools.cat('test_category_get_members', silent=True)
+        cat.cache['category'] = category.cache
+        cat._set_category_data()
+        self.assertTrue(len(cat.members), 92)
 
 
 class WPToolsCoreTestCase(unittest.TestCase):

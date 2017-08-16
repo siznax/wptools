@@ -207,6 +207,9 @@ class WPTools(object):
             query = self.cache[action]['query'].replace('&format=json', '')
             data = utils.json_loads(self.cache[action]['response'])
 
+            if data.get('error'):
+                raise LookupError
+
             if action == 'parse' and not data.get('parse'):
                 raise LookupError
 
@@ -790,6 +793,7 @@ class WPTools(object):
         pretty-print instance attributes
         """
         excludes = ['actions']
+        includes = ['namespace']
         maxlen = 72
 
         def ptrunc(prefix, tail):
@@ -803,9 +807,14 @@ class WPTools(object):
         data = {}
         for item in dir(self):
             prop = getattr(self, item)
+
+            if item in includes and isinstance(prop, int):
+                data[item] = "<int> %d" % prop
+
             if (not prop or callable(prop) or item.startswith('_')
                     or item in excludes):
                 continue
+
             if isinstance(prop, dict):
                 keys = sorted(prop.keys())
                 klen = len(keys)

@@ -52,6 +52,22 @@ class WPToolsBadTest(unittest.TestCase):
             print(detail)
 
 
+class WPToolsCategoryTest(unittest.TestCase):
+    """
+    CATEGORY TESTS
+    """
+
+    def test_get_category_members(self):
+        """
+        Get a category
+        """
+        cat = wptools.cat('Category:Human rights by issue', silent=True)
+        cat.get_members()
+        self.assertTrue('category' in cat.cache)
+        self.assertEqual(cat.title, 'Category:Human_rights_by_issue')
+        self.assertTrue(len(cat.members) > 50)
+
+
 class WPToolsPickTest(unittest.TestCase):
     """
     SELECTED (cherry-picked) TESTS
@@ -280,6 +296,7 @@ if __name__ == '__main__':
     from unittest import TestLoader
     suites = {
         'bad':  TestLoader().loadTestsFromTestCase(WPToolsBadTest),
+        'cat':  TestLoader().loadTestsFromTestCase(WPToolsCategoryTest),
         'pick': TestLoader().loadTestsFromTestCase(WPToolsPickTest),
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
         'rest': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
