@@ -57,7 +57,7 @@ class WPToolsCategoryTest(unittest.TestCase):
     CATEGORY TESTS
     """
 
-    def test_get_category_members(self):
+    def test_get_category_members_title(self):
         """
         Get a category
         """
@@ -65,6 +65,17 @@ class WPToolsCategoryTest(unittest.TestCase):
         cat.get_members()
         self.assertTrue('category' in cat.cache)
         self.assertEqual(cat.title, 'Category:Human_rights_by_issue')
+        self.assertTrue(len(cat.members) > 50)
+
+
+    def test_get_category_members_pageid(self):
+        """
+        Get a category
+        """
+        cat = wptools.cat(pageid=27568094, silent=True)
+        cat.get_members()
+        self.assertTrue('category' in cat.cache)
+        self.assertEqual(cat.pageid, 27568094)
         self.assertTrue(len(cat.members) > 50)
 
 
