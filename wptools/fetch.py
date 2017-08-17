@@ -199,12 +199,12 @@ class WPToolsFetch(object):
                 qry += "&cmlimit=%d" % limit
             if namespace is not None and namespace >= 0:
                 qry += "&cmnamespace=%d" % namespace
-            if pageid:
-                qry += "&cmpageid=%d" % pageid
-                thing = pageid
             if title:
                 qry += "&cmtitle=" + title
                 thing = title
+            if pageid:
+                qry += "&cmpageid=%d" % pageid
+                thing = pageid
         elif action == 'wikidata' or action == 'claims':
             ids = ''
             site = ''

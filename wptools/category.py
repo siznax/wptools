@@ -49,7 +49,6 @@ class WPToolsCategory(core.WPTools):
         if pageid:
             try:
                 kwargs['pageid'] = int(pageid)
-                args = [self.__module__]
             except ValueError:
                 raise ValueError("invalid pageid")
 
