@@ -17,6 +17,7 @@ Python and command-line MediaWiki access for Humans.
 - get an Infobox as a python dictionary
 - get any/all Wikidata by title
 - get info in any language
+- get category members
 - get random info
 
 This package is intended to make it as easy as possible to get data
