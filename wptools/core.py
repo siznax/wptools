@@ -79,7 +79,9 @@ class WPTools(object):
     html = None
     infobox = None
     label = None
+    languages = None
     lead = None
+    length = None
     links = None
     parsetree = None
     random = None
@@ -87,6 +89,7 @@ class WPTools(object):
     title = None
     url = None
     url_raw = None
+    watchers = None
     what = None
     wikidata_url = None
     wikitext = None
@@ -386,10 +389,12 @@ class WPTools(object):
         data = self._load_response('query')
         page = data['query']['pages'][0]
 
+        self.length = page.get('length')
         self.modified['page'] = page.get('touched')
         self.pageid = page.get('pageid')
         self.random = data['query']['random'][0]["title"]
         self.title = page.get('title').replace(' ', '_')
+        self.watchers = page.get('watchers')
 
         if page.get('extract'):
             self.extract = page['extract']
@@ -400,6 +405,10 @@ class WPTools(object):
         if page.get('fullurl'):
             self.url = page['fullurl']
             self.url_raw = self.url + '?action=raw'
+
+        languages = page.get('langlinks')
+        if languages:
+            self.languages = languages
 
         if page.get('pageimage'):
             self.images.append({'kind': 'query-pageimage',
