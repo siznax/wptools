@@ -59,26 +59,29 @@ Example
       cache: <dict(5)> {claims, imageinfo, parse, query, wikidata}
       claims: <dict(4)> {Q129286, Q5, Q6512732, Q668}
       description: pre-eminent leader of Indian nationalism during British-ruled India
-      extext: <str(2987)> **Mohandas Karamchand Gandhi** (; Hindustani: ...
-      extract: <str(3192)> <p><b>Mohandas Karamchand Gandhi</b> (<span><...
+      extext: <str(2980)> **Mohandas Karamchand Gandhi** (; Hindustani: ...
+      extract: <str(3184)> <p><b>Mohandas Karamchand Gandhi</b> (<span><...
       images: <list(4)>
       infobox: <dict(22)> {alma_mater, alt, birth_date, birth_name, birt...
       label: Mahatma Gandhi
       lang: en
+      languages: <list(167)>
+      length: 264260
       links: <list(10)>
       modified: <dict(2)> {page, wikidata}
       pageid: 19379
-      parsetree: <str(333213)> <root><template><title>Redirect</title><p...
+      parsetree: <str(333230)> <root><template><title>Redirect</title><p...
       props: <dict(7)> {P18, P27, P31, P345, P569, P570, P910}
-      random: Francis II, Duke of Saxe-Lauenburg
+      random: Ikioi Shōta
       title: Mahatma_Gandhi
       url: https://en.wikipedia.org/wiki/Mahatma_Gandhi
       url_raw: https://en.wikipedia.org/wiki/Mahatma_Gandhi?action=raw
+      watchers: 1723
       what: human
       wikibase: Q1001
       wikidata: <dict(7)> {IMDB, birth, category, citizenship, death, im...
       wikidata_url: https://www.wikidata.org/wiki/Q1001
-      wikitext: <str(262702)> {{Redirect|Gandhi}}{{pp-move-indef}}{{pp-s...
+      wikitext: <str(262639)> {{Redirect|Gandhi}}{{pp-move-indef}}{{pp-s...
     }
 
 
