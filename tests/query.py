@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|contributors|extracts|images|info|langlinks|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|contributors|extracts|images|info|langlinks|pageimages|pageprops|pageterms|pageviews&redirects&rnlimit=1&rnnamespace=0&titles=Douglas_Adams'
 
 response = r"""
 {
     "continue": {
-        "rncontinue": "0.413838719197|0.41383918599583097|202840|0",
+        "rncontinue": "0.785443924704|0.785444075093|5676344|0",
         "pccontinue": "8091|1591",
-        "continue": "||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms"
+        "continue": "||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms|pageviews"
     },
     "query": {
         "normalized": [
@@ -549,14 +549,76 @@ response = r"""
                         "Douglas N. Adams",
                         "DNA"
                     ]
+                },
+                "pageviews": {
+                    "2017-06-19": 1315,
+                    "2017-06-20": 1238,
+                    "2017-06-21": 1184,
+                    "2017-06-22": 1168,
+                    "2017-06-23": 1138,
+                    "2017-06-24": 1061,
+                    "2017-06-25": 1245,
+                    "2017-06-26": 1346,
+                    "2017-06-27": 1162,
+                    "2017-06-28": 1321,
+                    "2017-06-29": 1299,
+                    "2017-06-30": 1249,
+                    "2017-07-01": 1103,
+                    "2017-07-02": 1613,
+                    "2017-07-03": 1246,
+                    "2017-07-04": 1322,
+                    "2017-07-05": 1302,
+                    "2017-07-06": 1348,
+                    "2017-07-07": 1192,
+                    "2017-07-08": 1180,
+                    "2017-07-09": 1302,
+                    "2017-07-10": 1387,
+                    "2017-07-11": 1287,
+                    "2017-07-12": 1289,
+                    "2017-07-13": 1286,
+                    "2017-07-14": 1253,
+                    "2017-07-15": 1106,
+                    "2017-07-16": 1407,
+                    "2017-07-17": 1478,
+                    "2017-07-18": 1430,
+                    "2017-07-19": 1309,
+                    "2017-07-20": 1193,
+                    "2017-07-21": 1202,
+                    "2017-07-22": 1214,
+                    "2017-07-23": 1539,
+                    "2017-07-24": 1791,
+                    "2017-07-25": 1729,
+                    "2017-07-26": 1799,
+                    "2017-07-27": 1704,
+                    "2017-07-28": 1784,
+                    "2017-07-29": 1723,
+                    "2017-07-30": 1603,
+                    "2017-07-31": 1657,
+                    "2017-08-01": 1548,
+                    "2017-08-02": 1504,
+                    "2017-08-03": 1387,
+                    "2017-08-04": 1260,
+                    "2017-08-05": 1260,
+                    "2017-08-06": 1315,
+                    "2017-08-07": 1344,
+                    "2017-08-08": 1554,
+                    "2017-08-09": 1474,
+                    "2017-08-10": 1358,
+                    "2017-08-11": 1345,
+                    "2017-08-12": 1253,
+                    "2017-08-13": 1315,
+                    "2017-08-14": 1344,
+                    "2017-08-15": 1331,
+                    "2017-08-16": 1413,
+                    "2017-08-17": 1248
                 }
             }
         ],
         "random": [
             {
-                "id": 36897044,
+                "id": 45564415,
                 "ns": 0,
-                "title": "Seneca Senior High School"
+                "title": "1990 NBL Finals"
             }
         ]
     }

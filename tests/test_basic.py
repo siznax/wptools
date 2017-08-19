@@ -156,6 +156,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(page.length, 60069)
         self.assertEqual(page.pageid, 8091)
         self.assertEqual(page.title, 'Douglas_Adams')
+        self.assertEqual(page.views, 1362)
         self.assertEqual(page.watchers, 447)
         self.assertEqual(str(page.wikibase), 'Q42')
         self.assertTrue('Douglas_Adams' in page.url_raw)

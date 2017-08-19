@@ -74,7 +74,7 @@ class WPToolsFetch(object):
             "&pithumbsize=240"
             "&ppprop=wikibase_item"
             "&prop=categories|contributors|extracts|images|info|langlinks"
-            "|pageimages|pageprops|pageterms"
+            "|pageimages|pageprops|pageterms|pageviews"
             "&redirects"
             "&rnlimit=1"
             "&rnnamespace=0"

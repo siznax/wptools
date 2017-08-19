@@ -93,6 +93,7 @@ class WPTools(object):
     title = None
     url = None
     url_raw = None
+    views = None
     watchers = None
     what = None
     wikidata_url = None
@@ -438,6 +439,10 @@ class WPTools(object):
             if wikibase:
                 self.wikibase = wikibase
                 self.wikidata_url = utils.wikidata_url(self.wikibase)
+
+        pageviews = page.get('pageviews')
+        if pageviews:
+            self.views = int(sum(pageviews.values()) / len(pageviews))
 
         terms = page.get('terms')
         if terms:

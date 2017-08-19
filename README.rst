@@ -60,10 +60,12 @@ Example
       cache: <dict(5)> {claims, imageinfo, parse, query, wikidata}
       categories: <list(66)>
       claims: <dict(4)> {Q129286, Q5, Q6512732, Q668}
+      contributors: 2118
       description: pre-eminent leader of Indian nationalism during British-ruled India
       extext: <str(2980)> **Mohandas Karamchand Gandhi** (; Hindustani: ...
       extract: <str(3184)> <p><b>Mohandas Karamchand Gandhi</b> (<span><...
-      images: <list(4)>
+      files: <list(53)>
+      image: <list(4)>
       infobox: <dict(22)> {alma_mater, alt, birth_date, birth_name, birt...
       label: Mahatma Gandhi
       lang: en
@@ -78,7 +80,8 @@ Example
       title: Mahatma_Gandhi
       url: https://en.wikipedia.org/wiki/Mahatma_Gandhi
       url_raw: https://en.wikipedia.org/wiki/Mahatma_Gandhi?action=raw
-      watchers: 1723
+      views: 21400
+      watchers: 1724
       what: human
       wikibase: Q1001
       wikidata: <dict(7)> {IMDB, birth, category, citizenship, death, im...
