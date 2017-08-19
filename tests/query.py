@@ -1,27 +1,138 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&inprop=displaytitle|url&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=extracts|images|info|langlinks|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas_Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas Adams'
 
 response = r"""
 {
+    "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.139806592523|0.139807020333|24117092|0",
-        "imcontinue": "8091|Towelday-Innsbruck.jpg",
-        "continue": "||extracts|info|langlinks|pageimages|pageprops|pageterms"
+        "rncontinue": "0.173099126376|0.173099136868|39852235|0",
+        "continue": "-||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms"
     },
     "query": {
-        "normalized": [
-            {
-                "fromencoded": false,
-                "from": "Douglas_Adams",
-                "to": "Douglas Adams"
-            }
-        ],
         "pages": [
             {
                 "pageid": 8091,
                 "ns": 0,
                 "title": "Douglas Adams",
+                "categories": [
+                    {
+                        "ns": 14,
+                        "title": "Category:1952 births"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:2001 deaths"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:20th-century English novelists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:20th-century atheists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:21st-century British novelists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:21st-century atheists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Alumni of St John's College, Cambridge"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Audio book narrators"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:BBC radio producers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:British atheism activists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:British child writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Burials at Highgate Cemetery"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Critics of religions"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Douglas Adams"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English atheists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English comedy writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English humanists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English humorists"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English radio writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English science fiction writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English social commentators"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:English television writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Infocom"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Interactive fiction writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Monty Python"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Non-fiction environmental writers"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:People educated at Brentwood School (Essex)"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:People from Cambridge"
+                    },
+                    {
+                        "ns": 14,
+                        "title": "Category:Usenet people"
+                    }
+                ],
                 "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>\n<p></p>\n\n<p></p>\n",
                 "images": [
                     {
@@ -63,6 +174,14 @@ response = r"""
                     {
                         "ns": 6,
                         "title": "File:Sound-icon.svg"
+                    },
+                    {
+                        "ns": 6,
+                        "title": "File:Towelday-Innsbruck.jpg"
+                    },
+                    {
+                        "ns": 6,
+                        "title": "File:Wikiquote-logo.svg"
                     }
                 ],
                 "contentmodel": "wikitext",
@@ -381,9 +500,9 @@ response = r"""
         ],
         "random": [
             {
-                "id": 42785715,
+                "id": 37542590,
                 "ns": 0,
-                "title": "Arunodoyer Agnishikha"
+                "title": "1996–97 FIBA EuroLeague"
             }
         ]
     }

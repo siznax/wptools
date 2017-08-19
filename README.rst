@@ -17,7 +17,7 @@ Python and command-line MediaWiki access for Humans.
 - get an Infobox as a python dictionary
 - get any/all Wikidata by title
 - get info in any language
-- get category members
+- get category info
 - get random info
 
 This package is intended to make it as easy as possible to get data
@@ -58,6 +58,7 @@ Example
     Mahatma_Gandhi (en)
     {
       cache: <dict(5)> {claims, imageinfo, parse, query, wikidata}
+      categories: <list(66)>
       claims: <dict(4)> {Q129286, Q5, Q6512732, Q668}
       description: pre-eminent leader of Indian nationalism during British-ruled India
       extext: <str(2980)> **Mohandas Karamchand Gandhi** (; Hindustani: ...

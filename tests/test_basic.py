@@ -147,6 +147,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         page = wptools.page('test_get_query', silent=True)
         page.cache['query'] = query.cache
         page._set_query_data()
+        self.assertEqual(len(page.categories), 29)
         self.assertEqual(len(page.languages), 69)
         self.assertEqual(page.description, 'English writer and humorist')
         self.assertEqual(page.label, 'Douglas Adams')

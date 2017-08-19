@@ -69,6 +69,7 @@ class WPTools(object):
     _defer_imageinfo = False
 
     actions = ['parse', 'query', 'wikidata', 'rest', 'claims', 'imageinfo']
+    categories = None
     description = None
     endpoint = None
     exhtml = None
@@ -395,6 +396,10 @@ class WPTools(object):
         self.random = data['query']['random'][0]["title"]
         self.title = page.get('title').replace(' ', '_')
         self.watchers = page.get('watchers')
+
+        categories = page.get('categories')
+        if categories:
+            self.categories = [x['title'] for x in categories]
 
         if page.get('extract'):
             self.extract = page['extract']

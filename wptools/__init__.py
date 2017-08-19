@@ -11,7 +11,7 @@ Get Wikipedia article info and Wikidata via MediaWiki APIs:
 - get an Infobox as a python dictionary
 - get any/all Wikidata by title
 - get info in any language
-- get category members
+- get category info
 - get random info
 """
 
