@@ -102,7 +102,7 @@ class WPToolsPickTest(unittest.TestCase):
         self.assertEqual(p.wikibase, 'Q43303')
         self.assertTrue(p.label is not None)
         self.assertTrue(p.description is not None)
-        self.assertTrue(p.images.pop()['file'] is not None)
+        self.assertTrue(p.image.pop()['file'] is not None)
         self.assertTrue(len(p.wikidata) > 5)
 
     def test_wikidata_title(self):
@@ -133,7 +133,7 @@ class WPToolsPickTest(unittest.TestCase):
         Get a thumbnail image URL
         """
         p = wptools.page('Frida Kahlo').get_query(False)
-        self.assertTrue('url' in p.image('thumb'))
+        self.assertTrue('url' in p.pageimage('thumb'))
 
     def test_pageid(self):
         """
@@ -165,7 +165,7 @@ class WPToolsPickTest(unittest.TestCase):
         Ensure get_imageinfo() updates images
         """
         a = wptools.page('Aardvark').get_query(False)
-        self.assertTrue('url' in a.image('thumb'))
+        self.assertTrue('url' in a.pageimage('thumb'))
 
 
 class WPToolsRandomTest(unittest.TestCase):
@@ -298,7 +298,7 @@ class WPToolsWikidataTest(unittest.TestCase):
         page = wptools.page('test_wikidata_images')
         page.cache['wikidata'] = wikidata_images.cache
         page._set_wikidata()
-        self.assertEqual(len(page.images), 3)
+        self.assertEqual(len(page.image), 3)
 
 
 if __name__ == '__main__':

@@ -70,6 +70,7 @@ class WPTools(object):
 
     actions = ['parse', 'query', 'wikidata', 'rest', 'claims', 'imageinfo']
     categories = None
+    contributors = None
     description = None
     endpoint = None
     exhtml = None
@@ -77,7 +78,9 @@ class WPTools(object):
     extext = None
     extract = None
     fatal = False
+    files = None
     html = None
+    image = None
     infobox = None
     label = None
     languages = None
@@ -113,7 +116,7 @@ class WPTools(object):
 
         self.cache = {}
         self.claims = {}
-        self.images = []
+        self.image = []
         self.modified = {}
         self.props = {}
         self.wikidata = {}
@@ -121,7 +124,7 @@ class WPTools(object):
         if self.title:
             ttl = self.title
             if ttl.startswith('File:') or ttl.startswith('Image:'):
-                self.images = [{'file': self.title}]
+                self.image = [{'file': self.title}]
 
         if self.argprops:
             self.update_wikiprops(self.argprops)
@@ -147,7 +150,7 @@ class WPTools(object):
         returns normalized list of image filenames
         """
         files = []
-        for item in [x['file'] for x in self.images if x.get('file')]:
+        for item in [x['file'] for x in self.image if x.get('file')]:
             fname = item.replace('_', ' ')
             if (not fname.startswith('File')
                     and not fname.startswith('Image')):
@@ -158,14 +161,14 @@ class WPTools(object):
 
     def __update_imageinfo(self, title, info):
         """
-        update images with get_imageinfo data
+        update page imageinfos with get_imageinfo data
         """
-        for i, image in enumerate(self.images):
+        for i, image in enumerate(self.image):
             if image.get('file'):
                 fname = image.get('file').replace('_', ' ')
                 if fname.lower() in title.lower():
                     if image.get('kind') != 'query-thumbnail':
-                        self.images[i].update(info)
+                        self.image[i].update(info)
 
     def __set_title_wikidata(self, item):
         """
@@ -231,9 +234,9 @@ class WPTools(object):
 
     def _missing_imageinfo(self):
         """
-        returns images missing info
+        returns page images missing info
         """
-        return [x for x in self.images if not x.get('url')]
+        return [x for x in self.image if not x.get('url')]
 
     def _marshal_claims(self, query_claims):
         """
@@ -377,11 +380,11 @@ class WPTools(object):
 
         if self.infobox:
             if self.infobox.get('image'):
-                self.images.append({'kind': 'parse-image',
-                                    'file': self.infobox['image']})
+                self.image.append({'kind': 'parse-image',
+                                   'file': self.infobox['image']})
             if self.infobox.get('Cover'):
-                self.images.append({'kind': 'parse-cover',
-                                    'file': self.infobox['Cover']})
+                self.image.append({'kind': 'parse-cover',
+                                   'file': self.infobox['Cover']})
 
     def _set_query_data(self):
         """
@@ -390,6 +393,7 @@ class WPTools(object):
         data = self._load_response('query')
         page = data['query']['pages'][0]
 
+        self.languages = page.get('langlinks')
         self.length = page.get('length')
         self.modified['page'] = page.get('touched')
         self.pageid = page.get('pageid')
@@ -401,44 +405,55 @@ class WPTools(object):
         if categories:
             self.categories = [x['title'] for x in categories]
 
-        if page.get('extract'):
-            self.extract = page['extract']
-            extext = html2text.html2text(self.extract)
+        contributors = page.get("contributors") or 0
+        anoncontributors = page.get("anoncontributors") or 0
+        if isinstance(contributors, list):
+            contributors = len(contributors)
+        self.contributors = contributors + anoncontributors
+
+        extract = page.get('extract')
+        if extract:
+            self.extract = extract
+            extext = html2text.html2text(extract)
             if extext:
                 self.extext = extext.strip()
 
-        if page.get('fullurl'):
-            self.url = page['fullurl']
-            self.url_raw = self.url + '?action=raw'
+        fullurl = page.get('fullurl')
+        if fullurl:
+            self.url = fullurl
+            self.url_raw = fullurl + '?action=raw'
 
-        languages = page.get('langlinks')
-        if languages:
-            self.languages = languages
+        images = page.get('images')
+        if images:
+            self.files = [x['title'] for x in images]
 
-        if page.get('pageimage'):
-            self.images.append({'kind': 'query-pageimage',
-                                'file': page['pageimage']})
+        pageimage = page.get('pageimage')
+        if pageimage:
+            self.image.append({'kind': 'query-pageimage',
+                               'file': pageimage})
 
-        if page.get('pageprops'):
-            wikibase = page['pageprops'].get('wikibase_item')
+        pageprops = page.get('pageprops')
+        if pageprops:
+            wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.wikibase = wikibase
                 self.wikidata_url = utils.wikidata_url(self.wikibase)
 
-        if page.get('terms'):
-            terms = page['terms']
+        terms = page.get('terms')
+        if terms:
             if terms.get('description'):
                 self.description = next(iter(terms['description']), None)
             if terms.get('label'):
                 self.label = next(iter(terms['label']), None)
 
-        if page.get('thumbnail'):
+        thumbnail = page.get('thumbnail')
+        if thumbnail:
             qthumb = {'kind': 'query-thumbnail'}
-            qthumb.update(page['thumbnail'])
-            qthumb['url'] = page['thumbnail']['source']
+            qthumb.update(thumbnail)
+            qthumb['url'] = thumbnail.get('source')
             del qthumb['source']
             qthumb['file'] = qthumb['url'].split('/')[-2]
-            self.images.append(qthumb)
+            self.image.append(qthumb)
 
     def _set_rest_data(self):
         """
@@ -469,7 +484,7 @@ class WPTools(object):
         if data.get('image'):  # /page/mobile-sections-lead
             rimg = {'kind': 'rest-image'}
             rimg.update(data.get('image'))
-            self.images.append(rimg)
+            self.image.append(rimg)
 
         lastmodified = data.get('lastmodified')
         if lastmodified:
@@ -481,7 +496,7 @@ class WPTools(object):
             rimg.update(originalimage)
             if originalimage.get('source'):
                 rimg.update({'url': originalimage.get('source')})
-            self.images.append(rimg)
+            self.image.append(rimg)
 
         if data.get('sections'):
             lead = data.get('sections')[0]
@@ -493,7 +508,7 @@ class WPTools(object):
             rimg.update(thumbnail)
             if thumbnail.get('source'):
                 rimg.update({'url': thumbnail.get('source')})
-            self.images.append(rimg)
+            self.image.append(rimg)
 
         title = (data.get('title') or data.get('normalizedtitle'))
         if title:
@@ -526,12 +541,12 @@ class WPTools(object):
         self._marshal_claims(item.get('claims'))
         self.__set_title_wikidata(item)
 
-        if self.wikidata.get('image'):
-            images = self.wikidata['image']
-            if not isinstance(images, list):
-                images = [images]
-            for image in images:
-                self.images.append({'kind': 'wikidata-image', 'file': image})
+        image = self.wikidata.get('image')
+        if image:
+            if not isinstance(image, list):
+                image = [image]
+            for img in image:
+                self.image.append({'kind': 'wikidata-image', 'file': img})
 
     def _update_wikidata(self, label, value):
         """
@@ -618,11 +633,11 @@ class WPTools(object):
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki request for API:Imageinfo
-        - images: <dict> updates image URLs, sizes, etc.
+        - image: <dict> updates image URLs, sizes, etc.
         https://www.mediawiki.org/wiki/API:Imageinfo
         """
-        if not self.images:
-            raise LookupError("get_images needs images")
+        if not self.image:
+            raise LookupError("get_imageinfo needs self.image")
 
         if not self._missing_imageinfo() and 'imageinfo' in self.cache:
             utils.stderr("complete imageinfo in cache", self.silent)
@@ -635,7 +650,7 @@ class WPTools(object):
     def get_parse(self, show=True, proxy=None, timeout=0):
         """
         MediaWiki:API action=parse request for:
-        - images: <dict> {parse-image, parse-cover}
+        - image: <dict> {parse-image, parse-cover}
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
         - pageid: <int> Wikipedia database ID
@@ -657,7 +672,8 @@ class WPTools(object):
         - description: <str> Wikidata description (via pageterms)
         - extext: <str> plain text (Markdown) extract
         - extract: <str> HTML extract from Extension:TextExtract
-        - images: <dict> {query-pageimage, query-thumbnail}
+        - files: <list> list of files contained in the page
+        - image: <dict> {query-pageimage, query-thumbnail}
         - label: <str> Wikidata label (via pageterms)
         - modified (page): <str> ISO8601 date and time
         - pageid: <int> Wikipedia database ID
@@ -717,7 +733,7 @@ class WPTools(object):
         - exhtml: <str> "extract_html" from /page/summary
         - exrest: <str> "extract" from /page/summary
         - html: <str> from /page/html
-        - images: <dict> {rest-image, rest-thumb}
+        - image: <dict> {rest-image, rest-thumb}
         - lead: <str> section[0] from /page/mobile-sections-lead
         - modified (page): <str> ISO8601 date and time
         - title: <str> the article title
@@ -750,7 +766,7 @@ class WPTools(object):
         Wikidata:API (action=wbgetentities) for:
         - claims: <dict> Wikidata claims (to be resolved)
         - description: <str> Wikidata description
-        - images: <dict> {wikidata-image} Wikidata Property:P18
+        - image: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
         - modified (wikidata): <str> ISO8601 date and time
         - props: <dict> Wikidata properties
@@ -767,14 +783,6 @@ class WPTools(object):
 
         return self
 
-    def image(self, token):
-        """
-        returns first image info with kind containing token
-        """
-        for img in self.images:
-            if token in img.get('kind'):
-                return img
-
     def info(self, action=None):
         '''
         returns cached query info for given action,
@@ -783,6 +791,17 @@ class WPTools(object):
         if action in self.actions and action in self.cache:
             return self.cache[action]['info']
         return self.cache.keys() or None
+
+    def pageimage(self, token=None):
+        """
+        returns first pageimage info with kind containing token
+        or list of pageimage kinds
+        """
+        if not token and self.image:
+            return [x['kind'] for x in self.image]
+        for img in self.image:
+            if token in img.get('kind'):
+                return img
 
     def query(self, action=None):
         '''
@@ -839,7 +858,7 @@ class WPTools(object):
             elif utils.is_text(prop):
                 prop = prop.strip().replace("\n", '')
                 prop = re.sub(' +', ' ', prop)
-                if len(prop) > maxlen and not prop.startswith('http'):
+                if len(prop) > maxlen:
                     prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
                 data[item] = prop
             else:

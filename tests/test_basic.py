@@ -59,8 +59,8 @@ class WPToolsCoreTestCase(unittest.TestCase):
         page.cache['rest'] = rest_lead.cache
         page._set_rest_data()
         self.assertEqual(page.description, 'English writer and humorist')
-        self.assertEqual(len(page.images), 1)
-        self.assertEqual(page.image('image')['kind'], 'rest-image')
+        self.assertEqual(len(page.image), 1)
+        self.assertEqual(page.pageimage('image')['kind'], 'rest-image')
         self.assertTrue(len(page.lead) > 1024 * 6)
         self.assertTrue(page.lead.startswith('<span'))
         self.assertTrue('page' in page.modified)
@@ -79,20 +79,20 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(len(page.exhtml) < 1024)
         self.assertTrue(page.exrest.startswith('Douglas'))
         self.assertTrue(page.exhtml.startswith('<p>'))
-        self.assertEqual(len(page.images), 2)
-        self.assertEqual(page.image('image')['kind'], 'rest-image')
-        self.assertEqual(page.image('thumb')['kind'], 'rest-thumb')
+        self.assertEqual(len(page.image), 2)
+        self.assertEqual(page.pageimage('image')['kind'], 'rest-image')
+        self.assertEqual(page.pageimage('thumb')['kind'], 'rest-thumb')
         self.assertEqual(page.pageid, 8091)
         self.assertEqual(str(page.title), 'Douglas_Adams')
         self.assertTrue(page.url.endswith('Douglas_Adams'))
 
     def test_get_imageinfo(self):
         page = wptools.page('test_get_imageinfo', silent=True)
-        page.images = [{'file': 'Douglas adams portrait cropped.jpg',
-                        'kind': 'test'}]
+        page.image = [{'file': 'Douglas adams portrait cropped.jpg',
+                       'kind': 'test'}]
         page.cache['imageinfo'] = imageinfo.cache
         page._set_imageinfo_data()
-        image = page.images[0]
+        image = page.image[0]
         self.assertTrue(image['file'].startswith('File:'))
         self.assertTrue('/c/c0/' in image['url'])
         self.assertTrue('/commons.' in image['descriptionurl'])
@@ -119,7 +119,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(len(page.claims), 11)
         self.assertEqual(page.description, 'English writer and humorist')
         self.assertEqual(page.label, 'Douglas Adams')
-        self.assertEqual(page.images[0]['kind'], 'wikidata-image')
+        self.assertEqual(page.image[0]['kind'], 'wikidata-image')
         self.assertTrue('wikidata' in page.modified)
         self.assertEqual(len(page.props), 10)
         self.assertEqual(str(page.title), 'Douglas_Adams')
@@ -148,7 +148,8 @@ class WPToolsCoreTestCase(unittest.TestCase):
         page.cache['query'] = query.cache
         page._set_query_data()
         self.assertEqual(len(page.categories), 29)
-        self.assertEqual(len(page.languages), 69)
+        self.assertEqual(len(page.files), 12)
+        self.assertEqual(len(page.languages), 70)
         self.assertEqual(page.description, 'English writer and humorist')
         self.assertEqual(page.label, 'Douglas Adams')
         self.assertEqual(page.lang, 'en')
@@ -159,7 +160,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(str(page.wikibase), 'Q42')
         self.assertTrue('Douglas_Adams' in page.url_raw)
         self.assertTrue('page' in page.modified)
-        self.assertTrue(len(page.images) > 1)
+        self.assertTrue(len(page.image) > 1)
         self.assertTrue(page.extext.startswith('**Douglas'))
         self.assertTrue(page.extract.startswith('<p><b>Douglas'))
         self.assertTrue(page.url.endswith('Adams'))
@@ -171,7 +172,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
         abc.claims = {'Q1': 'test'}
         abc.cache['claims'] = {'response'}
         abc.cache['imageinfo'] = {'response'}
-        abc.images = [{'url': 'URL'}]
+        abc.image = [{'url': 'URL'}]
         abc.cache['parse'] = {'response'}
         abc.cache['query'] = {'response'}
         abc.cache['rest'] = {'response'}

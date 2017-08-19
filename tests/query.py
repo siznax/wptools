@@ -1,15 +1,22 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|contributors|extracts|images|info|langlinks|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas Adams'
 
 response = r"""
 {
-    "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.173099126376|0.173099136868|39852235|0",
-        "continue": "-||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms"
+        "rncontinue": "0.413838719197|0.41383918599583097|202840|0",
+        "pccontinue": "8091|1591",
+        "continue": "||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms"
     },
     "query": {
+        "normalized": [
+            {
+                "fromencoded": false,
+                "from": "Douglas_Adams",
+                "to": "Douglas Adams"
+            }
+        ],
         "pages": [
             {
                 "pageid": 8091,
@@ -133,7 +140,50 @@ response = r"""
                         "title": "Category:Usenet people"
                     }
                 ],
-                "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>\n<p></p>\n\n<p></p>\n",
+                "anoncontributors": 817,
+                "contributors": [
+                    {
+                        "userid": 16,
+                        "name": "General Wesc"
+                    },
+                    {
+                        "userid": 52,
+                        "name": "Eloquence"
+                    },
+                    {
+                        "userid": 74,
+                        "name": "Espen"
+                    },
+                    {
+                        "userid": 83,
+                        "name": "Tarquin"
+                    },
+                    {
+                        "userid": 90,
+                        "name": "Koyaanis Qatsi"
+                    },
+                    {
+                        "userid": 584,
+                        "name": "Danny"
+                    },
+                    {
+                        "userid": 637,
+                        "name": "Shsilver"
+                    },
+                    {
+                        "userid": 672,
+                        "name": "XJaM"
+                    },
+                    {
+                        "userid": 835,
+                        "name": "Rmhermen"
+                    },
+                    {
+                        "userid": 1411,
+                        "name": "Roadrunner"
+                    }
+                ],
+                "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>",
                 "images": [
                     {
                         "ns": 6,
@@ -188,7 +238,7 @@ response = r"""
                 "pagelanguage": "en",
                 "pagelanguagehtmlcode": "en",
                 "pagelanguagedir": "ltr",
-                "touched": "2017-08-18T03:52:51Z",
+                "touched": "2017-08-19T05:50:29Z",
                 "lastrevid": 793736590,
                 "length": 60069,
                 "watchers": 447,
@@ -211,6 +261,10 @@ response = r"""
                     {
                         "lang": "az",
                         "title": "Duqlas Adams"
+                    },
+                    {
+                        "lang": "azb",
+                        "title": "داقلاس آدامز"
                     },
                     {
                         "lang": "bar",
@@ -500,9 +554,9 @@ response = r"""
         ],
         "random": [
             {
-                "id": 37542590,
+                "id": 36897044,
                 "ns": 0,
-                "title": "1996–97 FIBA EuroLeague"
+                "title": "Seneca Senior High School"
             }
         ]
     }
