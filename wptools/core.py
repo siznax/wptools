@@ -441,8 +441,9 @@ class WPTools(object):
                 self.wikidata_url = utils.wikidata_url(self.wikibase)
 
         pageviews = page.get('pageviews')
+        values = [x for x in pageviews.values() if x]
         if pageviews:
-            self.views = int(sum(pageviews.values()) / len(pageviews))
+            self.views = int(sum(values) / len(values))
 
         terms = page.get('terms')
         if terms:
