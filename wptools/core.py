@@ -1,8 +1,13 @@
 # -*- coding:utf-8 -*-
 
 """
-WPTools core module.
-~~~~~~~~~~~~~~~~~~~~
+WPTools core module
+~~~~~~~~~~~~~~~~~~~
+
+Support for getting Mediawiki page info.
+
+See also:
+https://www.mediawiki.org/wiki/Manual:Page_table
 """
 
 from __future__ import print_function
@@ -23,7 +28,7 @@ from . import utils
 
 class WPTools(object):
     """
-    A user-created :class:WPTools object.
+    WPtools core class
     """
 
     _WIKIPROPS = {'P17': 'country',
@@ -100,7 +105,9 @@ class WPTools(object):
     wikitext = None
 
     def __init__(self, *args, **kwargs):
-
+        """
+        Returns a WPTools page object
+        """
         if len(args) > 0:
             if args[0]:
                 self.title = args[0].replace(' ', '_')

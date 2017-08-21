@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
 
 """
-WPTools Fetch module.
+WPTools Fetch module
+~~~~~~~~~~~~~~~~~~~~
+
+Makes WMF API HTTP requests.
 """
 
 from __future__ import print_function
@@ -24,7 +27,7 @@ from . import __title__, __contact__, __version__
 
 class WPToolsFetch(object):
     """
-    Supports MediaWiki:API, RESTBase, Wikidata API HTTP requests
+    WPToolsFetch class
     """
 
     EMOJI = [
@@ -107,6 +110,9 @@ class WPToolsFetch(object):
     title = None
 
     def __init__(self, **kwargs):
+        """
+        Returns a WPToolsFetch object.
+        """
         self.lang = kwargs.get('lang')
         self.silent = kwargs.get('silent') or False
         self.variant = kwargs.get('variant')
@@ -116,6 +122,9 @@ class WPToolsFetch(object):
         self.curl_setup(kwargs.get('proxy'), kwargs.get('timeout'))
 
     def __del__(self):
+        """
+        Close HTTP request
+        """
         self.cobj.close()
 
     def curl(self, url):

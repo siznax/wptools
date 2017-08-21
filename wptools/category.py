@@ -1,8 +1,10 @@
 # -*- coding:utf-8 -*-
 
 """
-WPToolsCategory module.
+WPTools Category module
 ~~~~~~~~~~~~~~~~~~~~~~~
+
+Support for getting Mediawiki category info.
 """
 
 from . import core
