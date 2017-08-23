@@ -21,7 +21,8 @@ __license__ = "MIT"
 __title__ = "wptools"
 __version__ = "0.3"
 
-from . import fetch
+from . import query
+from . import request
 from . import utils
 
 from .category import WPToolsCategory as cat

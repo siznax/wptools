@@ -11,18 +11,19 @@ https://www.mediawiki.org/wiki/Manual:Page_table
 """
 
 from __future__ import print_function
+
 try:  # python2
-    from urllib import quote
     from urlparse import urlparse
 except ImportError:  # python3
-    from urllib.parse import quote, urlparse
+    from urllib.parse import urlparse
 
 import collections
 import re
 
 import html2text
 
-from . import fetch
+from . import query
+from . import request
 from . import utils
 
 
@@ -201,25 +202,44 @@ class WPTools(object):
                 attr = "%s_%s" % (attr, suffix)
                 setattr(self, attr, value)
 
-    def _fetch(self, proxy, timeout):
+    def _get(self, action, show, proxy, timeout):
         """
-        returns wptools.fetch object for making HTTP requests
+        make HTTP request and cache response
         """
-        return fetch.WPToolsFetch(
-            lang=self.lang,
-            silent=self.silent,
-            variant=self.variant,
-            verbose=self.verbose,
-            wiki=self.wiki,
-            proxy=proxy,
-            timeout=timeout)
+        if action in self.cache:
+            if action != 'imageinfo':
+                utils.stderr("%s results in cache" % action, self.silent)
+                return
+
+        if action in self.skip:
+            utils.stderr("skipping %s" % action)
+            return
+
+        req = self._request(proxy, timeout)
+
+        qobj = query.WPToolsQuery(lang=self.lang,
+                                  wiki=self.wiki,
+                                  variant=self.variant)
+        qstr = self._query(action, qobj)
+
+        cache = {}
+        cache['query'] = qstr
+        cache['response'] = req.get(qstr, qobj.status)
+        cache['info'] = req.info
+
+        self.cache[action] = cache
+
+        self._set_data(action)
+
+        if show:
+            self.show()
 
     def _load_response(self, action):
         """
         returns API reponse from cache or raises ValueError
         """
         try:
-            query = self.cache[action]['query'].replace('&format=json', '')
+            _query = self.cache[action]['query'].replace('&format=json', '')
             data = utils.json_loads(self.cache[action]['response'])
 
             if data.get('error'):
@@ -238,7 +258,7 @@ class WPTools(object):
             return data
 
         except (LookupError, ValueError):
-            raise LookupError(query)
+            raise LookupError(_query)
 
     def _missing_imageinfo(self):
         """
@@ -260,66 +280,35 @@ class WPTools(object):
                 else:
                     self._update_wikidata(label, val)
 
-    def _query(self, action, _fetch):
+    def _query(self, action, qobj):
         """
-        returns WPToolsFetch query based on action
+        returns WPToolsQuery string from action
         """
-        if action == 'query' or action == 'parse':
-            if self.pageid:
-                return _fetch.query(action, self.pageid, pageid=True)
-            return _fetch.query(action, self.title)
-
-        elif action == 'wikidata':
-            thing = {'id': '', 'site': '', 'title': ''}
-            if self.wikibase:
-                thing['id'] = self.wikibase
-            elif self.lang and self.title:
-                thing['site'] = "%swiki" % self.lang
-                thing['title'] = self.title
-            return _fetch.query(action, thing)
-
-        elif action == 'rest':
-            try:
-                thing = quote(self.endpoint)
-            except KeyError:
-                thing = quote(self.endpoint.encode('utf-8'))
-            return _fetch.query(action, thing)
-
-        elif action == 'claims':
-            thing = {'id': "|".join(self.claims.keys()), 'props': 'labels'}
-            return _fetch.query(action, thing)
-
+        if action == 'claims':
+            return qobj.claims(self.claims.keys())
         elif action == 'imageinfo':
-            files = self.__get_image_files()
-            try:
-                files = [quote(x) for x in files]
-            except KeyError:
-                files = [quote(x.encode('utf-8')) for x in files]
-            return _fetch.query(action, '|'.join(files))
+            return qobj.imageinfo(self.__get_image_files())
+        elif action == 'parse':
+            return qobj.parse(self.title, self.pageid)
+        elif action == 'query':
+            return qobj.query(self.title, self.pageid)
+        elif action == 'rest':
+            return qobj.rest(self.endpoint)
+        elif action == 'wikidata':
+            return qobj.wikidata(self.title, self.wikibase)
 
-    def _request(self, action, show, proxy, timeout):
+    def _request(self, proxy, timeout):
         """
-        make HTTP request and cache response
+        Returns WPToolsRequest object
         """
-        if action in self.cache:
-            if action != 'imageinfo':
-                utils.stderr("%s results in cache" % action, self.silent)
-                return
+        return request.WPToolsRequest(self.silent,
+                                      self.verbose,
+                                      proxy, timeout)
 
-        if action in self.skip:
-            utils.stderr("skipping %s" % action)
-            return
-
-        _fetch = self._fetch(proxy, timeout)
-        query = self._query(action, _fetch)
-
-        req = {}
-        req['query'] = query
-        req['response'] = _fetch.curl(query)
-        req['info'] = _fetch.info
-
-        self.cache[action] = req
-
+    def _set_data(self, action):
+        """
+        Marshals response data into attributes by action
+        """
         if action == 'claims':
             self._set_claims_data()
         elif action == 'imageinfo':
@@ -332,15 +321,13 @@ class WPTools(object):
             self._set_rest_data()
         elif action == 'wikidata':
             self._set_wikidata()
-            if self.claims:
-                self.get_claims(show=False)
+
+        if action == 'wikidata' and self.claims:
+            self.get_claims(show=False)
 
         if action in ['parse', 'query', 'rest', 'wikidata']:
             if self._missing_imageinfo() and not self._defer_imageinfo:
                 self.get_imageinfo(show=False)
-
-        if show:
-            self.show()
 
     def _set_claims_data(self):
         """
@@ -639,7 +626,7 @@ class WPTools(object):
         if not self.claims:
             raise LookupError("get_claims needs claims")
 
-        self._request('claims', show, proxy, timeout)
+        self._get('claims', show, proxy, timeout)
 
         return self
 
@@ -656,7 +643,7 @@ class WPTools(object):
             utils.stderr("complete imageinfo in cache", self.silent)
             return
 
-        self._request('imageinfo', show, proxy, timeout)
+        self._get('imageinfo', show, proxy, timeout)
 
         return self
 
@@ -675,7 +662,7 @@ class WPTools(object):
         if not self.title and not self.pageid:
             raise LookupError("get_parse needs title or pageid")
 
-        self._request('parse', show, proxy, timeout)
+        self._get('parse', show, proxy, timeout)
 
         return self
 
@@ -698,7 +685,7 @@ class WPTools(object):
         if not self.title and not self.pageid:
             raise LookupError("get_query needs title or pageid")
 
-        self._request('query', show, proxy, timeout)
+        self._get('query', show, proxy, timeout)
 
         return self
 
@@ -709,14 +696,17 @@ class WPTools(object):
         - title: <str> article title
         https://www.mediawiki.org/wiki/API:Random
         """
-        _fetch = self._fetch(proxy, timeout)
-        query = _fetch.query('random', None)
-        response = _fetch.curl(query)
+        req = self._request(proxy, timeout)
+        qobj = query.WPToolsQuery(lang=self.lang,
+                                  wiki=self.wiki,
+                                  variant=self.variant)
+        qstr = qobj.random()
+        response = req.get(qstr, qobj.status)
 
         try:
             data = utils.json_loads(response)
         except ValueError:
-            raise LookupError(query.replace('&format=json', ''))
+            raise LookupError(qstr.replace('&format=json', ''))
 
         rand = data['query']['random'][0]
         self.pageid = rand.get('id')
@@ -770,7 +760,7 @@ class WPTools(object):
             parts.append(self.title)
             self.endpoint = '/' + '/'.join(parts)
 
-        self._request('rest', show, proxy, timeout)
+        self._get('rest', show, proxy, timeout)
 
         return self
 
@@ -792,13 +782,13 @@ class WPTools(object):
         if not self.wikibase and (not self.lang and not self.title):
             raise LookupError("get_wikidata needs wikibase or lang and title")
 
-        self._request('wikidata', show, proxy, timeout)
+        self._get('wikidata', show, proxy, timeout)
 
         return self
 
     def info(self, action=None):
         '''
-        returns cached query info for given action,
+        returns cached request info for given action,
         or list of cached actions
         '''
         if action in self.actions and action in self.cache:
@@ -818,7 +808,7 @@ class WPTools(object):
 
     def query(self, action=None):
         '''
-        returns cached query (without &format=json) for given action,
+        returns cached query string (without &format=json) for given action,
         or list of cached actions
         '''
         if action in self.actions and action in self.cache:
@@ -827,7 +817,7 @@ class WPTools(object):
 
     def response(self, action=None):
         '''
-        returns cached query response (as dict) for given action,
+        returns cached response (as dict) for given action,
         or list of cached actions
         '''
         if action in self.actions and action in self.cache:

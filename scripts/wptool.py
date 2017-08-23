@@ -12,7 +12,8 @@ import time
 import textwrap
 import wptools
 
-from wptools.fetch import WPToolsFetch
+from wptools.query import WPToolsQuery
+from wptools.request import WPToolsRequest
 
 
 def _html_image(item):
@@ -143,10 +144,10 @@ def get(args):
     start = time.time()
 
     if query:
-        fetch = WPToolsFetch(lang=lang, verbose=verbose, wiki=wiki)
+        qobj = WPToolsQuery(lang=lang, wiki=wiki)
         if title:
-            return fetch.query('query', title)
-        return fetch.query('random', None)
+            return qobj.query(title)
+        return qobj.random()
 
     item = wptools.page(title, lang=lang, silent=silent,
                         verbose=verbose, wiki=wiki)

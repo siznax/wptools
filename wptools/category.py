@@ -56,15 +56,14 @@ class WPToolsCategory(core.WPTools):
 
         super(WPToolsCategory, self).__init__(*args, **kwargs)
 
-    def _query(self, action, _fetch):
+    def _query(self, action, qobj):
         """
         Form query to enumerate category
         """
-        return _fetch.query(action, {
-            'limit': 500,
-            'namespace': self.namespace,
-            'pageid': self.pageid,
-            'title': self.title})
+        if self.title:
+            return qobj.category(title=self.title)
+        if self.pageid:
+            return qobj.category(None, pageid=self.pageid)
 
     def _set_category_data(self):
         """
@@ -91,7 +90,7 @@ class WPToolsCategory(core.WPTools):
         if not self.title and not self.pageid:
             raise LookupError("get_category needs category title or pageid")
 
-        self._request('category', False, proxy, timeout)
+        self._get('category', show, proxy, timeout)
 
         self._set_category_data()
 

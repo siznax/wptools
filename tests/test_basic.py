@@ -24,7 +24,8 @@ class WPToolsTestCase(unittest.TestCase):
     def test_entry_points(self):
 
         wptools.core
-        wptools.fetch
+        wptools.query
+        wptools.request
         wptools.utils
 
 
@@ -187,11 +188,188 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertTrue(not abc.pageid)
 
 
-class WPToolsFetchTestCase(unittest.TestCase):
+class WPToolsQueryTestCase(unittest.TestCase):
 
-    def test_variant(self):
-        f = wptools.fetch.WPToolsFetch(variant='zh-cn')
-        self.assertTrue(f.query('query', 'a').endswith('&variant=zh-cn'))
+
+    def test_query_init(self):
+        qobj = wptools.query.WPToolsQuery()
+        self.assertEqual(qobj.lang, 'en')
+        self.assertEqual(qobj.uri, 'https://en.wikipedia.org')
+        self.assertEqual(qobj.wiki, 'en.wikipedia.org')
+
+    def test_query_init_wiki(self):
+        qobj = wptools.query.WPToolsQuery(wiki='http://example.com')
+        self.assertEqual(qobj.domain, 'example.com')
+        self.assertEqual(qobj.uri, 'http://example.com')
+
+    def test_query_init_lang(self):
+        qobj = wptools.query.WPToolsQuery(lang='zz')
+        self.assertEqual(qobj.lang, 'zz')
+        self.assertEqual(qobj.domain, 'zz.wikipedia.org')
+        self.assertEqual(qobj.uri, 'https://zz.wikipedia.org')
+
+    def test_query_category(self):
+        qobj = wptools.query.WPToolsQuery()
+
+        qstr = qobj.category(title='TEST')
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('&list=categorymembers' in qstr)
+        self.assertTrue('&cmtitle=TEST' in qstr)
+        self.assertTrue('&cmpageid' not in qstr)
+        self.assertEqual(qobj.status, 'en.wikipedia.org (category) TEST')
+
+        qstr = qobj.category(None, pageid=123)
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('&list=categorymembers' in qstr)
+        self.assertTrue('&cmpageid=123' in qstr)
+        self.assertTrue('&cmtitle' not in qstr)
+        self.assertEqual(qobj.status, 'en.wikipedia.org (category) 123')
+
+    def test_query_claims(self):
+        qobj = wptools.query.WPToolsQuery()
+        qstr = qobj.claims(qids=['Q1', 'Q2', 'Q3'])
+        self.assertTrue(qstr.startswith('https://www.wikidata.org'))
+        self.assertTrue('?action=wbgetentities' in qstr)
+        self.assertTrue('&ids=Q1|Q2|Q3' in qstr)
+        self.assertEqual(qobj.status, 'www.wikidata.org (claims) Q1|Q2|Q3')
+
+    def test_query_domain_name(self):
+        domain = wptools.query.domain_name('http://example.com/a//b/c/')
+        self.assertEqual(domain, 'example.com')
+
+    def test_query_imageinfo(self):
+        qobj = wptools.query.WPToolsQuery()
+        qstr = qobj.imageinfo(files=['A', 'B', 'C'])
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=query' in qstr)
+        self.assertTrue('&prop=imageinfo' in qstr)
+        self.assertTrue('&titles=A|B|C' in qstr)
+        self.assertEqual(qobj.status, 'en.wikipedia.org (imageinfo) A|B|C')
+
+    def test_query_query(self):
+        qobj = wptools.query.WPToolsQuery()
+
+        qstr = qobj.query(titles='TEST')
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=query' in qstr)
+        self.assertTrue('&titles=TEST')
+        self.assertEqual(qobj.status, 'en.wikipedia.org (query) TEST')
+
+        qstr = qobj.query(None, pageids=123)
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=query' in qstr)
+        self.assertTrue('&pageids=123')
+        self.assertEqual(qobj.status, 'en.wikipedia.org (query) 123')
+
+    def test_query_parse(self):
+        qobj = wptools.query.WPToolsQuery()
+
+        qstr = qobj.parse(title='TEST')
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=parse' in qstr)
+        self.assertTrue('&page=TEST')
+        self.assertEqual(qobj.status, 'en.wikipedia.org (parse) TEST')
+
+        qstr = qobj.parse(None, pageid=123)
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=parse' in qstr)
+        self.assertTrue('&redirects' not in qstr)
+        self.assertTrue('&pageid=123')
+        self.assertEqual(qobj.status, 'en.wikipedia.org (parse) 123')
+
+    def test_query_random(self):
+        qobj = wptools.query.WPToolsQuery()
+        qstr = qobj.random()
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('?action=query' in qstr)
+        self.assertTrue('&list=random' in qstr)
+        self.assertTrue('en.wikipedia.org (random)' in qobj.status)
+
+    def test_query_rest(self):
+        qobj = wptools.query.WPToolsQuery()
+        qstr = qobj.rest(endpoint='/TEST/')
+        self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
+        self.assertTrue('/api/rest' in qstr)
+        self.assertTrue(qstr.endswith('/TEST/'))
+        self.assertEqual(qobj.status, 'en.wikipedia.org (rest) /TEST/')
+
+    def test_query_set_status(self):
+        qobj = wptools.query.WPToolsQuery()
+
+        qobj.set_status('TEST_ACTION', 'TEST_TARGET')
+        self.assertEqual(qobj.status,
+                         'en.wikipedia.org (TEST_ACTION) TEST_TARGET')
+        qobj.set_status('--------------------------------------------------',
+                        '--------------------------------------------------')
+        self.assertTrue(len(qobj.status) == 80)
+
+    def test_query_wiki_uri(self):
+        qobj = wptools.query.WPToolsQuery()
+        uri = qobj.wiki_uri(wiki='http://example.com/')
+        self.assertEqual(uri, 'http://example.com/')
+
+    def test_query_wikidata(self):
+        qobj = wptools.query.WPToolsQuery()
+
+        qstr = qobj.wikidata(title='TEST')
+        self.assertTrue(qstr.startswith('https://www.wikidata.org'))
+        self.assertTrue('?action=wbgetentities' in qstr)
+        self.assertTrue('&sites=enwiki' in qstr)
+        self.assertTrue('&titles=TEST' in qstr)
+        self.assertEqual(qobj.status, 'www.wikidata.org (wikidata) TEST')
+
+        qstr = qobj.wikidata(None, wikibase='Q1')
+        self.assertTrue(qstr.startswith('https://www.wikidata.org'))
+        self.assertTrue('?action=wbgetentities' in qstr)
+        self.assertTrue('&sites' not in qstr)
+        self.assertTrue('&titles' not in qstr)
+        self.assertTrue('&ids=Q1' in qstr)
+        self.assertEqual(qobj.status, 'www.wikidata.org (wikidata) Q1')
+
+    def test_query_variant_parse(self):
+        qobj = wptools.query.WPToolsQuery(variant='zh-cn')
+        qstr = qobj.parse('TEST')
+        self.assertTrue('&variant=zh-cn' in qstr)
+
+    def test_query_variant_query(self):
+        qobj = wptools.query.WPToolsQuery(variant='zh-cn')
+        qstr = qobj.query('TEST')
+        self.assertTrue('&variant=zh-cn' in qstr)
+
+    def test_query_variant_wikidata(self):
+        qobj = wptools.query.WPToolsQuery(variant='zh-cn')
+        qstr = qobj.wikidata('TEST')
+        self.assertTrue('&languages=zh-cn' in qstr)
+
+
+class WPToolsRequestTestCase(unittest.TestCase):
+
+    def test_request_init(self):
+        req = wptools.request.WPToolsRequest()
+        self.assertEqual(req.silent, False)
+        self.assertEqual(req.verbose, False)
+        self.assertTrue(isinstance(req.cobj, wptools.request.pycurl.Curl))
+
+    def test_request_curl_info(self):
+        req = wptools.request.WPToolsRequest()
+        info = wptools.request.curl_info(req.cobj)
+        self.assertEqual(info.get('status'), 0)
+        self.assertEqual(info.get('bytes'), 0.0)
+        self.assertEqual(info.get('content'), None)
+        self.assertTrue('wptools' in info.get('user-agent'))
+
+    def test_request_curl_setup(self):
+        req = wptools.request.WPToolsRequest()
+        req.curl_setup()
+        info = req.cobj.getinfo(wptools.request.pycurl.EFFECTIVE_URL)
+        self.assertEqual(info, '')
+        info = req.cobj.getinfo(wptools.request.pycurl.RESPONSE_CODE)
+        self.assertEqual(info, 0)
+
+    def test_request_user_agent(self):
+        agent = wptools.request.user_agent()
+        self.assertTrue(agent.startswith('wptools'))
+        self.assertTrue('(https://github.com/siznax/wptools)' in agent)
 
 
 class WPToolsToolTestCase(unittest.TestCase):
