@@ -25,52 +25,12 @@ import html2text
 from . import query
 from . import request
 from . import utils
-
+from . import wikidata
 
 class WPTools(object):
     """
     WPtools core class
     """
-
-    _WIKIPROPS = {'P17': 'country',
-                  'P18': 'image',
-                  'P27': 'citizenship',
-                  'P30': 'continent',
-                  'P31': 'instance',
-                  'P50': 'author',
-                  'P57': 'director',
-                  'P86': 'composer',
-                  'P105': 'taxon rank',
-                  'P110': 'illustrator',
-                  'P123': 'publisher',
-                  'P135': 'movement',
-                  'P136': 'genre',
-                  'P144': 'based on',
-                  'P161': 'cast',
-                  'P170': 'creator',
-                  'P171': 'parent taxon',
-                  'P175': 'performer',
-                  'P186': 'material',
-                  'P195': 'collection',
-                  'P212': 'ISBN',
-                  'P225': 'taxon name',
-                  'P301': 'topic',
-                  'P345': 'IMDB',
-                  'P217': 'inventory',
-                  'P276': 'location',
-                  'P279': 'subclass',
-                  'P569': 'birth',
-                  'P570': 'death',
-                  'P577': 'pubdate',
-                  'P585': 'datetime',
-                  'P625': 'coordinates',
-                  'P655': 'translator',
-                  'P658': 'tracklist',
-                  'P800': 'work',
-                  'P856': 'website',
-                  'P910': 'category',
-                  'P1773': 'attribution',
-                  'P1779': 'creator'}
 
     _defer_imageinfo = False
 
@@ -113,7 +73,6 @@ class WPTools(object):
             if args[0]:
                 self.title = args[0].replace(' ', '_')
 
-        self.argprops = kwargs.get('props')
         self.lang = kwargs.get('lang') or 'en'
         self.pageid = kwargs.get('pageid')
         self.silent = kwargs.get('silent') or False
@@ -130,13 +89,12 @@ class WPTools(object):
         self.props = {}
         self.wikidata = {}
 
+        self.wikiprops = wikidata.PROPS
+
         if self.title:
             ttl = self.title
             if ttl.startswith('File:') or ttl.startswith('Image:'):
                 self.image = [{'file': self.title}]
-
-        if self.argprops:
-            self.update_wikiprops(self.argprops)
 
         if not self.pageid and not self.title and not self.wikibase:
             self.get_random()
@@ -273,7 +231,7 @@ class WPTools(object):
         self.props = self._wikidata_props(query_claims)
 
         for propid in self.props:
-            label = self._WIKIPROPS[propid]
+            label = self.wikiprops[propid]
             for val in self.props[propid]:
                 if utils.is_text(val) and re.match(r'^Q\d+', val):
                     self.claims[val] = label
@@ -572,7 +530,7 @@ class WPTools(object):
                 try:
                     snak = prop.get('mainsnak').get('datavalue').get('value')
                 except AttributeError:
-                    if self._WIKIPROPS.get(claim):
+                    if self.wikiprops.get(claim):
                         props[claim] = []
                         continue
                 try:
@@ -590,7 +548,7 @@ class WPTools(object):
                 if not val or not [x for x in val if x]:
                     raise ValueError("%s %s" % (claim, prop))
 
-                if self._WIKIPROPS.get(claim):
+                if self.wikiprops.get(claim):
                     props[claim].append(val)
 
         return dict(props)
@@ -885,9 +843,3 @@ class WPTools(object):
         for item in sorted(data):
             utils.stderr("  %s: %s" % (item, data[item]), self.silent)
         utils.stderr("}", self.silent)
-
-    def update_wikiprops(self, props):
-        """
-        updates _WIKIPROPS dict with props
-        """
-        self._WIKIPROPS.update(props)
