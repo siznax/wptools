@@ -202,11 +202,14 @@ class WPToolsQuery(object):
         query += "&rnlimit=1&rnnamespace=0"
 
         emoji = [
-            u'\U0001f355',
-            u'\U0001f35c',
-            u'\U0001f363',
-            u'\U0001f36a',
-            u'\U0001f370',
+            u'\U0001f32f',  # burrito or wrap
+            u'\U0001f355',  # slice of pizza
+            u'\U0001f35c',  # steaming bowl of ramen
+            u'\U0001f363',  # sushi
+            u'\U0001f369',  # doughnut
+            u'\U0001f36a',  # cookie
+            u'\U0001f36d',  # lollipop
+            u'\U0001f370',  # strawberry shortcake
         ]
 
         self.set_status('random', random.choice(emoji))
