@@ -21,9 +21,13 @@ __license__ = "MIT"
 __title__ = "wptools"
 __version__ = "0.3"
 
+from . import core
 from . import query
 from . import request
+from . import restbase
+from . import site
 from . import utils
+from . import wikidata
 
-from .category import WPToolsCategory as cat
-from .core import WPTools as page
+from .category import WPToolsCategory as category
+from .page import WPToolsPage as page
