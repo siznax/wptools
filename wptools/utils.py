@@ -5,6 +5,7 @@ WPTools Utilities module.
 """
 
 from __future__ import print_function
+
 try:  # python2
     from urllib import quote
 except ImportError:  # python3
