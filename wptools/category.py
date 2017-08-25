@@ -32,15 +32,17 @@ class WPToolsCategory(core.WPTools):
         See also
           https://www.mediawiki.org/wiki/Manual:Namespace
         """
+        super(WPToolsCategory, self).__init__(*args, **kwargs)
 
         pageid = kwargs.get('pageid')
         namespace = kwargs.get('namespace')
 
-        if pageid and len(args) > 0:
-            raise ValueError("cannot use both title AND pageid")
+        title = None
+        if len(args) > 0:
+            title = args[0]
 
-        if not pageid and len(args) == 0:
-            raise ValueError("need category title OR pageid")
+        if pageid and title:
+            raise ValueError("cannot use both title AND pageid")
 
         if namespace or namespace == 0:
             try:
@@ -54,23 +56,45 @@ class WPToolsCategory(core.WPTools):
             except ValueError:
                 raise ValueError("invalid pageid")
 
-        super(WPToolsCategory, self).__init__(*args, **kwargs)
+        self.params.update({'title': title,
+                            'pageid': pageid,
+                            'namespace': namespace,
+                            'seed': title or pageid})
+
+        if not pageid and not title:
+            # raise ValueError("need category title OR pageid")
+            self.get_random()
 
     def _query(self, action, qobj):
         """
         Form query to enumerate category
         """
-        if self.title:
-            return qobj.category(title=self.title)
-        if self.pageid:
-            return qobj.category(None, pageid=self.pageid)
+        title = self.params['title']
+        pageid = self.params['pageid']
 
-    def _set_category_data(self):
+        if action == 'random':
+            return qobj.random(namespace=14)
+        elif action == 'category':
+            if title and pageid:
+                title = None
+            return qobj.category(title=title, pageid=pageid)
+
+    def _set_data(self, action):
         """
         Set category member data from API response
         """
-        data = self._load_response('category')
-        self.members = data.get('query').get('categorymembers')
+        data = self._load_response(action)
+
+        if action == 'category':
+            members = data.get('query').get('categorymembers')
+            self.data.update({'members': members})
+
+        if action == 'random':
+            rand = data['query']['random'][0]
+            data = {'pageid': rand.get('id'),
+                    'title': rand.get('title')}
+            self.data.update(data)
+            self.params.update(data)
 
     def get_members(self, show=True, proxy=None, timeout=0):
         """
@@ -87,14 +111,35 @@ class WPToolsCategory(core.WPTools):
         See also
           https://www.mediawiki.org/wiki/API:Categorymembers
         """
-        if not self.title and not self.pageid:
-            raise LookupError("get_category needs category title or pageid")
+        title = self.params['title']
+        pageid = self.params['pageid']
+
+        if not title and not pageid:
+            raise LookupError("needs category title or pageid")
 
         self._get('category', show, proxy, timeout)
 
-        self._set_category_data()
+        return self
 
-        if show:
-            self.show()
+    def get_random(self, show=True, proxy=None, timeout=0):
+        """
+        Make MediaWiki:API (action=query) request for random category
+
+        Arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
+        - pageid: <int> Wikipedia database ID
+        - title: <str> article title
+
+        See:
+        https://www.mediawiki.org/wiki/API:Random
+        """
+        self._get('random', show, proxy, timeout)
+
+        # flush cache to allow repeated random requests
+        del self.cache['random']
 
         return self

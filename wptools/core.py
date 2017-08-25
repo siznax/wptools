@@ -4,187 +4,63 @@
 WPTools core module
 ~~~~~~~~~~~~~~~~~~~
 
-Support for getting Mediawiki page info.
-
-See also:
-https://www.mediawiki.org/wiki/Manual:Page_table
+Support for accessing Mediawiki foundation APIs.
 """
-
-from __future__ import print_function
-
-try:  # python2
-    from urlparse import urlparse
-except ImportError:  # python3
-    from urllib.parse import urlparse
-
-import collections
-import re
-
-import html2text
 
 from . import query
 from . import request
 from . import utils
-from . import wikidata
+
 
 class WPTools(object):
     """
     WPtools core class
     """
 
-    _defer_imageinfo = False
-
-    actions = ['parse', 'query', 'wikidata', 'rest', 'claims', 'imageinfo']
-    categories = None
-    contributors = None
-    description = None
-    endpoint = None
-    exhtml = None
-    exrest = None
-    extext = None
-    extract = None
-    fatal = False
-    files = None
-    html = None
-    image = None
-    infobox = None
-    label = None
-    languages = None
-    lead = None
-    length = None
-    links = None
-    parsetree = None
-    random = None
-    silent = False
-    title = None
-    url = None
-    url_raw = None
-    views = None
-    watchers = None
-    what = None
-    wikidata_url = None
-    wikitext = None
-
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
         """
-        Returns a WPTools page object
+        Initializes a WPTools core object
+
+        See also:
+            wptools.page.WPToolsPage
+            wptools.category.WPToolsCategory
         """
-        if len(args) > 0:
-            if args[0]:
-                self.title = args[0].replace(' ', '_')
-
-        self.lang = kwargs.get('lang') or 'en'
-        self.pageid = kwargs.get('pageid')
-        self.silent = kwargs.get('silent') or False
-        self.skip = kwargs.get('skip') or ''
-        self.variant = kwargs.get('variant')
-        self.verbose = kwargs.get('verbose') or False
-        self.wiki = kwargs.get('wiki')
-        self.wikibase = kwargs.get('wikibase')
-
         self.cache = {}
-        self.claims = {}
-        self.image = []
-        self.modified = {}
-        self.props = {}
-        self.wikidata = {}
-
-        self.wikiprops = wikidata.PROPS
-
-        if self.title:
-            ttl = self.title
-            if ttl.startswith('File:') or ttl.startswith('Image:'):
-                self.image = [{'file': self.title}]
-
-        if not self.pageid and not self.title and not self.wikibase:
-            self.get_random()
-        else:
-            self.show()
-
-    def __get_entity_prop(self, entity, prop):
-        """
-        returns Wikidata entity property value
-        """
-        if entity.get(prop):
-            ent = entity[prop]
-            try:
-                return ent[self.variant or self.lang].get('value')
-            except AttributeError:
-                return ent.get('value')
-
-    def __get_image_files(self):
-        """
-        returns normalized list of image filenames
-        """
-        files = []
-        for item in [x['file'] for x in self.image if x.get('file')]:
-            fname = item.replace('_', ' ')
-            if (not fname.startswith('File')
-                    and not fname.startswith('Image')):
-                fname = 'File:' + fname
-            if fname not in files:
-                files.append(fname)
-        return files
-
-    def __update_imageinfo(self, title, info):
-        """
-        update page imageinfos with get_imageinfo data
-        """
-        for i, image in enumerate(self.image):
-            if image.get('file'):
-                fname = image.get('file').replace('_', ' ')
-                if fname.lower() in title.lower():
-                    if image.get('kind') != 'query-thumbnail':
-                        self.image[i].update(info)
-
-    def __set_title_wikidata(self, item):
-        """
-        attempt to set title from wikidata
-        """
-        if item.get('sitelinks'):
-            for link in item['sitelinks']:
-                if link == "%swiki" % self.lang:
-                    title = item['sitelinks'][link]['title']
-                    self.title = title.replace(' ', '_')
-
-        if not self.title and self.label:
-            self.title = self.label.replace(' ', '_')
-
-    def __setattr(self, attr, value, suffix):
-        """
-        set attribute, append suffix if clobber
-        """
-        if hasattr(self, attr) and getattr(self, attr):
-            extant = getattr(self, attr)
-            if extant != value:
-                attr = "%s_%s" % (attr, suffix)
-                setattr(self, attr, value)
+        self.data = {}
+        self.flags = {
+            'silent': kwargs.get('silent') or False,
+            'skip': kwargs.get('skip') or [],
+            'verbose': kwargs.get('verbose') or False}
+        self.params = {
+            'lang': kwargs.get('lang') or 'en',
+            'variant': kwargs.get('variant'),
+            'wiki': kwargs.get('wiki') or 'wikipedia.org'}
 
     def _get(self, action, show, proxy, timeout):
         """
         make HTTP request and cache response
         """
+        silent = self.flags['silent']
+
         if action in self.cache:
             if action != 'imageinfo':
-                utils.stderr("%s results in cache" % action, self.silent)
+                utils.stderr("%s results in cache" % action, silent)
                 return
 
-        if action in self.skip:
+        if action in self.flags['skip']:
             utils.stderr("skipping %s" % action)
             return
 
         req = self._request(proxy, timeout)
-
-        qobj = query.WPToolsQuery(lang=self.lang,
-                                  wiki=self.wiki,
-                                  variant=self.variant)
+        qobj = query.WPToolsQuery(lang=self.params['lang'],
+                                  wiki=self.params['wiki'],
+                                  variant=self.params['variant'])
         qstr = self._query(action, qobj)
 
         cache = {}
         cache['query'] = qstr
         cache['response'] = req.get(qstr, qobj.status)
         cache['info'] = req.info
-
         self.cache[action] = cache
 
         self._set_data(action)
@@ -218,558 +94,41 @@ class WPTools(object):
         except (LookupError, ValueError):
             raise LookupError(_query)
 
-    def _missing_imageinfo(self):
-        """
-        returns page images missing info
-        """
-        return [x for x in self.image if not x.get('url')]
-
-    def _marshal_claims(self, query_claims):
-        """
-        set Wikidata properties and entities from query claims
-        """
-        self.props = self._wikidata_props(query_claims)
-
-        for propid in self.props:
-            label = self.wikiprops[propid]
-            for val in self.props[propid]:
-                if utils.is_text(val) and re.match(r'^Q\d+', val):
-                    self.claims[val] = label
-                else:
-                    self._update_wikidata(label, val)
-
     def _query(self, action, qobj):
         """
-        returns WPToolsQuery string from action
+        Implemented by sub-classes
         """
-        if action == 'claims':
-            return qobj.claims(self.claims.keys())
-        elif action == 'imageinfo':
-            return qobj.imageinfo(self.__get_image_files())
-        elif action == 'parse':
-            return qobj.parse(self.title, self.pageid)
-        elif action == 'query':
-            return qobj.query(self.title, self.pageid)
-        elif action == 'rest':
-            return qobj.rest(self.endpoint)
-        elif action == 'wikidata':
-            return qobj.wikidata(self.title, self.wikibase)
+        pass
 
     def _request(self, proxy, timeout):
         """
         Returns WPToolsRequest object
         """
-        return request.WPToolsRequest(self.silent,
-                                      self.verbose,
+        return request.WPToolsRequest(self.flags['silent'],
+                                      self.flags['verbose'],
                                       proxy, timeout)
 
     def _set_data(self, action):
         """
-        Marshals response data into attributes by action
+        Pack data from API response
         """
-        if action == 'claims':
-            self._set_claims_data()
-        elif action == 'imageinfo':
-            self._set_imageinfo_data()
-        elif action == 'parse':
-            self._set_parse_data()
-        elif action == 'query':
-            self._set_query_data()
-        elif action == 'rest':
-            self._set_rest_data()
-        elif action == 'wikidata':
-            self._set_wikidata()
-
-        if action == 'wikidata' and self.claims:
-            self.get_claims(show=False)
-
-        if action in ['parse', 'query', 'rest', 'wikidata']:
-            if self._missing_imageinfo() and not self._defer_imageinfo:
-                self.get_imageinfo(show=False)
-
-    def _set_claims_data(self):
-        """
-        set property claim labels from get_claims()
-        """
-        data = self._load_response('claims')
-        entities = data.get('entities')
-        for item in entities:
-            attr = self.claims[item]
-            value = self.__get_entity_prop(entities[item], 'labels')
-            self._update_wikidata(attr, value)
-
-        self.what = self.wikidata.get('instance')
-
-    def _set_imageinfo_data(self):
-        """
-        set image attributes from MediaWiki API:Imageinfo response
-        """
-        data = self._load_response('imageinfo')
-        pages = data['query'].get('pages')
-        for page in pages:
-            title = page.get('title')
-            if page.get('imageinfo'):
-                for info in page['imageinfo']:
-                    info.update({'file': title})
-                    self.__update_imageinfo(title, info)
-
-    def _set_parse_data(self):
-        """
-        set attributes derived from MediaWiki (action=parse)
-        """
-        pdata = self._load_response('parse')['parse']
-
-        self.pageid = pdata.get('pageid')
-        self.parsetree = pdata.get('parsetree')
-        self.wikibase = pdata.get('properties').get('wikibase_item')
-        self.wikitext = pdata.get('wikitext')
-
-        self.infobox = utils.get_infobox(self.parsetree)
-        self.links = utils.get_links(pdata.get('iwlinks'))
-        self.wikidata_url = utils.wikidata_url(self.wikibase)
-
-        if pdata.get('title'):
-            self.title = pdata['title'].replace(' ', '_')
-
-        if self.infobox:
-            if self.infobox.get('image'):
-                self.image.append({'kind': 'parse-image',
-                                   'file': self.infobox['image']})
-            if self.infobox.get('Cover'):
-                self.image.append({'kind': 'parse-cover',
-                                   'file': self.infobox['Cover']})
-
-    def _set_query_data(self):
-        """
-        set attributes derived from MediaWiki (action=query)
-        """
-        data = self._load_response('query')
-        page = data['query']['pages'][0]
-
-        self.languages = page.get('langlinks')
-        self.length = page.get('length')
-        self.modified['page'] = page.get('touched')
-        self.pageid = page.get('pageid')
-        self.random = data['query']['random'][0]["title"]
-        self.title = page.get('title').replace(' ', '_')
-        self.watchers = page.get('watchers')
-
-        categories = page.get('categories')
-        if categories:
-            self.categories = [x['title'] for x in categories]
-
-        contributors = page.get("contributors") or 0
-        anoncontributors = page.get("anoncontributors") or 0
-        if isinstance(contributors, list):
-            contributors = len(contributors)
-        self.contributors = contributors + anoncontributors
-
-        extract = page.get('extract')
-        if extract:
-            self.extract = extract
-            extext = html2text.html2text(extract)
-            if extext:
-                self.extext = extext.strip()
-
-        fullurl = page.get('fullurl')
-        if fullurl:
-            self.url = fullurl
-            self.url_raw = fullurl + '?action=raw'
-
-        images = page.get('images')
-        if images:
-            self.files = [x['title'] for x in images]
-
-        pageimage = page.get('pageimage')
-        if pageimage:
-            self.image.append({'kind': 'query-pageimage',
-                               'file': pageimage})
-
-        pageprops = page.get('pageprops')
-        if pageprops:
-            wikibase = pageprops.get('wikibase_item')
-            if wikibase:
-                self.wikibase = wikibase
-                self.wikidata_url = utils.wikidata_url(self.wikibase)
-
-        pageviews = page.get('pageviews')
-        values = [x for x in pageviews.values() if x]
-        if pageviews:
-            self.views = int(sum(values) / len(values))
-
-        terms = page.get('terms')
-        if terms:
-            if terms.get('description'):
-                self.description = next(iter(terms['description']), None)
-            if terms.get('label'):
-                self.label = next(iter(terms['label']), None)
-
-        thumbnail = page.get('thumbnail')
-        if thumbnail:
-            qthumb = {'kind': 'query-thumbnail'}
-            qthumb.update(thumbnail)
-            qthumb['url'] = thumbnail.get('source')
-            del qthumb['source']
-            qthumb['file'] = qthumb['url'].split('/')[-2]
-            self.image.append(qthumb)
-
-    def _set_rest_data(self):
-        """
-        set attributes derived from RESTBase
-        """
-        if self.cache['rest']['info']['content'].startswith('text/html'):
-            html = self.cache['rest']['response']
-            if isinstance(html, bytes):
-                html = html.decode('utf-8')
-            self.html = html
-            return
-
-        data = self._load_response('rest')
-
-        if self.endpoint == '/page/':
-            msg = "RESTBase /page/ entry points: %s" % data.get('items')
-            utils.stderr(msg)
-            return
-
-        if self.cache['rest']['info']['status'] == 404:
-            raise LookupError(data.get('detail'))
-
-        self.description = data.get('description')
-        self.pageid = (data.get('id') or data.get('pageid'))
-        self.exrest = data.get('extract')
-        self.exhtml = data.get('extract_html')
-
-        if data.get('image'):  # /page/mobile-sections-lead
-            rimg = {'kind': 'rest-image'}
-            rimg.update(data.get('image'))
-            self.image.append(rimg)
-
-        lastmodified = data.get('lastmodified')
-        if lastmodified:
-            self.modified['page'] = lastmodified
-
-        originalimage = data.get('originalimage')  # /page/summary
-        if originalimage:
-            rimg = {'kind': 'rest-image'}
-            rimg.update(originalimage)
-            if originalimage.get('source'):
-                rimg.update({'url': originalimage.get('source')})
-            self.image.append(rimg)
-
-        if data.get('sections'):
-            lead = data.get('sections')[0]
-            self.lead = lead.get('text')
-
-        thumbnail = data.get('thumbnail')  # /page/summary
-        if thumbnail:
-            rimg = {'kind': 'rest-thumb'}
-            rimg.update(thumbnail)
-            if thumbnail.get('source'):
-                rimg.update({'url': thumbnail.get('source')})
-            self.image.append(rimg)
-
-        title = (data.get('title') or data.get('normalizedtitle'))
-        if title:
-            self.title = title.replace(' ', '_')
-
-        wikibase = data.get('wikibase_item')
-        if wikibase:
-            self.wikibase = wikibase
-            self.wikidata_url = utils.wikidata_url(wikibase)
-
-        url = urlparse(self.cache['rest']['query'])
-        self.url = "%s://%s/wiki/%s" % (url.scheme, url.netloc, self.title)
-        self.url_raw = self.url + '?action=raw'
-
-    def _set_wikidata(self):
-        """
-        set attributes derived from Wikidata (action=wbentities)
-        """
-        data = self._load_response('wikidata')
-        entities = data.get('entities')
-        item = entities.get(next(iter(entities)))
-
-        self.modified['wikidata'] = item.get('modified')
-        self.wikibase = item.get('id')
-        self.wikidata_url = utils.wikidata_url(self.wikibase)
-
-        self.description = self.__get_entity_prop(item, 'descriptions')
-        self.label = self.__get_entity_prop(item, 'labels')
-
-        self._marshal_claims(item.get('claims'))
-        self.__set_title_wikidata(item)
-
-        image = self.wikidata.get('image')
-        if image:
-            if not isinstance(image, list):
-                image = [image]
-            for img in image:
-                self.image.append({'kind': 'wikidata-image', 'file': img})
-
-    def _update_wikidata(self, label, value):
-        """
-        add or update Wikidata
-        """
-        if self.wikidata.get(label):
-            try:
-                self.wikidata[label].append(value)
-            except AttributeError:
-                first = self.wikidata.get(label)
-                self.wikidata[label] = [first]
-                self.wikidata[label].append(value)
-        else:
-            self.wikidata[label] = value
-
-    def _wikidata_props(self, query_claims):
-        """
-        returns dict containing selected properties from Wikidata query claims
-        """
-        props = collections.defaultdict(list)
-        for claim in query_claims:
-            for prop in query_claims.get(claim):
-                try:
-                    snak = prop.get('mainsnak').get('datavalue').get('value')
-                except AttributeError:
-                    if self.wikiprops.get(claim):
-                        props[claim] = []
-                        continue
-                try:
-                    if snak.get('id'):
-                        val = snak.get('id')
-                    elif snak.get('text'):
-                        val = snak.get('text')
-                    elif snak.get('time'):
-                        val = snak.get('time')
-                    else:
-                        val = snak
-                except AttributeError:
-                    val = snak
-
-                if not val or not [x for x in val if x]:
-                    raise ValueError("%s %s" % (claim, prop))
-
-                if self.wikiprops.get(claim):
-                    props[claim].append(val)
-
-        return dict(props)
-
-    def get(self, show=True, proxy=None, timeout=0):
-        """
-        make requests needed to populate most the things.
-        some sequence of:
-        - get_query()
-        - get_parse()
-        - get_wikidata()
-        """
-        if self.wikibase and not self.title:
-            self._defer_imageinfo = True
-            self.get_wikidata(False, proxy, timeout)
-            self.get_query(False, proxy, timeout)
-            self._defer_imageinfo = False
-            self.get_parse(show, proxy, timeout)
-        else:
-            self._defer_imageinfo = True
-            self.get_query(False, proxy, timeout)
-            self.get_parse(False, proxy, timeout)
-            self._defer_imageinfo = False
-            self.get_wikidata(show, proxy, timeout)
-        return self
-
-    def get_claims(self, show=True, proxy=None, timeout=0):
-        """
-        Wikidata:API (action=wbgetentities) for labels of claims
-        - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
-        - use get_wikidata() to populate claims
-        """
-        if not self.claims:
-            raise LookupError("get_claims needs claims")
-
-        self._get('claims', show, proxy, timeout)
-
-        return self
-
-    def get_imageinfo(self, show=True, proxy=None, timeout=0):
-        """
-        MediaWiki request for API:Imageinfo
-        - image: <dict> updates image URLs, sizes, etc.
-        https://www.mediawiki.org/wiki/API:Imageinfo
-        """
-        if not self.image:
-            raise LookupError("get_imageinfo needs self.image")
-
-        if not self._missing_imageinfo() and 'imageinfo' in self.cache:
-            utils.stderr("complete imageinfo in cache", self.silent)
-            return
-
-        self._get('imageinfo', show, proxy, timeout)
-
-        return self
-
-    def get_parse(self, show=True, proxy=None, timeout=0):
-        """
-        MediaWiki:API action=parse request for:
-        - image: <dict> {parse-image, parse-cover}
-        - infobox: <dict> Infobox data as python dictionary
-        - links: <list> interwiki links (iwlinks)
-        - pageid: <int> Wikipedia database ID
-        - parsetree: <str> XML parse tree
-        - wikibase: <str> Wikidata entity ID or wikidata URL
-        - wikitext: <str> raw wikitext URL
-        https://en.wikipedia.org/w/api.php?action=help&modules=parse
-        """
-        if not self.title and not self.pageid:
-            raise LookupError("get_parse needs title or pageid")
-
-        self._get('parse', show, proxy, timeout)
-
-        return self
-
-    def get_query(self, show=True, proxy=None, timeout=0):
-        """
-        MediaWiki:API action=query request for:
-        - description: <str> Wikidata description (via pageterms)
-        - extext: <str> plain text (Markdown) extract
-        - extract: <str> HTML extract from Extension:TextExtract
-        - files: <list> list of files contained in the page
-        - image: <dict> {query-pageimage, query-thumbnail}
-        - label: <str> Wikidata label (via pageterms)
-        - modified (page): <str> ISO8601 date and time
-        - pageid: <int> Wikipedia database ID
-        - random: <str> a random article title with every request!
-        - url: <str> the canonical wiki URL
-        - url_raw: <str> ostensible raw wikitext URL
-        https://en.wikipedia.org/w/api.php?action=help&modules=query
-        """
-        if not self.title and not self.pageid:
-            raise LookupError("get_query needs title or pageid")
-
-        self._get('query', show, proxy, timeout)
-
-        return self
-
-    def get_random(self, show=True, proxy=None, timeout=0):
-        """
-        MediaWiki:API (action=query) request for:
-        - pageid: <int> Wikipedia database ID
-        - title: <str> article title
-        https://www.mediawiki.org/wiki/API:Random
-        """
-        req = self._request(proxy, timeout)
-        qobj = query.WPToolsQuery(lang=self.lang,
-                                  wiki=self.wiki,
-                                  variant=self.variant)
-        qstr = qobj.random()
-        response = req.get(qstr, qobj.status)
-
-        try:
-            data = utils.json_loads(response)
-        except ValueError:
-            raise LookupError(qstr.replace('&format=json', ''))
-
-        rand = data['query']['random'][0]
-        self.pageid = rand.get('id')
-
-        if rand.get('title'):
-            self.title = rand['title'].replace(' ', '_')
-
-        if show:
-            self.show()
-
-        return self
-
-    def get_rest(self, endpoint=None, show=True, proxy=None, timeout=0):
-        """
-        RESTBase /page endpoints needing only {title}
-        for example:
-            /page/html
-            /page/summary
-            /page/mobile-sections-lead
-
-        Arguments:
-        - endpoint: the RESTBase entry point
-
-        Without arguments, lists RESTBase /page/ entry points
-
-        Attributes affected:
-        - exhtml: <str> "extract_html" from /page/summary
-        - exrest: <str> "extract" from /page/summary
-        - html: <str> from /page/html
-        - image: <dict> {rest-image, rest-thumb}
-        - lead: <str> section[0] from /page/mobile-sections-lead
-        - modified (page): <str> ISO8601 date and time
-        - title: <str> the article title
-        - url: <str> the canonical wiki URL
-        - url_raw: <str> probable raw wikitext URL
-        - wikibase: <str> Wikidata item ID
-        - wikidata_url: <str> Wikidata URL
-
-        See https://en.wikipedia.org/api/rest_v1/
-        """
-        if not self.title:
-            raise LookupError("get_rest needs a title")
-
-        if not endpoint:
-            self.endpoint = '/page/'
-        else:
-            parts = endpoint.split('/')
-            parts = [x for x in parts if x]
-            if not parts[0] == 'page':
-                parts.insert(0, 'page')
-            parts.append(self.title)
-            self.endpoint = '/' + '/'.join(parts)
-
-        self._get('rest', show, proxy, timeout)
-
-        return self
-
-    def get_wikidata(self, show=True, proxy=None, timeout=0):
-        """
-        Wikidata:API (action=wbgetentities) for:
-        - claims: <dict> Wikidata claims (to be resolved)
-        - description: <str> Wikidata description
-        - image: <dict> {wikidata-image} Wikidata Property:P18
-        - label: <str> Wikidata label
-        - modified (wikidata): <str> ISO8601 date and time
-        - props: <dict> Wikidata properties
-        - what: <str> Wikidata Property:P31 "instance of"
-        - wikibase: <str> Wikidata item ID
-        - wikidata: <dict> resolved Wikidata properties
-        - wikidata_url: <str> Wikidata URL
-        https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
-        """
-        if not self.wikibase and (not self.lang and not self.title):
-            raise LookupError("get_wikidata needs wikibase or lang and title")
-
-        self._get('wikidata', show, proxy, timeout)
-
-        return self
+        pass
 
     def info(self, action=None):
         '''
         returns cached request info for given action,
         or list of cached actions
         '''
-        if action in self.actions and action in self.cache:
+        if action in self.cache:
             return self.cache[action]['info']
         return self.cache.keys() or None
-
-    def pageimage(self, token=None):
-        """
-        returns first pageimage info with kind containing token
-        or list of pageimage kinds
-        """
-        if not token and self.image:
-            return [x['kind'] for x in self.image]
-        for img in self.image:
-            if token in img.get('kind'):
-                return img
 
     def query(self, action=None):
         '''
         returns cached query string (without &format=json) for given action,
         or list of cached actions
         '''
-        if action in self.actions and action in self.cache:
+        if action in self.cache:
             return self.cache[action]['query'].replace('&format=json', '')
         return self.cache.keys() or None
 
@@ -778,68 +137,49 @@ class WPTools(object):
         returns cached response (as dict) for given action,
         or list of cached actions
         '''
-        if action in self.actions and action in self.cache:
+        if action in self.cache:
             return utils.json_loads(self.cache[action]['response'])
         return self.cache.keys() or None
 
-    def show(self):
+    def show(self, maxwidth=78):
         """
-        pretty-print instance attributes
+        Pretty-print instance data
         """
-        excludes = ['actions']
-        includes = ['namespace']
-        maxlen = 72
+        if not self.data:
+            return
 
-        def ptrunc(prefix, tail):
-            """pretty truncate text"""
-            pad = 8
-            text = tail[:maxlen - (len(prefix) + pad)]
-            if len(prefix) + len(tail) + pad >= maxlen:
-                text += '...'
-            return text
+        seed = self.params['seed'] or self.data['title']
+        output = ["%s (%s)" % (seed, self.params['lang'])]
 
-        data = {}
-        for item in dir(self):
-            prop = getattr(self, item)
+        for item in self.data:
 
-            if item in includes and isinstance(prop, int):
-                data[item] = "<int> %d" % prop
+            prefix = item
+            value = self.data[item]
 
-            if (not prop or callable(prop) or item.startswith('_')
-                    or item in excludes):
-                continue
+            if isinstance(value, dict):
+                prefix = "%s: <dict(%d)>" % (prefix, len(value))
+                value = ', '.join(value.keys())
+            elif isinstance(value, int):
+                prefix = "%s:" % prefix
+            elif isinstance(value, list):
+                prefix = "%s: <list(%d)>" % (prefix, len(value))
+                value = ', '.join((str(x) for x in value))
+            elif isinstance(value, tuple):
+                prefix = "%s: <tuple(%d)>" % (prefix, len(value))
+                value = ', '.join((str(x) for x in value))
+            elif utils.is_text(value):
+                value = value.strip().replace('\n', '')
+                if len(value) > (maxwidth - len(prefix)):
+                    prefix = "%s: <str(%d)>" % (prefix, len(value))
+                else:
+                    prefix = "%s:" % prefix
 
-            if isinstance(prop, dict):
-                keys = sorted(prop.keys())
-                klen = len(keys)
-                kstr = ', '.join(keys)
-                data[item] = ptrunc(item, "<dict(%d)> {%s}" % (klen, kstr))
-            elif isinstance(prop, list):
-                data[item] = "<list(%d)>" % len(prop)
-            elif utils.is_text(prop):
-                prop = prop.strip().replace("\n", '')
-                prop = re.sub(' +', ' ', prop)
-                if len(prop) > maxlen:
-                    prop = ptrunc(item, "<str(%d)> %s" % (len(prop), prop))
-                data[item] = prop
-            else:
-                data[item] = prop
+            output.append("  %s %s" % (prefix, value))
 
-        lang = self.lang
-        if self.variant:
-            lang = "%s/%s" % (self.lang, self.variant)
+        output.append('}')
 
-        thing = self.title
-        if self.wikibase and not self.title:
-            thing = self.wikibase
-            if thing.startswith('http'):
-                thing = thing.split('/')[-1]
-
-        header = "%s (%s)" % (thing, lang)
-
-        # NOTE: json.dumps and pprint show unicode literals
-        utils.stderr(header, self.silent)
-        utils.stderr("{", self.silent)
-        for item in sorted(data):
-            utils.stderr("  %s: %s" % (item, data[item]), self.silent)
-        utils.stderr("}", self.silent)
+        if not self.flags['silent']:
+            for line in output:
+                if len(line) >= 80:
+                    line = line[:77] + '...'
+                utils.stderr(line)
