@@ -106,7 +106,7 @@ class WPToolsQuery(object):
         self.domain = domain_name(self.wiki)
         self.uri = self.wiki_uri(self.wiki)
 
-    def category(self, title, pageid=None, limit=500, namespace=0):
+    def category(self, title, pageid=None, limit=500, namespace=None):
         """
         Returns category query string
         """
@@ -115,16 +115,16 @@ class WPToolsQuery(object):
         if limit:
             query += "&cmlimit=%d" % limit
 
-        if namespace is not None and namespace >= 0:
+        if namespace is not None:
             query += "&cmnamespace=%d" % namespace
 
         if title:
-            query += "&cmtitle=" + title
+            query += "&cmtitle=" + safequote(title)
 
         if pageid:
             query += "&cmpageid=%d" % pageid
 
-        self.set_status('category', pageid or title)
+        self.set_status('categorymembers', pageid or title)
 
         return query
 
@@ -151,12 +151,7 @@ class WPToolsQuery(object):
         """
         Returns imageinfo query string
         """
-        try:
-            files = [quote(x) for x in files]
-        except KeyError:
-            files = [quote(x.encode('utf-8')) for x in files]
-
-        files = '|'.join(files)
+        files = '|'.join([safequote(x) for x in files])
 
         self.set_status('imageinfo', files)
 
@@ -194,12 +189,12 @@ class WPToolsQuery(object):
 
         return query
 
-    def random(self):
+    def random(self, namespace=0):
         """
         Returns query string for random page
         """
         query = self.LIST.substitute(WIKI=self.uri, LIST='random')
-        query += "&rnlimit=1&rnnamespace=0"
+        query += "&rnlimit=1&rnnamespace=%d" % namespace
 
         emoji = [
             u'\U0001f32f',  # burrito or wrap
@@ -212,7 +207,7 @@ class WPToolsQuery(object):
             u'\U0001f370',  # strawberry shortcake
         ]
 
-        self.set_status('random', random.choice(emoji))
+        self.set_status('random:%d' % namespace, random.choice(emoji))
 
         return query
 
@@ -220,12 +215,7 @@ class WPToolsQuery(object):
         """
         Returns RESTBase query string
         """
-        try:
-            endpoint = quote(endpoint)
-        except KeyError:
-            endpoint = quote(endpoint.encode('utf-8'))
-
-        self.set_status('rest', endpoint)
+        self.set_status('rest', safequote(endpoint))
 
         return "%s/api/rest_v1%s" % (self.uri, endpoint)
 
@@ -283,3 +273,13 @@ def domain_name(wiki):
     if '//' in wiki:
         wiki = wiki.split('//')[1]
     return wiki.split('/')[0]
+
+
+def safequote(string):
+    """
+    UTF-8 encode string if quote() throws KeyError
+    """
+    try:
+        return quote(string)
+    except KeyError:
+        return quote(string.encode('utf-8'))
