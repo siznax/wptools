@@ -48,12 +48,12 @@ class WPToolsQuery(object):
 
     PARSE = Template((
         "${WIKI}/w/api.php?action=parse"
+        "&format=json"
+        "&formatversion=2"
         "&contentmodel=text"
         "&disableeditsection="
         "&disablelimitreport="
         "&disabletoc="
-        "&format=json"
-        "&formatversion=2"
         "&prop=text|iwlinks|parsetree|wikitext|displaytitle|properties"
         "&redirects"
         "&page=${PAGE}"))
@@ -207,7 +207,11 @@ class WPToolsQuery(object):
             u'\U0001f370',  # strawberry shortcake
         ]
 
-        self.set_status('random:%d' % namespace, random.choice(emoji))
+        action = 'random'
+        if namespace:
+            action = 'random:%d' % namespace
+
+        self.set_status(action, random.choice(emoji))
 
         return query
 
