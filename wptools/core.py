@@ -34,7 +34,7 @@ class WPTools(object):
         self.params = {
             'lang': kwargs.get('lang') or 'en',
             'variant': kwargs.get('variant'),
-            'wiki': kwargs.get('wiki') or 'wikipedia.org'}
+            'wiki': kwargs.get('wiki')}
 
     def _get(self, action, show, proxy, timeout):
         """
@@ -51,16 +51,20 @@ class WPTools(object):
             utils.stderr("skipping %s" % action)
             return
 
-        req = self._request(proxy, timeout)
+        # make the request
         qobj = query.WPToolsQuery(lang=self.params['lang'],
                                   wiki=self.params['wiki'],
                                   variant=self.params['variant'])
         qstr = self._query(action, qobj)
+        req = self._request(proxy, timeout)
+        response = req.get(qstr, qobj.status)
+        info = req.info
 
+        # cache the response
         cache = {}
         cache['query'] = qstr
-        cache['response'] = req.get(qstr, qobj.status)
-        cache['info'] = req.info
+        cache['response'] = response
+        cache['info'] = info
         self.cache[action] = cache
 
         self._set_data(action)
@@ -148,10 +152,11 @@ class WPTools(object):
         if not self.data:
             return
 
+        maxlen = 80
         seed = self.params['seed'] or self.data['title']
         output = ["%s (%s)" % (seed, self.params['lang'])]
 
-        for item in self.data:
+        for item in sorted(self.data):
 
             prefix = item
             value = self.data[item]
@@ -179,7 +184,8 @@ class WPTools(object):
         output.append('}')
 
         if not self.flags['silent']:
+            extent = maxlen - 7  # ellipses + 2 spaces left and right
             for line in output:
-                if len(line) >= 80:
-                    line = line[:77] + '...'
+                if len(line) >= maxlen:
+                    line = line[:extent] + '...'
                 utils.stderr(line)
