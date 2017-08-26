@@ -163,10 +163,11 @@ class WPTools(object):
         if not self.data:
             return
 
-        title = self.params['title']
+        ptitle = self.params['title']
+        dtitle = self.data['title']
         pageid = self.params['pageid']
 
-        seed = title or pageid
+        seed = dtitle or ptitle or pageid
         if utils.is_text(seed):
             seed = seed.replace('_', ' ')
 
