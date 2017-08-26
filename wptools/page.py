@@ -70,7 +70,7 @@ class WPToolsPage(core.WPTools,
         wikibase = kwargs.get('wikibase')
 
         if len(args) > 0:  # first positional arg is title
-            title = args[0]
+            title = args[0].replace(' ', '_')
             # add files titles to image data (to be resolved)
             if title.startswith('File:') or title.startswith('Image:'):
                 image = [{'file': title}]
