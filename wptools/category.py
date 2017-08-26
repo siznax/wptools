@@ -32,7 +32,7 @@ class WPToolsCategory(core.WPTools):
         See also
           https://www.mediawiki.org/wiki/Manual:Namespace
         """
-        super(WPToolsCategory, self).__init__(*args, **kwargs)
+        super(WPToolsCategory, self).__init__(**kwargs)
 
         pageid = kwargs.get('pageid')
         namespace = kwargs.get('namespace')

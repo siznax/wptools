@@ -9,19 +9,9 @@ Support for getting Mediawiki/Wikidata/RESTBase page info.
 * https://www.mediawiki.org/wiki/Manual:Page_table
 """
 
-try:  # python2
-    from urlparse import urlparse
-except ImportError:  # python3
-    from urllib.parse import urlparse
-
-import collections
-import re
-
 import html2text
 
 from . import core
-from . import query
-from . import request
 from . import restbase
 from . import utils
 from . import wikidata
@@ -55,10 +45,10 @@ class WPToolsPage(core.WPTools,
         - [skip]: <str> list of actions to skip
         - [verbose]: <bool> verbose output to stderr if True
         """
-        super(WPToolsPage, self).__init__(*args, **kwargs)
+        super(WPToolsPage, self).__init__(**kwargs)
 
-        self.flags = {'defer_imageinfo': False}
-        self.params = self.__init_params(args, kwargs)
+        self.flags.update({'defer_imageinfo': False})
+        self.params.update(self.__init_params(args, kwargs))
 
         title = self.params['title']
         pageid = self.params['pageid']
@@ -78,13 +68,13 @@ class WPToolsPage(core.WPTools,
         title = None
         pageid = kwargs.get('pageid')
         wikibase = kwargs.get('wikibase')
-    
+
         if len(args) > 0:  # first positional arg is title
             title = args[0]
             # add files titles to image data (to be resolved)
             if title.startswith('File:') or title.startswith('Image:'):
                 image = [{'file': title}]
-    
+
         seed = title or pageid or wikibase
 
         return {'image': image,
@@ -98,7 +88,9 @@ class WPToolsPage(core.WPTools,
         returns normalized list of image filenames
         """
         files = []
-        for item in [x['file'] for x in self.image if x.get('file')]:
+        image = self.data['image']
+
+        for item in [x['file'] for x in image if x.get('file')]:
             fname = item.replace('_', ' ')
             if (not fname.startswith('File')
                     and not fname.startswith('Image')):
@@ -111,18 +103,19 @@ class WPToolsPage(core.WPTools,
         """
         update page imageinfos with get_imageinfo data
         """
-        for i, image in enumerate(self.image):
+        for i, image in enumerate(self.data['image']):
             if image.get('file'):
                 fname = image.get('file').replace('_', ' ')
                 if fname.lower() in title.lower():
                     if image.get('kind') != 'query-thumbnail':
-                        self.image[i].update(info)
+                        self.data['image'][i].update(info)
 
     def _missing_imageinfo(self):
         """
         returns page images missing info
         """
-        return [x for x in self.image if not x.get('url')]
+        if 'image' in self.data:
+            return [x for x in self.data['image'] if not x.get('url')]
 
     def _query(self, action, qobj):
         """
@@ -130,7 +123,6 @@ class WPToolsPage(core.WPTools,
         """
         title = self.params['title']
         pageid = self.params['pageid']
-        wikibase = self.params['wikibase']
 
         if action == 'random':
             return qobj.random()
@@ -183,25 +175,30 @@ class WPToolsPage(core.WPTools,
         """
         pdata = self._load_response('parse')['parse']
 
-        self.pageid = pdata.get('pageid')
-        self.parsetree = pdata.get('parsetree')
-        self.wikibase = pdata.get('properties').get('wikibase_item')
-        self.wikitext = pdata.get('wikitext')
+        parsetree = pdata.get('parsetree')
+        wikibase = pdata.get('properties').get('wikibase_item')
+        self.data['pageid'] = pdata.get('pageid')
+        self.data['parsetree'] = parsetree
+        self.data['wikibase'] = wikibase
+        self.data['wikitext'] = pdata.get('wikitext')
 
-        self.infobox = utils.get_infobox(self.parsetree)
-        self.links = utils.get_links(pdata.get('iwlinks'))
-        self.wikidata_url = utils.wikidata_url(self.wikibase)
+        infobox = utils.get_infobox(parsetree)
+        self.data['infobox'] = infobox
+        self.data['links'] = utils.get_links(pdata.get('iwlinks'))
+        self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
         if pdata.get('title'):
-            self.title = pdata['title'].replace(' ', '_')
+            self.data['title'] = pdata['title'].replace(' ', '_')
 
-        if self.infobox:
-            if self.infobox.get('image'):
-                self.image.append({'kind': 'parse-image',
-                                   'file': self.infobox['image']})
-            if self.infobox.get('Cover'):
-                self.image.append({'kind': 'parse-cover',
-                                   'file': self.infobox['Cover']})
+        if self.data['infobox']:
+            if 'image' not in self.data:
+                self.data['image'] = []
+            if infobox.get('image'):
+                self.data['image'].append({
+                    'kind': 'parse-image', 'file': infobox['image']})
+            if infobox.get('Cover'):
+                self.data['image'].append({
+                    'kind': 'parse-cover', 'file': infobox['Cover']})
 
     def _set_query_data(self):
         """
@@ -209,64 +206,67 @@ class WPToolsPage(core.WPTools,
         """
         data = self._load_response('query')
         page = data['query']['pages'][0]
+        wikibase = self.data['wikibase']
 
-        self.languages = page.get('langlinks')
-        self.length = page.get('length')
-        self.modified['page'] = page.get('touched')
-        self.pageid = page.get('pageid')
-        self.random = data['query']['random'][0]["title"]
-        self.title = page.get('title').replace(' ', '_')
-        self.watchers = page.get('watchers')
+        self.data['languages'] = page.get('langlinks')
+        self.data['length'] = page.get('length')
+        self.data['modified']['page'] = page.get('touched')
+        self.data['pageid'] = page.get('pageid')
+        self.data['random'] = data['query']['random'][0]["title"]
+        self.data['title'] = page.get('title').replace(' ', '_')
+        self.data['watchers'] = page.get('watchers')
 
         categories = page.get('categories')
         if categories:
-            self.categories = [x['title'] for x in categories]
+            self.data['categories'] = [x['title'] for x in categories]
 
         contributors = page.get("contributors") or 0
         anoncontributors = page.get("anoncontributors") or 0
         if isinstance(contributors, list):
             contributors = len(contributors)
-        self.contributors = contributors + anoncontributors
+        self.data['contributors'] = contributors + anoncontributors
 
         extract = page.get('extract')
         if extract:
-            self.extract = extract
+            self.data['extract'] = extract
             extext = html2text.html2text(extract)
             if extext:
-                self.extext = extext.strip()
+                self.data['extext'] = extext.strip()
 
         fullurl = page.get('fullurl')
         if fullurl:
-            self.url = fullurl
-            self.url_raw = fullurl + '?action=raw'
+            self.data['url'] = fullurl
+            self.data['url_raw'] = fullurl + '?action=raw'
 
         images = page.get('images')
         if images:
-            self.files = [x['title'] for x in images]
+            self.data['files'] = [x['title'] for x in images]
 
         pageimage = page.get('pageimage')
         if pageimage:
-            self.image.append({'kind': 'query-pageimage',
-                               'file': pageimage})
+            self.data['image'].append({
+                'kind': 'query-pageimage',
+                'file': pageimage})
 
         pageprops = page.get('pageprops')
         if pageprops:
             wikibase = pageprops.get('wikibase_item')
             if wikibase:
-                self.wikibase = wikibase
-                self.wikidata_url = utils.wikidata_url(self.wikibase)
+                self.data['wikibase'] = wikibase
+                self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
         pageviews = page.get('pageviews')
         values = [x for x in pageviews.values() if x]
         if pageviews:
-            self.views = int(sum(values) / len(values))
+            self.data['views'] = int(sum(values) / len(values))
 
         terms = page.get('terms')
         if terms:
             if terms.get('description'):
-                self.description = next(iter(terms['description']), None)
+                self.data['description'] = next(iter(terms['description']),
+                                                None)
             if terms.get('label'):
-                self.label = next(iter(terms['label']), None)
+                self.data['label'] = next(iter(terms['label']), None)
 
         thumbnail = page.get('thumbnail')
         if thumbnail:
@@ -275,24 +275,22 @@ class WPToolsPage(core.WPTools,
             qthumb['url'] = thumbnail.get('source')
             del qthumb['source']
             qthumb['file'] = qthumb['url'].split('/')[-2]
-            self.image.append(qthumb)
+            self.data['image'].append(qthumb)
 
     def _set_random_data(self):
         """
         Sets random page data
         """
-        data = self._load_response('random')
-        rand = data['query']['random'][0]
-        pageid = rand.get('id')
-        title = rand.get('title')
+        rdata = self._load_response('random')
+        rdata = rdata['query']['random'][0]
+        pageid = rdata.get('id')
+        title = rdata.get('title')
 
-        if title:
-            title = rand['title'].replace(' ', '_')
-
+        self.params['pageid'] = pageid
         self.data.update({'pageid': pageid,
                           'title': title})
 
-    def get(self):
+    def get(self, show=True, proxy=None, timeout=0):
         """
         Make Mediawiki, RESTBase, and Wikidata requests for page data
         some sequence of:
@@ -301,17 +299,19 @@ class WPToolsPage(core.WPTools,
         - get_rest()
         - get_wikidata()
         """
-        if self.wikibase and not self.title:
-            self.defer_imageinfo = True
+        wikibase = self.params['wikibase']
+        title = self.params['title']
+        if wikibase and not title:
+            self.flags['defer_imageinfo'] = True
             self.get_wikidata(False, proxy, timeout)
             self.get_query(False, proxy, timeout)
-            self.defer_imageinfo = False
+            self.flags['defer_imageinfo'] = False
             self.get_parse(show, proxy, timeout)
         else:
-            self.defer_imageinfo = True
+            self.data['defer_imageinfo'] = True
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
-            self.defer_imageinfo = False
+            self.data['defer_imageinfo'] = False
             self.get_wikidata(show, proxy, timeout)
         return self
 
@@ -321,11 +321,11 @@ class WPToolsPage(core.WPTools,
         - image: <dict> updates image URLs, sizes, etc.
         https://www.mediawiki.org/wiki/API:Imageinfo
         """
-        if not self.image:
-            raise LookupError("get_imageinfo needs self.image")
+        if not self.data['image']:
+            raise LookupError("get_imageinfo needs image")
 
         if not self._missing_imageinfo() and 'imageinfo' in self.cache:
-            utils.stderr("complete imageinfo in cache", self.silent)
+            utils.stderr("complete imageinfo in cache", self.flags['silent'])
             return
 
         self._get('imageinfo', show, proxy, timeout)
@@ -344,7 +344,7 @@ class WPToolsPage(core.WPTools,
         - wikitext: <str> raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
-        if not self.title and not self.pageid:
+        if not self.params['title'] and not self.params['pageid']:
             raise LookupError("get_parse needs title or pageid")
 
         self._get('parse', show, proxy, timeout)
@@ -367,7 +367,7 @@ class WPToolsPage(core.WPTools,
         - url_raw: <str> ostensible raw wikitext URL
         https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
-        if not self.title and not self.pageid:
+        if not self.params['title'] and not self.params['pageid']:
             raise LookupError("get_query needs title or pageid")
 
         self._get('query', show, proxy, timeout)
@@ -402,8 +402,8 @@ class WPToolsPage(core.WPTools,
         returns first pageimage info with kind containing token
         or list of pageimage kinds
         """
-        if not token and self.image:
-            return [x['kind'] for x in self.image]
-        for img in self.image:
+        if not token and self.data['image']:
+            return [x['kind'] for x in self.data['image']]
+        for img in self.data['image']:
             if token in img.get('kind'):
                 return img
