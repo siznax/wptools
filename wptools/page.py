@@ -206,11 +206,9 @@ class WPToolsPage(core.WPTools,
         """
         data = self._load_response('query')
         page = data['query']['pages'][0]
-        wikibase = self.data['wikibase']
 
         self.data['languages'] = page.get('langlinks')
         self.data['length'] = page.get('length')
-        self.data['modified']['page'] = page.get('touched')
         self.data['pageid'] = page.get('pageid')
         self.data['random'] = data['query']['random'][0]["title"]
         self.data['title'] = page.get('title').replace(' ', '_')
@@ -242,8 +240,14 @@ class WPToolsPage(core.WPTools,
         if images:
             self.data['files'] = [x['title'] for x in images]
 
+        modified = page.get('touched')
+        if 'modified' not in data:
+            self.data['modified'] = {'page': modified}
+
         pageimage = page.get('pageimage')
         if pageimage:
+            if 'image' not in self.data:
+                self.data['image'] = []
             self.data['image'].append({
                 'kind': 'query-pageimage',
                 'file': pageimage})
