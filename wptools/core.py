@@ -158,6 +158,9 @@ class WPTools(object):
 
         for item in sorted(self.data):
 
+            if self.data[item] is None:
+                continue
+
             prefix = item
             value = self.data[item]
 
@@ -168,10 +171,10 @@ class WPTools(object):
                 prefix = "%s:" % prefix
             elif isinstance(value, list):
                 prefix = "%s: <list(%d)>" % (prefix, len(value))
-                value = ', '.join((str(x) for x in value))
+                value = ', '.join((safestr(x) for x in value))
             elif isinstance(value, tuple):
                 prefix = "%s: <tuple(%d)>" % (prefix, len(value))
-                value = ', '.join((str(x) for x in value))
+                value = ', '.join((safestr(x) for x in value))
             elif utils.is_text(value):
                 value = value.strip().replace('\n', '')
                 if len(value) > (maxwidth - len(prefix)):
@@ -189,3 +192,13 @@ class WPTools(object):
                 if len(line) >= maxlen:
                     line = line[:extent] + '...'
                 utils.stderr(line)
+
+
+def safestr(text):
+    """
+    Safely convert unicode to a string
+    """
+    try:
+        return str(text)
+    except UnicodeEncodeError:
+        return str(text.encode('utf-8'))
