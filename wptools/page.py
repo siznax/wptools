@@ -28,60 +28,41 @@ class WPToolsPage(core.WPTools,
         """
         Returns a WPToolsPage object.
 
-        Optional positional args:
+        Optional positional arguments:
         - [title]: <str> Mediawiki page title, file, category, etc.
 
-        Optional keyword args:
-        - [pageid]: <int> Mediawiki pageid
-        - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
-
-        Optional params:
+        Optional keyword arguments:
         - [lang]: <str> Mediawiki language code (default='en')
+        - [pageid]: <int> Mediawiki pageid
         - [variant]: <str> Mediawiki langauge variant
         - [wiki]: <str> alternative wiki site (default='wikipedia.org')
+        - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
 
-        Optional flags:
-        - [silent]: <bool> do not echo response data if True
-        - [skip]: <str> list of actions to skip
+        Keyword flags:
+        - [silent]: <bool> do not echo page data if True
+        - [skip]: <list> skip actions in this list
         - [verbose]: <bool> verbose output to stderr if True
         """
         super(WPToolsPage, self).__init__(**kwargs)
 
-        self.flags.update({'defer_imageinfo': False})
-        self.params.update(self.__init_params(args, kwargs))
+        title = None
+        if len(args) > 0:  # first positional arg is title
+            title = args[0].replace(' ', '_')
 
-        title = self.params['title']
-        pageid = self.params['pageid']
-        wikibase = self.params['wikibase']
+        pageid = kwargs.get('pageid')
+        wikibase = kwargs.get('wikibase')
+
+        self.params.update({
+            'pageid': pageid,
+            'title': title,
+            'wikibase': wikibase})
+
+        self.flags.update({'defer_imageinfo': False})
 
         if not title and not pageid and not wikibase:
             self.get_random()
         else:
             self.show()
-
-    @staticmethod
-    def __init_params(args, kwargs):
-        """
-        Initialize page parameters
-        """
-        image = None
-        title = None
-        pageid = kwargs.get('pageid')
-        wikibase = kwargs.get('wikibase')
-
-        if len(args) > 0:  # first positional arg is title
-            title = args[0].replace(' ', '_')
-            # add files titles to image data (to be resolved)
-            if title.startswith('File:') or title.startswith('Image:'):
-                image = [{'file': title}]
-
-        seed = title or pageid or wikibase
-
-        return {'image': image,
-                'pageid': pageid,
-                'title': title,
-                'seed': seed,
-                'wikibase': wikibase}
 
     def __get_image_files(self):
         """
