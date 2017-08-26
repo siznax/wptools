@@ -95,20 +95,6 @@ class WPTools(object):
         except (LookupError, ValueError):
             raise LookupError(_query)
 
-    def _prettyprint(self, datastr):
-        """
-        Print page data strings to stderr
-        """
-        maxwidth = WPToolsQuery.MAXWIDTH
-        rpad = WPToolsQuery.RPAD
-
-        if not self.flags['silent']:
-            extent = maxwidth - (rpad + 2)
-            for line in datastr:
-                if len(line) >= maxwidth:
-                    line = line[:extent] + '...'
-                utils.stderr(line)
-
     def _query(self, action, qobj):
         """
         Implemented by sub-classes
@@ -156,10 +142,12 @@ class WPTools(object):
             return utils.json_loads(self.cache[action]['response'])
         return self.cache.keys() or None
 
-    def show(self):
+    def show(self, force=False):
         """
         Pretty-print instance data
         """
+        if self.flags['silent'] and not force:
+            return
         if not self.data:
             return
 
@@ -205,7 +193,21 @@ class WPTools(object):
 
         output.append('}')
 
-        self._prettyprint(output)
+        prettyprint(output)
+
+
+def prettyprint(datastr):
+    """
+    Print page data strings to stderr
+    """
+    maxwidth = WPToolsQuery.MAXWIDTH
+    rpad = WPToolsQuery.RPAD
+
+    extent = maxwidth - (rpad + 2)
+    for line in datastr:
+        if len(line) >= maxwidth:
+            line = line[:extent] + '...'
+        utils.stderr(line)
 
 
 def safestr(text):
