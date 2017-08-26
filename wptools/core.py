@@ -7,7 +7,8 @@ WPTools core module
 Support for accessing Mediawiki foundation APIs.
 """
 
-from . import query
+from wptools.query import WPToolsQuery
+
 from . import request
 from . import utils
 
@@ -52,9 +53,9 @@ class WPTools(object):
             return
 
         # make the request
-        qobj = query.WPToolsQuery(lang=self.params['lang'],
-                                  wiki=self.params['wiki'],
-                                  variant=self.params['variant'])
+        qobj = WPToolsQuery(lang=self.params['lang'],
+                            wiki=self.params['wiki'],
+                            variant=self.params['variant'])
         qstr = self._query(action, qobj)
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)
@@ -86,10 +87,6 @@ class WPTools(object):
             if action == 'parse' and not data.get('parse'):
                 raise LookupError
 
-            if action == 'query':
-                if [x for x in data['query']['pages'] if x.get('missing')]:
-                    raise LookupError
-
             if action == 'wikidata' and '-1' in data.get('entities'):
                 raise LookupError
 
@@ -97,6 +94,20 @@ class WPTools(object):
 
         except (LookupError, ValueError):
             raise LookupError(_query)
+
+    def _prettyprint(self, datastr):
+        """
+        Print page data strings to stderr
+        """
+        maxwidth = WPToolsQuery.MAXWIDTH
+        rpad = WPToolsQuery.RPAD
+
+        if not self.flags['silent']:
+            extent = maxwidth - (rpad + 2)
+            for line in datastr:
+                if len(line) >= maxwidth:
+                    line = line[:extent] + '...'
+                utils.stderr(line)
 
     def _query(self, action, qobj):
         """
@@ -145,16 +156,23 @@ class WPTools(object):
             return utils.json_loads(self.cache[action]['response'])
         return self.cache.keys() or None
 
-    def show(self, maxwidth=78):
+    def show(self):
         """
         Pretty-print instance data
         """
         if not self.data:
             return
 
-        maxlen = 80
-        seed = self.params['seed'] or self.data['title']
+        title = self.params['title']
+        pageid = self.params['pageid']
+
+        seed = title or pageid
+        if utils.is_text(seed):
+            seed = seed.replace('_', ' ')
+
         output = ["%s (%s)" % (seed, self.params['lang'])]
+
+        maxwidth = WPToolsQuery.MAXWIDTH
 
         for item in sorted(self.data):
 
@@ -186,12 +204,7 @@ class WPTools(object):
 
         output.append('}')
 
-        if not self.flags['silent']:
-            extent = maxlen - 7  # ellipses + 2 spaces left and right
-            for line in output:
-                if len(line) >= maxlen:
-                    line = line[:extent] + '...'
-                utils.stderr(line)
+        self._prettyprint(output)
 
 
 def safestr(text):

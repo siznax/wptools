@@ -32,6 +32,9 @@ class WPToolsQuery(object):
     WPToolsQuery class
     """
 
+    MAXWIDTH = 80
+    RPAD = 4
+
     IMAGEINFO = Template((
         "${WIKI}/w/api.php?action=query"
         "&format=json"
@@ -234,8 +237,10 @@ class WPToolsQuery(object):
 
         status = "%s (%s) %s" % (self.domain, action, target)
 
-        if len(status) >= 80:
-            self.status = status[:77] + '...'
+        if len(status) >= self.MAXWIDTH:
+            tail = '...'
+            extent = self.MAXWIDTH - (len(tail) + self.RPAD)
+            self.status = status[:extent] + tail
         else:
             self.status = status
 
