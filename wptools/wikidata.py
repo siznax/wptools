@@ -101,6 +101,8 @@ class WPToolsWikidata(object):
         """
         returns WPToolsQuery string
         """
+        wikibase = self.params['wikibase']
+
         if action == 'claims':
             return qobj.claims(self.wikidata.claims.keys())
         elif action == 'wikidata':
