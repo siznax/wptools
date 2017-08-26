@@ -59,6 +59,7 @@ class WPToolsRequest(object):
         # return r.text
 
         crl = self.cobj
+
         try:
             crl.setopt(pycurl.URL, url)
         except UnicodeEncodeError:
