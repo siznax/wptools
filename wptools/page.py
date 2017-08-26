@@ -104,6 +104,7 @@ class WPToolsPage(core.WPTools,
         """
         title = self.params['title']
         pageid = self.params['pageid']
+        wikibase = self.params['wikibase']
 
         if action == 'random':
             return qobj.random()
@@ -113,6 +114,11 @@ class WPToolsPage(core.WPTools,
             return qobj.parse(title, pageid)
         elif action == 'imageinfo':
             return qobj.imageinfo(self.__get_image_files())
+
+        if action == 'claims':
+            return qobj.claims(self.data['claims'].keys())
+        elif action == 'wikidata':
+            return qobj.wikidata(title, wikibase)
 
     def _set_data(self, action):
         """
@@ -132,6 +138,8 @@ class WPToolsPage(core.WPTools,
             self._set_rest_data()
         elif action == 'wikidata':
             self._set_wikidata()
+            if 'claims' in self.data and self.data['claims']:
+                self.get_claims(show=False)
 
         if action in ['parse', 'query', 'rest', 'wikidata']:
             if self._missing_imageinfo() and not self.flags['defer_imageinfo']:
@@ -268,12 +276,15 @@ class WPToolsPage(core.WPTools,
         """
         rdata = self._load_response('random')
         rdata = rdata['query']['random'][0]
+
         pageid = rdata.get('id')
         title = rdata.get('title')
 
-        self.params['pageid'] = pageid
         self.data.update({'pageid': pageid,
                           'title': title})
+
+        self.params['title'] = title.replace(' ', '_')
+        self.params['pageid'] = pageid
 
     def get(self, show=True, proxy=None, timeout=0):
         """

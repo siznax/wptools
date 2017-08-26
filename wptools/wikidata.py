@@ -7,9 +7,16 @@ WPTools Wikidata module
 Support for Wikidata metadata.
 """
 
-from . import core
+import collections
+import re
+
+from . import utils
+
 
 class WPToolsWikidata(object):
+    """
+    WPToolsWikidata class
+    """
 
     # user-defined property labels
     LABELS = {'P17': 'country',
@@ -56,17 +63,20 @@ class WPToolsWikidata(object):
         """
         Returns a WPToolsWikidata object
         """
-        self.claims = None
-        self.properties = None
+        self.data['claims'] = None
+        self.data['properties'] = None
 
     def __get_entity_prop(self, entity, prop):
         """
         returns Wikidata entity property value
         """
+        variant = self.params['variant']
+        lang = self.params['lang']
+
         if entity.get(prop):
             ent = entity[prop]
             try:
-                return ent[self.variant or self.lang].get('value')
+                return ent[variant or lang].get('value')
             except AttributeError:
                 return ent.get('value')
 
@@ -74,39 +84,34 @@ class WPToolsWikidata(object):
         """
         attempt to set title from wikidata
         """
+        lang = self.params['lang']
+
         if item.get('sitelinks'):
             for link in item['sitelinks']:
-                if link == "%swiki" % self.lang:
+                if link == "%swiki" % lang:
                     title = item['sitelinks'][link]['title']
-                    self.title = title.replace(' ', '_')
+                    self.data['title'] = title.replace(' ', '_')
 
-        if not self.title and self.label:
-            self.title = self.label.replace(' ', '_')
+        title = self.data['title']
+        label = self.data['label']
+        if not title and label:
+            self.data['title'] = label.replace(' ', '_')
 
     def _marshal_claims(self, query_claims):
         """
         set Wikidata properties and entities from query claims
         """
-        self.props = self._wikidata_props(query_claims)
+        properties = self._wikidata_props(query_claims)
+        self.data['properties'] = properties
+        self.data['claims'] = {}
 
-        for propid in self.props:
-            label = self.wikiprops[propid]
-            for val in self.props[propid]:
+        for propid in properties:
+            label = self.LABELS[propid]
+            for val in properties[propid]:
                 if utils.is_text(val) and re.match(r'^Q\d+', val):
-                    self.claims[val] = label
+                    self.data['claims'][val] = label
                 else:
                     self._update_wikidata(label, val)
-
-    def _query(self, action, qobj):
-        """
-        returns WPToolsQuery string
-        """
-        wikibase = self.params['wikibase']
-
-        if action == 'claims':
-            return qobj.claims(self.wikidata.claims.keys())
-        elif action == 'wikidata':
-            return qobj.wikidata(title, wikibase)
 
     def _set_claims_data(self):
         """
@@ -115,53 +120,62 @@ class WPToolsWikidata(object):
         data = self._load_response('claims')
         entities = data.get('entities')
         for item in entities:
-            attr = self.claims[item]
+            attr = self.data['claims'][item]
             value = self.__get_entity_prop(entities[item], 'labels')
             self._update_wikidata(attr, value)
 
-        self.what = self.wikidata.get('instance')
+        self.data['what'] = self.data['wikidata'].get('instance')
 
     def _set_wikidata(self):
         """
         set attributes derived from Wikidata (action=wbentities)
         """
+        self.data['wikidata'] = {}
+
         data = self._load_response('wikidata')
         entities = data.get('entities')
         item = entities.get(next(iter(entities)))
 
-        self.modified['wikidata'] = item.get('modified')
-        self.wikibase = item.get('id')
-        self.wikidata_url = utils.wikidata_url(self.wikibase)
+        modified = item.get('modified')
+        try:
+            self.data['modified'].update({'wikidata': modified})
+        except KeyError:
+            self.data['modified'] = {'wikidata': modified}
 
-        self.description = self.__get_entity_prop(item, 'descriptions')
-        self.label = self.__get_entity_prop(item, 'labels')
+        wikibase = item.get('id')
+        self.data['wikibase'] = wikibase
+        self.data['wikidata_url'] = utils.wikidata_url(wikibase)
+
+        self.data['description'] = self.__get_entity_prop(item, 'descriptions')
+        self.data['label'] = self.__get_entity_prop(item, 'labels')
 
         self._marshal_claims(item.get('claims'))
         self.__set_title_wikidata(item)
 
-        image = self.wikidata.get('image')
+        image = self.data['wikidata'].get('image')
         if image:
             if not isinstance(image, list):
                 image = [image]
             for img in image:
-                self.image.append({'kind': 'wikidata-image', 'file': img})
-
-        if self.claims:
-            self.get_claims(show=False)
+                if 'image' not in self.data:
+                    self.data['image'] = []
+                self.data['image'].append({
+                    'kind': 'wikidata-image',
+                    'file': img})
 
     def _update_wikidata(self, label, value):
         """
         add or update Wikidata
         """
-        if self.wikidata.get(label):
+        if self.data['wikidata'].get(label):
             try:
-                self.wikidata[label].append(value)
+                self.data['wikidata'][label].append(value)
             except AttributeError:
-                first = self.wikidata.get(label)
-                self.wikidata[label] = [first]
-                self.wikidata[label].append(value)
+                first = self.data['wikidata'].get(label)
+                self.data['wikidata'][label] = [first]
+                self.data['wikidata'][label].append(value)
         else:
-            self.wikidata[label] = value
+            self.data['wikidata'][label] = value
 
     def _wikidata_props(self, query_claims):
         """
@@ -173,7 +187,7 @@ class WPToolsWikidata(object):
                 try:
                     snak = prop.get('mainsnak').get('datavalue').get('value')
                 except AttributeError:
-                    if self.wikiprops.get(claim):
+                    if self.LABELS.get(claim):
                         props[claim] = []
                         continue
                 try:
@@ -191,7 +205,7 @@ class WPToolsWikidata(object):
                 if not val or not [x for x in val if x]:
                     raise ValueError("%s %s" % (claim, prop))
 
-                if self.wikiprops.get(claim):
+                if self.LABELS.get(claim):
                     props[claim].append(val)
 
         return dict(props)
@@ -202,7 +216,7 @@ class WPToolsWikidata(object):
         - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
         - use get_wikidata() to populate claims
         """
-        if not self.claims:
+        if not self.data['claims']:
             raise LookupError("get_claims needs claims")
 
         self._get('claims', show, proxy, timeout)
@@ -224,8 +238,13 @@ class WPToolsWikidata(object):
         - wikidata_url: <str> Wikidata URL
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        if not self.wikibase and (not self.lang and not self.title):
-            raise LookupError("get_wikidata needs wikibase or lang and title")
+        lang = self.params['lang']
+        title = self.params['title']
+        wikibase = self.params['wikibase']
+
+        if not wikibase and (not lang and not title):
+            msg = "get_wikidata needs wikibase or (lang and title)"
+            raise LookupError(msg)
 
         self._get('wikidata', show, proxy, timeout)
 
