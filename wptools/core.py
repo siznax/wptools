@@ -111,9 +111,9 @@ class WPTools(object):
 
     def _set_data(self, action):
         """
-        Pack data from API response
+        Abstract method to capture API response data
         """
-        pass
+        raise NotImplementedError("A subclass must implement this method.")
 
     def info(self, action=None):
         '''
