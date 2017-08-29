@@ -236,6 +236,7 @@ class WPToolsQuery(object):
             pass
 
         status = "%s (%s) %s" % (self.domain, action, target)
+        status = status.strip().replace('\n', '')
 
         if len(status) >= self.MAXWIDTH:
             tail = '...'
