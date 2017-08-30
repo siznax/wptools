@@ -97,9 +97,9 @@ class WPTools(object):
 
     def _query(self, action, qobj):
         """
-        Implemented by sub-classes
+        Abstract method that returns WPToolsQuery string
         """
-        pass
+        raise NotImplementedError("A subclass must implement this method.")
 
     def _request(self, proxy, timeout):
         """
@@ -151,9 +151,9 @@ class WPTools(object):
         if not self.data:
             return
 
-        ptitle = self.params['title']
-        dtitle = self.data['title']
-        pageid = self.params['pageid']
+        ptitle = self.params.get('title')
+        dtitle = self.data.get('title')
+        pageid = self.params.get('pageid')
 
         seed = dtitle or ptitle or pageid
         if utils.is_text(seed):
