@@ -29,7 +29,8 @@ class WPToolsRESTBase(core.WPTools):
         - [title]: <str> Mediawiki page title, file, category, etc.
 
         Optional keyword arguments:
-        - [lang]: <str> Mediawiki language code (default='en')
+        - [lang]: <str> Mediawiki language code (default=en)
+        - [endpoint]: the RESTBase entry point (default=/page/)
         """
         super(WPToolsRESTBase, self).__init__(**kwargs)
 
@@ -37,7 +38,10 @@ class WPToolsRESTBase(core.WPTools):
         if len(args) > 0:  # first positional arg is title
             title = args[0].replace(' ', '_')
 
-        self.params.update({'lang': kwargs.get('lang') or 'en',
+        endpoint = self._parse_endpoint(kwargs.get('endpoint'), title)
+
+        self.params.update({'endpoint': endpoint,
+                            'lang': kwargs.get('lang') or 'en',
                             'title': title})
 
     def _handle_response(self):
@@ -70,7 +74,7 @@ class WPToolsRESTBase(core.WPTools):
 
         return response
 
-    def _parse_endpoint(self, endpoint):
+    def _parse_endpoint(self, endpoint, title):
         """
         Parse input endpoint
         """
@@ -83,12 +87,11 @@ class WPToolsRESTBase(core.WPTools):
         if not parts[0] == 'page':
             parts.insert(0, 'page')
 
-        title = self.params.get('title')
         if not title and len(parts) < 3:
             raise StandardError("need a title.")
 
-        if len(parts) == 3 and self.params.get('title'):  # check title
-            if self.params['title'] != parts[2]:
+        if len(parts) == 3 and title:  # check title
+            if title != parts[2]:
                 raise StandardError("titles conflict.")
 
         if title and len(parts) < 3:
@@ -109,12 +112,6 @@ class WPToolsRESTBase(core.WPTools):
         """
         Sets RESTBase response data
         """
-        self._set_rest_data()
-
-    def _set_rest_data(self):
-        """
-        Unpacks RESTBase response data
-        """
         res = self._handle_response()
         if res is None:
             return
@@ -123,8 +120,6 @@ class WPToolsRESTBase(core.WPTools):
         self.data['pageid'] = (res.get('id') or res.get('pageid'))
         self.data['exrest'] = res.get('extract')
         self.data['exhtml'] = res.get('extract_html')
-
-        self._unpack_images(res)
 
         lastmodified = res.get('lastmodified')
         if lastmodified:
@@ -137,14 +132,6 @@ class WPToolsRESTBase(core.WPTools):
         if res.get('sections'):
             lead = res.get('sections')[0]
             self.data['lead'] = lead.get('text')
-
-        thumbnail = res.get('thumbnail')  # /page/summary
-        if thumbnail:
-            rimg = {'kind': 'rest-thumb'}
-            rimg.update(thumbnail)
-            if thumbnail.get('source'):
-                rimg.update({'url': thumbnail.get('source')})
-            self.data['image'].append(rimg)
 
         title = res.get('title') or res.get('normalizedtitle')
         if title:
@@ -162,39 +149,46 @@ class WPToolsRESTBase(core.WPTools):
         self.data['url'] = durl
         self.data['url_raw'] = durl + '?action=raw'
 
+        self._unpack_images(res)
+
     def _unpack_images(self, rdata):
         """
         Set image data from RESTBase response
         """
         image = rdata.get('image')  # /page/mobile-sections-lead
         originalimage = rdata.get('originalimage')  # /page/summary
+        thumbnail = rdata.get('thumbnail')  # /page/summary
 
-        if image or originalimage:
+        if image or originalimage or thumbnail:
             if 'image' not in self.data:
                 self.data['image'] = []
 
         if image:
-            rimg = {'kind': 'rest-image'}
-            rimg.update(image)
-            self.data['image'].append(rimg)
+            img = {'kind': 'rest-image'}
+            img.update(image)
+            self.data['image'].append(img)
 
         if originalimage:
-            rimg = {'kind': 'rest-image'}
-            rimg.update(originalimage)
+            img = {'kind': 'rest-original'}
+            img.update(originalimage)
             if originalimage.get('source'):
-                rimg.update({'url': originalimage.get('source')})
-            self.data['image'].append(rimg)
+                img.update({'url': originalimage.get('source')})
+            self.data['image'].append(img)
 
-    def get_rest(self, endpoint=None, show=True, proxy=None, timeout=0):
+        if thumbnail:
+            img = {'kind': 'rest-thumb'}
+            img.update(thumbnail)
+            if thumbnail.get('source'):
+                img.update({'url': thumbnail.get('source')})
+            self.data['image'].append(img)
+
+    def get_rest(self, show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
         for example:
             /page/html/{title}
             /page/summary/{title}
             /page/mobile-sections-lead/{title}
-
-        Arguments:
-        - endpoint: the RESTBase entry point
 
         Without arguments, lists RESTBase /page/ entry points
 
@@ -213,8 +207,6 @@ class WPToolsRESTBase(core.WPTools):
 
         See https://en.wikipedia.org/api/rest_v1/
         """
-        self.params['endpoint'] = self._parse_endpoint(endpoint)
-
         self._get('rest', show, proxy, timeout)
 
         return self
