@@ -12,14 +12,10 @@ Support for getting Mediawiki/Wikidata/RESTBase page info.
 import html2text
 
 from . import core
-from . import restbase
 from . import utils
-from . import wikidata
 
 
-class WPToolsPage(core.WPTools,
-                  wikidata.WPToolsWikidata,
-                  restbase.WPToolsRESTBase):
+class WPToolsPage(core.WPTools):
     """
     WPtools core class
     """
@@ -104,7 +100,6 @@ class WPToolsPage(core.WPTools,
         """
         title = self.params['title']
         pageid = self.params['pageid']
-        wikibase = self.params['wikibase']
 
         if action == 'random':
             return qobj.random()
@@ -115,18 +110,11 @@ class WPToolsPage(core.WPTools,
         elif action == 'imageinfo':
             return qobj.imageinfo(self.__get_image_files())
 
-        if action == 'claims':
-            return qobj.claims(self.data['claims'].keys())
-        elif action == 'wikidata':
-            return qobj.wikidata(title, wikibase)
-
     def _set_data(self, action):
         """
         Marshals response data into page data
         """
-        if action == 'claims':
-            self._set_claims_data()
-        elif action == 'imageinfo':
+        if action == 'imageinfo':
             self._set_imageinfo_data()
         elif action == 'parse':
             self._set_parse_data()
@@ -134,16 +122,10 @@ class WPToolsPage(core.WPTools,
             self._set_query_data()
         elif action == 'random':
             self._set_random_data()
-        elif action == 'rest':
-            self._set_rest_data()
-        elif action == 'wikidata':
-            self._set_wikidata()
-            if 'claims' in self.data and self.data['claims']:
-                self.get_claims(show=False)
 
-        if action in ['parse', 'query', 'rest', 'wikidata']:
-            if self._missing_imageinfo() and not self.flags['defer_imageinfo']:
-                self.get_imageinfo(show=False)
+        defer = self.flags.get('defer_imageinfo')
+        if self._missing_imageinfo() and not defer:
+            self.get_imageinfo(show=False)
 
     def _set_imageinfo_data(self):
         """
@@ -290,8 +272,8 @@ class WPToolsPage(core.WPTools,
         """
         Make Mediawiki, RESTBase, and Wikidata requests for page data
         some sequence of:
-        - get_query()
         - get_parse()
+        - get_query()
         - get_rest()
         - get_wikidata()
         """
@@ -299,7 +281,7 @@ class WPToolsPage(core.WPTools,
         title = self.params['title']
         if wikibase and not title:
             self.flags['defer_imageinfo'] = True
-            self.get_wikidata(False, proxy, timeout)
+            # self.get_wikidata(False, proxy, timeout)
             self.get_query(False, proxy, timeout)
             self.flags['defer_imageinfo'] = False
             self.get_parse(show, proxy, timeout)
@@ -308,7 +290,7 @@ class WPToolsPage(core.WPTools,
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
             self.data['defer_imageinfo'] = False
-            self.get_wikidata(show, proxy, timeout)
+            # self.get_wikidata(show, proxy, timeout)
         return self
 
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
@@ -398,8 +380,12 @@ class WPToolsPage(core.WPTools,
         returns first pageimage info with kind containing token
         or list of pageimage kinds
         """
-        if not token and self.data['image']:
+        if 'image' not in self.data:
+            return
+
+        if not token:
             return [x['kind'] for x in self.data['image']]
+
         for img in self.data['image']:
             if token in img.get('kind'):
                 return img
