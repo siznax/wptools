@@ -53,8 +53,6 @@ class WPToolsPage(core.WPTools):
             'title': title,
             'wikibase': wikibase})
 
-        self.flags.update({'defer_imageinfo': False})
-
         if not title and not pageid and not wikibase:
             self.get_random()
         else:
@@ -123,8 +121,7 @@ class WPToolsPage(core.WPTools):
         elif action == 'random':
             self._set_random_data()
 
-        defer = self.flags.get('defer_imageinfo')
-        if self._missing_imageinfo() and not defer:
+        if self._missing_imageinfo() and not self.flags.get('defer_imageinfo'):
             self.get_imageinfo(show=False)
 
     def _set_imageinfo_data(self):
@@ -162,14 +159,7 @@ class WPToolsPage(core.WPTools):
             self.data['title'] = pdata['title'].replace(' ', '_')
 
         if self.data['infobox']:
-            if 'image' not in self.data:
-                self.data['image'] = []
-            if infobox.get('image'):
-                self.data['image'].append({
-                    'kind': 'parse-image', 'file': infobox['image']})
-            if infobox.get('Cover'):
-                self.data['image'].append({
-                    'kind': 'parse-cover', 'file': infobox['Cover']})
+            self._unpack_images(self.data['infobox'], 'parse')
 
     def _set_query_data(self):
         """
@@ -202,26 +192,20 @@ class WPToolsPage(core.WPTools):
             if extext:
                 self.data['extext'] = extext.strip()
 
+        files = page.get('images')  # these are ALL page files
+        if files:
+            self.data['files'] = [x['title'] for x in files]
+
         fullurl = page.get('fullurl')
         if fullurl:
             self.data['url'] = fullurl
             self.data['url_raw'] = fullurl + '?action=raw'
 
-        images = page.get('images')
-        if images:
-            self.data['files'] = [x['title'] for x in images]
-
         modified = page.get('touched')
-        if 'modified' not in data:
+        if 'modified' in self.data:
+            self.data['modified'].update({'page': modified})
+        else:
             self.data['modified'] = {'page': modified}
-
-        pageimage = page.get('pageimage')
-        if pageimage:
-            if 'image' not in self.data:
-                self.data['image'] = []
-            self.data['image'].append({
-                'kind': 'query-pageimage',
-                'file': pageimage})
 
         pageprops = page.get('pageprops')
         if pageprops:
@@ -243,14 +227,7 @@ class WPToolsPage(core.WPTools):
             if terms.get('label'):
                 self.data['label'] = next(iter(terms['label']), None)
 
-        thumbnail = page.get('thumbnail')
-        if thumbnail:
-            qthumb = {'kind': 'query-thumbnail'}
-            qthumb.update(thumbnail)
-            qthumb['url'] = thumbnail.get('source')
-            del qthumb['source']
-            qthumb['file'] = qthumb['url'].split('/')[-2]
-            self.data['image'].append(qthumb)
+        self._unpack_images(page, 'query')
 
     def _set_random_data(self):
         """
@@ -268,6 +245,46 @@ class WPToolsPage(core.WPTools):
         self.params['title'] = title.replace(' ', '_')
         self.params['pageid'] = pageid
 
+    def _unpack_images(self, source, action):
+        """
+        Set image data from Mediawiki response data
+        """
+        if 'image' not in self.data:
+            self.data['image'] = []
+
+        if action == 'parse':
+
+            image = source.get('image')
+            cover = source.get('Cover')
+
+            if image:
+                self.data['image'].append({
+                    'kind': 'parse-image',
+                    'file': source['image']})
+
+            if cover:
+                self.data['image'].append({
+                    'kind': 'parse-cover',
+                    'file': source['Cover']})
+
+        if action == 'query':
+
+            pageimage = source.get('pageimage')
+            thumbnail = source.get('thumbnail')
+
+            if pageimage:
+                self.data['image'].append({
+                    'kind': 'query-pageimage',
+                    'file': pageimage})
+
+            if thumbnail:
+                qthumb = {'kind': 'query-thumbnail'}
+                qthumb.update(thumbnail)
+                qthumb['url'] = thumbnail.get('source')
+                del qthumb['source']
+                qthumb['file'] = qthumb['url'].split('/')[-2]
+                self.data['image'].append(qthumb)
+
     def get(self, show=True, proxy=None, timeout=0):
         """
         Make Mediawiki, RESTBase, and Wikidata requests for page data
@@ -277,8 +294,9 @@ class WPToolsPage(core.WPTools):
         - get_rest()
         - get_wikidata()
         """
-        wikibase = self.params['wikibase']
         title = self.params['title']
+        wikibase = self.params['wikibase']
+
         if wikibase and not title:
             self.flags['defer_imageinfo'] = True
             # self.get_wikidata(False, proxy, timeout)
@@ -286,16 +304,17 @@ class WPToolsPage(core.WPTools):
             self.flags['defer_imageinfo'] = False
             self.get_parse(show, proxy, timeout)
         else:
-            self.data['defer_imageinfo'] = True
+            self.flags['defer_imageinfo'] = True
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
-            self.data['defer_imageinfo'] = False
+            self.flags['defer_imageinfo'] = False
             # self.get_wikidata(show, proxy, timeout)
+
         return self
 
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
         """
-        MediaWiki request for API:Imageinfo
+        GET MediaWiki request for API:Imageinfo
         - image: <dict> updates image URLs, sizes, etc.
         https://www.mediawiki.org/wiki/API:Imageinfo
         """
@@ -312,7 +331,7 @@ class WPToolsPage(core.WPTools):
 
     def get_parse(self, show=True, proxy=None, timeout=0):
         """
-        MediaWiki:API action=parse request for:
+        GET MediaWiki:API action=parse request for:
         - image: <dict> {parse-image, parse-cover}
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
@@ -331,7 +350,7 @@ class WPToolsPage(core.WPTools):
 
     def get_query(self, show=True, proxy=None, timeout=0):
         """
-        MediaWiki:API action=query request for:
+        GET MediaWiki:API action=query request for:
         - description: <str> Wikidata description (via pageterms)
         - extext: <str> plain text (Markdown) extract
         - extract: <str> HTML extract from Extension:TextExtract
@@ -354,7 +373,7 @@ class WPToolsPage(core.WPTools):
 
     def get_random(self, show=True, proxy=None, timeout=0):
         """
-        Make MediaWiki:API (action=query) request for random title
+        GET MediaWiki:API (action=query) list=random
 
         Arguments:
         - [show]: <bool> echo page data if true
