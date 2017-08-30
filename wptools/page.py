@@ -65,7 +65,7 @@ class WPToolsPage(core.WPTools):
         files = []
         image = self.data['image']
 
-        for item in [x['file'] for x in image if x.get('file')]:
+        for item in (x['file'] for x in image if x.get('file')):
             fname = item.replace('_', ' ')
             if (not fname.startswith('File')
                     and not fname.startswith('Image')):
@@ -155,8 +155,9 @@ class WPToolsPage(core.WPTools):
         self.data['links'] = utils.get_links(pdata.get('iwlinks'))
         self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
-        if pdata.get('title'):
-            self.data['title'] = pdata['title'].replace(' ', '_')
+        title = pdata.get('title')
+        if title:
+            self.data['title'] = title.replace(' ', '_')
 
         if self.data['infobox']:
             self._unpack_images(self.data['infobox'], 'parse')
@@ -168,33 +169,19 @@ class WPToolsPage(core.WPTools):
         data = self._load_response('query')
         page = data['query']['pages'][0]
 
+        self._set_query_data_fast(data, page)
+        self._set_query_data_slow(page)
+
+    def _set_query_data_fast(self, data, page):
+        """
+        Set less expensive action=query response data
+        """
         self.data['languages'] = page.get('langlinks')
         self.data['length'] = page.get('length')
         self.data['pageid'] = page.get('pageid')
         self.data['random'] = data['query']['random'][0]["title"]
         self.data['title'] = page.get('title').replace(' ', '_')
         self.data['watchers'] = page.get('watchers')
-
-        categories = page.get('categories')
-        if categories:
-            self.data['categories'] = [x['title'] for x in categories]
-
-        contributors = page.get("contributors") or 0
-        anoncontributors = page.get("anoncontributors") or 0
-        if isinstance(contributors, list):
-            contributors = len(contributors)
-        self.data['contributors'] = contributors + anoncontributors
-
-        extract = page.get('extract')
-        if extract:
-            self.data['extract'] = extract
-            extext = html2text.html2text(extract)
-            if extext:
-                self.data['extext'] = extext.strip()
-
-        files = page.get('images')  # these are ALL page files
-        if files:
-            self.data['files'] = [x['title'] for x in files]
 
         fullurl = page.get('fullurl')
         if fullurl:
@@ -214,11 +201,6 @@ class WPToolsPage(core.WPTools):
                 self.data['wikibase'] = wikibase
                 self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
-        pageviews = page.get('pageviews')
-        values = [x for x in pageviews.values() if x]
-        if pageviews:
-            self.data['views'] = int(sum(values) / len(values))
-
         terms = page.get('terms')
         if terms:
             if terms.get('description'):
@@ -228,6 +210,36 @@ class WPToolsPage(core.WPTools):
                 self.data['label'] = next(iter(terms['label']), None)
 
         self._unpack_images(page, 'query')
+
+    def _set_query_data_slow(self, page):
+        """
+        Set more expensive action=query response data
+        """
+        categories = page.get('categories')
+        if categories:
+            self.data['categories'] = [x['title'] for x in categories]
+
+        contributors = page.get("contributors") or 0
+        anoncontributors = page.get("anoncontributors") or 0
+        if isinstance(contributors, list):
+            contributors = len(contributors)
+        self.data['contributors'] = contributors + anoncontributors
+
+        extract = page.get('extract')
+        if extract:
+            self.data['extract'] = extract
+            extext = html2text.html2text(extract)
+            if extext:
+                self.data['extext'] = extext.strip()
+
+        files = page.get('images')  # really, these are FILES
+        if files:
+            self.data['files'] = [x['title'] for x in files]
+
+        pageviews = page.get('pageviews')
+        if pageviews:
+            values = [x for x in pageviews.values() if x]
+            self.data['views'] = int(sum(values) / len(values))
 
     def _set_random_data(self):
         """
