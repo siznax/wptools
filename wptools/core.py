@@ -161,6 +161,8 @@ class WPTools(object):
 
         output = ["%s (%s)" % (seed, self.params['lang'])]
 
+        output.append('{')
+
         maxwidth = WPToolsQuery.MAXWIDTH
 
         for item in sorted(self.data):
