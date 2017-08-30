@@ -313,17 +313,18 @@ class WPToolsPage(core.WPTools):
 
         if wikibase and not title:
             self.flags['defer_imageinfo'] = True
-            # self.get_wikidata(False, proxy, timeout)
+            self.get_wikidata(False, proxy, timeout)
             self.get_query(False, proxy, timeout)
             self.flags['defer_imageinfo'] = False
-            self.get_parse(show, proxy, timeout)
+            self.get_parse(False, proxy, timeout)
+            self.show(show)
         else:
             self.flags['defer_imageinfo'] = True
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
             self.flags['defer_imageinfo'] = False
-            # self.get_wikidata(show, proxy, timeout)
-
+            self.get_wikidata(False, proxy, timeout)
+            self.show(show)
         return self
 
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
