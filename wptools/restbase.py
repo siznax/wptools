@@ -94,6 +94,9 @@ class WPToolsRESTBase(core.WPTools):
         if title and len(parts) < 3:
             parts.append(title)
 
+        if not title:
+            self.params['title'] = parts[-1]
+
         return '/' + '/'.join(parts)
 
     def _query(self, action, qobj):
@@ -143,7 +146,7 @@ class WPToolsRESTBase(core.WPTools):
                 rimg.update({'url': thumbnail.get('source')})
             self.data['image'].append(rimg)
 
-        title = (res.get('title') or res.get('normalizedtitle'))
+        title = res.get('title') or res.get('normalizedtitle')
         if title:
             self.data['title'] = title.replace(' ', '_')
 
