@@ -75,11 +75,11 @@ class WPToolsWikidata(core.WPTools):
         super(WPToolsWikidata, self).__init__(**kwargs)
 
         title = None
-        if len(args) > 0:  # first positional arg is title
+        if len(args) > 0 and args[0]:  # first positional arg is title
             title = args[0].replace(' ', '_')
 
         self.params.update({'lang': kwargs.get('lang') or 'en',
-                            'title': title,
+                            'title': title or kwargs.get('title'),
                             'variant': kwargs.get('variant'),
                             'wikibase': kwargs.get('wikibase')})
 
@@ -281,13 +281,12 @@ class WPToolsWikidata(core.WPTools):
         - wikidata_url: <str> Wikidata URL
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        lang = self.params.get('lang')
         title = self.params.get('title')
         wikibase = self.params.get('wikibase')
 
-        if not wikibase and (not lang and not title):
-            msg = "get_wikidata needs wikibase or (lang and title)"
-            raise LookupError(msg)
+        if not wikibase and not title:
+            err = "get_wikidata needs wikibase or title"
+            raise LookupError(err)
 
         self._get('wikidata', show, proxy, timeout)
 
