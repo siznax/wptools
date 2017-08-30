@@ -4,16 +4,17 @@
 WPTools Wikidata module
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Support for Wikidata metadata.
+Support for getting Wikidata.
 """
 
 import collections
 import re
 
+from . import core
 from . import utils
 
 
-class WPToolsWikidata(object):
+class WPToolsWikidata(core.WPTools):
     """
     WPToolsWikidata class
     """
@@ -62,11 +63,30 @@ class WPToolsWikidata(object):
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsWikidata object
+
+        Optional positional arguments:
+        - [title]: <str> Mediawiki page title, file, category, etc.
+
+        Optional keyword arguments:
+        - [lang]: <str> Mediawiki language code (default='en')
+        - [variant]: <str> Mediawiki langauge variant
+        - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
         """
+        super(WPToolsWikidata, self).__init__(**kwargs)
+
+        title = None
+        if len(args) > 0:  # first positional arg is title
+            title = args[0].replace(' ', '_')
+
+        self.params.update({'lang': kwargs.get('lang') or 'en',
+                            'title': title,
+                            'variant': kwargs.get('variant'),
+                            'wikibase': kwargs.get('wikibase')})
+
         self.data['claims'] = None
         self.data['properties'] = None
 
-    def __get_entity_prop(self, entity, prop):
+    def _get_entity_prop(self, entity, prop):
         """
         returns Wikidata entity property value
         """
@@ -79,23 +99,6 @@ class WPToolsWikidata(object):
                 return ent[variant or lang].get('value')
             except AttributeError:
                 return ent.get('value')
-
-    def __set_title_wikidata(self, item):
-        """
-        attempt to set title from wikidata
-        """
-        lang = self.params['lang']
-
-        if item.get('sitelinks'):
-            for link in item['sitelinks']:
-                if link == "%swiki" % lang:
-                    title = item['sitelinks'][link]['title']
-                    self.data['title'] = title.replace(' ', '_')
-
-        title = self.data['title']
-        label = self.data['label']
-        if not title and label:
-            self.data['title'] = label.replace(' ', '_')
 
     def _marshal_claims(self, query_claims):
         """
@@ -113,6 +116,29 @@ class WPToolsWikidata(object):
                 else:
                     self._update_wikidata(label, val)
 
+    def _query(self, action, qobj):
+        """
+        Returns wikidata query string
+        """
+        if action == 'claims':
+            return qobj.claims(self.data['claims'].keys())
+        elif action == 'wikidata':
+            return qobj.wikidata(self.params.get('title'),
+                                 self.params.get('wikibase'))
+
+    def _set_data(self, action):
+        """
+        Capture Wikidata API response data
+        """
+        if action == 'claims':
+            self._set_claims_data()
+
+        if action == 'wikidata':
+            self._set_wikidata()
+
+            if self.data.get('claims'):
+                self.get_claims(show=False)
+
     def _set_claims_data(self):
         """
         set property claim labels from get_claims()
@@ -121,10 +147,27 @@ class WPToolsWikidata(object):
         entities = data.get('entities')
         for item in entities:
             attr = self.data['claims'][item]
-            value = self.__get_entity_prop(entities[item], 'labels')
+            value = self._get_entity_prop(entities[item], 'labels')
             self._update_wikidata(attr, value)
 
         self.data['what'] = self.data['wikidata'].get('instance')
+
+    def _set_title(self, item):
+        """
+        attempt to set title from wikidata
+        """
+        lang = self.params['lang']
+
+        if item.get('sitelinks'):
+            for link in item['sitelinks']:
+                if link == "%swiki" % lang:
+                    title = item['sitelinks'][link]['title']
+                    self.data['title'] = title.replace(' ', '_')
+
+        title = self.data['title']
+        label = self.data['label']
+        if not title and label:
+            self.data['title'] = label.replace(' ', '_')
 
     def _set_wikidata(self):
         """
@@ -146,11 +189,11 @@ class WPToolsWikidata(object):
         self.data['wikibase'] = wikibase
         self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
-        self.data['description'] = self.__get_entity_prop(item, 'descriptions')
-        self.data['label'] = self.__get_entity_prop(item, 'labels')
+        self.data['description'] = self._get_entity_prop(item, 'descriptions')
+        self.data['label'] = self._get_entity_prop(item, 'labels')
 
         self._marshal_claims(item.get('claims'))
-        self.__set_title_wikidata(item)
+        self._set_title(item)
 
         image = self.data['wikidata'].get('image')
         if image:
@@ -238,9 +281,9 @@ class WPToolsWikidata(object):
         - wikidata_url: <str> Wikidata URL
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
-        lang = self.params['lang']
-        title = self.params['title']
-        wikibase = self.params['wikibase']
+        lang = self.params.get('lang')
+        title = self.params.get('title')
+        wikibase = self.params.get('wikibase')
 
         if not wikibase and (not lang and not title):
             msg = "get_wikidata needs wikibase or (lang and title)"
