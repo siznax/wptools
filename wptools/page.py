@@ -14,6 +14,8 @@ import html2text
 from . import core
 from . import utils
 
+from .wikidata import WPToolsWikidata
+
 
 class WPToolsPage(core.WPTools):
     """
@@ -405,6 +407,16 @@ class WPToolsPage(core.WPTools):
         del self.cache['random']
 
         return self
+
+    def get_wikidata(self, show=True, proxy=None, timeout=0):
+        """
+        Envoke wptools.wikidata.WPToolsWikidata()
+        """
+        wdobj = WPToolsWikidata(self.params.get('title'), **self.params)
+
+        wdobj.get_wikidata(show, proxy, timeout)
+
+        self.data.update(wdobj.data)
 
     def pageimage(self, token=None):
         """
