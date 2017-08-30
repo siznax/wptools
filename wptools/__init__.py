@@ -24,10 +24,10 @@ __version__ = "0.3"
 from . import core
 from . import query
 from . import request
-from . import restbase
 from . import site
 from . import utils
-from . import wikidata
 
 from .category import WPToolsCategory as category
 from .page import WPToolsPage as page
+from .restbase import WPToolsRESTBase as restbase
+from .wikidata import WPToolsWikidata as wikidata
