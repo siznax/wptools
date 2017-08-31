@@ -14,6 +14,7 @@ import html2text
 from . import core
 from . import utils
 
+from .restbase import WPToolsRESTBase
 from .wikidata import WPToolsWikidata
 
 
@@ -30,10 +31,11 @@ class WPToolsPage(core.WPTools):
         - [title]: <str> Mediawiki page title, file, category, etc.
 
         Optional keyword arguments:
-        - [lang]: <str> Mediawiki language code (default='en')
+        - [endpoint]: <str> RESTBase entry point (default=summary)
+        - [lang]: <str> Mediawiki language code (default=en)
         - [pageid]: <int> Mediawiki pageid
         - [variant]: <str> Mediawiki langauge variant
-        - [wiki]: <str> alternative wiki site (default='wikipedia.org')
+        - [wiki]: <str> alternative wiki site (default=wikipedia.org)
         - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
 
         Keyword flags:
@@ -44,18 +46,20 @@ class WPToolsPage(core.WPTools):
         super(WPToolsPage, self).__init__(**kwargs)
 
         title = None
-        if len(args) > 0:  # first positional arg is title
-            title = args[0].replace(' ', '_')
+        if len(args) > 0 and args[0]:  # first positional arg is title
+            title = args[0]
 
+        endpoint = kwargs.get('endpoint')
         pageid = kwargs.get('pageid')
         wikibase = kwargs.get('wikibase')
 
         self.params.update({
+            'endpoint': endpoint,
             'pageid': pageid,
             'title': title,
             'wikibase': wikibase})
 
-        if not title and not pageid and not wikibase:
+        if not title and not endpoint and not pageid and not wikibase:
             self.get_random()
         else:
             self.show()
@@ -144,25 +148,49 @@ class WPToolsPage(core.WPTools):
         set attributes derived from MediaWiki (action=parse)
         """
         pdata = self._load_response('parse')['parse']
-
         parsetree = pdata.get('parsetree')
-        wikibase = pdata.get('properties').get('wikibase_item')
+
         self.data['pageid'] = pdata.get('pageid')
         self.data['parsetree'] = parsetree
-        self.data['wikibase'] = wikibase
         self.data['wikitext'] = pdata.get('wikitext')
 
         infobox = utils.get_infobox(parsetree)
         self.data['infobox'] = infobox
         self.data['links'] = utils.get_links(pdata.get('iwlinks'))
-        self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
         title = pdata.get('title')
         if title:
-            self.data['title'] = title.replace(' ', '_')
+            self.data['title'] = title
+            if not self.params.get('title'):
+                self.params['title'] = title
+
+        wikibase = pdata.get('properties').get('wikibase_item')
+        if wikibase:
+            self.data['wikibase'] = wikibase
+            self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
         if self.data['infobox']:
-            self._unpack_images(self.data['infobox'], 'parse')
+            self._set_parse_image(self.data['infobox'])
+
+    def _set_parse_image(self, infobox):
+        """
+        Set image data from action=parse response
+        """
+        if 'image' not in self.data:
+            self.data['image'] = []
+
+        image = infobox.get('image')
+        cover = infobox.get('Cover')
+
+        if image:
+            self.data['image'].append({
+                'kind': 'parse-image',
+                'file': infobox['image']})
+
+        if cover:
+            self.data['image'].append({
+                'kind': 'parse-cover',
+                'file': infobox['Cover']})
 
     def _set_query_data(self):
         """
@@ -171,18 +199,18 @@ class WPToolsPage(core.WPTools):
         data = self._load_response('query')
         page = data['query']['pages'][0]
 
-        self._set_query_data_fast(data, page)
+        self.data['random'] = data['query']['random'][0]["title"]
+
+        self._set_query_data_fast(page)
         self._set_query_data_slow(page)
 
-    def _set_query_data_fast(self, data, page):
+    def _set_query_data_fast(self, page):
         """
         Set less expensive action=query response data
         """
         self.data['languages'] = page.get('langlinks')
         self.data['length'] = page.get('length')
         self.data['pageid'] = page.get('pageid')
-        self.data['random'] = data['query']['random'][0]["title"]
-        self.data['title'] = page.get('title').replace(' ', '_')
         self.data['watchers'] = page.get('watchers')
 
         fullurl = page.get('fullurl')
@@ -211,7 +239,12 @@ class WPToolsPage(core.WPTools):
             if terms.get('label'):
                 self.data['label'] = next(iter(terms['label']), None)
 
-        self._unpack_images(page, 'query')
+        title = page.get('title')
+        self.data['title'] = title
+        if not self.params.get('title'):
+            self.params['title'] = title
+
+        self._set_query_image(page)
 
     def _set_query_data_slow(self, page):
         """
@@ -241,7 +274,33 @@ class WPToolsPage(core.WPTools):
         pageviews = page.get('pageviews')
         if pageviews:
             values = [x for x in pageviews.values() if x]
-            self.data['views'] = int(sum(values) / len(values))
+            if values:
+                self.data['views'] = int(sum(values) / len(values))
+            else:
+                self.data['views'] = 0
+
+    def _set_query_image(self, page):
+        """
+        Set image data from action=query response
+        """
+        if 'image' not in self.data:
+            self.data['image'] = []
+
+        pageimage = page.get('pageimage')
+        thumbnail = page.get('thumbnail')
+
+        if pageimage:
+            self.data['image'].append({
+                'kind': 'query-pageimage',
+                'file': pageimage})
+
+        if thumbnail:
+            qthumb = {'kind': 'query-thumbnail'}
+            qthumb.update(thumbnail)
+            qthumb['url'] = thumbnail.get('source')
+            del qthumb['source']
+            qthumb['file'] = qthumb['url'].split('/')[-2]
+            self.data['image'].append(qthumb)
 
     def _set_random_data(self):
         """
@@ -256,48 +315,8 @@ class WPToolsPage(core.WPTools):
         self.data.update({'pageid': pageid,
                           'title': title})
 
-        self.params['title'] = title.replace(' ', '_')
+        self.params['title'] = title
         self.params['pageid'] = pageid
-
-    def _unpack_images(self, source, action):
-        """
-        Set image data from Mediawiki response data
-        """
-        if 'image' not in self.data:
-            self.data['image'] = []
-
-        if action == 'parse':
-
-            image = source.get('image')
-            cover = source.get('Cover')
-
-            if image:
-                self.data['image'].append({
-                    'kind': 'parse-image',
-                    'file': source['image']})
-
-            if cover:
-                self.data['image'].append({
-                    'kind': 'parse-cover',
-                    'file': source['Cover']})
-
-        if action == 'query':
-
-            pageimage = source.get('pageimage')
-            thumbnail = source.get('thumbnail')
-
-            if pageimage:
-                self.data['image'].append({
-                    'kind': 'query-pageimage',
-                    'file': pageimage})
-
-            if thumbnail:
-                qthumb = {'kind': 'query-thumbnail'}
-                qthumb.update(thumbnail)
-                qthumb['url'] = thumbnail.get('source')
-                del qthumb['source']
-                qthumb['file'] = qthumb['url'].split('/')[-2]
-                self.data['image'].append(qthumb)
 
     def get(self, show=True, proxy=None, timeout=0):
         """
@@ -305,26 +324,48 @@ class WPToolsPage(core.WPTools):
         some sequence of:
         - get_parse()
         - get_query()
-        - get_rest()
+        - get_restbase()
         - get_wikidata()
         """
-        title = self.params['title']
-        wikibase = self.params['wikibase']
+        title = self.params.get('title')
+        wikibase = self.params.get('wikibase')
+
+        if not self.params.get('endpoint'):
+            self.params['endpoint'] = 'summary'
 
         if wikibase and not title:
+
             self.flags['defer_imageinfo'] = True
+
             self.get_wikidata(False, proxy, timeout)
             self.get_query(False, proxy, timeout)
-            self.flags['defer_imageinfo'] = False
             self.get_parse(False, proxy, timeout)
-            self.show(show)
+
+            self.flags['defer_imageinfo'] = False
+
+            self.get_restbase(False, proxy, timeout)
+
+            if not self.flags.get('silent'):
+                self.show(show)
         else:
+
             self.flags['defer_imageinfo'] = True
+
             self.get_query(False, proxy, timeout)
             self.get_parse(False, proxy, timeout)
-            self.flags['defer_imageinfo'] = False
+
+            if not self.data.get('wikibase'):
+                self.flags['skip'].append('wikidata')
+
             self.get_wikidata(False, proxy, timeout)
-            self.show(show)
+
+            self.flags['defer_imageinfo'] = False
+
+            self.get_restbase(False, proxy, timeout)
+
+            if not self.flags.get('silent'):
+                self.show(show)
+
         return self
 
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
@@ -409,11 +450,29 @@ class WPToolsPage(core.WPTools):
 
         return self
 
+    def get_restbase(self, show=True, proxy=None, timeout=0):
+        """
+        Envoke wptools.restbase.get_restbase()
+        """
+        kwargs = {}
+        kwargs.update(self.params)
+        kwargs.update(self.flags)
+
+        rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
+
+        rbobj.get_restbase(show, proxy, timeout)
+
+        self.data.update(rbobj.data)
+
     def get_wikidata(self, show=True, proxy=None, timeout=0):
         """
-        Envoke wptools.wikidata.WPToolsWikidata()
+        Envoke wptools.wikidata.get_wikidata()
         """
-        wdobj = WPToolsWikidata(self.params.get('title'), **self.params)
+        kwargs = {}
+        kwargs.update(self.params)
+        kwargs.update(self.flags)
+
+        wdobj = WPToolsWikidata(self.params.get('title'), **kwargs)
 
         wdobj.get_wikidata(show, proxy, timeout)
 
