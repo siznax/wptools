@@ -29,47 +29,44 @@ class WPToolsRESTBase(core.WPTools):
         - [title]: <str> Mediawiki page title, file, category, etc.
 
         Optional keyword arguments:
-        - [lang]: <str> Mediawiki language code (default=en)
         - [endpoint]: the RESTBase entry point (default=/page/)
+        - [lang]: <str> Mediawiki language code (default=en)
         """
         super(WPToolsRESTBase, self).__init__(**kwargs)
 
         title = None
-        if len(args) > 0:  # first positional arg is title
+        if len(args) > 0 and args[0]:  # first positional arg is title
             title = args[0].replace(' ', '_')
 
         endpoint = self._parse_endpoint(kwargs.get('endpoint'), title)
 
-        self.params.update({'endpoint': endpoint,
-                            'lang': kwargs.get('lang') or 'en',
-                            'title': title})
+        self.params.update({
+            'endpoint': endpoint,
+            'lang': kwargs.get('lang') or 'en',
+            'title': self.params.get('title') or title})
 
     def _handle_response(self):
         """
         Returns RESTBase response if appropriate
         """
-        content = self.cache['rest']['info']['content']
+        content = self.cache['restbase']['info']['content']
         if content.startswith('text/html'):
-            html = self.cache['rest']['response']
+            html = self.cache['restbase']['response']
             if isinstance(html, bytes):
                 html = html.decode('utf-8')
             self.data['html'] = html
             return
 
-        response = self._load_response('rest')
+        response = self._load_response('restbase')
 
-        http_status = self.cache['rest']['info']['status']
+        http_status = self.cache['restbase']['info']['status']
         if http_status == 404:
-            err = response.get('detail')
-            if err:
-                raise LookupError(err)
-            else:
-                raise LookupError(self.cache['rest']['query'])
+            raise LookupError(self.cache['restbase']['query'])
 
         if self.params.get('endpoint') == '/page/':
             msg = "RESTBase /page/ entry points: %s" % response.get('items')
             utils.stderr(msg)
-            del self.cache['rest']
+            del self.cache['restbase']
             return
 
         return response
@@ -87,18 +84,18 @@ class WPToolsRESTBase(core.WPTools):
         if not parts[0] == 'page':
             parts.insert(0, 'page')
 
-        if not title and len(parts) < 3:
-            raise StandardError("need a title.")
+        if len(parts) == 2:
+            if title:
+                parts.append(title)
+            else:
+                raise StandardError("need a title.")
 
-        if len(parts) == 3 and title:  # check title
-            if title != parts[2]:
-                raise StandardError("titles conflict.")
-
-        if title and len(parts) < 3:
-            parts.append(title)
-
-        if not title:
-            self.params['title'] = parts[-1]
+        if len(parts) == 3:
+            if title:  # check title
+                if title != parts[2]:
+                    raise StandardError("titles conflict.")
+            else:
+                self.params['title'] = parts[-1]
 
         return '/' + '/'.join(parts)
 
@@ -142,7 +139,7 @@ class WPToolsRESTBase(core.WPTools):
             self.data['wikibase'] = wikibase
             self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
-        url = urlparse(self.cache['rest']['query'])
+        url = urlparse(self.cache['restbase']['query'])
         durl = "%s://%s/wiki/%s" % (url.scheme,
                                     url.netloc,
                                     self.params['title'])
@@ -164,25 +161,25 @@ class WPToolsRESTBase(core.WPTools):
                 self.data['image'] = []
 
         if image:
-            img = {'kind': 'rest-image'}
+            img = {'kind': 'restbase-image'}
             img.update(image)
             self.data['image'].append(img)
 
         if originalimage:
-            img = {'kind': 'rest-original'}
+            img = {'kind': 'restbase-original'}
             img.update(originalimage)
             if originalimage.get('source'):
                 img.update({'url': originalimage.get('source')})
             self.data['image'].append(img)
 
         if thumbnail:
-            img = {'kind': 'rest-thumb'}
+            img = {'kind': 'restbase-thumb'}
             img.update(thumbnail)
             if thumbnail.get('source'):
                 img.update({'url': thumbnail.get('source')})
             self.data['image'].append(img)
 
-    def get_rest(self, show=True, proxy=None, timeout=0):
+    def get_restbase(self, show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
         for example:
@@ -207,6 +204,6 @@ class WPToolsRESTBase(core.WPTools):
 
         See https://en.wikipedia.org/api/rest_v1/
         """
-        self._get('rest', show, proxy, timeout)
+        self._get('restbase', show, proxy, timeout)
 
         return self
