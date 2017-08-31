@@ -66,10 +66,7 @@ def json_loads(data):
     """
     python-version safe json.loads
     """
-    try:  # python2
-        return json.loads(data)
-    except TypeError:  # python3
-        return json.loads(data.decode('utf-8'))
+    return json.loads(data, encoding='utf-8')
 
 
 def media_url(fname, namespace='commons',
