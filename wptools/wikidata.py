@@ -78,10 +78,11 @@ class WPToolsWikidata(core.WPTools):
         if len(args) > 0 and args[0]:  # first positional arg is title
             title = args[0].replace(' ', '_')
 
-        self.params.update({'lang': kwargs.get('lang') or 'en',
-                            'title': title or kwargs.get('title'),
-                            'variant': kwargs.get('variant'),
-                            'wikibase': kwargs.get('wikibase')})
+        self.params.update({
+            'lang': kwargs.get('lang') or 'en',
+            'title': title or kwargs.get('title'),
+            'variant': kwargs.get('variant'),
+            'wikibase': kwargs.get('wikibase')})
 
         self.data['claims'] = None
         self.data['properties'] = None
@@ -186,8 +187,9 @@ class WPToolsWikidata(core.WPTools):
             self.data['modified'] = {'wikidata': modified}
 
         wikibase = item.get('id')
-        self.data['wikibase'] = wikibase
-        self.data['wikidata_url'] = utils.wikidata_url(wikibase)
+        if wikibase:
+            self.data['wikibase'] = wikibase
+            self.data['wikidata_url'] = utils.wikidata_url(wikibase)
 
         self.data['description'] = self._get_entity_prop(item, 'descriptions')
         self.data['label'] = self._get_entity_prop(item, 'labels')
