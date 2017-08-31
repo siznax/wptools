@@ -15,8 +15,6 @@ See also:
 * WMF: https://wikimediafoundation.org/wiki/Our_projects
 """
 
-from __future__ import print_function
-
 try:  # python2
     from urllib import quote, unquote
 except ImportError:  # python3
@@ -32,7 +30,7 @@ class WPToolsQuery(object):
     WPToolsQuery class
     """
 
-    MAXWIDTH = 80
+    MAXWIDTH = 72
     RPAD = 4
 
     IMAGEINFO = Template((
@@ -164,7 +162,8 @@ class WPToolsQuery(object):
         """
         Returns Mediawiki action=parse query string
         """
-        qry = self.PARSE.substitute(WIKI=self.uri, PAGE=title or pageid)
+        qry = self.PARSE.substitute(WIKI=self.uri,
+                                    PAGE=safequote(title) or pageid)
 
         if pageid and not title:
             qry = qry.replace('&page=', '&pageid=').replace('&redirects', '')
@@ -180,7 +179,8 @@ class WPToolsQuery(object):
         """
         Returns MediaWiki action=query query string
         """
-        query = self.QUERY.substitute(WIKI=self.uri, TITLES=titles or pageids)
+        query = self.QUERY.substitute(WIKI=self.uri,
+                                      TITLES=safequote(titles) or pageids)
 
         if pageids and not titles:
             query = query.replace('&titles=', '&pageids=')
@@ -222,7 +222,9 @@ class WPToolsQuery(object):
         """
         Returns RESTBase query string
         """
-        self.set_status('rest', safequote(endpoint))
+        endpoint = safequote(endpoint)
+
+        self.set_status('restbase', endpoint)
 
         return "%s/api/rest_v1%s" % (self.uri, endpoint)
 
@@ -265,11 +267,12 @@ class WPToolsQuery(object):
             LANG=self.variant or self.lang,
             PROPS="info|claims|descriptions|labels|sitelinks")
 
-        if title:
+        if wikibase:
+            query += "&ids=%s" % wikibase
+        elif title:
+            title = safequote(title)
             query += "&sites=%swiki" % self.lang
             query += "&titles=%s" % title
-        elif wikibase:
-            query += "&ids=%s" % wikibase
 
         self.set_status('wikidata', wikibase or title)
 
@@ -289,7 +292,6 @@ def safequote(string):
     """
     UTF-8 encode string if quote() throws KeyError
     """
-    try:
-        return quote(string)
-    except KeyError:
-        return quote(string.encode('utf-8'))
+    if string is None:
+        return
+    return quote(string.encode('utf-8'))
