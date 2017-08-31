@@ -45,11 +45,13 @@ class WPTools(object):
 
         if action in self.cache:
             if action != 'imageinfo':
-                utils.stderr("%s results in cache" % action, silent)
+                utils.stderr("+ %s results in cache" % action, silent)
                 return
+        else:
+            self.cache[action] = {}
 
         if action in self.flags['skip']:
-            utils.stderr("skipping %s" % action)
+            utils.stderr("+ skipping %s" % action)
             return
 
         # make the request
@@ -57,16 +59,12 @@ class WPTools(object):
                             wiki=self.params['wiki'],
                             variant=self.params['variant'])
         qstr = self._query(action, qobj)
+        self.cache[action]['query'] = qstr
+
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)
-        info = req.info
-
-        # cache the response
-        cache = {}
-        cache['query'] = qstr
-        cache['response'] = response
-        cache['info'] = info
-        self.cache[action] = cache
+        self.cache[action]['response'] = response
+        self.cache[action]['info'] = req.info
 
         self._set_data(action)
 
@@ -77,23 +75,27 @@ class WPTools(object):
         """
         returns API reponse from cache or raises ValueError
         """
+        _query = self.cache[action]['query'].replace('&format=json', '')
+        response = self.cache[action]['response']
+
+        if not response:
+            raise StandardError("Empty response: %s" % self.params)
+
         try:
-            _query = self.cache[action]['query'].replace('&format=json', '')
-            data = utils.json_loads(self.cache[action]['response'])
+            data = utils.json_loads(response)
+        except ValueError:
+            raise ValueError(_query)
 
-            if data.get('error'):
-                raise LookupError
-
-            if action == 'parse' and not data.get('parse'):
-                raise LookupError
-
-            if action == 'wikidata' and '-1' in data.get('entities'):
-                raise LookupError
-
-            return data
-
-        except (LookupError, ValueError):
+        if data.get('error'):
             raise LookupError(_query)
+
+        if action == 'parse' and not data.get('parse'):
+            raise LookupError(_query)
+
+        if action == 'wikidata' and '-1' in data.get('entities'):
+            raise LookupError(_query)
+
+        return data
 
     def _query(self, action, qobj):
         """
@@ -146,8 +148,9 @@ class WPTools(object):
         """
         Pretty-print instance data
         """
-        if self.flags['silent'] and not force:
+        if self.flags.get('silent') and not force:
             return
+
         if not self.data:
             return
 
@@ -180,10 +183,10 @@ class WPTools(object):
                 prefix = "%s:" % prefix
             elif isinstance(value, list):
                 prefix = "%s: <list(%d)>" % (prefix, len(value))
-                value = ', '.join((safestr(x) for x in value))
+                value = ', '.join((safestr(x) for x in value if x))
             elif isinstance(value, tuple):
                 prefix = "%s: <tuple(%d)>" % (prefix, len(value))
-                value = ', '.join((safestr(x) for x in value))
+                value = ', '.join((safestr(x) for x in value if x))
             elif utils.is_text(value):
                 value = value.strip().replace('\n', '')
                 if len(value) > (maxwidth - len(prefix)):
@@ -216,6 +219,8 @@ def safestr(text):
     """
     Safely convert unicode to a string
     """
+    if text is None:
+        return
     try:
         return str(text)
     except UnicodeEncodeError:
