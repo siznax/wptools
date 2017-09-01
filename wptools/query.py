@@ -218,7 +218,7 @@ class WPToolsQuery(object):
 
         return query
 
-    def rest(self, endpoint):
+    def restbase(self, endpoint):
         """
         Returns RESTBase query string
         """

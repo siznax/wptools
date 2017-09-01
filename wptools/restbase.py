@@ -108,7 +108,7 @@ class WPToolsRESTBase(core.WPTools):
         """
         returns WPToolsQuery string from action
         """
-        return qobj.rest(self.params['endpoint'])
+        return qobj.restbase(self.params['endpoint'])
 
     def _set_data(self, action):
         """

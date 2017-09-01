@@ -235,7 +235,7 @@ class WPToolsQueryTestCase(unittest.TestCase):
 
     def test_query_rest(self):
         qobj = wptools.query.WPToolsQuery()
-        qstr = qobj.rest(endpoint='/TEST/')
+        qstr = qobj.restbase(endpoint='/TEST/')
         self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
         self.assertTrue('/api/rest' in qstr)
         self.assertTrue(qstr.endswith('/TEST/'))
