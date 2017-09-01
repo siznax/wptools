@@ -459,10 +459,13 @@ class WPToolsPage(core.WPTools):
         kwargs.update(self.flags)
 
         rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
-
+        rbobj.cache.update(self.cache)
         rbobj.get_restbase(show, proxy, timeout)
 
+        self.cache.update(rbobj.cache)
         self.data.update(rbobj.data)
+
+        return self
 
     def get_wikidata(self, show=True, proxy=None, timeout=0):
         """
@@ -473,10 +476,13 @@ class WPToolsPage(core.WPTools):
         kwargs.update(self.flags)
 
         wdobj = WPToolsWikidata(self.params.get('title'), **kwargs)
-
+        wdobj.cache.update(self.cache)
         wdobj.get_wikidata(show, proxy, timeout)
 
+        self.cache.update(wdobj.cache)
         self.data.update(wdobj.data)
+
+        return self
 
     def pageimage(self, token=None):
         """
