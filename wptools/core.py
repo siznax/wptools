@@ -4,7 +4,7 @@
 WPTools core module
 ~~~~~~~~~~~~~~~~~~~
 
-Support for accessing Mediawiki foundation APIs.
+Support for accessing Wikimedia foundation APIs.
 """
 
 from wptools.query import WPToolsQuery
@@ -18,13 +18,19 @@ class WPTools(object):
     WPtools core class
     """
 
+    cache = None
+    data = None
+    flags = None
+    params = None
+
     def __init__(self, **kwargs):
         """
         Initializes a WPTools core object
 
-        See also:
-            wptools.page.WPToolsPage
-            wptools.category.WPToolsCategory
+        - wptools.page
+        - wptools.category
+        - wptools.restbase
+        - wptools.wikidata
         """
         self.cache = {}
         self.data = {}
