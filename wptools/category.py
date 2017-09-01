@@ -22,15 +22,27 @@ class WPToolsCategory(core.WPTools):
 
     def __init__(self, *args, **kwargs):
         """
-        Returns a wptools category object.
+        Returns a WPToolsCategory object
 
-        Arguments:
-        - namespace: <int> filter on this namespace (0=article, 14=category)
-        - pageid: <int> category pageid
-        - title: <str> category title
+        Gets a random category without arguments
 
-        See also
-          https://www.mediawiki.org/wiki/Manual:Namespace
+        Optional positional {params}:
+        - [title]: <str> category title
+
+        Optional keyword {params}:
+        - [lang]: <str> Mediawiki language code (default=en)
+        - [namespace]: <int> filter members (0=article, 14=category)
+        - [pageid]: <int> category pageid
+        - [variant]: <str> Mediawiki language variant
+        - [wiki]: <str> alternative wiki site (default=wikipedia.org)
+
+        Optional keyword {flags}:
+        - [silent]: <bool> do not echo page data if True
+        - [skip]: <list> skip actions in this list
+        - [verbose]: <bool> verbose output to stderr if True
+
+        See also:
+        https://www.mediawiki.org/wiki/Manual:Namespace
         """
         super(WPToolsCategory, self).__init__(**kwargs)
 
@@ -100,16 +112,19 @@ class WPToolsCategory(core.WPTools):
         """
         Mediawiki:API (action=query) for category members
 
-        Arguments:
-        - proxy: <str> use this HTTP proxy
-        - show: <bool> echo category attributes if True
-        - timeout: <int> seconds to wait before timeout
+        https://www.mediawiki.org/wiki/API:Categorymembers
 
-        Attributes affected:
+        Required {params}: title OR pageid
+        - title: <str> article title
+        - pageid: <int> Wikipedia database ID
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
         - members: <list> category members [{ns, pageid, title}]
-
-        See also
-          https://www.mediawiki.org/wiki/API:Categorymembers
         """
         title = self.params['title']
         pageid = self.params['pageid']
@@ -123,9 +138,13 @@ class WPToolsCategory(core.WPTools):
 
     def get_random(self, show=True, proxy=None, timeout=0):
         """
-        Make MediaWiki:API (action=query) request for random category
+        GET MediaWiki:API (action=query) for random category
 
-        Arguments:
+        https://www.mediawiki.org/wiki/API:Random
+
+        Required {params}: None
+
+        Optional arguments:
         - [show]: <bool> echo page data if true
         - [proxy]: <str> use this HTTP proxy
         - [timeout]: <int> timeout in seconds (0=wait forever)
@@ -133,9 +152,6 @@ class WPToolsCategory(core.WPTools):
         Data captured:
         - pageid: <int> Wikipedia database ID
         - title: <str> article title
-
-        See:
-        https://www.mediawiki.org/wiki/API:Random
         """
         self._get('random', show, proxy, timeout)
 

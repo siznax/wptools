@@ -5,6 +5,8 @@ WPTools Wikidata module
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 Support for getting Wikidata.
+
+https://www.wikidata.org/wiki/Wikidata:Data_access
 """
 
 import collections
@@ -64,13 +66,18 @@ class WPToolsWikidata(core.WPTools):
         """
         Returns a WPToolsWikidata object
 
-        Optional positional arguments:
+        Optional positional {params}:
         - [title]: <str> Mediawiki page title, file, category, etc.
 
-        Optional keyword arguments:
+        Optional keyword {params}:
         - [lang]: <str> Mediawiki language code (default='en')
-        - [variant]: <str> Mediawiki langauge variant
+        - [variant]: <str> Mediawiki language variant
         - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
+
+        Optional keyword {flags}:
+        - [silent]: <bool> do not echo page data if True
+        - [skip]: <list> skip actions in this list
+        - [verbose]: <bool> verbose output to stderr if True
         """
         super(WPToolsWikidata, self).__init__(**kwargs)
 
@@ -119,7 +126,7 @@ class WPToolsWikidata(core.WPTools):
 
     def _query(self, action, qobj):
         """
-        Returns wikidata query string
+        returns wikidata query string
         """
         if action == 'claims':
             return qobj.claims(self.data['claims'].keys())
@@ -129,7 +136,7 @@ class WPToolsWikidata(core.WPTools):
 
     def _set_data(self, action):
         """
-        Capture Wikidata API response data
+        capture Wikidata API response data
         """
         if action == 'claims':
             self._set_claims_data()
@@ -257,9 +264,17 @@ class WPToolsWikidata(core.WPTools):
 
     def get_claims(self, show=True, proxy=None, timeout=0):
         """
-        Wikidata:API (action=wbgetentities) for labels of claims
-        - e.g. {'Q298': 'country'} resolves to {'country': 'Chile'}
-        - use get_wikidata() to populate claims
+        GET Wikidata:API (action=wbgetentities) claims labels
+
+        https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+
+        Required {data}: claims
+        e.g. claims: {'Q298': 'country'}
+
+        Data captured:
+        e.g. wikidata: {'country': 'Chile'}
+
+        Use wikidata.get_wikidata() to populate data['claims']
         """
         if not self.data['claims']:
             raise LookupError("get_claims needs claims")
@@ -270,8 +285,25 @@ class WPToolsWikidata(core.WPTools):
 
     def get_wikidata(self, show=True, proxy=None, timeout=0):
         """
-        Wikidata:API (action=wbgetentities) for:
-        - claims: <dict> Wikidata claims (to be resolved)
+        GET Wikidata:API (action=wbgetentities) wikidata
+
+        https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+
+        Required {params}: title OR wikibase
+        - title: <str> Mediawiki page title, file, category, etc.
+        - wikibase: <str> Wikidata item ID
+
+        Optional {params}:
+        - [lang]: <str> Mediawiki language code (default='en')
+        - [variant]: <str> Mediawiki language variant
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
+        - claims: <dict> Wikidata claims (see get_claims())
         - description: <str> Wikidata description
         - image: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
@@ -281,7 +313,6 @@ class WPToolsWikidata(core.WPTools):
         - wikibase: <str> Wikidata item ID
         - wikidata: <dict> resolved Wikidata properties
         - wikidata_url: <str> Wikidata URL
-        https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
         """
         title = self.params.get('title')
         wikibase = self.params.get('wikibase')

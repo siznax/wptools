@@ -4,9 +4,17 @@
 WPTools Page module
 ~~~~~~~~~~~~~~~~~~~
 
-Support for getting Mediawiki/Wikidata/RESTBase page info.
+Support for getting Wikimedia page info.
 
-* https://www.mediawiki.org/wiki/Manual:Page_table
+Access to Wikimedia APIs:
+
+- Mediawiki: https://www.mediawiki.org/wiki/API:Main_page
+- RESTBase: https://www.mediawiki.org/wiki/RESTBase
+- Wikidata: https://www.wikidata.org/wiki/Wikidata:Data_access
+
+See also:
+
+- https://www.mediawiki.org/wiki/Manual:Page_table
 """
 
 import html2text
@@ -25,20 +33,22 @@ class WPToolsPage(core.WPTools):
 
     def __init__(self, *args, **kwargs):
         """
-        Returns a WPToolsPage object.
+        Returns a WPToolsPage object
 
-        Optional positional arguments:
+        Gets a random title without arguments
+
+        Optional positional {params}:
         - [title]: <str> Mediawiki page title, file, category, etc.
 
-        Optional keyword arguments:
+        Optional keyword {params}:
         - [endpoint]: <str> RESTBase entry point (default=summary)
         - [lang]: <str> Mediawiki language code (default=en)
         - [pageid]: <int> Mediawiki pageid
-        - [variant]: <str> Mediawiki langauge variant
+        - [variant]: <str> Mediawiki language variant
         - [wiki]: <str> alternative wiki site (default=wikipedia.org)
         - [wikibase]: <str> Wikidata database ID (e.g. 'Q1')
 
-        Keyword flags:
+        Optional keyword {flags}:
         - [silent]: <bool> do not echo page data if True
         - [skip]: <list> skip actions in this list
         - [verbose]: <bool> verbose output to stderr if True
@@ -116,7 +126,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_data(self, action):
         """
-        Marshals response data into page data
+        marshals response data into page data
         """
         if action == 'imageinfo':
             self._set_imageinfo_data()
@@ -174,7 +184,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_parse_image(self, infobox):
         """
-        Set image data from action=parse response
+        set image data from action=parse response
         """
         if 'image' not in self.data:
             self.data['image'] = []
@@ -206,7 +216,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_query_data_fast(self, page):
         """
-        Set less expensive action=query response data
+        set less expensive action=query response data
         """
         self.data['languages'] = page.get('langlinks')
         self.data['length'] = page.get('length')
@@ -248,7 +258,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_query_data_slow(self, page):
         """
-        Set more expensive action=query response data
+        set more expensive action=query response data
         """
         categories = page.get('categories')
         if categories:
@@ -281,7 +291,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_query_image(self, page):
         """
-        Set image data from action=query response
+        set image data from action=query response
         """
         if 'image' not in self.data:
             self.data['image'] = []
@@ -304,7 +314,7 @@ class WPToolsPage(core.WPTools):
 
     def _set_random_data(self):
         """
-        Sets random page data
+        sets page data from random request
         """
         rdata = self._load_response('random')
         rdata = rdata['query']['random'][0]
@@ -371,8 +381,19 @@ class WPToolsPage(core.WPTools):
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki request for API:Imageinfo
-        - image: <dict> updates image URLs, sizes, etc.
+
         https://www.mediawiki.org/wiki/API:Imageinfo
+
+        Required {data}:
+        - image: <list> member (<dict>) with 'file' and not 'url'
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
+        - image: <list> member (<dict>) image URLs, sizes, etc.
         """
         if not self.data['image']:
             raise LookupError("get_imageinfo needs image")
@@ -387,7 +408,20 @@ class WPToolsPage(core.WPTools):
 
     def get_parse(self, show=True, proxy=None, timeout=0):
         """
-        GET MediaWiki:API action=parse request for:
+        GET MediaWiki:API action=parse request
+
+        https://en.wikipedia.org/w/api.php?action=help&modules=parse
+
+        Required {params}: title OR pageid
+        - title: <str> article title
+        - pageid: <int> Wikipedia database ID
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
         - image: <dict> {parse-image, parse-cover}
         - infobox: <dict> Infobox data as python dictionary
         - links: <list> interwiki links (iwlinks)
@@ -395,7 +429,6 @@ class WPToolsPage(core.WPTools):
         - parsetree: <str> XML parse tree
         - wikibase: <str> Wikidata entity ID or wikidata URL
         - wikitext: <str> raw wikitext URL
-        https://en.wikipedia.org/w/api.php?action=help&modules=parse
         """
         if not self.params['title'] and not self.params['pageid']:
             raise LookupError("get_parse needs title or pageid")
@@ -406,7 +439,20 @@ class WPToolsPage(core.WPTools):
 
     def get_query(self, show=True, proxy=None, timeout=0):
         """
-        GET MediaWiki:API action=query request for:
+        GET MediaWiki:API action=query selected data
+
+        https://en.wikipedia.org/w/api.php?action=help&modules=query
+
+        Required {params}: title OR pageid
+        - title: <str> article title
+        - pageid: <int> Wikipedia database ID
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
         - description: <str> Wikidata description (via pageterms)
         - extext: <str> plain text (Markdown) extract
         - extract: <str> HTML extract from Extension:TextExtract
@@ -418,7 +464,6 @@ class WPToolsPage(core.WPTools):
         - random: <str> a random article title with every request!
         - url: <str> the canonical wiki URL
         - url_raw: <str> ostensible raw wikitext URL
-        https://en.wikipedia.org/w/api.php?action=help&modules=query
         """
         if not self.params['title'] and not self.params['pageid']:
             raise LookupError("get_query needs title or pageid")
@@ -431,7 +476,11 @@ class WPToolsPage(core.WPTools):
         """
         GET MediaWiki:API (action=query) list=random
 
-        Arguments:
+        https://www.mediawiki.org/wiki/API:Random
+
+        Required {params}: None
+
+        Optional arguments:
         - [show]: <bool> echo page data if true
         - [proxy]: <str> use this HTTP proxy
         - [timeout]: <int> timeout in seconds (0=wait forever)
@@ -439,9 +488,6 @@ class WPToolsPage(core.WPTools):
         Data captured:
         - pageid: <int> Wikipedia database ID
         - title: <str> article title
-
-        See:
-        https://www.mediawiki.org/wiki/API:Random
         """
         self._get('random', show, proxy, timeout)
 

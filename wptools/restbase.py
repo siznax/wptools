@@ -25,12 +25,17 @@ class WPToolsRESTBase(core.WPTools):
         """
         Returns a WPToolsRESTBase object
 
-        Optional positional arguments:
+        Optional positional {params}:
         - [title]: <str> Mediawiki page title, file, category, etc.
 
-        Optional keyword arguments:
+        Optional keyword {params}:
         - [endpoint]: the RESTBase entry point (default=/page/)
         - [lang]: <str> Mediawiki language code (default=en)
+
+        Optional keyword {flags}:
+        - [silent]: <bool> do not echo page data if True
+        - [skip]: <list> skip actions in this list
+        - [verbose]: <bool> verbose output to stderr if True
         """
         super(WPToolsRESTBase, self).__init__(**kwargs)
 
@@ -47,7 +52,7 @@ class WPToolsRESTBase(core.WPTools):
 
     def _handle_response(self):
         """
-        Returns RESTBase response if appropriate
+        returns RESTBase response if appropriate
         """
         content = self.cache['restbase']['info']['content']
         if content.startswith('text/html'):
@@ -73,7 +78,7 @@ class WPToolsRESTBase(core.WPTools):
 
     def _parse_endpoint(self, endpoint, title):
         """
-        Parse input endpoint
+        parse input endpoint
         """
         if not endpoint:
             return '/page/'
@@ -182,14 +187,28 @@ class WPToolsRESTBase(core.WPTools):
     def get_restbase(self, show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
+
+        https://en.wikipedia.org/api/rest_v1/
+
         for example:
             /page/html/{title}
             /page/summary/{title}
             /page/mobile-sections-lead/{title}
 
+        Required {params}: None
         Without arguments, lists RESTBase /page/ entry points
 
-        Attributes affected:
+        Optional {params}:
+        - [title]: <str> Mediawiki page title, file, category, etc.
+        - [endpoint]: the RESTBase entry point (default=/page/)
+        - [lang]: <str> Mediawiki language code (default=en)
+
+        Optional arguments:
+        - [show]: <bool> echo page data if true
+        - [proxy]: <str> use this HTTP proxy
+        - [timeout]: <int> timeout in seconds (0=wait forever)
+
+        Data captured:
         - exhtml: <str> "extract_html" from /page/summary
         - exrest: <str> "extract" from /page/summary
         - html: <str> from /page/html
@@ -201,8 +220,6 @@ class WPToolsRESTBase(core.WPTools):
         - url_raw: <str> probable raw wikitext URL
         - wikibase: <str> Wikidata item ID
         - wikidata_url: <str> Wikidata URL
-
-        See https://en.wikipedia.org/api/rest_v1/
         """
         self._get('restbase', show, proxy, timeout)
 
