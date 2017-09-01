@@ -290,8 +290,11 @@ def domain_name(wiki):
 
 def safequote(string):
     """
-    UTF-8 encode string if quote() throws KeyError
+    Try to UTF-8 encode and urllib quote string
     """
     if string is None:
         return
-    return quote(string.encode('utf-8'))
+    try:
+        return quote(string.encode('utf-8'))
+    except UnicodeDecodeError:
+        return quote(string)
