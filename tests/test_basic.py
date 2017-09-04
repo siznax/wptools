@@ -425,6 +425,15 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         self.assertTrue(data['wikidata_url'].endswith('Q42'))
         self.assertTrue(str(data['wikidata']['birth']).startswith('+1952'))
 
+    def test_wikidata_title_param(self):
+        """
+        Ensure title param is set given only wikibase
+        """
+        page = wptools.wikidata(wikibase='TEST')
+        page.cache = {'wikidata': wikidata.cache}
+        page._set_wikidata()
+        self.assertEqual(str(page.params['title']), 'Douglas_Adams')
+
 
 class WPToolsToolTestCase(unittest.TestCase):
 
