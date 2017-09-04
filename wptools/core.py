@@ -168,7 +168,7 @@ class WPTools(object):
         if utils.is_text(seed):
             seed = seed.replace('_', ' ')
 
-        output = ["%s (%s)" % (seed, self.params['lang'])]
+        output = ["%s (%s) data" % (seed, self.params['lang'])]
 
         output.append('{')
 
