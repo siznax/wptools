@@ -510,6 +510,8 @@ class WPToolsPage(core.WPTools):
 
         self.cache.update(rbobj.cache)
         self.data.update(rbobj.data)
+        self.flags.update(rbobj.flags)
+        self.params.update(rbobj.params)
 
         return self
 
@@ -527,6 +529,8 @@ class WPToolsPage(core.WPTools):
 
         self.cache.update(wdobj.cache)
         self.data.update(wdobj.data)
+        self.flags.update(wdobj.flags)
+        self.params.update(wdobj.params)
 
         return self
 
