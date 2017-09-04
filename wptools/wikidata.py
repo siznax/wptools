@@ -164,7 +164,9 @@ class WPToolsWikidata(core.WPTools):
         """
         attempt to set title from wikidata
         """
+        title = None
         lang = self.params['lang']
+        label = self.data['label']
 
         if item.get('sitelinks'):
             for link in item['sitelinks']:
@@ -172,10 +174,11 @@ class WPToolsWikidata(core.WPTools):
                     title = item['sitelinks'][link]['title']
                     self.data['title'] = title.replace(' ', '_')
 
-        title = self.data['title']
-        label = self.data['label']
-        if not title and label:
+        if not self.data.get('title') and label:
             self.data['title'] = label.replace(' ', '_')
+
+        if self.data.get('title') and not self.params.get('title'):
+            self.params['title'] = self.data['title']
 
     def _set_wikidata(self):
         """
