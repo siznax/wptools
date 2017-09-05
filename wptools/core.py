@@ -150,14 +150,11 @@ class WPTools(object):
             return utils.json_loads(self.cache[action]['response'])
         return self.cache.keys() or None
 
-    def show(self, force=False):
+    def show(self):
         """
         Pretty-print instance data
         """
-        if self.flags.get('silent') and not force:
-            return
-
-        if not self.data:
+        if self.flags.get('silent') or not self.data:
             return
 
         ptitle = self.params.get('title')
