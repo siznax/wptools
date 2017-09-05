@@ -140,6 +140,8 @@ class WPToolsPage(core.WPTools):
         if self._missing_imageinfo() and not self.flags.get('defer_imageinfo'):
             self.get_imageinfo(show=False)
 
+        self._update_params()
+
     def _set_imageinfo_data(self):
         """
         set image attributes from MediaWiki API:Imageinfo response
@@ -325,8 +327,13 @@ class WPToolsPage(core.WPTools):
         self.data.update({'pageid': pageid,
                           'title': title})
 
-        self.params['title'] = title
-        self.params['pageid'] = pageid
+    def _update_params(self):
+        """
+        update params from response data
+        """
+        self.params['title'] = self.data.get('title')
+        self.params['pageid'] = self.data.get('pageid')
+        self.params['wikibase'] = self.data.get('wikibase')
 
     def get(self, show=True, proxy=None, timeout=0):
         """
@@ -355,8 +362,8 @@ class WPToolsPage(core.WPTools):
 
             self.get_restbase(False, proxy, timeout)
 
-            if not self.flags.get('silent'):
-                self.show(show)
+            if show:
+                self.show()
         else:
 
             self.flags['defer_imageinfo'] = True
@@ -373,8 +380,8 @@ class WPToolsPage(core.WPTools):
 
             self.get_restbase(False, proxy, timeout)
 
-            if not self.flags.get('silent'):
-                self.show(show)
+            if show:
+                self.show()
 
         return self
 
@@ -506,12 +513,15 @@ class WPToolsPage(core.WPTools):
 
         rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
         rbobj.cache.update(self.cache)
-        rbobj.get_restbase(show, proxy, timeout)
+        rbobj.get_restbase(False, proxy, timeout)
 
         self.cache.update(rbobj.cache)
         self.data.update(rbobj.data)
         self.flags.update(rbobj.flags)
         self.params.update(rbobj.params)
+
+        if show:
+            self.show()
 
         return self
 
@@ -525,12 +535,15 @@ class WPToolsPage(core.WPTools):
 
         wdobj = WPToolsWikidata(self.params.get('title'), **kwargs)
         wdobj.cache.update(self.cache)
-        wdobj.get_wikidata(show, proxy, timeout)
+        wdobj.get_wikidata(False, proxy, timeout)
 
         self.cache.update(wdobj.cache)
         self.data.update(wdobj.data)
         self.flags.update(wdobj.flags)
         self.params.update(wdobj.params)
+
+        if show:
+            self.show()
 
         return self
 
