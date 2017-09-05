@@ -316,8 +316,8 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue(html.endswith('</html>'))
 
     def test_get_restbase_lead(self):
-        page = wptools.restbase(endpoint='mobile-sections-lead/TEST',
-                                silent=True)
+        endpoint = 'mobile-sections-lead/TEST'
+        page = wptools.restbase(endpoint=endpoint, silent=True)
         page.cache['restbase'] = rest_lead.cache
         page._set_data('restbase')
 
@@ -425,7 +425,7 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         self.assertTrue(data['wikidata_url'].endswith('Q42'))
         self.assertTrue(str(data['wikidata']['birth']).startswith('+1952'))
 
-    def test_wikidata_title_param(self):
+    def test_wikidata_disambig(self):
         """
         Ensure title param is set given only wikibase
         """
