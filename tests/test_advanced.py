@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 """
-WPTools advanced tests
+WPTools tests that use the network
 """
 
 from __future__ import print_function
@@ -12,71 +12,32 @@ import random
 import unittest
 
 import tests.titles as titles
-import tests.wikidata_images as wikidata_images
 import wptools
 
-LANG = ['de', 'es', 'fr', 'hi', 'it', 'ja', 'nl', 'ru', 'sv', 'vi', 'zh']
+LANG = [
+    'en', 'ceb', 'sv', 'de', 'nl', 'fr', 'ru', 'it', 'es', 'war',
+    'pl', 'vi', 'ja', 'pt', 'zh', 'uk', 'fa', 'ca', 'ar', 'no', 'sh',
+    'fi', 'hu', 'id', 'ko', 'cs', 'ro', 'sr', 'ms', 'tr', 'eu', 'eo',
+    'bg', 'da', 'hy', 'min', 'kk', 'sk', 'he', 'lt', 'hr', 'ce', 'et',
+    'sl', 'be', 'el', 'nn', 'uz', 'simple', 'la', 'az', 'ur', 'hi',
+    'vo', 'th', 'ka', 'ta', 'cy', 'mk', 'mg', 'oc', 'tl', 'lv', 'ky',
+    'bs', 'tt', 'new', 'tg', 'sq', 'te', 'pms', 'br', 'bn', 'ml',
+    'ht', 'jv', 'ast', 'lb', 'mr', 'af', 'sco', 'pnb', 'ga', 'is',
+    'cv', 'ba', 'azb', 'fy', 'su', 'sw', 'my', 'lmo', 'an', 'yo',
+    'ne', 'gu', 'io', 'pa', 'nds', 'scn', 'bpy', 'als', 'bar', 'ku',
+    'kn', 'ia', 'qu', 'ckb', 'mn', 'arz',
+]
 
-
-class WPToolsBadTest(unittest.TestCase):
-    """
-    BAD API REQUEST TESTS
-    """
-
-    def test_redirect(self):
-        """
-        Get redirected
-        """
-        b = wptools.page('Ben Franklin').get_query(False)
-        self.assertTrue(b.url.endswith('Benjamin_Franklin'))
-
-    def test_missing(self):
-        """
-        Get missing page
-        """
-        try:
-            wptools.page(pageid=1).get(False)
-            self.fail("failed to raise LookupError")
-        except LookupError as detail:
-            print(detail)
-
-    def test_unknown_lang(self):
-        """
-        Mediawiki site function not supported
-        """
-        # "jp" Wikinews (unknown language code)
-        try:
-            wptools.page(wiki='jp.wikinews.org')
-            self.fail("failed to raise LookupError")
-        except LookupError as detail:
-            print(detail)
-
-
-class WPToolsCategoryTest(unittest.TestCase):
-    """
-    CATEGORY TESTS
-    """
-
-    def test_get_category_members_title(self):
-        """
-        Get a category
-        """
-        cat = wptools.cat('Category:Human rights by issue', silent=True)
-        cat.get_members()
-        self.assertTrue('category' in cat.cache)
-        self.assertEqual(cat.title, 'Category:Human_rights_by_issue')
-        self.assertTrue(len(cat.members) > 50)
-
-
-    def test_get_category_members_pageid(self):
-        """
-        Get a category
-        """
-        cat = wptools.cat(pageid=27568094, silent=True)
-        cat.get_members()
-        self.assertTrue('category' in cat.cache)
-        self.assertEqual(cat.pageid, 27568094)
-        self.assertTrue(len(cat.members) > 50)
+WIKIS = [
+    'commons.wikimedia.org',
+    'en.wikibooks.org',
+    'en.wikinews.org',
+    'en.wikiquote.org',
+    'en.wikisource.org',
+    'en.wikiversity.org',
+    'en.wikivoyage.org',
+    'en.wiktionary.org',
+]
 
 
 class WPToolsPickTest(unittest.TestCase):
@@ -86,86 +47,22 @@ class WPToolsPickTest(unittest.TestCase):
 
     def test_selected(self):
         """
-        Get selected title
+        Test overall functionality from random i18n choice
         """
-        t = titles.title()
-        p = wptools.page(t['title'], lang=t['lang']).get_query(False)
-        self.assertTrue(p.pageid is not None)
-
-    def test_wikibase(self):
-        """
-        Get everything wikibase only
-        """
-        p = wptools.page(wikibase='Q43303').get_wikidata(False)
-        self.assertEqual(p.title, 'Malcolm_X')
-        self.assertEqual(p.what, 'human')
-        self.assertEqual(p.wikibase, 'Q43303')
-        self.assertTrue(p.label is not None)
-        self.assertTrue(p.description is not None)
-        self.assertTrue(p.image.pop()['file'] is not None)
-        self.assertTrue(len(p.wikidata) > 5)
-
-    def test_wikidata_title(self):
-        """
-        Get wikidata from title only
-        """
-        w = wptools.page('Les Misérables').get_wikidata(False)
-        self.assertTrue(w.wikibase is not None)
-
-    def test_wikidata_claims(self):
-        """
-        Get wikidata claims
-        """
-        p = wptools.page('Paris').get_wikidata(False)
-        self.assertTrue('latitude' in p.wikidata['coordinates'])
-        self.assertEqual(p.wikidata['country'], 'France')
-        self.assertTrue(len(p.wikidata['instance']) > 3)
-
-    def test_mixed_lang(self):
-        """
-        Get mixed language
-        """
-        p = wptools.page('Abraham Lincoln', lang='zh').get_query(False)
-        self.assertEqual(p.wikibase, 'Q91')
-
-    def test_thumbnail(self):
-        """
-        Get a thumbnail image URL
-        """
-        p = wptools.page('Frida Kahlo').get_query(False)
-        self.assertTrue('url' in p.pageimage('thumb'))
-
-    def test_pageid(self):
-        """
-        Get a page by pageid
-        """
-        p = wptools.page(pageid=851640).get_query(False)
-        self.assertTrue(p.title == 'Helianthus')
-
-    def test_disambiguation_wikibase(self):
-        """
-        Get an unambiguous page by wikibase
-        """
-        p = wptools.page(wikibase='Q528917')
-        p.get_wikidata(False).get_query(False)
-        self.assertTrue(p.pageid == 20974062)
+        title = titles.title()
+        page = wptools.page(title['title'], lang=title['lang'])
+        page.get(show=False)
+        self.assertTrue(page.data['pageid'] is not None)
 
     def test_lookup_unicode_error(self):
         """
-        Potentially raise UnicodeDecodeError on LookupError
+        Raise LookupError without UnicodeDecodeError. Issue #29
         """
         try:
-            wptools.page('阿Vane').get(False)  # issue 29
+            wptools.page('Д北_TEST').get(False)
             self.fail("failed to raise LookupError")
         except LookupError as detail:
             print(detail)
-
-    def test_imageinfo(self):
-        """
-        Ensure get_imageinfo() updates images
-        """
-        a = wptools.page('Aardvark').get_query(False)
-        self.assertTrue('url' in a.pageimage('thumb'))
 
 
 class WPToolsRandomTest(unittest.TestCase):
@@ -175,69 +72,24 @@ class WPToolsRandomTest(unittest.TestCase):
 
     def test_random(self):
         """
-        Get a random title
+        Get random title from random language wiki
         """
-        r = wptools.page()
-        self.assertTrue(r.pageid is not None)
-        self.assertTrue(r.title is not None)
-
-    def test_random_lang(self):
-        """
-        Get random title by language
-        """
-        r = wptools.page(lang=random.choice(LANG))
-        self.assertTrue(r.pageid is not None)
+        page = wptools.page(lang=random.choice(LANG))
+        page.get(show=False)
+        self.assertTrue(page.data['pageid'] is not None)
 
     def test_random_wiki(self):
         """
-        Get random title by wiki
+        Get random title from random Wikmedia project
         """
-        r = wptools.page(wiki='commons.wikimedia.org')
-        self.assertTrue(r.pageid is not None)
+        page = wptools.page(wiki=random.choice(WIKIS))
+        self.assertTrue(page.data['pageid'] is not None)
 
 
 class WPToolsRestBaseTest(unittest.TestCase):
     """
     RESTBase TESTS
     """
-
-    def test_get_rest(self):
-        """
-        Get RESTBase entry points
-        """
-        page = wptools.page('test')
-        page.get_rest()
-        self.assertEqual(page.endpoint, '/page/')
-
-    def test_get_rest_html(self):
-        """
-        Get RESTBase HTML
-        """
-        page = wptools.page()
-        page.get_rest('html')
-        self.assertTrue('/html/' in page.endpoint)
-        self.assertTrue(page.html.startswith('<!DOCTYPE'))
-        self.assertTrue(page.html.endswith('</html>'))
-
-    def test_get_rest_lead(self):
-        """
-        Get RESTBase lead section
-        """
-        page = wptools.page()
-        page.get_rest('mobile-sections-lead')
-        self.assertTrue(page.lead.startswith('<span'))
-        self.assertTrue('page' in page.modified)
-        self.assertTrue(page.pageid is not None)
-        self.assertTrue(page.wikibase is not None)
-
-    def test_get_rest_summary(self):
-        """
-        Get RESTBase page summary
-        """
-        page = wptools.page()
-        page.get_rest('summary')
-        self.assertTrue(page.exhtml.startswith('<p>'))
-        self.assertTrue(page.pageid is not None)
 
 
 class WPToolsToolTest(unittest.TestCase):
@@ -267,23 +119,17 @@ class WPToolsUtilsTest(unittest.TestCase):
         """
         Get infobox data with sub-elements. Issue #66
         """
-        p = wptools.page("ONE OK ROCK", lang='ja').get_parse()
-        self.assertGreater(len(p.infobox['Genre'].split('<br')), 5)
+        page = wptools.page("ONE OK ROCK", lang='ja').get_parse(show=False)
+        infobox = page.data['infobox']
+        self.assertGreater(len(infobox['Genre'].split('<br')), 5)
 
     def test_infobox_children(self):
         """
         Get infobox data with list values. Issue #62
         """
-        p = wptools.page('Lewisit', lang='de').get_parse()
-        self.assertGreater(len(p.infobox['Dichte'].split('*')), 1)
-
-    def test_complex_infobox(self):
-        """
-        Successfully populate complex infobox dict
-        """
-        p = wptools.page('Aung San Suu Kyi').get_parse(False)
-        self.assertGreaterEqual(len(p.infobox), 32)
-        self.assertTrue('errors' not in p.infobox)
+        page = wptools.page('Lewisit', lang='de').get_parse(show=False)
+        infobox = page.data['infobox']
+        self.assertGreater(len(infobox['Dichte'].split('*')), 1)
 
 
 class WPToolsWikidataTest(unittest.TestCase):
@@ -291,26 +137,15 @@ class WPToolsWikidataTest(unittest.TestCase):
     Wikidata Tests
     """
 
-    def test_wikidata_images(self):
-        """
-        Get wikidata images from cache.
-        """
-        page = wptools.page('test_wikidata_images')
-        page.cache['wikidata'] = wikidata_images.cache
-        page._set_wikidata()
-        self.assertEqual(len(page.image), 3)
-
 
 if __name__ == '__main__':
     # unittest.main()
 
     from unittest import TestLoader
     suites = {
-        'bad':  TestLoader().loadTestsFromTestCase(WPToolsBadTest),
-        'cat':  TestLoader().loadTestsFromTestCase(WPToolsCategoryTest),
         'pick': TestLoader().loadTestsFromTestCase(WPToolsPickTest),
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
-        'rest': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
+        'restbase': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
         'tool': TestLoader().loadTestsFromTestCase(WPToolsToolTest),
         'utils': TestLoader().loadTestsFromTestCase(WPToolsUtilsTest),
         'wikidata': TestLoader().loadTestsFromTestCase(WPToolsWikidataTest),
