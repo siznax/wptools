@@ -137,9 +137,7 @@ class WPToolsPage(core.WPTools):
         elif action == 'random':
             self._set_random_data()
 
-        if self._missing_imageinfo() and not self.flags.get('defer_imageinfo'):
-            self.get_imageinfo(show=False)
-
+        self._update_imageinfo()
         self._update_params()
 
     def _set_imageinfo_data(self):
@@ -188,21 +186,18 @@ class WPToolsPage(core.WPTools):
         """
         set image data from action=parse response
         """
-        if 'image' not in self.data:
-            self.data['image'] = []
-
         image = infobox.get('image')
         cover = infobox.get('Cover')
 
-        if image:
-            self.data['image'].append({
-                'kind': 'parse-image',
-                'file': infobox['image']})
+        if image and utils.isfilename(image):
+            if 'image' not in self.data:
+                self.data['image'] = []
+            self.data['image'].append({'kind': 'parse-image', 'file': image})
 
-        if cover:
-            self.data['image'].append({
-                'kind': 'parse-cover',
-                'file': infobox['Cover']})
+        if cover and utils.isfilename(cover):
+            if 'image' not in self.data:
+                self.data['image'] = []
+            self.data['image'].append({'kind': 'parse-cover', 'file': cover})
 
     def _set_query_data(self):
         """
@@ -327,13 +322,23 @@ class WPToolsPage(core.WPTools):
         self.data.update({'pageid': pageid,
                           'title': title})
 
+    def _update_imageinfo(self):
+        """
+        calls get_imageinfo() if data image missing info
+        """
+        if self._missing_imageinfo() and not self.flags.get('defer_imageinfo'):
+            self.get_imageinfo(show=False)
+
     def _update_params(self):
         """
         update params from response data
         """
-        self.params['title'] = self.data.get('title')
-        self.params['pageid'] = self.data.get('pageid')
-        self.params['wikibase'] = self.data.get('wikibase')
+        if self.data.get('title'):
+            self.params['title'] = self.data.get('title')
+        if self.data.get('pageid'):
+            self.params['pageid'] = self.data.get('pageid')
+        if self.data.get('wikibase'):
+            self.params['wikibase'] = self.data.get('wikibase')
 
     def get(self, show=True, proxy=None, timeout=0):
         """
@@ -513,12 +518,16 @@ class WPToolsPage(core.WPTools):
 
         rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
         rbobj.cache.update(self.cache)
+        rbobj.data.update(self.data)
         rbobj.get_restbase(False, proxy, timeout)
 
         self.cache.update(rbobj.cache)
         self.data.update(rbobj.data)
         self.flags.update(rbobj.flags)
         self.params.update(rbobj.params)
+
+        self._update_imageinfo()
+        self._update_params()
 
         if show:
             self.show()
@@ -535,12 +544,16 @@ class WPToolsPage(core.WPTools):
 
         wdobj = WPToolsWikidata(self.params.get('title'), **kwargs)
         wdobj.cache.update(self.cache)
+        wdobj.data.update(self.data)
         wdobj.get_wikidata(False, proxy, timeout)
 
         self.cache.update(wdobj.cache)
         self.data.update(wdobj.data)
         self.flags.update(wdobj.flags)
         self.params.update(wdobj.params)
+
+        self._update_imageinfo()
+        self._update_params()
 
         if show:
             self.show()

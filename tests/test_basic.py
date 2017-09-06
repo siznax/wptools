@@ -87,9 +87,9 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue('/c/c0/' in image['url'])
         self.assertTrue('/commons.' in image['descriptionurl'])
         self.assertTrue(image['file'].startswith('File:'))
-        self.assertTrue(image['height'] > 320)
-        self.assertTrue(image['size'] > 1024)
-        self.assertTrue(image['width'] > 240)
+        self.assertEqual(image['height'], 386)
+        self.assertEqual(image['size'], 32915)
+        self.assertEqual(image['width'], 333)
 
     def test_page_get_parse(self):
         page = wptools.page('test_get_parse', silent=True)
@@ -107,6 +107,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(str(data['wikibase']), 'Q42')
         self.assertTrue('satire' in data['infobox']['genre'])
         self.assertTrue(data['wikidata_url'].startswith('http'))
+        self.assertEqual(str(data['image'][0]['file']),
+                         'Douglas adams portrait cropped.jpg')
 
     def test_page_get_query(self):
         page = wptools.page('test_get_query', silent=True)

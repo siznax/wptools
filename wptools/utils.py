@@ -62,6 +62,15 @@ def is_text(obj, name=None):
     return ans
 
 
+def isfilename(name):
+    """
+    returns True if name looks like a Mediawiki filename
+    """
+    if name[0].isalnum() and name[-3:].isalpha():
+        return True
+    return False
+
+
 def json_loads(data):
     """
     python-version safe json.loads
