@@ -13,75 +13,75 @@ import textwrap
 import wptools
 
 from wptools.query import WPToolsQuery
-from wptools.request import WPToolsRequest
 
 
-def _html_image(item):
+def _html_image(page):
     """
     returns HTML img tag
     """
-    source = _image(item)
+    source = _image(page)
     if not source:
         return
-    alt = item.title
-    if item.label:
-        alt = item.label
+    alt = page.data.get('label') or page.data.get('title')
     img = "<img src=\"%s\"" % source
     img += " alt=\"%s\" title=\"%s\" " % (alt, alt)
     img += "align=\"right\" width=\"240\">"
     return img
 
 
-def _html_title(item):
+def _html_title(page):
     """
     returns Wiki-linked HTML title
     """
-    link = "<a href=\"%s\">%s</a>" % (item.url, item.title)
-    if item.description:
-        link += "&mdash;<i>%s</i>" % item.description
+    link = "<a href=\"%s\">%s</a>" % (page.data.get('url'),
+                                      page.data.get('title'))
+    desc = page.data.get('description')
+    if desc:
+        link += "&mdash;<i>%s</i>" % desc
     else:
         link += "&mdash;<i>description</i>"
     if link:
         return "<p>%s</p>" % link
 
 
-def _image(item):
+def _image(page):
     """
     returns (preferred) image from wptools object
     """
-    try:
-        return item.image('image')['url']
-    except TypeError:
-        return None
+    if page.pageimage('pageimage'):
+        return page.pageimage('pageimage')['url']
 
 
-def _item_html(item):
+def _page_html(page):
     """
     returns assembled HTML output
     """
     out = []
-    out.append(_html_title(item))
-    out.append(_html_image(item))
-    out.append(item.extract)
+    out.append(_html_title(page))
+    out.append(_html_image(page))
+    out.append(page.extract)
     return "\n".join([x for x in out if x])
 
 
-def _item_text(item, nowrap=False):
+def _page_text(page, nowrap=False):
     """
     returns assembled text output
     """
-    title = item.title.upper()
-    if hasattr(item, 'description') and item.description:
-        title += u'\u2014' + "%s" % item.description
+    title = page.data['title'].upper()
+    desc = page.data.get('description')
+    if desc:
+        title += u'\u2014' + "%s" % desc
     title = "\n".join(textwrap.wrap(title))
 
-    img = _text_image(item)
+    img = _text_image(page)
+
+    text = page.data.get('extext')
 
     if nowrap:
-        pars = item.extext
+        pars = text
     else:
         parlist = []
-        for par in item.extext.split("\n\n"):
+        for par in text.split("\n\n"):
             parlist.append("\n".join(textwrap.wrap(par)))
         pars = "\n\n".join(parlist)
 
@@ -91,10 +91,7 @@ def _item_text(item, nowrap=False):
     txt.append(pars)
 
     head = "\n\n".join([x for x in txt if x])
-
-    tail = "\n\n<%s>\n" % item.url
-    if item.wikibase:
-        tail += "<https://wikidata.org/wiki/%s>\n" % item.wikibase
+    tail = "\n\n<%s>\n" % page.data['url']
 
     return head + tail
 
@@ -113,15 +110,13 @@ def _safe_exit(output):
         pass
 
 
-def _text_image(item):
+def _text_image(page):
     """
     returns text image URL
     """
     img = None
-    alt = item.title
-    if item.label:
-        alt = item.label
-    source = _image(item)
+    alt = page.data.get('label') or page.data.get('title')
+    source = _image(page)
     if source:
         img = "![%s](%s)" % (alt, source)
     return img
@@ -149,19 +144,22 @@ def get(args):
             return qobj.query(title)
         return qobj.random()
 
-    item = wptools.page(title, lang=lang, silent=silent,
+    page = wptools.page(title, lang=lang, silent=silent,
                         verbose=verbose, wiki=wiki)
-    item.get_query()
 
-    if not hasattr(item, 'extract') or not item.extract:
+    try:
+        page.get_query()
+    except (StandardError, ValueError, LookupError):
         return "NOT_FOUND"
 
-    out = _item_text(item, nowrap)
-    if html:
-        out = _item_html(item)
+    if not page.data.get('extext'):
+        out = page.cache['query']['query']
 
-    if not silent:
-        print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
+    out = _page_text(page, nowrap)
+    if html:
+        out = _page_html(page)
+
+    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
     try:
         return out.encode('utf-8')
