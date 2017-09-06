@@ -189,14 +189,14 @@ class WPToolsPage(core.WPTools):
         image = infobox.get('image')
         cover = infobox.get('Cover')
 
-        if image and utils.isfilename(image):
+        if image or cover:
             if 'image' not in self.data:
                 self.data['image'] = []
+
+        if image and utils.isfilename(image):
             self.data['image'].append({'kind': 'parse-image', 'file': image})
 
         if cover and utils.isfilename(cover):
-            if 'image' not in self.data:
-                self.data['image'] = []
             self.data['image'].append({'kind': 'parse-cover', 'file': cover})
 
     def _set_query_data(self):
@@ -290,11 +290,12 @@ class WPToolsPage(core.WPTools):
         """
         set image data from action=query response
         """
-        if 'image' not in self.data:
-            self.data['image'] = []
-
         pageimage = page.get('pageimage')
         thumbnail = page.get('thumbnail')
+
+        if pageimage or thumbnail:
+            if 'image' not in self.data:
+                self.data['image'] = []
 
         if pageimage:
             self.data['image'].append({

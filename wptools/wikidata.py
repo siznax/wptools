@@ -211,11 +211,11 @@ class WPToolsWikidata(core.WPTools):
 
         image = self.data['wikidata'].get('image')
         if image:
+            if 'image' not in self.data:
+                self.data['image'] = []
             if not isinstance(image, list):
                 image = [image]
             for img in image:
-                if 'image' not in self.data:
-                    self.data['image'] = []
                 self.data['image'].append({
                     'kind': 'wikidata-image',
                     'file': img})
