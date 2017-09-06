@@ -95,6 +95,11 @@ class WPTools(object):
         if data.get('error'):
             raise LookupError(_query)
 
+        if action == 'query' and data.get('query'):
+            if data['query'].get('pages'):
+                if data['query']['pages'][0].get('missing'):
+                    raise LookupError(_query)
+
         if action == 'parse' and not data.get('parse'):
             raise LookupError(_query)
 
