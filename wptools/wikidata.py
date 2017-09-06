@@ -190,6 +190,8 @@ class WPToolsWikidata(core.WPTools):
         entities = data.get('entities')
         item = entities.get(next(iter(entities)))
 
+        self.data['pageid'] = item.get('pageid')
+
         modified = item.get('modified')
         try:
             self.data['modified'].update({'wikidata': modified})
