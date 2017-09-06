@@ -93,9 +93,10 @@ class WPTools(object):
             raise ValueError(_query)
 
         if data.get('error'):
+            utils.stderr("API error: %s" % data.get('error'))
             raise LookupError(_query)
 
-        if action == 'query' and data.get('query'):
+        if 'query' in action and data.get('query'):
             if data['query'].get('pages'):
                 if data['query']['pages'][0].get('missing'):
                     raise LookupError(_query)

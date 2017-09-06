@@ -61,22 +61,30 @@ class WPToolsQuery(object):
 
     QUERY = Template((
         "${WIKI}/w/api.php?action=query"
-        "&cllimit=500"
-        "&clshow=!hidden"
         "&exintro"
         "&format=json"
         "&formatversion=2"
-        "&imlimit=500"
         "&inprop=url|watchers"
         "&list=random"
-        "&lllimit=500"
         "&pithumbsize=240"
         "&ppprop=wikibase_item"
-        "&prop=categories|contributors|extracts|images|info|langlinks"
-        "|pageimages|pageprops|pageterms|pageviews"
+        "&prop=extracts|info|pageimages|pageprops|pageterms"
         "&redirects"
         "&rnlimit=1"
         "&rnnamespace=0"
+        "&titles=${TITLES}"))
+
+    QUERYMORE = Template((
+        "${WIKI}/w/api.php?action=query"
+        "&cllimit=500"
+        "&clshow=!hidden"
+        "&format=json"
+        "&formatversion=2"
+        "&imlimit=500"
+        "&lllimit=500"
+        "&pclimit=500"
+        "&prop=categories|contributors|images|langlinks|pageviews"
+        "&redirects"
         "&titles=${TITLES}"))
 
     WIKIDATA = Template((
@@ -189,6 +197,25 @@ class WPToolsQuery(object):
             query += '&variant=' + self.variant
 
         self.set_status('query', pageids or titles)
+
+        return query
+
+    def querymore(self, titles, pageids=None):
+        """
+        Returns MediaWiki action=query query string (for MORE)
+        A much more expensive query for popular pages
+        """
+        query = self.QUERYMORE.substitute(
+            WIKI=self.uri,
+            TITLES=safequote(titles) or pageids)
+
+        if pageids and not titles:
+            query = query.replace('&titles=', '&pageids=')
+
+        if self.variant:
+            query += '&variant=' + self.variant
+
+        self.set_status('querymore', pageids or titles)
 
         return query
 
