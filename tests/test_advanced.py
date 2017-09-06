@@ -28,6 +28,8 @@ LANG = [
     'kn', 'ia', 'qu', 'ckb', 'mn', 'arz',
 ]
 
+NOPAGE = 'aspofinwepobw'
+
 WIKIS = [
     'commons.wikimedia.org',
     'en.wikibooks.org',
@@ -53,6 +55,16 @@ class WPToolsPickTest(unittest.TestCase):
         page = wptools.page(title['title'], lang=title['lang'])
         page.get(show=False)
         self.assertTrue(page.data['pageid'] is not None)
+
+    def test_not_found(self):
+        """
+        Try to get a non-existent page
+        """
+        try:
+            wptools.page(NOPAGE).get(False)
+            self.fail("failed to raise LookupError")
+        except LookupError as detail:
+            print(detail)
 
     def test_lookup_unicode_error(self):
         """
