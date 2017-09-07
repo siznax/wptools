@@ -184,7 +184,7 @@ class WPToolsRESTBase(core.WPTools):
                 img.update({'url': thumbnail.get('source')})
             self.data['image'].append(img)
 
-    def get_restbase(self, show=True, proxy=None, timeout=0):
+    def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
 
@@ -204,6 +204,7 @@ class WPToolsRESTBase(core.WPTools):
         - [lang]: <str> Mediawiki language code (default=en)
 
         Optional arguments:
+        - [endpoint]: the RESTBase entry point (default=/page/)
         - [show]: <bool> echo page data if true
         - [proxy]: <str> use this HTTP proxy
         - [timeout]: <int> timeout in seconds (0=wait forever)
@@ -221,6 +222,10 @@ class WPToolsRESTBase(core.WPTools):
         - wikibase: <str> Wikidata item ID
         - wikidata_url: <str> Wikidata URL
         """
+        if endpoint:
+            endpoint = self._parse_endpoint(endpoint, self.params.get('title'))
+            self.params.update({'endpoint': endpoint})
+
         self._get('restbase', show, proxy, timeout)
 
         return self

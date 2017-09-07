@@ -557,7 +557,7 @@ class WPToolsPage(core.WPTools):
 
         return self
 
-    def get_restbase(self, show=True, proxy=None, timeout=0):
+    def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
         """
         Envoke wptools.restbase.get_restbase()
         """
@@ -568,7 +568,7 @@ class WPToolsPage(core.WPTools):
         rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
         rbobj.cache.update(self.cache)
         rbobj.data.update(self.data)
-        rbobj.get_restbase(False, proxy, timeout)
+        rbobj.get_restbase(endpoint, False, proxy, timeout)
 
         self.cache.update(rbobj.cache)
         self.data.update(rbobj.data)
