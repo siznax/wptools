@@ -192,6 +192,11 @@ class WPToolsWikidata(core.WPTools):
 
         self.data['pageid'] = item.get('pageid')
 
+        aliases = item.get('aliases')
+        if aliases:
+            aliases = [x['value'] for x in aliases[self.params['lang']]]
+            self.data['aliases'] = aliases
+
         modified = item.get('modified')
         try:
             self.data['modified'].update({'wikidata': modified})
@@ -308,12 +313,15 @@ class WPToolsWikidata(core.WPTools):
         - [timeout]: <int> timeout in seconds (0=wait forever)
 
         Data captured:
+        - aliases: <list> list of "also known as"
         - claims: <dict> Wikidata claims (see get_claims())
         - description: <str> Wikidata description
         - image: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
         - modified (wikidata): <str> ISO8601 date and time
-        - props: <dict> Wikidata properties
+        - pageid: <int> Wikipedia database ID
+        - properties: <dict> Wikidata properties
+        - title: <str> article title
         - what: <str> Wikidata Property:P31 "instance of"
         - wikibase: <str> Wikidata item ID
         - wikidata: <dict> resolved Wikidata properties

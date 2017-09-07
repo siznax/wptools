@@ -292,7 +292,7 @@ class WPToolsQuery(object):
         query = self.WIKIDATA.substitute(
             WIKI=self.uri,
             LANG=self.variant or self.lang,
-            PROPS="info|claims|descriptions|labels|sitelinks")
+            PROPS="aliases|info|claims|descriptions|labels|sitelinks")
 
         if wikibase:
             query += "&ids=%s" % wikibase
