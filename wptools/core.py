@@ -92,6 +92,9 @@ class WPTools(object):
         except ValueError:
             raise ValueError(_query)
 
+        if data.get('warnings'):
+            utils.stderr("API warning: %s" % data.get('warnings'))
+
         if data.get('error'):
             utils.stderr("API error: %s" % data.get('error'))
             raise LookupError(_query)
