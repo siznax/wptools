@@ -135,28 +135,28 @@ class WPTools(object):
         raise NotImplementedError("A subclass must implement this method.")
 
     def info(self, action=None):
-        '''
+        """
         returns cached request info for given action,
         or list of cached actions
-        '''
+        """
         if action in self.cache:
             return self.cache[action]['info']
         return self.cache.keys() or None
 
     def query(self, action=None):
-        '''
+        """
         returns cached query string (without &format=json) for given action,
         or list of cached actions
-        '''
+        """
         if action in self.cache:
             return self.cache[action]['query'].replace('&format=json', '')
         return self.cache.keys() or None
 
     def response(self, action=None):
-        '''
+        """
         returns cached response (as dict) for given action,
         or list of cached actions
-        '''
+        """
         if action in self.cache:
             return utils.json_loads(self.cache[action]['response'])
         return self.cache.keys() or None
