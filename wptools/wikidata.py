@@ -91,9 +91,6 @@ class WPToolsWikidata(core.WPTools):
             'variant': kwargs.get('variant'),
             'wikibase': kwargs.get('wikibase')})
 
-        self.data['claims'] = None
-        self.data['properties'] = None
-
     def _get_entity_prop(self, entity, prop):
         """
         returns Wikidata entity property value
