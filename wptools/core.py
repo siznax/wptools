@@ -15,7 +15,7 @@ from . import utils
 
 class WPTools(object):
     """
-    WPtools core class
+    WPtools (abstract) core class
     """
 
     cache = None
@@ -25,19 +25,21 @@ class WPTools(object):
 
     def __init__(self, **kwargs):
         """
-        Initializes a WPTools core object
-
+        Abstract initialization for...
         - wptools.page
         - wptools.category
         - wptools.restbase
         - wptools.wikidata
         """
         self.cache = {}
+
         self.data = {}
+
         self.flags = {
             'silent': kwargs.get('silent') or False,
             'skip': kwargs.get('skip') or [],
             'verbose': kwargs.get('verbose') or False}
+
         self.params = {
             'lang': kwargs.get('lang') or 'en',
             'variant': kwargs.get('variant'),
