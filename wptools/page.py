@@ -53,21 +53,21 @@ class WPToolsPage(core.WPTools):
         - [skip]: <list> skip actions in this list
         - [verbose]: <bool> verbose output to stderr if True
         """
-        super(WPToolsPage, self).__init__(**kwargs)
+        super(WPToolsPage, self).__init__(*args, **kwargs)
 
-        title = None
-        if len(args) > 0 and args[0]:  # first positional arg is title
-            title = args[0]
+        title = self.params.get('title')
 
         endpoint = kwargs.get('endpoint')
-        pageid = kwargs.get('pageid')
-        wikibase = kwargs.get('wikibase')
+        if endpoint:
+            self.params.update({'endpoint': endpoint})
 
-        self.params.update({
-            'endpoint': endpoint,
-            'pageid': pageid,
-            'title': title,
-            'wikibase': wikibase})
+        pageid = kwargs.get('pageid')
+        if pageid:
+            self.params.update({'pageid': pageid})
+
+        wikibase = kwargs.get('wikibase')
+        if wikibase:
+            self.params.update({'wikibase': wikibase})
 
         if not title and not endpoint and not pageid and not wikibase:
             self.get_random()
@@ -112,8 +112,8 @@ class WPToolsPage(core.WPTools):
         """
         returns WPToolsQuery string
         """
-        title = self.params['title']
-        pageid = self.params['pageid']
+        title = self.params.get('title')
+        pageid = self.params.get('pageid')
 
         if action == 'random':
             return qobj.random()

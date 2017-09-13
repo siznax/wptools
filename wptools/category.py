@@ -52,37 +52,31 @@ class WPToolsCategory(core.WPTools):
         title = None
         if len(args) > 0:
             title = args[0]
-
-        if pageid and title:
-            raise ValueError("cannot use both title AND pageid")
-
-        if namespace or namespace == 0:
-            try:
-                self.namespace = int(namespace)
-            except ValueError:
-                raise ValueError("invalid namespace")
+            self.params.update({'title': title})
 
         if pageid:
             try:
-                kwargs['pageid'] = int(pageid)
+                self.params.update({'pageid': int(pageid)})
             except ValueError:
                 raise ValueError("invalid pageid")
+            if title:
+                raise ValueError("cannot use both title AND pageid")
 
-        self.params.update({'title': title,
-                            'pageid': pageid,
-                            'namespace': namespace,
-                            'seed': title or pageid})
+        if namespace or namespace == 0:
+            try:
+                self.params.update({'namespace': int(namespace)})
+            except ValueError:
+                raise ValueError("invalid namespace")
 
         if not pageid and not title:
-            # raise ValueError("need category title OR pageid")
             self.get_random()
 
     def _query(self, action, qobj):
         """
         Form query to enumerate category
         """
-        title = self.params['title']
-        pageid = self.params['pageid']
+        title = self.params.get('title')
+        pageid = self.params.get('pageid')
 
         if action == 'random':
             return qobj.random(namespace=14)
@@ -126,8 +120,8 @@ class WPToolsCategory(core.WPTools):
         Data captured:
         - members: <list> category members [{ns, pageid, title}]
         """
-        title = self.params['title']
-        pageid = self.params['pageid']
+        title = self.params.get('title')
+        pageid = self.params.get('pageid')
 
         if not title and not pageid:
             raise LookupError("needs category title or pageid")

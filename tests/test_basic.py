@@ -21,7 +21,8 @@ from . import wikidata
 
 class WPToolsTestCase(unittest.TestCase):
 
-    def test_entry_points(self):
+    @staticmethod
+    def test_entry_points():
         wptools.core
         wptools.query
         wptools.request
@@ -38,6 +39,14 @@ class WPToolsCategoryTestCase(unittest.TestCase):
     def test_category_init(self):
         self.assertRaises(ValueError, wptools.category, pageid='TEST')
         self.assertRaises(ValueError, wptools.category, 'TEST', pageid=123)
+        cat = wptools.category('TEST')
+        self.assertEqual(cat.params, {'lang': 'en', 'title': 'TEST'})
+
+    def test_category_caching(self):
+        cat = wptools.category('TEST', silent=True)
+        cat.cache['category'] = {'response': None}
+        cat.get_members()
+        self.assertEqual(len(cat.data), 0)
 
     def test_category_get_members(self):
         cat = wptools.category('TEST')
@@ -45,59 +54,64 @@ class WPToolsCategoryTestCase(unittest.TestCase):
         cat._set_data('category')
         self.assertTrue(len(cat.data['members']), 92)
 
-
-class WPToolsCoreTestCase(unittest.TestCase):
-
-    def test_core_caching(self):
-        page = wptools.page('TEST', silent=True)
-
-        page.cache['parse'] = {'response': None}
-        page.get_parse()
-        self.assertTrue('query' not in page.cache['parse'])
-        self.assertEqual(len(page.data), 0)
-
-        page.cache['query'] = {'response': None}
-        page.get_query()
-        self.assertTrue('query' not in page.cache['query'])
-        self.assertEqual(len(page.data), 0)
-
-        page.cache['restbase'] = {'response': None}
-        page.get_restbase()
-        self.assertTrue('query' not in page.cache['restbase'])
-        self.assertEqual(len(page.data), 0)
-
-        page.cache['wikidata'] = {'response': None}
-        page.get_wikidata()
-        self.assertTrue('query' not in page.cache['wikidata'])
-        self.assertEqual(len(page.data), 2)  # claims, properties
+    def test_category_get_members_namespace(self):
+        cat = wptools.category('TEST', namespace=0)
+        cat.cache['category'] = category.cache
+        cat._set_data('category')
+        self.assertTrue(len(cat.data['members']), 92)
 
 
 class WPToolsPageTestCase(unittest.TestCase):
 
-    def test_page_get_imageinfo(self):
-        page = wptools.page('test_get_imageinfo', silent=True)
-        page.data['image'] = [{
-            'file': 'Douglas adams portrait cropped.jpg',
-            'kind': 'test'}]
-        page.cache['imageinfo'] = imageinfo.cache
-        page._set_imageinfo_data()
+    def test_core_init(self):
+        page = wptools.page('TEST', skip='SKIP')
+        self.assertEqual(page.flags,
+                         {'silent': False, 'skip': 'SKIP', 'verbose': False})
 
-        image = page.data['image'][0]
+        page = wptools.page('TEST', variant='VARIANT')
+        self.assertEqual(page.params,
+                         {'lang': 'en', 'title': 'TEST', 'variant': 'VARIANT'})
 
-        self.assertTrue('/c/c0/' in image['url'])
-        self.assertTrue('/commons.' in image['descriptionurl'])
-        self.assertTrue(image['file'].startswith('File:'))
-        self.assertEqual(image['height'], 386)
-        self.assertEqual(image['size'], 32915)
-        self.assertEqual(image['width'], 333)
+        page = wptools.page('TEST', wiki='WIKI')
+        self.assertEqual(page.params,
+                         {'lang': 'en', 'title': 'TEST', 'wiki': 'WIKI'})
+
+    def test_page_init(self):
+        page = wptools.page('TEST', silent=True)
+        self.assertEqual(page.params, {'lang': 'en', 'title': 'TEST'})
+        self.assertEqual(page.flags, {'silent': True, 'verbose': False})
+
+        page = wptools.page(endpoint='TEST', silent=True)
+        self.assertEqual(page.params, {'endpoint': 'TEST', 'lang': 'en'})
+
+        page = wptools.page(pageid=123, silent=True)
+        self.assertEqual(page.params, {'lang': 'en', 'pageid': 123})
+
+        page = wptools.page(wikibase='Q42', silent=True)
+        self.assertEqual(page.params, {'lang': 'en', 'wikibase': 'Q42'})
+
+    def test_page_caching(self):
+        page = wptools.page('TEST', silent=True)
+
+        page.cache['parse'] = {'response': None}
+        page.cache['query'] = {'response': None}
+        page.cache['restbase'] = {'response': None}
+        page.cache['wikidata'] = {'response': None}
+
+        page.get_parse()
+        page.get_query()
+        page.get_restbase()
+        page.get_wikidata()
+
+        self.assertEqual(len(page.data), 0)
 
     def test_page_get_parse(self):
         page = wptools.page('test_get_parse', silent=True)
+
         page.cache['parse'] = parse.cache
         page._set_parse_data()
 
         data = page.data
-
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(len(data['infobox']), 15)
         self.assertEqual(len(data['links']), 2)
@@ -112,11 +126,11 @@ class WPToolsPageTestCase(unittest.TestCase):
 
     def test_page_get_query(self):
         page = wptools.page('test_get_query', silent=True)
+
         page.cache['query'] = query.cache
         page._set_query_data()
 
         data = page.data
-
         self.assertEqual(data['description'], 'English writer and humorist')
         self.assertEqual(data['label'], 'Douglas Adams')
         self.assertEqual(data['length'], 60069)
@@ -135,6 +149,33 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue(data['url_raw'].endswith('_Adams?action=raw'))
         self.assertTrue(data['wikidata_url'].endswith('Q42'))
         self.assertTrue(wptools.utils.is_text(page.data['random']))
+
+    def test_page_get_imageinfo(self):
+        page = wptools.page('test_get_imageinfo', silent=True)
+
+        page.data['image'] = [{
+            'file': 'Douglas adams portrait cropped.jpg',
+            'kind': 'test'}]
+        page.cache['imageinfo'] = imageinfo.cache
+        page._set_imageinfo_data()
+
+        image = page.data['image'][0]
+        self.assertTrue('/c/c0/' in image['url'])
+        self.assertTrue('/commons.' in image['descriptionurl'])
+        self.assertTrue(image['file'].startswith('File:'))
+        self.assertEqual(image['height'], 386)
+        self.assertEqual(image['size'], 32915)
+        self.assertEqual(image['width'], 333)
+
+    def test_page_get_restbase(self):
+        page = wptools.page('TEST', endpoint='summary', silent=True)
+        page.cache = {'restbase': rest_summary.cache}
+        page.get_restbase()
+
+    def test_page_get_wikidata(self):
+        page = wptools.page('TEST', wikibase='Q42', silent=True)
+        page.cache = {'wikidata': wikidata.cache}
+        page.get_wikidata()
 
 
 class WPToolsQueryTestCase(unittest.TestCase):
@@ -294,17 +335,26 @@ class WPToolsQueryTestCase(unittest.TestCase):
 
 class WPToolsRESTBaseTestCase(unittest.TestCase):
 
-    def test_get_restbase(self):
+    def test_restbase_init(self):
         page = wptools.restbase()
-        self.assertEqual(page.params['endpoint'], '/page/')
+        self.assertEqual(page.params, {'endpoint': '/page/', 'lang': 'en'})
 
         page = wptools.restbase('TEST', endpoint='html')
-        self.assertEqual(page.params['title'], 'TEST')
-        self.assertEqual(page.params['endpoint'], '/page/html/TEST')
+        self.assertEqual(page.params,
+                         {'endpoint': '/page/html/TEST',
+                          'lang': 'en',
+                          'title': 'TEST'})
 
         page = wptools.restbase(endpoint='summary/TEST')
-        self.assertEqual(page.params['title'], 'TEST')
-        self.assertEqual(page.params['endpoint'], '/page/summary/TEST')
+        self.assertEqual(page.params,
+                         {'endpoint': '/page/summary/TEST',
+                          'lang': 'en',
+                          'title': 'TEST'})
+
+        self.assertRaises(ValueError, wptools.restbase, endpoint='TEST')
+
+        self.assertRaises(ValueError, wptools.restbase,
+                          'TEST', endpoint='summary/TEST_TEST')
 
     def test_get_restbase_html(self):
         page = wptools.restbase(endpoint='html/TEST', silent=True)
@@ -385,12 +435,12 @@ class WPToolsRequestTestCase(unittest.TestCase):
 
 class WPToolsWikidataTestCase(unittest.TestCase):
 
-    def test_wikidata(self):
+    def test_wikidata_init(self):
         page = wptools.wikidata('TEST', silent=True)
-        self.assertEqual(page.params['title'], 'TEST')
+        self.assertEqual(page.params, {'lang': 'en', 'title': 'TEST'})
 
         page = wptools.wikidata(wikibase='Q42', silent=True)
-        self.assertEqual(page.params['wikibase'], 'Q42')
+        self.assertEqual(page.params, {'lang': 'en', 'wikibase': 'Q42'})
 
     def test_wikidata_get_claims(self):
         page = wptools.wikidata(silent=True)

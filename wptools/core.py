@@ -23,7 +23,7 @@ class WPTools(object):
     flags = None
     params = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Abstract initialization for...
         - wptools.page
@@ -32,18 +32,28 @@ class WPTools(object):
         - wptools.wikidata
         """
         self.cache = {}
-
         self.data = {}
 
         self.flags = {
             'silent': kwargs.get('silent') or False,
-            'skip': kwargs.get('skip') or [],
-            'verbose': kwargs.get('verbose') or False}
+            'verbose': kwargs.get('verbose') or False
+        }
 
         self.params = {
             'lang': kwargs.get('lang') or 'en',
-            'variant': kwargs.get('variant'),
-            'wiki': kwargs.get('wiki')}
+        }
+
+        if len(args) > 0 and args[0]:  # first positional arg is title
+            self.params.update({'title': args[0]})
+
+        if kwargs.get('skip'):
+            self.flags.update({'skip': kwargs.get('skip')})
+
+        if kwargs.get('variant'):
+            self.params.update({'variant': kwargs.get('variant')})
+
+        if kwargs.get('wiki'):
+            self.params.update({'wiki': kwargs.get('wiki')})
 
     def _get(self, action, show, proxy, timeout):
         """
@@ -58,14 +68,14 @@ class WPTools(object):
         else:
             self.cache[action] = {}
 
-        if action in self.flags['skip']:
+        if self.flags.get('skip') and action in self.flags['skip']:
             utils.stderr("+ skipping %s" % action)
             return
 
         # make the request
         qobj = WPToolsQuery(lang=self.params['lang'],
-                            wiki=self.params['wiki'],
-                            variant=self.params['variant'])
+                            wiki=self.params.get('wiki'),
+                            variant=self.params.get('variant'))
         qstr = self._query(action, qobj)
         self.cache[action]['query'] = qstr
 

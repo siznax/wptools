@@ -37,18 +37,12 @@ class WPToolsRESTBase(core.WPTools):
         - [skip]: <list> skip actions in this list
         - [verbose]: <bool> verbose output to stderr if True
         """
-        super(WPToolsRESTBase, self).__init__(**kwargs)
+        super(WPToolsRESTBase, self).__init__(*args, **kwargs)
 
-        title = None
-        if len(args) > 0 and args[0]:  # first positional arg is title
-            title = args[0].replace(' ', '_')
+        endpoint = self._parse_endpoint(kwargs.get('endpoint'),
+                                        self.params.get('title'))
 
-        endpoint = self._parse_endpoint(kwargs.get('endpoint'), title)
-
-        self.params.update({
-            'endpoint': endpoint,
-            'lang': kwargs.get('lang') or 'en',
-            'title': self.params.get('title') or title})
+        self.params.update({'endpoint': endpoint})
 
     def _handle_response(self):
         """
@@ -93,12 +87,12 @@ class WPToolsRESTBase(core.WPTools):
             if title:
                 parts.append(title)
             else:
-                raise StandardError("need a title.")
+                raise ValueError("need a title.")
 
         if len(parts) == 3:
             if title:  # check title
                 if title != parts[2]:
-                    raise StandardError("titles conflict.")
+                    raise ValueError("titles conflict.")
             else:
                 self.params['title'] = parts[-1]
 

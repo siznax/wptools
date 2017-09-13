@@ -79,24 +79,18 @@ class WPToolsWikidata(core.WPTools):
         - [skip]: <list> skip actions in this list
         - [verbose]: <bool> verbose output to stderr if True
         """
-        super(WPToolsWikidata, self).__init__(**kwargs)
+        super(WPToolsWikidata, self).__init__(*args, **kwargs)
 
-        title = None
-        if len(args) > 0 and args[0]:  # first positional arg is title
-            title = args[0].replace(' ', '_')
-
-        self.params.update({
-            'lang': kwargs.get('lang') or 'en',
-            'title': title or kwargs.get('title'),
-            'variant': kwargs.get('variant'),
-            'wikibase': kwargs.get('wikibase')})
+        wikibase = kwargs.get('wikibase')
+        if wikibase:
+            self.params.update({'wikibase': wikibase})
 
     def _get_entity_prop(self, entity, prop):
         """
         returns Wikidata entity property value
         """
-        variant = self.params['variant']
-        lang = self.params['lang']
+        variant = self.params.get('variant')
+        lang = self.params.get('lang')
 
         if entity.get(prop):
             ent = entity[prop]
