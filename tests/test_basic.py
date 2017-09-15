@@ -60,6 +60,18 @@ class WPToolsCategoryTestCase(unittest.TestCase):
         cat._set_data('category')
         self.assertTrue(len(cat.data['members']), 92)
 
+    def test_category_query(self):
+        cat = wptools.category('TEST')
+        qobj = wptools.query.WPToolsQuery()
+        self.assertEqual(cat._query('random', qobj),
+                         ('https://en.wikipedia.org/w/api.php?'
+                          'action=query&format=json&formatversion=2'
+                          '&list=random&rnlimit=1&rnnamespace=14'))
+        self.assertEqual(cat._query('category', qobj),
+                         ('https://en.wikipedia.org/w/api.php?'
+                          'action=query&format=json&formatversion=2'
+                          '&list=categorymembers&cmlimit=500&cmtitle=TEST'))
+
 
 class WPToolsPageTestCase(unittest.TestCase):
 

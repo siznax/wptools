@@ -127,6 +127,9 @@ class WPToolsQuery(object):
         if namespace is not None:
             query += "&cmnamespace=%d" % namespace
 
+        if title and pageid:
+            title = None
+
         if title:
             query += "&cmtitle=" + safequote(title)
 

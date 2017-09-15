@@ -81,8 +81,6 @@ class WPToolsCategory(core.WPTools):
         if action == 'random':
             return qobj.random(namespace=14)
         elif action == 'category':
-            if title and pageid:
-                title = None
             return qobj.category(title=title, pageid=pageid)
 
     def _set_data(self, action):
