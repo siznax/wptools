@@ -70,25 +70,34 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         page = wptools.page('TEST', variant='VARIANT')
         self.assertEqual(page.params,
-                         {'lang': 'en', 'title': 'TEST', 'variant': 'VARIANT'})
+                         {'endpoint': '/page/', 'lang': 'en',
+                          'title': 'TEST', 'variant': 'VARIANT'})
 
         page = wptools.page('TEST', wiki='WIKI')
         self.assertEqual(page.params,
-                         {'lang': 'en', 'title': 'TEST', 'wiki': 'WIKI'})
+                         {'endpoint': '/page/', 'lang': 'en',
+                          'title': 'TEST', 'wiki': 'WIKI'})
 
     def test_page_init(self):
         page = wptools.page('TEST', silent=True)
-        self.assertEqual(page.params, {'lang': 'en', 'title': 'TEST'})
+        self.assertEqual(page.params,
+                         {'endpoint': '/page/', 'lang': 'en', 'title': 'TEST'})
         self.assertEqual(page.flags, {'silent': True, 'verbose': False})
 
-        page = wptools.page(endpoint='TEST', silent=True)
-        self.assertEqual(page.params, {'endpoint': 'TEST', 'lang': 'en'})
+        page = wptools.page('TEST', endpoint='ENDPOINT', silent=True)
+        self.assertEqual(page.params,
+                         {'endpoint': 'ENDPOINT',
+                          'lang': 'en', 'title': 'TEST'})
 
         page = wptools.page(pageid=123, silent=True)
-        self.assertEqual(page.params, {'lang': 'en', 'pageid': 123})
+        self.assertEqual(page.params,
+                         {'endpoint': '/page/', 'lang': 'en',
+                          'pageid': 123})
 
         page = wptools.page(wikibase='Q42', silent=True)
-        self.assertEqual(page.params, {'lang': 'en', 'wikibase': 'Q42'})
+        self.assertEqual(page.params,
+                         {'endpoint': '/page/', 'lang': 'en',
+                          'wikibase': 'Q42'})
 
     def test_page_caching(self):
         page = wptools.page('TEST', silent=True)
@@ -386,7 +395,7 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue(data['lead'].startswith('<span'))
         self.assertTrue(len(data['image']), 1)
 
-    def test_get_rest_summary(self):
+    def test_get_restbase_summary(self):
         page = wptools.restbase(endpoint='summary/TEST', silent=True)
         page.cache['restbase'] = rest_summary.cache
         page._set_data('restbase')

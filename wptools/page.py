@@ -26,9 +26,11 @@ from .restbase import WPToolsRESTBase
 from .wikidata import WPToolsWikidata
 
 
-class WPToolsPage(core.WPTools):
+class WPToolsPage(WPToolsRESTBase,
+                  WPToolsWikidata,
+                  core.WPTools):
     """
-    WPtools core class
+    WPtools Page class, derived from wptools.core
     """
 
     def __init__(self, *args, **kwargs):
@@ -114,19 +116,32 @@ class WPToolsPage(core.WPTools):
         """
         title = self.params.get('title')
         pageid = self.params.get('pageid')
+        wikibase = self.params.get('wikibase')
+        endpoint = self.params.get('endpoint')
+
+        qstr = None
 
         if action == 'random':
-            return qobj.random()
+            qstr = qobj.random()
         elif action == 'query':
-            return qobj.query(title, pageid)
+            qstr = qobj.query(title, pageid)
         elif action == 'querymore':
-            return qobj.querymore(title, pageid)
+            qstr = qobj.querymore(title, pageid)
         elif action == 'parse':
-            return qobj.parse(title, pageid)
+            qstr = qobj.parse(title, pageid)
         elif action == 'imageinfo':
-            return qobj.imageinfo(self.__get_image_files())
+            qstr = qobj.imageinfo(self.__get_image_files())
+        elif action == 'claims':
+            qstr = qobj.claims(self.data['claims'].keys())
+        elif action == 'wikidata':
+            qstr = qobj.wikidata(title, wikibase)
+        elif action == 'restbase':
+            qstr = qobj.restbase(endpoint)
 
-        raise StandardError("Unknown action: %s" % action)
+        if qstr is None:
+            raise StandardError("Unknown action: %s" % action)
+
+        return qstr
 
     def _set_data(self, action):
         """
@@ -140,6 +155,14 @@ class WPToolsPage(core.WPTools):
             self._set_parse_data()
         elif action == 'random':
             self._set_random_data()
+        elif action == 'claims':
+            self._set_claims_data()
+        elif action == 'wikidata':
+            self._set_wikidata()
+            if self.data.get('claims'):
+                self.get_claims(show=False)
+        elif action == 'restbase':
+            self._set_restbase_data()
 
         self._update_imageinfo()
         self._update_params()
@@ -365,9 +388,6 @@ class WPToolsPage(core.WPTools):
         title = self.params.get('title')
         wikibase = self.params.get('wikibase')
 
-        if not self.params.get('endpoint'):
-            self.params['endpoint'] = 'summary'
-
         if wikibase and not title:
 
             self.flags['defer_imageinfo'] = True
@@ -378,10 +398,11 @@ class WPToolsPage(core.WPTools):
 
             self.flags['defer_imageinfo'] = False
 
-            self.get_restbase(False, proxy, timeout)
+            self.get_restbase('summary', False, proxy, timeout)
 
             if show:
                 self.show()
+
         else:
 
             self.flags['defer_imageinfo'] = True
@@ -396,7 +417,7 @@ class WPToolsPage(core.WPTools):
 
             self.flags['defer_imageinfo'] = False
 
-            self.get_restbase(False, proxy, timeout)
+            self.get_restbase('summary', False, proxy, timeout)
 
             if show:
                 self.show()
@@ -554,58 +575,6 @@ class WPToolsPage(core.WPTools):
 
         # flush cache to allow repeated random requests
         del self.cache['random']
-
-        return self
-
-    def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
-        """
-        Envoke wptools.restbase.get_restbase()
-        """
-        kwargs = {}
-        kwargs.update(self.params)
-        kwargs.update(self.flags)
-
-        rbobj = WPToolsRESTBase(self.params.get('title'), **kwargs)
-        rbobj.cache.update(self.cache)
-        rbobj.data.update(self.data)
-        rbobj.get_restbase(endpoint, False, proxy, timeout)
-
-        self.cache.update(rbobj.cache)
-        self.data.update(rbobj.data)
-        self.flags.update(rbobj.flags)
-        self.params.update(rbobj.params)
-
-        self._update_imageinfo()
-        self._update_params()
-
-        if show:
-            self.show()
-
-        return self
-
-    def get_wikidata(self, show=True, proxy=None, timeout=0):
-        """
-        Envoke wptools.wikidata.get_wikidata()
-        """
-        kwargs = {}
-        kwargs.update(self.params)
-        kwargs.update(self.flags)
-
-        wdobj = WPToolsWikidata(self.params.get('title'), **kwargs)
-        wdobj.cache.update(self.cache)
-        wdobj.data.update(self.data)
-        wdobj.get_wikidata(False, proxy, timeout)
-
-        self.cache.update(wdobj.cache)
-        self.data.update(wdobj.data)
-        self.flags.update(wdobj.flags)
-        self.params.update(wdobj.params)
-
-        self._update_imageinfo()
-        self._update_params()
-
-        if show:
-            self.show()
 
         return self
 

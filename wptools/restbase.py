@@ -108,6 +108,9 @@ class WPToolsRESTBase(core.WPTools):
         """
         Sets RESTBase response data
         """
+        self._set_restbase_data()
+
+    def _set_restbase_data(self):
         res = self._handle_response()
         if res is None:
             return
