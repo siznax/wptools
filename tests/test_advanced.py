@@ -61,20 +61,20 @@ class WPToolsPickTest(unittest.TestCase):
         Try to get a non-existent page
         """
         try:
-            wptools.page(NOPAGE).get(False)
+            wptools.page(NOPAGE, silent=True).get(False)
             self.fail("failed to raise LookupError")
         except LookupError as detail:
-            print(detail)
+            pass
 
     def test_lookup_unicode_error(self):
         """
         Raise LookupError without UnicodeDecodeError. Issue #29
         """
         try:
-            wptools.page('Д北_TEST').get(False)
+            wptools.page('Д北_TEST', silent=True).get(False)
             self.fail("failed to raise LookupError")
         except LookupError as detail:
-            print(detail)
+            pass
 
 
 class WPToolsRandomTest(unittest.TestCase):
@@ -131,7 +131,8 @@ class WPToolsUtilsTest(unittest.TestCase):
         """
         Get infobox data with sub-elements. Issue #66
         """
-        page = wptools.page("ONE OK ROCK", lang='ja').get_parse(show=False)
+        page = wptools.page("ONE OK ROCK", lang='ja', silent=True)
+        page.get_parse(show=False)
         infobox = page.data['infobox']
         self.assertGreater(len(infobox['Genre'].split('<br')), 5)
 
@@ -139,7 +140,8 @@ class WPToolsUtilsTest(unittest.TestCase):
         """
         Get infobox data with list values. Issue #62
         """
-        page = wptools.page('Lewisit', lang='de').get_parse(show=False)
+        page = wptools.page('Lewisit', lang='de', silent=True)
+        page.get_parse(show=False)
         infobox = page.data['infobox']
         self.assertGreater(len(infobox['Dichte'].split('*')), 1)
 
