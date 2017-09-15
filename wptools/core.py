@@ -98,7 +98,7 @@ class WPTools(object):
         response = self.cache[action]['response']
 
         if not response:
-            raise StandardError("Empty response: %s" % self.params)
+            raise ValueError("Empty response: %s" % self.params)
 
         try:
             data = utils.json_loads(response)

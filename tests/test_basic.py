@@ -73,6 +73,82 @@ class WPToolsCategoryTestCase(unittest.TestCase):
                           '&list=categorymembers&cmlimit=500&cmtitle=TEST'))
 
 
+class WPToolsCoreTestCase(unittest.TestCase):
+
+    def test_core_load_missing(self):
+        page = wptools.page('TEST')
+
+        # empty response
+        page.cache = {'query': {'query': 'QUERY', 'response': ''}}
+        self.assertRaises(ValueError, page._load_response, 'query')
+
+        # bad JSON
+        page.cache = {'query': {'query': 'QUERY', 'response': '{TEST}'}}
+        self.assertRaises(ValueError, page._load_response, 'query')
+
+        # warnings
+        page.cache = {'query':
+                      {'query': 'QUERY',
+                       'response': '{"warnings":{"query":{ "warnings":"TEST"}}}'}}
+        page._load_response('query')
+
+        # API error
+        page.cache = {'parse':
+                      {'query': 'QUERY',
+                       'response': '{"error": {"code": "TEST"}}'}}
+        self.assertRaises(LookupError, page._load_response, 'parse')
+
+        # missing parse
+        page.cache = {'parse': {'query': 'QUERY', 'response': '{}'}}
+        self.assertRaises(LookupError, page._load_response, 'parse')
+
+        # missing query
+        page.cache = {'query':
+                      {'query': 'QUERY',
+                       'response': '{"query":{"pages":[{"missing": true}]}}'}}
+        self.assertRaises(LookupError, page._load_response, 'query')
+
+        # missing wikidata
+        page.cache = {'wikidata':
+                      {'query': 'QUERY',
+                       'response': '{"entities":{"-1": {"missing": ""}}}'}}
+        self.assertRaises(LookupError, page._load_response, 'wikidata')
+
+        # show
+        page.cache = {'query': query.cache}
+        page.flags['skip'] = ['imageinfo']
+        page._set_data('query')
+        page.show()
+
+    def test_core_info(self):
+        page = wptools.page('TEST')
+        page.cache = {'query': query.cache}
+        self.assertEqual(list(page.info()), ['query'])
+        self.assertEqual(page.info('query')['status'], 200)
+
+    def test_core_query(self):
+        page = wptools.page('TEST')
+        page.cache = {'query': query.cache}
+        self.assertEqual(list(page.query()), ['query'])
+
+        qstr = page.query('query')
+        start = 'https://en.wikipedia.org/w/api.php?action=query'
+        end = '&titles=Douglas_Adams'
+        self.assertTrue(qstr.startswith(start))
+        self.assertTrue(qstr.endswith(end))
+
+    def test_core_response(self):
+        page = wptools.page('TEST')
+        page.cache = {'query': query.cache}
+        self.assertEqual(list(page.response()), ['query'])
+        self.assertTrue('query' in page.response('query'))
+
+    def test_core_safestr(self):
+        self.assertEqual(wptools.core.safestr(None), None)
+        self.assertEqual(wptools.core.safestr(1), '1')
+        self.assertTrue(isinstance(wptools.core.safestr(u'ü'), str))
+
+
 class WPToolsPageTestCase(unittest.TestCase):
 
     def test_core_init(self):

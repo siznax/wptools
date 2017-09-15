@@ -625,4 +625,4 @@ response = r"""
 }
 """
 
-cache = {'query': query, 'response': response}
+cache = {'info': {'status': 200}, 'query': query, 'response': response}
