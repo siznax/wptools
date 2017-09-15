@@ -179,12 +179,22 @@ class WPToolsPageTestCase(unittest.TestCase):
     def test_page_get_restbase(self):
         page = wptools.page('TEST', endpoint='summary', silent=True)
         page.cache = {'restbase': rest_summary.cache}
-        page.get_restbase()
+        page._set_data('restbase')
+        data = page.data
+        self.assertEqual(data['pageid'], 8091)
+        self.assertTrue(data['exhtml'].startswith("<p><b>Douglas"))
+        self.assertTrue(data['exrest'].startswith("Douglas"))
 
     def test_page_get_wikidata(self):
-        page = wptools.page('TEST', wikibase='Q42', silent=True)
+        page = wptools.page('TEST', wikibase='WIKIBASE', silent=True)
         page.cache = {'wikidata': wikidata.cache}
-        page.get_wikidata()
+        page.flags['skip'] = ['claims', 'imageinfo']
+        page._set_data('wikidata')
+        data = page.data
+        self.assertEqual(data['wikibase'], 'Q42')
+        self.assertEqual(len(data['properties']), 10)
+        self.assertEqual(len(data['claims']), 11)
+        self.assertEqual(len(data['wikidata']), 5)
 
 
 class WPToolsQueryTestCase(unittest.TestCase):

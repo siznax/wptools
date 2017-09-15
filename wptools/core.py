@@ -69,7 +69,8 @@ class WPTools(object):
             self.cache[action] = {}
 
         if self.flags.get('skip') and action in self.flags['skip']:
-            utils.stderr("+ skipping %s" % action)
+            if not self.flags['silent']:
+                utils.stderr("+ skipping %s" % action)
             return
 
         # make the request
