@@ -206,6 +206,8 @@ class WPTools(object):
                 value = ', '.join(value.keys())
             elif isinstance(value, int):
                 prefix = "%s:" % prefix
+                if prefix != 'pageid:':
+                    value = "{:,}".format(value)
             elif isinstance(value, list):
                 prefix = "%s: <list(%d)>" % (prefix, len(value))
                 value = ', '.join((safestr(x) for x in value if x))
