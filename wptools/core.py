@@ -75,8 +75,8 @@ class WPTools(object):
 
         # make the request
         qobj = WPToolsQuery(lang=self.params['lang'],
-                            wiki=self.params.get('wiki'),
-                            variant=self.params.get('variant'))
+                            variant=self.params.get('variant'),
+                            wiki=self.params.get('wiki'))
         qstr = self._query(action, qobj)
         self.cache[action]['query'] = qstr
 
