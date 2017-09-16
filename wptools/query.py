@@ -277,6 +277,21 @@ class WPToolsQuery(object):
         else:
             self.status = status
 
+    def site(self, action):
+        """
+        Returns site query
+        """
+        query = None
+        target = 'all'
+
+        if action == 'sitematrix':
+            query = ('https://commons.wikimedia.org/w/api.php?'
+                     'action=sitematrix&format=json&formatversion=2')
+
+        self.set_status(action, target)
+
+        return query
+
     def wiki_uri(self, wiki):
         """
         Returns scheme://domain from wiki name

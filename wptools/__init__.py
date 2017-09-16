@@ -30,4 +30,5 @@ from . import utils
 from .category import WPToolsCategory as category
 from .page import WPToolsPage as page
 from .restbase import WPToolsRESTBase as restbase
+from .site import WPToolsSite as site
 from .wikidata import WPToolsWikidata as wikidata

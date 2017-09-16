@@ -16,6 +16,7 @@ from . import query
 from . import rest_lead
 from . import rest_html
 from . import rest_summary
+from . import sitematrix
 from . import wikidata
 
 
@@ -31,6 +32,7 @@ class WPToolsTestCase(unittest.TestCase):
         wptools.page
         wptools.category
         wptools.restbase
+        wptools.site
         wptools.wikidata
 
 
@@ -538,6 +540,28 @@ class WPToolsRequestTestCase(unittest.TestCase):
         agent = wptools.request.user_agent()
         self.assertTrue(agent.startswith('wptools'))
         self.assertTrue('(https://github.com/siznax/wptools)' in agent)
+
+
+class WPToolsSiteTestCase(unittest.TestCase):
+
+    def test_site_init(self):
+        site = wptools.site()
+        self.assertEqual(site.params,
+                         {'lang': 'en', 'wiki': 'commons.wikimedia.org'})
+
+    def test_site_query(self):
+        site = wptools.site()
+        query = site._query('sitematrix', wptools.query.WPToolsQuery())
+        self.assertTrue(query.startswith('https://commons.wikimedia.org'))
+
+    def test_site_get_sitematrix(self):
+        site = wptools.site(silent=True)
+        site.cache = {'sitematrix': sitematrix.cache}
+        site.get_sitematrix()
+        site._set_data('sitematrix')
+        data = site.data
+        self.assertEqual(len(data['matrix']), 290)
+        self.assertTrue(data.get('random') is not None)
 
 
 class WPToolsWikidataTestCase(unittest.TestCase):
