@@ -17,6 +17,7 @@ from . import rest_lead
 from . import rest_html
 from . import rest_summary
 from . import sitematrix
+from . import siteinfo
 from . import wikidata
 
 
@@ -546,22 +547,50 @@ class WPToolsSiteTestCase(unittest.TestCase):
 
     def test_site_init(self):
         site = wptools.site()
-        self.assertEqual(site.params,
-                         {'lang': 'en', 'wiki': 'commons.wikimedia.org'})
+        self.assertEqual(site.params, {'lang': 'en'})
+        self.assertEqual(site.flags, {'silent': False, 'verbose': False})
 
     def test_site_query(self):
         site = wptools.site()
-        query = site._query('sitematrix', wptools.query.WPToolsQuery())
+
+        qobj = wptools.query.WPToolsQuery(wiki='commons.wikimedia.org')
+        query = site._query('sitematrix', qobj)
         self.assertTrue(query.startswith('https://commons.wikimedia.org'))
 
-    def test_site_get_sitematrix(self):
+        qobj = wptools.query.WPToolsQuery()
+        query = site._query('siteinfo', qobj)
+        self.assertTrue(query.startswith('https://en.wikipedia.org'))
+
+    def test_site_get_sites(self):
         site = wptools.site(silent=True)
         site.cache = {'sitematrix': sitematrix.cache}
-        site.get_sitematrix()
+        site.get_sites()
         site._set_data('sitematrix')
         data = site.data
-        self.assertEqual(len(data['matrix']), 290)
+        self.assertEqual(len(data['sites']), 741)
         self.assertTrue(data.get('random') is not None)
+
+        # filter by domain
+        site.params.update({'domain': 'wikipedia.org'})
+        site._set_data('sitematrix')
+        data = site.data
+        self.assertEqual(len(data['sites']), 290)
+
+    def test_site_get_siteinfo(self):
+        site = wptools.site(silent=True)
+        site.cache = {'siteinfo': siteinfo.cache}
+        site.get_siteinfo(wiki='en.wikipedia.org')
+        site._set_data('siteinfo')
+        data = site.data
+        self.assertEqual(data['activeusers'], 126428)
+        self.assertEqual(data['admins'], 1248)
+        self.assertEqual(data['articles'], 5478043)
+        self.assertEqual(data['edits'], 910280417)
+        self.assertEqual(data['images'], 854600)
+        self.assertEqual(len(data['info']), 49)
+        self.assertEqual(data['pages'], 43105508)
+        self.assertEqual(data['site'], 'enwiki')
+        self.assertEqual(data['users'], 31780544)
 
 
 class WPToolsWikidataTestCase(unittest.TestCase):

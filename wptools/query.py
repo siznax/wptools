@@ -111,6 +111,7 @@ class WPToolsQuery(object):
         """
         self.lang = lang
         self.variant = variant
+
         self.wiki = wiki or "%s.wikipedia.org" % self.lang
         self.domain = domain_name(self.wiki)
         self.uri = self.wiki_uri(self.wiki)
@@ -282,11 +283,20 @@ class WPToolsQuery(object):
         Returns site query
         """
         query = None
-        target = 'all'
+        target = None
 
         if action == 'sitematrix':
-            query = ('https://commons.wikimedia.org/w/api.php?'
-                     'action=sitematrix&format=json&formatversion=2')
+            query = self.uri + '/w/api.php?action=sitematrix'
+            target = 'all'
+        elif action == 'siteinfo':
+            query = self.uri + ('/w/api.php?action=query&meta=siteinfo'
+                                '&siprop=general|statistics')
+            target = 'info'
+
+        query += '&format=json&formatversion=2'
+
+        if not query or not target:
+            raise ValueError("Could not form query")
 
         self.set_status(action, target)
 
