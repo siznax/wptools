@@ -605,20 +605,5 @@ class WPToolsToolTestCase(unittest.TestCase):
         main(args(**cli))
 
 
-class WPToolsUtilsTestCase(unittest.TestCase):
-
-    def test_snip_html_metadata(self):
-        from wptools.utils import snip_html
-        txt = "<small class=\"metadata\">a</small>b"
-        ans = '<span><span ignored></span>b</span>'
-        self.assertEqual(snip_html(txt), ans)
-
-    def test_snip_html_reference(self):
-        from wptools.utils import snip_html
-        txt = "a<sup class=\"reference\"><a href>[b]</a></sup>c"
-        ans = "a<span><span ignored></span>c</span>"
-        self.assertEqual(snip_html(txt), ans)
-
-
 if __name__ == '__main__':
     unittest.main()
