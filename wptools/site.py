@@ -19,11 +19,6 @@ class WPToolsSite(core.WPTools):
 
     COMMONS = 'commons.wikimedia.org'
 
-    mostviewed = None
-    siteinfo = None
-    siteviews = None
-    uniqueviews = None
-
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsSite object.
@@ -44,6 +39,8 @@ class WPToolsSite(core.WPTools):
             self._set_sitematrix()
         elif action == 'siteinfo':
             self._set_siteinfo()
+        elif action == 'pageviews' or 'visitors':
+            self._set_siteviews(action)
 
     def _set_siteinfo(self):
         """
@@ -80,6 +77,20 @@ class WPToolsSite(core.WPTools):
         if matrix:
             self.data['sites'] = self._sitelist(matrix)
             self.data['random'] = random.choice(self.data['sites'])
+
+    def _set_siteviews(self, action):
+        """
+        capture API pageview/visitor data in data attribute
+        """
+        data = self._load_response(action).get('query')
+
+        siteviews = data.get('siteviews')
+        if siteviews:
+            values = [x for x in siteviews.values() if x]
+            if values:
+                self.data[action] = int(sum(values) / len(values))
+            else:
+                self.data[action] = 0
 
     def _sitelist(self, matrix):
         """
@@ -143,16 +154,32 @@ class WPToolsSite(core.WPTools):
 
         return self
 
-    def get_siteviews(self, show=True, proxy=None, timeout=0):
+    def get_pageviews(self, wiki=None, show=True, proxy=None, timeout=0):
         """
-        Average daily site views for past 60 days
+        GET average daily site views for past 60 days
         https://www.mediawiki.org/wiki/Extension:PageViewInfo
-        """
-        pass
 
-    def get_uniqueviews(self, show=True, proxy=None, timeout=0):
+        Optional arguments:
+        - [wiki]: <str> alternate wiki site (default=en.wikipedia.org)
         """
-        Average daily unique views for past 60 days
+        if wiki:
+            self.params.update({'wiki': wiki})
+
+        self._get('pageviews', show, proxy, timeout)
+
+        return self
+
+    def get_visitors(self, wiki=None, show=True, proxy=None, timeout=0):
+        """
+        GET average daily unique visitors for past 60 days
         https://www.mediawiki.org/wiki/Extension:PageViewInfo
+
+        Optional arguments:
+        - [wiki]: <str> alternate wiki site (default=en.wikipedia.org)
         """
-        pass
+        if wiki:
+            self.params.update({'wiki': wiki})
+
+        self._get('visitors', show, proxy, timeout)
+
+        return self

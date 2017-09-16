@@ -292,6 +292,13 @@ class WPToolsQuery(object):
             query = self.uri + ('/w/api.php?action=query&meta=siteinfo'
                                 '&siprop=general|statistics')
             target = 'info'
+        elif action == 'pageviews':
+            query = self.uri + '/w/api.php?action=query&meta=siteviews'
+            target = 'siteviews'
+        elif action == 'visitors':
+            query = self.uri + ('/w/api.php?action=query&meta=siteviews'
+                                '&pvismetric=uniques')
+            target = 'uniques'
 
         query += '&format=json&formatversion=2'
 

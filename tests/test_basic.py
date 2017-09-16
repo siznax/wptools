@@ -16,8 +16,9 @@ from . import query
 from . import rest_lead
 from . import rest_html
 from . import rest_summary
-from . import sitematrix
 from . import siteinfo
+from . import sitematrix
+from . import siteviews
 from . import wikidata
 
 
@@ -591,6 +592,21 @@ class WPToolsSiteTestCase(unittest.TestCase):
         self.assertEqual(data['pages'], 43105508)
         self.assertEqual(data['site'], 'enwiki')
         self.assertEqual(data['users'], 31780544)
+
+    def test_site_get_views(self):
+        site = wptools.site(silent=True)
+
+        site.cache = {'pageviews': siteviews.cache}
+        site.get_pageviews(wiki='en.wikipedia.org')
+        site._set_data('pageviews')
+        data = site.data
+        self.assertEqual(data['pageviews'], 233903370)
+
+        site.cache = {'visitors': siteviews.cache}
+        site.get_visitors(wiki='en.wikipedia.org')
+        site._set_data('visitors')
+        data = site.data
+        self.assertEqual(data['visitors'], 233903370)
 
 
 class WPToolsWikidataTestCase(unittest.TestCase):
