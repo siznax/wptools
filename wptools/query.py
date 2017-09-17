@@ -283,29 +283,28 @@ class WPToolsQuery(object):
         Returns site query
         """
         query = None
-        target = None
+        viewdays = 7
 
-        if action == 'sitematrix':
+        if action == 'siteinfo':
+            query = self.uri + ('/w/api.php?action=query'
+                                '&meta=siteinfo|siteviews'
+                                '&siprop=general|statistics'
+                                '&list=mostviewed&pvimlimit=max')
+            query += '&pvisdays=%d' % viewdays  # meta=siteviews
+            self.set_status('query', 'siteinfo|siteviews|mostviewed')
+        elif action == 'sitematrix':
             query = self.uri + '/w/api.php?action=sitematrix'
-            target = 'all'
-        elif action == 'siteinfo':
-            query = self.uri + ('/w/api.php?action=query&meta=siteinfo'
-                                '&siprop=general|statistics')
-            target = 'info'
-        elif action == 'pageviews':
-            query = self.uri + '/w/api.php?action=query&meta=siteviews'
-            target = 'siteviews'
-        elif action == 'visitors':
-            query = self.uri + ('/w/api.php?action=query&meta=siteviews'
-                                '&pvismetric=uniques')
-            target = 'uniques'
+            self.set_status('sitematrix', 'all')
+        elif action == 'sitevisitors':
+            query = self.uri + ('/w/api.php?action=query'
+                                '&meta=siteviews&pvismetric=uniques')
+            query += '&pvisdays=%d' % viewdays  # meta=siteviews
+            self.set_status('query', 'siteviews:uniques')
 
         query += '&format=json&formatversion=2'
 
-        if not query or not target:
+        if not query:
             raise ValueError("Could not form query")
-
-        self.set_status(action, target)
 
         return query
 

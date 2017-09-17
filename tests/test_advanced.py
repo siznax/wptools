@@ -104,6 +104,22 @@ class WPToolsRestBaseTest(unittest.TestCase):
     """
 
 
+class WPToolsSiteTest(unittest.TestCase):
+    """
+    Site TESTS
+    """
+    def test_site_get_info(self):
+        """
+        Get info about a random site
+        """
+        site = wptools.site(silent=True)
+        site.get_sites()
+        self.assertTrue(site.data['random'] is not None)
+        site.get_info(site.data['random'])
+        self.assertTrue(site.data['visitors'] >= 0)
+        site.top(limit=10)
+
+
 class WPToolsToolTest(unittest.TestCase):
     """
     WPTOOL TESTS
@@ -160,6 +176,7 @@ if __name__ == '__main__':
         'pick': TestLoader().loadTestsFromTestCase(WPToolsPickTest),
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
         'restbase': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
+        'site': TestLoader().loadTestsFromTestCase(WPToolsSiteTest),
         'tool': TestLoader().loadTestsFromTestCase(WPToolsToolTest),
         'utils': TestLoader().loadTestsFromTestCase(WPToolsUtilsTest),
         'wikidata': TestLoader().loadTestsFromTestCase(WPToolsWikidataTest),

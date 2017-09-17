@@ -560,16 +560,24 @@ class WPToolsSiteTestCase(unittest.TestCase):
 
         qobj = wptools.query.WPToolsQuery()
         query = site._query('siteinfo', qobj)
-        self.assertTrue(query.startswith('https://en.wikipedia.org'))
+        self.assertTrue('&meta=siteinfo|siteviews' in query)
+        self.assertTrue('&siprop=general|statistics' in query)
+        self.assertTrue('&list=mostviewed&pvimlimit=max' in query)
+        query = site._query('sitevisitors', qobj)
+        self.assertTrue('&meta=siteviews&pvismetric=uniques' in query)
 
     def test_site_get_sites(self):
         site = wptools.site(silent=True)
         site.cache = {'sitematrix': sitematrix.cache}
+
         site.get_sites()
         site._set_data('sitematrix')
-        data = site.data
-        self.assertEqual(len(data['sites']), 741)
-        self.assertTrue(data.get('random') is not None)
+        self.assertEqual(len(site.data['sites']), 741)
+        self.assertTrue(site.data.get('random') is not None)
+
+        site.get_sites(domain='wikipedia.org')
+        site._set_data('sitematrix')
+        self.assertEqual(len(site.data['sites']), 290)
 
         # filter by domain
         site.params.update({'domain': 'wikipedia.org'})
@@ -579,34 +587,29 @@ class WPToolsSiteTestCase(unittest.TestCase):
 
     def test_site_get_siteinfo(self):
         site = wptools.site(silent=True)
-        site.cache = {'siteinfo': siteinfo.cache}
-        site.get_siteinfo(wiki='en.wikipedia.org')
+        site.cache = {'siteinfo': siteinfo.cache,
+                      'siteviews': siteviews.cache}
+        site.get_info()
+        site.get_info(wiki='en.wikipedia.org')
         site._set_data('siteinfo')
+        site._set_data('sitevisitors')
         data = site.data
         self.assertEqual(data['activeusers'], 126428)
         self.assertEqual(data['admins'], 1248)
-        self.assertEqual(data['articles'], 5478043)
-        self.assertEqual(data['edits'], 910280417)
-        self.assertEqual(data['images'], 854600)
+        self.assertEqual(data['articles'], 5478623)
+        self.assertEqual(data['edits'], 910438071)
+        self.assertEqual(data['images'], 854622)
         self.assertEqual(len(data['info']), 49)
-        self.assertEqual(data['pages'], 43105508)
+        self.assertEqual(data['pages'], 43112467)
         self.assertEqual(data['site'], 'enwiki')
-        self.assertEqual(data['users'], 31780544)
+        self.assertEqual(data['users'], 31786628)
 
-    def test_site_get_views(self):
-        site = wptools.site(silent=True)
+        self.assertEqual(len(data['mostviewed']), 500)
+        self.assertEqual(data['siteviews'], 233991363)
+        self.assertEqual(data['visitors'], 63079969)
 
-        site.cache = {'pageviews': siteviews.cache}
-        site.get_pageviews(wiki='en.wikipedia.org')
-        site._set_data('pageviews')
-        data = site.data
-        self.assertEqual(data['pageviews'], 233903370)
-
-        site.cache = {'visitors': siteviews.cache}
-        site.get_visitors(wiki='en.wikipedia.org')
-        site._set_data('visitors')
-        data = site.data
-        self.assertEqual(data['visitors'], 233903370)
+        site.top()
+        site.top(wiki='en.wikipedia.org', limit=10)
 
 
 class WPToolsWikidataTestCase(unittest.TestCase):
