@@ -200,7 +200,7 @@ class WPToolsQuery(object):
         if self.variant:
             query += '&variant=' + self.variant
 
-        self.set_status('query', pageids or titles)
+        self.set_status('query', titles or pageids)
 
         return query
 

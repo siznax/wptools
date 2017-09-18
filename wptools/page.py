@@ -139,7 +139,7 @@ class WPToolsPage(WPToolsRESTBase,
             qstr = qobj.restbase(endpoint)
 
         if qstr is None:
-            raise StandardError("Unknown action: %s" % action)
+            raise ValueError("Unknown action: %s" % action)
 
         return qstr
 
@@ -385,10 +385,9 @@ class WPToolsPage(WPToolsRESTBase,
         - get_restbase()
         - get_wikidata()
         """
-        title = self.params.get('title')
         wikibase = self.params.get('wikibase')
 
-        if wikibase and not title:
+        if wikibase:
 
             self.flags['defer_imageinfo'] = True
 
@@ -411,7 +410,7 @@ class WPToolsPage(WPToolsRESTBase,
             self.get_parse(False, proxy, timeout)
 
             if not self.data.get('wikibase'):
-                self.flags['skip'].append('wikidata')
+                self.flags['skip'] = ['wikidata']
 
             self.get_wikidata(False, proxy, timeout)
 
@@ -441,8 +440,8 @@ class WPToolsPage(WPToolsRESTBase,
         Data captured:
         - image: <list> member (<dict>) image URLs, sizes, etc.
         """
-        if not self.data['image']:
-            raise LookupError("get_imageinfo needs image")
+        if not self.data.get('image'):
+            raise ValueError("get_imageinfo needs a page image")
 
         if not self._missing_imageinfo() and 'imageinfo' in self.cache:
             utils.stderr("complete imageinfo in cache", self.flags['silent'])
@@ -482,8 +481,8 @@ class WPToolsPage(WPToolsRESTBase,
         - wikibase: <str> Wikidata entity ID or wikidata URL
         - wikitext: <str> raw wikitext URL
         """
-        if not self.params['title'] and not self.params['pageid']:
-            raise LookupError("get_parse needs title or pageid")
+        if not self.params.get('title') and not self.params.get('pageid'):
+            raise ValueError("get_parse needs title or pageid")
 
         self._get('parse', show, proxy, timeout)
 
@@ -517,8 +516,8 @@ class WPToolsPage(WPToolsRESTBase,
         - url_raw: <str> ostensible raw wikitext URL
         - watchers: <int> number of people watching this page
         """
-        if not self.params['title'] and not self.params['pageid']:
-            raise LookupError("get_query needs title or pageid")
+        if not self.params.get('title') and not self.params.get('pageid'):
+            raise ValueError("get_query needs title or pageid")
 
         self._get('query', show, proxy, timeout)
 
@@ -548,7 +547,7 @@ class WPToolsPage(WPToolsRESTBase,
         - views: <int> average daily page views over past 60 days
         """
         if not self.params['title'] and not self.params['pageid']:
-            raise LookupError("get_query needs title or pageid")
+            raise ValueError("get_query needs title or pageid")
 
         self._get('querymore', show, proxy, timeout)
 

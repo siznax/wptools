@@ -13,6 +13,7 @@ from . import claims
 from . import imageinfo
 from . import parse
 from . import query
+from . import querymore
 from . import rest_lead
 from . import rest_html
 from . import rest_summary
@@ -206,12 +207,58 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         self.assertEqual(len(page.data), 0)
 
+    def test_page_query(self):
+        page = wptools.page('TEST')
+
+        qobj = wptools.query.WPToolsQuery()
+
+        qstr = page._query('random', qobj)
+        self.assertTrue('list=random' in qstr)
+
+        qstr = page._query('query', qobj)
+        self.assertTrue('action=query' in qstr)
+        self.assertTrue('pageprops' in qstr)
+
+        qstr = page._query('querymore', qobj)
+        self.assertTrue('action=query' in qstr)
+        self.assertTrue('&cllimit=500' in qstr)
+        self.assertTrue('&imlimit=500&lllimit=500&pclimit=500' in qstr)
+
+        qstr = page._query('parse', qobj)
+        self.assertTrue('action=parse' in qstr)
+        self.assertTrue('parsetree' in qstr)
+
+        page.data['claims'] = {'Q0': 'TEST'}
+        qstr = page._query('claims', qobj)
+        self.assertTrue('action=wbgetentities' in qstr)
+        self.assertTrue('ids=Q0' in qstr)
+
+        qstr = page._query('wikidata', qobj)
+        self.assertTrue('action=wbgetentities' in qstr)
+
+        qstr = page._query('restbase', qobj)
+        self.assertTrue('api/rest' in qstr)
+
+    def test_page_get(self):
+        cache = {'claims': claims.cache,
+                 'imageinfo': imageinfo.cache,
+                 'parse': parse.cache,
+                 'query': query.cache,
+                 'restbase': rest_summary.cache,
+                 'wikidata': wikidata.cache}
+
+        page = wptools.page('TEST', silent=True)
+        page.cache = cache
+        page.get()
+
+        page = wptools.page('TEST', wikibase='Q42', silent=True)
+        page.cache = cache
+        page.get()
+
     def test_page_get_parse(self):
-        page = wptools.page('test_get_parse', silent=True)
-
-        page.cache['parse'] = parse.cache
-        page._set_parse_data()
-
+        page = wptools.page('TEST', skip=['imageinfo'], silent=True)
+        page.cache = {'parse': parse.cache}
+        page._set_data('parse')
         data = page.data
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(len(data['infobox']), 15)
@@ -226,11 +273,9 @@ class WPToolsPageTestCase(unittest.TestCase):
                          'Douglas adams portrait cropped.jpg')
 
     def test_page_get_query(self):
-        page = wptools.page('test_get_query', silent=True)
-
-        page.cache['query'] = query.cache
-        page._set_query_data()
-
+        page = wptools.page('TEST', skip=['imageinfo'], silent=True)
+        page.cache = {'query': query.cache}
+        page._set_data('query')
         data = page.data
         self.assertEqual(data['description'], 'English writer and humorist')
         self.assertEqual(data['label'], 'Douglas Adams')
@@ -251,15 +296,30 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue(data['wikidata_url'].endswith('Q42'))
         self.assertTrue(wptools.utils.is_text(page.data['random']))
 
+    def test_page_get_more(self):
+        page = wptools.page('TEST', silent=True)
+        page.cache = {'querymore': querymore.cache}
+        page.get_more()
+        page._set_data('querymore')
+        self.assertTrue(len(page.data['categories']), 29)
+        self.assertTrue(len(page.data['files']), 12)
+        self.assertTrue(len(page.data['languages']), 70)
+        self.assertTrue(page.data['contributors'], 1317)
+        self.assertTrue(page.data['views'], 1398)
+
     def test_page_get_imageinfo(self):
         page = wptools.page('test_get_imageinfo', silent=True)
 
-        page.data['image'] = [{
-            'file': 'Douglas adams portrait cropped.jpg',
-            'kind': 'test'}]
-        page.cache['imageinfo'] = imageinfo.cache
-        page._set_imageinfo_data()
+        self.assertRaises(ValueError, page.get_imageinfo)
 
+        page.cache = {'imageinfo': imageinfo.cache}
+        page.data['image'] = [{'kind': 'parse-image',
+                               'file': 'Douglas adams portrait cropped.jpg'}]
+
+        query = page._query('imageinfo', wptools.query.WPToolsQuery())
+        self.assertTrue('File%3ADouglas' in query)
+
+        page._set_data('imageinfo')
         image = page.data['image'][0]
         self.assertTrue('/c/c0/' in image['url'])
         self.assertTrue('/commons.' in image['descriptionurl'])
@@ -267,6 +327,14 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(image['height'], 386)
         self.assertEqual(image['size'], 32915)
         self.assertEqual(image['width'], 333)
+
+    def test_page_get_random(self):
+        page = wptools.page('TEST', skip=['imageinfo'], silent=True)
+        page.cache = {'random': query.cache}
+        page._set_data('random')
+        page.get_random()
+        self.assertEqual(page.data['pageid'], 45564415)
+        self.assertEqual(page.data['title'], '1990 NBL Finals')
 
     def test_page_get_restbase(self):
         page = wptools.page('TEST', endpoint='summary', silent=True)
@@ -278,15 +346,24 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue(data['exrest'].startswith("Douglas"))
 
     def test_page_get_wikidata(self):
-        page = wptools.page('TEST', wikibase='WIKIBASE', silent=True)
-        page.cache = {'wikidata': wikidata.cache}
-        page.flags['skip'] = ['claims', 'imageinfo']
+        page = wptools.page('TEST', wikibase='WIKIBASE', skip=['imageinfo'],
+                            silent=True)
+        page.cache = {'claims': claims.cache,
+                      'wikidata': wikidata.cache}
         page._set_data('wikidata')
+        page._set_data('claims')
         data = page.data
         self.assertEqual(data['wikibase'], 'Q42')
         self.assertEqual(len(data['properties']), 10)
         self.assertEqual(len(data['claims']), 11)
-        self.assertEqual(len(data['wikidata']), 5)
+        self.assertEqual(len(data['wikidata']), 10)
+
+    def test_page_pageimage(self):
+        page = wptools.page('TEST', silent=True)
+        page.pageimage()
+        page.data['image'] = [{'kind': 'TEST'}, {'kind': 'TESTMORE'}]
+        page.pageimage()
+        page.pageimage('MORE')
 
 
 class WPToolsQueryTestCase(unittest.TestCase):
@@ -588,8 +665,7 @@ class WPToolsSiteTestCase(unittest.TestCase):
     def test_site_get_siteinfo(self):
         site = wptools.site(silent=True)
         site.cache = {'siteinfo': siteinfo.cache,
-                      'siteviews': siteviews.cache}
-        site.get_info()
+                      'sitevisitors': siteviews.cache}
         site.get_info(wiki='en.wikipedia.org')
         site._set_data('siteinfo')
         site._set_data('sitevisitors')
