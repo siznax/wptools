@@ -41,52 +41,55 @@ Example
 .. code-block:: python
 
     >>> import wptools
-
     >>> page = wptools.page('Gandhi')
-    Gandhi (en)
-    {
-      lang: en
-      title: Gandhi
-    }
 
     >>> page.get()
     en.wikipedia.org (query) Gandhi
     en.wikipedia.org (parse) 19379
     www.wikidata.org (wikidata) Q1001
     www.wikidata.org (claims) Q5|Q129286|Q6512732|Q668
+    en.wikipedia.org (restbase) /page/summary/Mahatma_Gandhi
     en.wikipedia.org (imageinfo) File:Portrait Gandhi.jpg|File:MKGandhi.jpg
-    Mahatma_Gandhi (en)
+    Mahatma Gandhi (en) data
     {
-      cache: <dict(5)> {claims, imageinfo, parse, query, wikidata}
-      categories: <list(66)>
-      claims: <dict(4)> {Q129286, Q5, Q6512732, Q668}
-      contributors: 2118
-      description: pre-eminent leader of Indian nationalism during British-ruled India
-      extext: <str(2980)> **Mohandas Karamchand Gandhi** (; Hindustani: ...
-      extract: <str(3184)> <p><b>Mohandas Karamchand Gandhi</b> (<span><...
-      files: <list(53)>
-      image: <list(4)>
-      infobox: <dict(22)> {alma_mater, alt, birth_date, birth_name, birt...
+      aliases: <list(10)> M K Gandhi, Mohandas Gandhi, Bapu, Gandhi, M...
+      claims: <dict(4)> Q5, Q129286, Q6512732, Q668
+      description: <str(67)> pre-eminent leader of Indian nationalism ...
+      exhtml: <str(1064)> <p>Mahātmā <b>Mohandas Karamchand Gandhi</b>...
+      exrest: <str(896)> Mahātmā Mohandas Karamchand Gandhi (; Hindust...
+      extext: <str(2985)> Mahātmā **Mohandas Karamchand Gandhi** (; Hi...
+      extract: <str(3212)> <p>Mahātmā <b>Mohandas Karamchand Gandhi</b...
+      image: <list(6)> {'kind': 'query-pageimage', u'descriptionshortu...
+      infobox: <dict(25)> known_for, other_names, image, signature, bi...
       label: Mahatma Gandhi
-      lang: en
-      languages: <list(167)>
-      length: 264260
-      links: <list(10)>
-      modified: <dict(2)> {page, wikidata}
+      length: 264,127
+      links: <list(10)> https://biblio.wiki/wiki/Mohandas_K._Gandhi, h...
+      modified: <dict(2)> wikidata, page
       pageid: 19379
-      parsetree: <str(333230)> <root><template><title>Redirect</title><p...
-      props: <dict(7)> {P18, P27, P31, P345, P569, P570, P910}
-      random: Ikioi Shōta
+      parsetree: <str(333405)> <root><template><title>Redirect</title>...
+      properties: <dict(7)> P27, P569, P345, P18, P910, P31, P570
+      random: Catlins River
       title: Mahatma_Gandhi
       url: https://en.wikipedia.org/wiki/Mahatma_Gandhi
       url_raw: https://en.wikipedia.org/wiki/Mahatma_Gandhi?action=raw
-      views: 21400
-      watchers: 1724
+      watchers: 1,732
       what: human
       wikibase: Q1001
-      wikidata: <dict(7)> {IMDB, birth, category, citizenship, death, im...
+      wikidata: <dict(7)> category, death, citizenship, image, instanc...
       wikidata_url: https://www.wikidata.org/wiki/Q1001
-      wikitext: <str(262639)> {{Redirect|Gandhi}}{{pp-move-indef}}{{pp-s...
+      wikitext: <str(262663)> {{Redirect|Gandhi}}{{pp-move-indef}}{{pp...
+    }
+
+    >>> page.get_more()
+    en.wikipedia.org (querymore) Mahatma Gandhi
+    Mahatma Gandhi (en) data
+    {
+      categories: <list(67)> Category:1869 births, Category:1948 death...
+      contributors: 2,608
+      files: <list(52)> File:Aum Om red.svg, File:Commons-logo.svg, Fi...
+      languages: <list(167)> {u'lang': u'af', u'title': u'Mahatma Gand...
+      title: Mahatma Gandhi
+      views: 21,490
     }
 
 
