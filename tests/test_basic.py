@@ -179,7 +179,7 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         page = wptools.page('TEST', endpoint='ENDPOINT', silent=True)
         self.assertEqual(page.params,
-                         {'endpoint': 'ENDPOINT',
+                         {'endpoint': '/page/ENDPOINT/TEST',
                           'lang': 'en', 'title': 'TEST'})
 
         page = wptools.page(pageid=123, silent=True)

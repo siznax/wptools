@@ -61,6 +61,7 @@ class WPToolsPage(WPToolsRESTBase,
 
         endpoint = kwargs.get('endpoint')
         if endpoint:
+            endpoint = self._parse_endpoint(endpoint, title)
             self.params.update({'endpoint': endpoint})
 
         pageid = kwargs.get('pageid')
