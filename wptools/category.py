@@ -102,8 +102,7 @@ class WPToolsCategory(core.WPTools):
 
     def get_members(self, show=True, proxy=None, timeout=0):
         """
-        Mediawiki:API (action=query) for category members
-
+        GET Mediawiki:API (action=query) category members
         https://www.mediawiki.org/wiki/API:Categorymembers
 
         Required {params}: title OR pageid
@@ -131,7 +130,6 @@ class WPToolsCategory(core.WPTools):
     def get_random(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki:API (action=query) for random category
-
         https://www.mediawiki.org/wiki/API:Random
 
         Required {params}: None
