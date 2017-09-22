@@ -15,11 +15,6 @@ class WPToolsCategory(core.WPTools):
     WPToolsCategory class
     """
 
-    members = None
-    namespace = None
-    pageid = None
-    title = None
-
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsCategory object
