@@ -266,7 +266,6 @@ class WPToolsWikidata(core.WPTools):
     def get_claims(self, show=True, proxy=None, timeout=0):
         """
         GET Wikidata:API (action=wbgetentities) claims labels
-
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
         Required {data}: claims
@@ -287,7 +286,6 @@ class WPToolsWikidata(core.WPTools):
     def get_wikidata(self, show=True, proxy=None, timeout=0):
         """
         GET Wikidata:API (action=wbgetentities) wikidata
-
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
         Required {params}: title OR wikibase

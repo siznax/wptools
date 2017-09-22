@@ -427,7 +427,6 @@ class WPToolsPage(WPToolsRESTBase,
     def get_imageinfo(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki request for API:Imageinfo
-
         https://www.mediawiki.org/wiki/API:Imageinfo
 
         Required {data}:
@@ -461,7 +460,6 @@ class WPToolsPage(WPToolsRESTBase,
     def get_parse(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki:API action=parse request
-
         https://en.wikipedia.org/w/api.php?action=help&modules=parse
 
         Required {params}: title OR pageid
@@ -492,7 +490,6 @@ class WPToolsPage(WPToolsRESTBase,
     def get_query(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki:API action=query selected data
-
         https://en.wikipedia.org/w/api.php?action=help&modules=query
 
         Required {params}: title OR pageid
@@ -528,7 +525,6 @@ class WPToolsPage(WPToolsRESTBase,
         """
         GET MediaWiki:API action=query for MORE data
         A much more expensive (slower!) query for popular pages
-
         https://en.wikipedia.org/w/api.php?action=help&modules=query
 
         Required {params}: title OR pageid
@@ -557,7 +553,6 @@ class WPToolsPage(WPToolsRESTBase,
     def get_random(self, show=True, proxy=None, timeout=0):
         """
         GET MediaWiki:API (action=query) list=random
-
         https://www.mediawiki.org/wiki/API:Random
 
         Required {params}: None

@@ -184,7 +184,6 @@ class WPToolsRESTBase(core.WPTools):
     def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
-
         https://en.wikipedia.org/api/rest_v1/
 
         for example:
