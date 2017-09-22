@@ -40,7 +40,12 @@ Example
 .. code-block:: python
 
     >>> import wptools
+
+.. code-block:: python
+
     >>> page = wptools.page('Gandhi')
+
+.. code-block:: python
 
     >>> page.get()
     en.wikipedia.org (query) Gandhi
@@ -78,6 +83,8 @@ Example
       wikidata_url: https://www.wikidata.org/wiki/Q1001
       wikitext: <str(262663)> {{Redirect|Gandhi}}{{pp-move-indef}}{{pp...
     }
+
+.. code-block:: python
 
     >>> page.get_more()
     en.wikipedia.org (querymore) Mahatma Gandhi
