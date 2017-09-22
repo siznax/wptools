@@ -12,13 +12,12 @@ Wikipedia tools (for Humans)
 
 Python and command-line MediaWiki access for Humans.
 
-- get an HTML or plain text "extract" (lead or summary)
-- get a representative image (pageimage, thumb, etc.)
-- get an Infobox as a python dictionary
-- get any/all Wikidata by title
-- get info in any language
-- get category info
-- get random info
+- get page extracts, image, Infobox data, Wikidata, and more
+- get a random page, category, or site
+- get page statistics
+- get category members
+- get site info and stats
+- get data in any language
 
 This package is intended to make it as easy as possible to get data
 from MediaWiki instances, expose more Wikidata, and extend Wikimedia
