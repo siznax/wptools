@@ -237,14 +237,14 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
 
-        self._set_query_data_fast(page)
+        self._set_query_data_fast_1(page)  # avoid pylint too-many-branches
+        self._set_query_data_fast_2(page)
         self._set_query_data_slow(page)
 
-    def _set_query_data_fast(self, page):
+    def _set_query_data_fast_1(self, page):
         """
-        set less expensive action=query response data
+        set less expensive action=query response data PART 1
         """
-        self.data['length'] = page.get('length')
         self.data['pageid'] = page.get('pageid')
 
         extract = page.get('extract')
@@ -259,11 +259,16 @@ class WPToolsPage(WPToolsRESTBase,
             self.data['url'] = fullurl
             self.data['url_raw'] = fullurl + '?action=raw'
 
+        length = page.get('length')
+        if length:
+            self.data['length'] = length
+
         modified = page.get('touched')
-        if 'modified' in self.data:
-            self.data['modified'].update({'page': modified})
-        else:
-            self.data['modified'] = {'page': modified}
+        if modified:
+            if 'modified' in self.data:
+                self.data['modified'].update({'page': modified})
+            else:
+                self.data['modified'] = {'page': modified}
 
         pageprops = page.get('pageprops')
         if pageprops:
@@ -279,6 +284,12 @@ class WPToolsPage(WPToolsRESTBase,
                                                 None)
             if terms.get('label'):
                 self.data['label'] = next(iter(terms['label']), None)
+
+    def _set_query_data_fast_2(self, page):
+        """
+        set less expensive action=query response data PART 2
+        """
+        self.data['pageid'] = page.get('pageid')
 
         title = page.get('title')
         self.data['title'] = title
