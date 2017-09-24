@@ -10,7 +10,7 @@ Wikipedia tools (for Humans)
 .. image:: https://coveralls.io/repos/github/siznax/wptools/badge.svg?branch=master
         :target: https://coveralls.io/github/siznax/wptools
 
-Python and command-line MediaWiki access for Humans.
+Python and command-line MediaWiki access for Humans
 
 - get page extracts, image, Infobox data, Wikidata, and more
 - get a random page, category, or site

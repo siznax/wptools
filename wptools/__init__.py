@@ -4,7 +4,7 @@
 Wikipedia tools (for Humans)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Get Wikipedia article info and Wikidata via MediaWiki APIs:
+Python and command-line MediaWiki access for Humans
 
 - get page extracts, image, Infobox data, Wikidata, and more
 - get a random page, category, or site
@@ -18,7 +18,7 @@ __author__ = "siznax"
 __contact__ = "https://github.com/siznax/wptools"
 __license__ = "MIT"
 __title__ = "wptools"
-__version__ = "0.3"
+__version__ = "0.4"
 
 from . import core
 from . import query

@@ -3,6 +3,17 @@
 Release History
 ---------------
 
+0.4 (2017-09-23)
+++++++++++++++++
+
+* Increased test coverage to 93%, pylint score 10.0
+* Added more page data, split off expensive queries
+* Implemented basic category and site functionality
+* Changed page._WIKIPROPS to wikidata.LABELS
+* Refactored attributes to only cache, data, flags, params
+* Unified Wikimedia APIs access pattern via wptools.core
+
+
 0.3 (2017-08-13)
 ++++++++++++++++
 
