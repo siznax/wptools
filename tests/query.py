@@ -1,530 +1,1608 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&cllimit=500&clshow=!hidden&exintro&formatversion=2&imlimit=500&inprop=url|watchers&list=random&lllimit=500&pithumbsize=240&ppprop=wikibase_item&prop=categories|contributors|extracts|images|info|langlinks|pageimages|pageprops|pageterms|pageviews&redirects&rnlimit=1&rnnamespace=0&titles=Douglas_Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas%20Adams'
 
 response = r"""
 {
+    "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.785443924704|0.785444075093|5676344|0",
-        "pccontinue": "8091|1591",
-        "continue": "||categories|extracts|images|info|langlinks|pageimages|pageprops|pageterms|pageviews"
+        "rncontinue": "0.855352545904|0.8553532323190001|23584133|0",
+        "continue": "-||extracts|info|links|pageimages|pageprops|pageterms"
     },
     "query": {
-        "normalized": [
-            {
-                "fromencoded": false,
-                "from": "Douglas_Adams",
-                "to": "Douglas Adams"
-            }
-        ],
         "pages": [
             {
                 "pageid": 8091,
                 "ns": 0,
                 "title": "Douglas Adams",
-                "categories": [
-                    {
-                        "ns": 14,
-                        "title": "Category:1952 births"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:2001 deaths"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:20th-century English novelists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:20th-century atheists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:21st-century British novelists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:21st-century atheists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Alumni of St John's College, Cambridge"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Audio book narrators"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:BBC radio producers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:British atheism activists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:British child writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Burials at Highgate Cemetery"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Critics of religions"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Douglas Adams"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English atheists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English comedy writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English humanists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English humorists"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English radio writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English science fiction writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English social commentators"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:English television writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Infocom"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Interactive fiction writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Monty Python"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Non-fiction environmental writers"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:People educated at Brentwood School (Essex)"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:People from Cambridge"
-                    },
-                    {
-                        "ns": 14,
-                        "title": "Category:Usenet people"
-                    }
-                ],
-                "anoncontributors": 817,
-                "contributors": [
-                    {
-                        "userid": 16,
-                        "name": "General Wesc"
-                    },
-                    {
-                        "userid": 52,
-                        "name": "Eloquence"
-                    },
-                    {
-                        "userid": 74,
-                        "name": "Espen"
-                    },
-                    {
-                        "userid": 83,
-                        "name": "Tarquin"
-                    },
-                    {
-                        "userid": 90,
-                        "name": "Koyaanis Qatsi"
-                    },
-                    {
-                        "userid": 584,
-                        "name": "Danny"
-                    },
-                    {
-                        "userid": 637,
-                        "name": "Shsilver"
-                    },
-                    {
-                        "userid": 672,
-                        "name": "XJaM"
-                    },
-                    {
-                        "userid": 835,
-                        "name": "Rmhermen"
-                    },
-                    {
-                        "userid": 1411,
-                        "name": "Roadrunner"
-                    }
-                ],
                 "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>",
-                "images": [
+                "contentmodel": "wikitext",
+                "pagelanguage": "en",
+                "pagelanguagehtmlcode": "en",
+                "pagelanguagedir": "ltr",
+                "touched": "2017-11-15T08:35:40Z",
+                "lastrevid": 810162769,
+                "length": 60137,
+                "watchers": 452,
+                "fullurl": "https://en.wikipedia.org/wiki/Douglas_Adams",
+                "editurl": "https://en.wikipedia.org/w/index.php?title=Douglas_Adams&action=edit",
+                "canonicalurl": "https://en.wikipedia.org/wiki/Douglas_Adams",
+                "links": [
                     {
-                        "ns": 6,
-                        "title": "File:Blue pencil.svg"
+                        "ns": 0,
+                        "title": ".Mac"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Commons-logo.svg"
+                        "ns": 0,
+                        "title": "18610 Arthurdent"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:DNA in Monty Python.jpg"
+                        "ns": 0,
+                        "title": "25924 Douglasadams"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Dirk Gently's Holistic Detective Agency.svg"
+                        "ns": 0,
+                        "title": "42 Puzzle"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "69105 (number)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "A Christmas Fairly Story"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "A Mind Forever Voyaging"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Activision"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Albert Vezza"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "American Atheists"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Amy Briggs"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "And Another Thing... (novel)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Anthony Read"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "AppleMasters"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Apple Macintosh"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Apricot Computers"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Artemis Fowl (series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Arthur: The Quest for Excalibur"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Arthur Dent"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Atheist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Atherosclerosis"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Audiobook"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Author"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BAFTA"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC7"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC Micro"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC One"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC Online"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC Radio 4"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BBC Two"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BIBSYS"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Ballyhoo (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BattleTech: The Crescent Hawk's Inception"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "BattleTech: The Crescent Hawk's Revenge"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Beyond Zork"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Biblioteca Nacional de España"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bibliothèque nationale de France"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bidenichthys beeblebroxi"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Big Finish Productions"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Black Cinderella Two Goes East"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Black rhino"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Black rhinoceros"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Blue plaque"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bob Bates"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Book at Bedtime"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Border Zone (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Brain Damage (song)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Brentwood, Essex"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Brentwood School (England)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Brentwood School (Essex)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Brian Moriarty"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bruce Daniels"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bureaucracy (computer game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Bureaucracy (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cambridge"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cambridge Z88"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cardiac arrhythmia"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Channel9.msdn.com"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Channel 9 (discussion forum)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Charles Thomson (artist)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Chinese river dolphin"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Christopher Cerf (musician and television producer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Christopher H. Bidmead"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "CiNii"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Circuit's Edge"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "City of Death"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Classic Text Adventure Masterpieces of Infocom"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cocoa (API)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Codie"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Collaborative writing"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Commodore PET"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Conservation movement"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cornerstone (software)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Cutthroats"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dave Lebling"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "David Agnew"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "David Fisher (writer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "David Gilmour"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "David Irving"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Deadline (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Destiny of the Daleks"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dian Fossey"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Digital Equipment Corporation"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk (play)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Gently"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Gently's Holistic Detective Agency"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Gently's Holistic Detective Agency (TV series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Gently's Holistic Detective Agency (radio serial)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Gently (TV series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dirk Maggs"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Disney"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor Snuggles"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor Who"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor Who (season 16)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor Who spin-offs"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor in the House (TV series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Doctor on the Go"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Don't Panic: The Official Hitchhiker's Guide to the Galaxy Companion"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Douglas Adams's Guide to The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Douglas Adams's Starship Titanic"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Douglas Adams (disambiguation)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Douglas Adams at the BBC"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Dramatist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "E-book"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Eagle (comic)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Early adopter"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "East End of London"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Eclipse (song)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Edinburgh Fringe"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Embedded Systems Conference"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Embedded system"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Enchanter (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Encyclopedia Galactica"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Endangered species"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "English literature"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Environmental activist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Eoin Colfer"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Erechthias beeblebroxi"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Essayist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Exhibition (scholarship)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Find a Grave"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Fine-tuned Universe"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Fooblitzky"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Footlights"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Ford Prefect (character)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Gareth Roberts (writer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Geoffrey Perkins"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Get Lamp"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Google Doodle"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Graham Chapman"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Graham Williams (television producer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Great Ape Project"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Gregory Hines"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Griff Rhys Jones"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Grue (monster)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "H2g2"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Harmony Books"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Harvey Mudd College"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hello, sailor"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Highgate Cemetery"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hitch-hiker's Guide to Europe"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hitchcon"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hitchhiker: A Biography of Douglas Adams"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hollywood Hijinx"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hugo Award"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hugo Award for Best Dramatic Presentation"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hyperland"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Hypertext"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "IMDb"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "IMovie"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "ITV (TV network)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Implementer (video games)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Infidel (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "InfoTaskForce"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Infocom"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Innsbruck"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Institute for Advanced Technology in the Humanities"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Integrated Authority File"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Interactive fiction"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "International Standard Book Number"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "International Standard Name Identifier"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "International Standard Serial Number"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "InvisiClues"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Islington"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Istituto Centrale per il Catalogo Unico"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Jack Straw"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "James Clavell's Shōgun"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "James Goss (producer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Jane Belson"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Joe Ybarra"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "John Cleese"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "John Lloyd (producer)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Journey (1989 video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Kakapo"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Karey Kirkpatrick"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Kim Fuller"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Knowledge Navigator"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "LIBRIS"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Labyrinth: The Computer Game"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Last Chance to See"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Leather Goddesses of Phobos"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Leather Goddesses of Phobos 2: Gas Pump Girls Meet the Pulsating Inconvenience from Planet X!"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Legend Entertainment"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Legends of Zork"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Library of Congress Control Number"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Life, the Universe and Everything"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of Doctor Who serials"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of Monty Python's Flying Circus episodes"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of humorists"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of minor The Hitchhiker's Guide to the Galaxy characters"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of races and species in The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "List of recurring Monty Python's Flying Circus characters"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Lucasfilm Games"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "MacUser"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mac OS X"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Marc Blank"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mark Carwardine"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Marvin (character)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Michael Berlyn"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Michael Palin"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Microsoft"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mines of Titan"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Minor Planet Center"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Minor Planet Circular"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Montecito, California"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Monty Python"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Monty Python's Flying Circus"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Moonmist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mostly Harmless"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mount Kilimanjaro"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Mountain gorilla"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "MusicBrainz"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Myocardial infarction"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "National Diet Library"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "National Library of Australia"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "National Library of the Czech Republic"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "National Public Radio"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Natural history"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Neil Gaiman"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Neil Innes"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Noel Edmonds"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Nord and Bert Couldn't Make Head or Tail of It"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Northern white rhinoceros"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Not the Nine O'Clock News"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "One of These Nights"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Out of the Trees"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Paola Cavalieri"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Patient Abuse"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Paul McCartney"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Paul McGann"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Paul Neil Milne Johnstone"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Paul Wickens"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Peter Fincham"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Peter Singer"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Peter Stothard"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Phrases from The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Pilot (Dirk Gently)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Pink Floyd"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Places in The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Planetfall"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Plundered Hearts"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Preparatory school (UK)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Procol Harum"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Professional Developers Conference"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Professor Chronotis"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Quarterstaff: The Tomb of Setmoth"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "RSPCA"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Radio Academy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Rainbow 100"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Return to Zork"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Richard Dawkins"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Robin Day"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Russian State Library"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Sally Emerson"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Salon (website)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Santa Barbara, California"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Satirist"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Save the Rhino"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Science fiction writer"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Screenwriter"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Script editor"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Scriptwriter"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Seastalker"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Shada (Doctor Who)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Sherlock: The Riddle of the Crown Jewels"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Sic"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Simon & Schuster"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Simon Brett"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Simon Jones (actor)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Slartibartfast"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "So Long, and Thanks for All the Fish"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Somebody else's problem"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Sorcerer (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Spellbreaker"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "St. Cedd's College, Cambridge"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "St John's College, Cambridge"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "St Martin-in-the-Fields"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Starcross (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Starship Titanic"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Stationfall"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Stephen Fry"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Steve Meretzky"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Steven Moffat"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Strike action"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Stuckism"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Suspect (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Suspended"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Système universitaire de documentation"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "TED (conference)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Tandy 1000"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Tanzania"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Technological innovation"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Technology in The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Ted Nelson"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Terry Jones"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Album of the Soundtrack of the Trailer of the Film of Monty Python and the Holy Grail"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Beatles"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Burkiss Way"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Daily Telegraph"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Deeper Meaning of Liff"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Digital Village"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Division Bell"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Doctor (Doctor Who)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Five Doctors"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The God Delusion"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Guardian"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Future"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy: The Original Radio Scripts"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (TV series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (book)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (computer game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (fictional)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (film)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (novel)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (radio series)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy Primary and Secondary Phases"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy Tertiary to Quintessential Phases"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Hitchhiker's Guide to the Galaxy cast lists"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Independent on Sunday"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Key to Time"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Long Dark Tea-Time of the Soul"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Long Dark Tea-Time of the Soul (radio serial)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Lost Treasures of Infocom"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Lurking Horror"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Meaning of Liff"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The News Huddlines"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Pirate Planet"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Private Life of Genghis Khan"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Restaurant at the End of the Universe"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Salmon of Doubt"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Snowmen"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Times"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Utterly Utterly Merry Comic Relief Christmas Book"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "The Witness (1983 video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Tim Anderson (Zork)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Timeline of The Hitchhiker's Guide to the Galaxy versions"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Tom Baker"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Tombs & Treasure"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Towel Day"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Trafalgar Square"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Trillian (character)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Trinity (video game)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "USENET"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Upper Street"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Virtual International Authority File"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Vogon"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Wayback Machine"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Webcast"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Week Ending"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "West End of London"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Westwood Studios"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "William Blake"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "William Todd-Jones"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Wish You Were Here (1975 song)"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Wishbringer"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Word processor"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "WorldCat"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Writer's block"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Young Zaphod Plays It Safe"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Z-machine"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zaire"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zaphod Beeblebrox"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork: Grand Inquisitor"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork: The Undiscovered Underground"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork I"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork II"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork III"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork Nemesis"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork Zero"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "Zork books"
+                    },
+                    {
+                        "ns": 4,
+                        "title": "Wikipedia:LIBRARY"
+                    },
+                    {
+                        "ns": 4,
+                        "title": "Wikipedia:Media help"
+                    },
+                    {
+                        "ns": 4,
+                        "title": "Wikipedia:Spoken articles"
                     },
                     {
                         "ns": 6,
                         "title": "File:Douglas Adams Part 1.ogg"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Douglas Adams Part 2.ogg"
+                        "ns": 10,
+                        "title": "Template:Dirk Gently"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Douglas Adams San Francisco.jpg"
+                        "ns": 10,
+                        "title": "Template:Douglas Adams"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Douglas adams portrait cropped.jpg"
+                        "ns": 10,
+                        "title": "Template:Infocom games"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Grave of Douglas Adams, Highgate.jpg"
+                        "ns": 10,
+                        "title": "Template:The Hitchhiker's Guide to the Galaxy"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Sound-icon.svg"
+                        "ns": 11,
+                        "title": "Template talk:Dirk Gently"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Towelday-Innsbruck.jpg"
+                        "ns": 11,
+                        "title": "Template talk:Douglas Adams"
                     },
                     {
-                        "ns": 6,
-                        "title": "File:Wikiquote-logo.svg"
-                    }
-                ],
-                "contentmodel": "wikitext",
-                "pagelanguage": "en",
-                "pagelanguagehtmlcode": "en",
-                "pagelanguagedir": "ltr",
-                "touched": "2017-08-19T05:50:29Z",
-                "lastrevid": 793736590,
-                "length": 60069,
-                "watchers": 447,
-                "fullurl": "https://en.wikipedia.org/wiki/Douglas_Adams",
-                "editurl": "https://en.wikipedia.org/w/index.php?title=Douglas_Adams&action=edit",
-                "canonicalurl": "https://en.wikipedia.org/wiki/Douglas_Adams",
-                "langlinks": [
-                    {
-                        "lang": "ar",
-                        "title": "دوغلاس آدمز"
-                    },
-                    {
-                        "lang": "arz",
-                        "title": "دوجلاس ادامز"
-                    },
-                    {
-                        "lang": "ast",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "az",
-                        "title": "Duqlas Adams"
-                    },
-                    {
-                        "lang": "azb",
-                        "title": "داقلاس آدامز"
-                    },
-                    {
-                        "lang": "bar",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "be",
-                        "title": "Дуглас Адамс"
-                    },
-                    {
-                        "lang": "be-x-old",
-                        "title": "Дуглас Адамз"
-                    },
-                    {
-                        "lang": "bg",
-                        "title": "Дъглас Адамс"
-                    },
-                    {
-                        "lang": "bn",
-                        "title": "ডগলাস অ্যাডামস"
-                    },
-                    {
-                        "lang": "bs",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ca",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "cs",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "cy",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "da",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "de",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "el",
-                        "title": "Ντάγκλας Άνταμς"
-                    },
-                    {
-                        "lang": "eo",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "es",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "et",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "eu",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "fa",
-                        "title": "داگلاس آدامز"
-                    },
-                    {
-                        "lang": "fi",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "fr",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ga",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "gl",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "he",
-                        "title": "דאגלס אדמס"
-                    },
-                    {
-                        "lang": "hr",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "hu",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "hy",
-                        "title": "Դուգլաս Ադամս"
-                    },
-                    {
-                        "lang": "id",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "io",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "is",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "it",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ja",
-                        "title": "ダグラス・アダムズ"
-                    },
-                    {
-                        "lang": "jv",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ka",
-                        "title": "დაგლას ადამსი"
-                    },
-                    {
-                        "lang": "ko",
-                        "title": "더글러스 애덤스"
-                    },
-                    {
-                        "lang": "la",
-                        "title": "Duglassius Adams"
-                    },
-                    {
-                        "lang": "lv",
-                        "title": "Duglass Adamss"
-                    },
-                    {
-                        "lang": "mg",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "mk",
-                        "title": "Даглас Адамс"
-                    },
-                    {
-                        "lang": "ml",
-                        "title": "ഡഗ്ലസ് ആഡംസ്"
-                    },
-                    {
-                        "lang": "mr",
-                        "title": "डग्लस अ‍ॅडम्स"
-                    },
-                    {
-                        "lang": "mrj",
-                        "title": "Адамс, Дуглас"
-                    },
-                    {
-                        "lang": "nl",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "nn",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "no",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "oc",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "pl",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "pt",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ro",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "ru",
-                        "title": "Адамс, Дуглас"
-                    },
-                    {
-                        "lang": "sc",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "sco",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "sh",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "simple",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "sk",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "sl",
-                        "title": "Douglas Adams"
-                    },
-                    {
-                        "lang": "sq",
-                        "title": "Douglas Adams"
+                        "ns": 11,
+                        "title": "Template talk:Infocom games"
                     },
                     {
-                        "lang": "sr",
-                        "title": "Даглас Адамс"
+                        "ns": 11,
+                        "title": "Template talk:The Hitchhiker's Guide to the Galaxy"
                     },
                     {
-                        "lang": "sv",
-                        "title": "Douglas Adams"
+                        "ns": 12,
+                        "title": "Help:Authority control"
                     },
                     {
-                        "lang": "ta",
-                        "title": "டக்ளஸ் ஆடம்ஸ்"
+                        "ns": 12,
+                        "title": "Help:CS1 errors"
                     },
                     {
-                        "lang": "tr",
-                        "title": "Douglas Adams"
+                        "ns": 14,
+                        "title": "Category:CS1 maint: Extra text: authors list"
                     },
                     {
-                        "lang": "uk",
-                        "title": "Дуглас Адамс"
+                        "ns": 14,
+                        "title": "Category:CS1 maint: Extra text: editors list"
                     },
                     {
-                        "lang": "ur",
-                        "title": "ڈگلس ایڈمس"
+                        "ns": 14,
+                        "title": "Category:CS1 maint: Multiple names: authors list"
                     },
                     {
-                        "lang": "vep",
-                        "title": "Adams Duglas"
+                        "ns": 14,
+                        "title": "Category:The Hitchhiker's Guide to the Galaxy"
                     },
                     {
-                        "lang": "vi",
-                        "title": "Douglas Adams"
+                        "ns": 14,
+                        "title": "Category:Use British English from October 2013"
                     },
                     {
-                        "lang": "war",
-                        "title": "Douglas Adams"
+                        "ns": 14,
+                        "title": "Category:Use dmy dates from April 2015"
                     },
                     {
-                        "lang": "zh",
-                        "title": "道格拉斯·亚当斯"
+                        "ns": 100,
+                        "title": "Portal:Hitchhiker's"
                     }
                 ],
                 "thumbnail": {
@@ -537,88 +1615,26 @@ response = r"""
                     "wikibase_item": "Q42"
                 },
                 "terms": {
-                    "description": [
-                        "English writer and humorist"
-                    ],
-                    "label": [
-                        "Douglas Adams"
-                    ],
                     "alias": [
                         "Douglas Noël Adams",
                         "Douglas Noel Adams",
                         "Douglas N. Adams",
                         "DNA"
+                    ],
+                    "description": [
+                        "English writer and humorist"
+                    ],
+                    "label": [
+                        "Douglas Adams"
                     ]
-                },
-                "pageviews": {
-                    "2017-06-19": 1315,
-                    "2017-06-20": 1238,
-                    "2017-06-21": 1184,
-                    "2017-06-22": 1168,
-                    "2017-06-23": 1138,
-                    "2017-06-24": 1061,
-                    "2017-06-25": 1245,
-                    "2017-06-26": 1346,
-                    "2017-06-27": 1162,
-                    "2017-06-28": 1321,
-                    "2017-06-29": 1299,
-                    "2017-06-30": 1249,
-                    "2017-07-01": 1103,
-                    "2017-07-02": 1613,
-                    "2017-07-03": 1246,
-                    "2017-07-04": 1322,
-                    "2017-07-05": 1302,
-                    "2017-07-06": 1348,
-                    "2017-07-07": 1192,
-                    "2017-07-08": 1180,
-                    "2017-07-09": 1302,
-                    "2017-07-10": 1387,
-                    "2017-07-11": 1287,
-                    "2017-07-12": 1289,
-                    "2017-07-13": 1286,
-                    "2017-07-14": 1253,
-                    "2017-07-15": 1106,
-                    "2017-07-16": 1407,
-                    "2017-07-17": 1478,
-                    "2017-07-18": 1430,
-                    "2017-07-19": 1309,
-                    "2017-07-20": 1193,
-                    "2017-07-21": 1202,
-                    "2017-07-22": 1214,
-                    "2017-07-23": 1539,
-                    "2017-07-24": 1791,
-                    "2017-07-25": 1729,
-                    "2017-07-26": 1799,
-                    "2017-07-27": 1704,
-                    "2017-07-28": 1784,
-                    "2017-07-29": 1723,
-                    "2017-07-30": 1603,
-                    "2017-07-31": 1657,
-                    "2017-08-01": 1548,
-                    "2017-08-02": 1504,
-                    "2017-08-03": 1387,
-                    "2017-08-04": 1260,
-                    "2017-08-05": 1260,
-                    "2017-08-06": 1315,
-                    "2017-08-07": 1344,
-                    "2017-08-08": 1554,
-                    "2017-08-09": 1474,
-                    "2017-08-10": 1358,
-                    "2017-08-11": 1345,
-                    "2017-08-12": 1253,
-                    "2017-08-13": 1315,
-                    "2017-08-14": 1344,
-                    "2017-08-15": 1331,
-                    "2017-08-16": 1413,
-                    "2017-08-17": 1248
                 }
             }
         ],
         "random": [
             {
-                "id": 45564415,
+                "id": 1158197,
                 "ns": 0,
-                "title": "1990 NBL Finals"
+                "title": "Hope Bay"
             }
         ]
     }

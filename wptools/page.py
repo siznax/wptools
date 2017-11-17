@@ -194,7 +194,7 @@ class WPToolsPage(WPToolsRESTBase,
 
         infobox = utils.get_infobox(parsetree)
         self.data['infobox'] = infobox
-        self.data['links'] = utils.get_links(pdata.get('iwlinks'))
+        self.data['iwlinks'] = utils.get_links(pdata.get('iwlinks'))
 
         title = pdata.get('title')
         if title:
@@ -263,6 +263,8 @@ class WPToolsPage(WPToolsRESTBase,
         if length:
             self.data['length'] = length
 
+        self.data['links'] = utils.get_links(page.get('links'))
+
         modified = page.get('touched')
         if modified:
             if 'modified' in self.data:
@@ -272,10 +274,20 @@ class WPToolsPage(WPToolsRESTBase,
 
         pageprops = page.get('pageprops')
         if pageprops:
+
             wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.data['wikibase'] = wikibase
                 self.data['wikidata_url'] = utils.wikidata_url(wikibase)
+
+            if 'disambiguation' in pageprops:
+                self.data['disambiguation'] = len(self.data['links'])
+
+    def _set_query_data_fast_2(self, page):
+        """
+        set less expensive action=query response data PART 2
+        """
+        self.data['pageid'] = page.get('pageid')
 
         terms = page.get('terms')
         if terms:
@@ -284,12 +296,6 @@ class WPToolsPage(WPToolsRESTBase,
                                                 None)
             if terms.get('label'):
                 self.data['label'] = next(iter(terms['label']), None)
-
-    def _set_query_data_fast_2(self, page):
-        """
-        set less expensive action=query response data PART 2
-        """
-        self.data['pageid'] = page.get('pageid')
 
         title = page.get('title')
         self.data['title'] = title
@@ -485,7 +491,7 @@ class WPToolsPage(WPToolsRESTBase,
         Data captured:
         - image: <dict> {parse-image, parse-cover}
         - infobox: <dict> Infobox data as python dictionary
-        - links: <list> interwiki links (iwlinks)
+        - iwlinks: <list> interwiki links
         - pageid: <int> Wikipedia database ID
         - parsetree: <str> XML parse tree
         - wikibase: <str> Wikidata entity ID or wikidata URL

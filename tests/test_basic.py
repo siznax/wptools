@@ -10,6 +10,7 @@ import wptools
 
 from . import category
 from . import claims
+from . import disambiguation
 from . import imageinfo
 from . import parse
 from . import query
@@ -138,7 +139,7 @@ class WPToolsCoreTestCase(unittest.TestCase):
 
         qstr = page.query('query')
         start = 'https://en.wikipedia.org/w/api.php?action=query'
-        end = '&titles=Douglas_Adams'
+        end = '&titles=Douglas%20Adams'
         self.assertTrue(qstr.startswith(start))
         self.assertTrue(qstr.endswith(end))
 
@@ -262,7 +263,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         data = page.data
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(len(data['infobox']), 15)
-        self.assertEqual(len(data['links']), 2)
+        self.assertEqual(len(data['iwlinks']), 2)
         self.assertEqual(len(data['parsetree']), 78594)
         self.assertEqual(len(data['wikitext']), 65836)
         self.assertEqual(str(data['title']), 'Douglas Adams')
@@ -279,14 +280,11 @@ class WPToolsPageTestCase(unittest.TestCase):
         data = page.data
         self.assertEqual(data['description'], 'English writer and humorist')
         self.assertEqual(data['label'], 'Douglas Adams')
-        self.assertEqual(data['length'], 60069)
+        self.assertEqual(data['length'], 60137)
         self.assertEqual(data['pageid'], 8091)
-        self.assertEqual(data['views'], 1362)
-        self.assertEqual(data['watchers'], 447)
-        self.assertEqual(len(data['categories']), 29)
-        self.assertEqual(len(data['files']), 12)
+        self.assertEqual(data['watchers'], 452)
         self.assertEqual(len(data['image']), 2)
-        self.assertEqual(len(data['languages']), 70)
+        self.assertEqual(len(data['links']), 373)
         self.assertEqual(str(data['wikibase']), 'Q42')
         self.assertTrue('page' in data['modified'])
         self.assertTrue(data['extext'].startswith('**Douglas'))
@@ -333,8 +331,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'random': query.cache}
         page._set_data('random')
         page.get_random()
-        self.assertEqual(page.data['pageid'], 45564415)
-        self.assertEqual(page.data['title'], '1990 NBL Finals')
+        self.assertEqual(page.data['pageid'], 1158197)
+        self.assertEqual(page.data['title'], 'Hope Bay')
 
     def test_page_get_restbase(self):
         page = wptools.page('TEST', endpoint='summary', silent=True)
@@ -364,6 +362,14 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.data['image'] = [{'kind': 'TEST'}, {'kind': 'TESTMORE'}]
         page.pageimage()
         page.pageimage('MORE')
+
+    def test_page_get_disambiguation(self):
+        page = wptools.page('TEST', silent=True)
+        page.cache = {'query': disambiguation.cache}
+        page._set_data('query')
+        data = page.data
+        self.assertEqual(data['disambiguation'], 10)
+        self.assertEqual(len(data['links']), 10)
 
 
 class WPToolsQueryTestCase(unittest.TestCase):

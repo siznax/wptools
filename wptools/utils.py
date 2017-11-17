@@ -28,13 +28,19 @@ def get_infobox(ptree):
             return template_to_dict(item)
 
 
-def get_links(iwlinks):
+def get_links(rlinks):
     """
-    returns list of interwiki links get_parse/iwlinks
+    returns list of titles/urls from query/parse links response
     """
+    if rlinks is None:
+        return
     links = []
-    for item in iwlinks:
-        links.append(item['url'])
+    for item in rlinks:
+        if 'url' in item:
+            links.append(item['url'])
+        if 'title' in item and 'ns' in item:
+            if item['ns'] == 0:  # articles only
+                links.append(item['title'])
     return sorted(links) if links else None
 
 
