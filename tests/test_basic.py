@@ -15,6 +15,7 @@ from . import imageinfo
 from . import parse
 from . import query
 from . import querymore
+from . import redirect
 from . import rest_lead
 from . import rest_html
 from . import rest_summary
@@ -370,6 +371,14 @@ class WPToolsPageTestCase(unittest.TestCase):
         data = page.data
         self.assertEqual(data['disambiguation'], 10)
         self.assertEqual(len(data['links']), 10)
+
+    def test_page_get_redirect(self):
+        page = wptools.page('TEST', silent=True)
+        page.cache = {'query': redirect.cache}
+        page._set_data('query')
+        data = page.data
+        self.assertEqual(data['redirected'][0]['from'], u'Adams, Douglas')
+        self.assertEqual(len(data['redirects']), 10)
 
 
 class WPToolsQueryTestCase(unittest.TestCase):

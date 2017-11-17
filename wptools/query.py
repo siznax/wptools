@@ -69,7 +69,7 @@ class WPToolsQuery(object):
         "&pithumbsize=240"
         "&pllimit=500"
         "&ppprop=disambiguation|wikibase_item"
-        "&prop=extracts|info|links|pageimages|pageprops|pageterms"
+        "&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects"
         "&redirects"
         "&rnlimit=1"
         "&rnnamespace=0"

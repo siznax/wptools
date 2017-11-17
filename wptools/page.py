@@ -237,6 +237,9 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
 
+        if 'redirects' in data['query']:
+            self.data['redirected'] = data['query']['redirects']
+
         self._set_query_data_fast_1(page)  # avoid pylint too-many-branches
         self._set_query_data_fast_2(page)
         self._set_query_data_slow(page)
@@ -288,6 +291,10 @@ class WPToolsPage(WPToolsRESTBase,
         set less expensive action=query response data PART 2
         """
         self.data['pageid'] = page.get('pageid')
+
+        redirects = page.get('redirects')
+        if redirects:
+            self.data['redirects'] = redirects
 
         terms = page.get('terms')
         if terms:
