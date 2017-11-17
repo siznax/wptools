@@ -71,6 +71,7 @@ class WPToolsQuery(object):
         "&ppprop=disambiguation|wikibase_item"
         "&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects"
         "&redirects"
+        "&rdlimit=500"
         "&rnlimit=1"
         "&rnnamespace=0"
         "&titles=${TITLES}"))

@@ -1,13 +1,13 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects&redirects&rnlimit=1&rnnamespace=0&titles=Adams%2C%20Douglas'
+query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects&redirects&rdlimit=500&rnlimit=1&rnnamespace=0&titles=Adams%2C%20Douglas'
 
 response = r"""
 {
+    "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.690075033014|0.690075589487|46989360|0",
-        "rdcontinue": "35473253",
-        "continue": "||extracts|info|links|pageimages|pageprops|pageterms"
+        "rncontinue": "0.451758138282|0.451758516273|3968730|0",
+        "continue": "-||extracts|info|links|pageimages|pageprops|pageterms|redirects"
     },
     "query": {
         "redirects": [
@@ -1684,15 +1684,25 @@ response = r"""
                         "pageid": 31976318,
                         "ns": 0,
                         "title": "Douglas Adams bibliography"
+                    },
+                    {
+                        "pageid": 35473253,
+                        "ns": 0,
+                        "title": "Adams, Douglas Noël"
+                    },
+                    {
+                        "pageid": 41687224,
+                        "ns": 0,
+                        "title": "Adamsian"
                     }
                 ]
             }
         ],
         "random": [
             {
-                "id": 48746789,
+                "id": 6759437,
                 "ns": 0,
-                "title": "Phil Hyde (cricketer)"
+                "title": "Barbara Loden"
             }
         ]
     }

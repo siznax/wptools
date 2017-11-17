@@ -378,7 +378,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         page._set_data('query')
         data = page.data
         self.assertEqual(data['redirected'][0]['from'], u'Adams, Douglas')
-        self.assertEqual(len(data['redirects']), 10)
+        self.assertEqual(len(data['redirects']), 12)
 
 
 class WPToolsQueryTestCase(unittest.TestCase):
