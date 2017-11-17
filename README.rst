@@ -73,6 +73,8 @@ Example
       parsetree: <str(333405)> <root><template><title>Redirect</title>...
       properties: <dict(7)> P27, P569, P345, P18, P910, P31, P570
       random: Catlins River
+      redirected: <list(1)> {u'to': u'Mahatma Gandhi', u'from': u'Gandhi'}
+      redirects: <list(53)> {u'ns': 0, u'pageid': 55342, u'title': u'M...
       title: Mahatma_Gandhi
       url: https://en.wikipedia.org/wiki/Mahatma_Gandhi
       url_raw: https://en.wikipedia.org/wiki/Mahatma_Gandhi?action=raw
