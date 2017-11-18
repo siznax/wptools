@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4 (2017-09-23)
-++++++++++++++++
+0.4.1 (2017-11-17)
+++++++++++++++++++
 
+* Surfaced redirects, disambiguation links
 * Increased test coverage to 93%, pylint score 10.0
 * Added more page data, split off expensive queries
 * Implemented basic category and site functionality
