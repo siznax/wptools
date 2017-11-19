@@ -191,7 +191,6 @@ class WPToolsWikidata(core.WPTools):
         set wikidata from claims and labels
         """
         claims = self.data['claims']
-        self.data['wikidatl'] = {}
 
         for ent in claims:
 
