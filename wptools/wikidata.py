@@ -21,6 +21,8 @@ class WPToolsWikidata(core.WPTools):
     WPToolsWikidata class
     """
 
+    WANTED = None
+
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsWikidata object
@@ -60,15 +62,23 @@ class WPToolsWikidata(core.WPTools):
 
     def _marshal_claims(self, query_claims):
         """
-        set Wikidata properties and entities from query claims
+        set Wikidata entities from query claims
         """
         claims = self._reduce_claims(query_claims)
         # self.data['claimq'] = query_claims
         self.data['claims'] = claims
-        entities = set()
 
+        entities = set()
         for eid in claims:
-            entities.add(eid)  # P (property)
+
+            if self.WANTED:
+                if eid in self.WANTED or eid == 'P31':
+                    entities.add(eid)  # P (property)
+                else:
+                    continue  # get only wanted entities
+            else:
+                entities.add(eid)  # P (property)
+
             for val in claims[eid]:
                 if utils.is_text(val) and re.match(r'^Q\d+$', val):
                     entities.add(val)  # Q (item)
@@ -91,6 +101,42 @@ class WPToolsWikidata(core.WPTools):
             return qobj.wikidata(self.params.get('title'),
                                  self.params.get('wikibase'))
 
+    def _reduce_claims(self, query_claims):
+        """
+        returns claims as reduced dict {P: [Q's or values]}
+            P = property
+            Q = item
+        """
+        claims = collections.defaultdict(list)
+
+        for claim in query_claims:
+
+            for ent in query_claims.get(claim):
+
+                try:
+                    snak = ent.get('mainsnak').get('datavalue').get('value')
+                except AttributeError:
+                    claims[claim] = []
+
+                try:
+                    if snak.get('id'):
+                        val = snak.get('id')
+                    elif snak.get('text'):
+                        val = snak.get('text')
+                    elif snak.get('time'):
+                        val = snak.get('time')
+                    else:
+                        val = snak
+                except AttributeError:
+                    val = snak
+
+                if not val or not [x for x in val if x]:
+                    raise ValueError("%s %s" % (claim, ent))
+
+                claims[claim].append(val)
+
+        return dict(claims)
+
     def _set_data(self, action):
         """
         capture Wikidata API response data
@@ -104,7 +150,7 @@ class WPToolsWikidata(core.WPTools):
 
     def _set_labels(self):
         """
-        set property claim labels from get_claims()
+        set entity labels from get_labels()
         """
         data = self._load_response('labels')
         entities = data.get('entities')
@@ -179,6 +225,27 @@ class WPToolsWikidata(core.WPTools):
                     'kind': 'wikidata-image',
                     'file': img})
 
+    def _update_images(self):
+        """
+        add images from Wikidata
+        """
+        images = {}
+        for item in self.data['wikidata']:
+            if '(P18)' in item:  # P18 image property
+                images[item] = self.data['wikidata'][item]
+
+        if images:
+            img_files = []
+            if 'image' in self.data:
+                img_files = [x.get('file') for x in self.data['image']]
+            else:
+                self.data['image'] = []
+
+            for img in images:
+                if img not in img_files:
+                    self.data['image'].append({'file': images[img],
+                                               'kind': img})
+
     def _update_what(self):
         """
         set what this thing is! "instance of (P31)"
@@ -194,59 +261,25 @@ class WPToolsWikidata(core.WPTools):
 
         for ent in claims:
 
-            claim = []
-            # P (property) label
-            plabel = "%s (%s)" % (self.data['labels'][ent], ent)
+            plabel = self.data['labels'].get(ent)  # P (property) label
+            if plabel:
+                plabel = "%s (%s)" % (plabel, ent)
 
+            claim = []
             for item in claims[ent]:
+                ilabel = item
                 if utils.is_text(item) and re.match(r'^Q\d+$', item):
-                    # Q (item) label
-                    ilabel = "%s (%s)" % (self.data['labels'][item], item)
-                else:
-                    ilabel = item
+                    ilabel = self.data['labels'].get(item)  # Q (item) label
+                    if ilabel:
+                        ilabel = "%s (%s)" % (ilabel, item)
 
                 if len(claims[ent]) == 1:
                     claim = ilabel
                 else:
                     claim.append(ilabel)
 
-            self.data['wikidata'][plabel] = claim
-
-    def _reduce_claims(self, query_claims):
-        """
-        returns claims as reduced dict {P: [Q's or values]}
-            P = property
-            Q = item
-        """
-        claims = collections.defaultdict(list)
-
-        for claim in query_claims:
-
-            for ent in query_claims.get(claim):
-
-                try:
-                    snak = ent.get('mainsnak').get('datavalue').get('value')
-                except AttributeError:
-                    claims[claim] = []
-
-                try:
-                    if snak.get('id'):
-                        val = snak.get('id')
-                    elif snak.get('text'):
-                        val = snak.get('text')
-                    elif snak.get('time'):
-                        val = snak.get('time')
-                    else:
-                        val = snak
-                except AttributeError:
-                    val = snak
-
-                if not val or not [x for x in val if x]:
-                    raise ValueError("%s %s" % (claim, ent))
-
-                claims[claim].append(val)
-
-        return dict(claims)
+            if plabel and ilabel:
+                self.data['wikidata'][plabel] = claim
 
     def get_labels(self, show=True, proxy=None, timeout=0):
         """
@@ -254,13 +287,13 @@ class WPToolsWikidata(core.WPTools):
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
         Required {data}: entities
-            e.g. entities: [u'P31', u'Q5']
+            e.g. data['entities']: [u'P31', u'Q5']
 
         Data captured:
-            labels: {'P17': 'country'}
+            labels: {'P17': 'country', ...}
             wikidata: {'country (P17)': 'Chile (Q298)'}
 
-        Use wikidata.get_wikidata() to populate data['entities']
+        Use get_wikidata() to populate data['entities']
         """
         if 'entities' not in self.data:
             print("No entities found.")
@@ -270,7 +303,9 @@ class WPToolsWikidata(core.WPTools):
             self._get('labels', False, proxy, timeout)
 
         del self.data['entities']
+
         self._update_wikidata()
+        self._update_images()
         self._update_what()
 
         return self
@@ -318,3 +353,18 @@ class WPToolsWikidata(core.WPTools):
         self._get('wikidata', show, proxy, timeout)
 
         return self
+
+    def wanted_labels(self, labels):
+        """
+        Specify only WANTED labels to minimize get_labels() requests
+
+        Args:
+        - labels: <list> of wanted labels.
+
+        Example:
+          page.wanted_labels(['P18', 'P31'])
+        """
+        if not isinstance(labels, list):
+            return ValueError("wanted must be a list.")
+
+        self.WANTED = labels
