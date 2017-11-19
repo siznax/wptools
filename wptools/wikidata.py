@@ -21,47 +21,6 @@ class WPToolsWikidata(core.WPTools):
     WPToolsWikidata class
     """
 
-    # user-defined property labels
-    LABELS = {'P17': 'country',
-              'P18': 'image',
-              'P27': 'citizenship',
-              'P30': 'continent',
-              'P31': 'instance',
-              'P50': 'author',
-              'P57': 'director',
-              'P86': 'composer',
-              'P105': 'taxon rank',
-              'P110': 'illustrator',
-              'P123': 'publisher',
-              'P135': 'movement',
-              'P136': 'genre',
-              'P144': 'based on',
-              'P161': 'cast',
-              'P170': 'creator',
-              'P171': 'parent taxon',
-              'P175': 'performer',
-              'P186': 'material',
-              'P195': 'collection',
-              'P212': 'ISBN',
-              'P225': 'taxon name',
-              'P301': 'topic',
-              'P345': 'IMDB',
-              'P217': 'inventory',
-              'P276': 'location',
-              'P279': 'subclass',
-              'P569': 'birth',
-              'P570': 'death',
-              'P577': 'pubdate',
-              'P585': 'datetime',
-              'P625': 'coordinates',
-              'P655': 'translator',
-              'P658': 'tracklist',
-              'P800': 'work',
-              'P856': 'website',
-              'P910': 'category',
-              'P1773': 'attribution',
-              'P1779': 'creator'}
-
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsWikidata object
@@ -103,24 +62,31 @@ class WPToolsWikidata(core.WPTools):
         """
         set Wikidata properties and entities from query claims
         """
-        properties = self._wikidata_props(query_claims)
-        self.data['properties'] = properties
-        self.data['claims'] = {}
+        claims = self._reduce_claims(query_claims)
+        # self.data['claimq'] = query_claims
+        self.data['claims'] = claims
+        entities = set()
 
-        for propid in properties:
-            label = self.LABELS[propid]
-            for val in properties[propid]:
-                if utils.is_text(val) and re.match(r'^Q\d+', val):
-                    self.data['claims'][val] = label
-                else:
-                    self._update_wikidata(label, val)
+        for eid in claims:
+            entities.add(eid)  # P (property)
+            for val in claims[eid]:
+                if utils.is_text(val) and re.match(r'^Q\d+$', val):
+                    entities.add(val)  # Q (item)
+
+        self.data['entities'] = list(entities)
+
+    def _pop_entities(self, limit=50):
+        """returns up to limit entities and pops them off the list"""
+        out = self.data['entities'][:limit]
+        del self.data['entities'][:limit]
+        return out
 
     def _query(self, action, qobj):
         """
         returns wikidata query string
         """
-        if action == 'claims':
-            return qobj.claims(self.data['claims'].keys())
+        if action == 'labels':
+            return qobj.labels(self._pop_entities())
         elif action == 'wikidata':
             return qobj.wikidata(self.params.get('title'),
                                  self.params.get('wikibase'))
@@ -129,27 +95,23 @@ class WPToolsWikidata(core.WPTools):
         """
         capture Wikidata API response data
         """
-        if action == 'claims':
-            self._set_claims_data()
+        if action == 'labels':
+            self._set_labels()
 
         if action == 'wikidata':
             self._set_wikidata()
+            self.get_labels(show=False)
 
-            if self.data.get('claims'):
-                self.get_claims(show=False)
-
-    def _set_claims_data(self):
+    def _set_labels(self):
         """
         set property claim labels from get_claims()
         """
-        data = self._load_response('claims')
+        data = self._load_response('labels')
         entities = data.get('entities')
-        for item in entities:
-            attr = self.data['claims'][item]
-            value = self._get_entity_prop(entities[item], 'labels')
-            self._update_wikidata(attr, value)
 
-        self.data['what'] = self.data['wikidata'].get('instance')
+        for ent in entities:
+            label = self._get_entity_prop(entities[ent], 'labels')
+            self.data['labels'][ent] = label
 
     def _set_title(self, item):
         """
@@ -175,6 +137,7 @@ class WPToolsWikidata(core.WPTools):
         """
         set attributes derived from Wikidata (action=wbentities)
         """
+        self.data['labels'] = {}
         self.data['wikidata'] = {}
 
         data = self._load_response('wikidata')
@@ -216,33 +179,57 @@ class WPToolsWikidata(core.WPTools):
                     'kind': 'wikidata-image',
                     'file': img})
 
-    def _update_wikidata(self, label, value):
+    def _update_what(self):
         """
-        add or update Wikidata
+        set what this thing is! "instance of (P31)"
         """
-        if self.data['wikidata'].get(label):
-            try:
-                self.data['wikidata'][label].append(value)
-            except AttributeError:
-                first = self.data['wikidata'].get(label)
-                self.data['wikidata'][label] = [first]
-                self.data['wikidata'][label].append(value)
-        else:
-            self.data['wikidata'][label] = value
+        p31 = self.data['claims']['P31'][0]
+        self.data['what'] = self.data['labels'][p31]
 
-    def _wikidata_props(self, query_claims):
+    def _update_wikidata(self):
         """
-        returns dict containing selected properties from Wikidata query claims
+        set wikidata from claims and labels
         """
-        props = collections.defaultdict(list)
+        claims = self.data['claims']
+        self.data['wikidatl'] = {}
+
+        for ent in claims:
+
+            claim = []
+            # P (property) label
+            plabel = "%s (%s)" % (self.data['labels'][ent], ent)
+
+            for item in claims[ent]:
+                if utils.is_text(item) and re.match(r'^Q\d+$', item):
+                    # Q (item) label
+                    ilabel = "%s (%s)" % (self.data['labels'][item], item)
+                else:
+                    ilabel = item
+
+                if len(claims[ent]) == 1:
+                    claim = ilabel
+                else:
+                    claim.append(ilabel)
+
+            self.data['wikidata'][plabel] = claim
+
+    def _reduce_claims(self, query_claims):
+        """
+        returns claims as reduced dict {P: [Q's or values]}
+            P = property
+            Q = item
+        """
+        claims = collections.defaultdict(list)
+
         for claim in query_claims:
-            for prop in query_claims.get(claim):
+
+            for ent in query_claims.get(claim):
+
                 try:
-                    snak = prop.get('mainsnak').get('datavalue').get('value')
+                    snak = ent.get('mainsnak').get('datavalue').get('value')
                 except AttributeError:
-                    if self.LABELS.get(claim):
-                        props[claim] = []
-                        continue
+                    claims[claim] = []
+
                 try:
                     if snak.get('id'):
                         val = snak.get('id')
@@ -256,30 +243,36 @@ class WPToolsWikidata(core.WPTools):
                     val = snak
 
                 if not val or not [x for x in val if x]:
-                    raise ValueError("%s %s" % (claim, prop))
+                    raise ValueError("%s %s" % (claim, ent))
 
-                if self.LABELS.get(claim):
-                    props[claim].append(val)
+                claims[claim].append(val)
 
-        return dict(props)
+        return dict(claims)
 
-    def get_claims(self, show=True, proxy=None, timeout=0):
+    def get_labels(self, show=True, proxy=None, timeout=0):
         """
-        GET Wikidata:API (action=wbgetentities) claims labels
+        GET Wikidata:API (action=wbgetentities) for claims labels
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
-        Required {data}: claims
-        e.g. claims: {'Q298': 'country'}
+        Required {data}: entities
+            e.g. entities: [u'P31', u'Q5']
 
         Data captured:
-        e.g. wikidata: {'country': 'Chile'}
+            labels: {'P17': 'country'}
+            wikidata: {'country (P17)': 'Chile (Q298)'}
 
-        Use wikidata.get_wikidata() to populate data['claims']
+        Use wikidata.get_wikidata() to populate data['entities']
         """
-        if not self.data['claims']:
-            raise LookupError("get_claims needs claims")
+        if 'entities' not in self.data:
+            print("No entities found.")
+            return
 
-        self._get('claims', show, proxy, timeout)
+        while self.data['entities']:
+            self._get('labels', False, proxy, timeout)
+
+        del self.data['entities']
+        self._update_wikidata()
+        self._update_what()
 
         return self
 
@@ -303,7 +296,7 @@ class WPToolsWikidata(core.WPTools):
 
         Data captured:
         - aliases: <list> list of "also known as"
-        - claims: <dict> Wikidata claims (see get_claims())
+        - claims: <dict> Wikidata claims (see get_labels())
         - description: <str> Wikidata description
         - image: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
@@ -326,9 +319,3 @@ class WPToolsWikidata(core.WPTools):
         self._get('wikidata', show, proxy, timeout)
 
         return self
-
-    def update_labels(self, labels):
-        """
-        Update wikidata property labels to capture
-        """
-        self.LABELS.update(labels)

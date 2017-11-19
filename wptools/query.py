@@ -143,10 +143,13 @@ class WPToolsQuery(object):
 
         return query
 
-    def claims(self, qids):
+    def labels(self, qids):
         """
-        Returns Wikidata claims query string
+        Returns Wikidata labels query string
         """
+        if len(qids) > 50:
+            raise ValueError("The limit is 50.")
+
         self.domain = 'www.wikidata.org'
         self.uri = self.wiki_uri(self.domain)
 
@@ -158,7 +161,7 @@ class WPToolsQuery(object):
         qids = '|'.join(qids)
         query += "&ids=%s" % qids
 
-        self.set_status('claims', qids)
+        self.set_status('labels', qids)
 
         return query
 

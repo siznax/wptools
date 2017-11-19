@@ -7,6 +7,8 @@ WPTools core module
 Support for accessing Wikimedia foundation APIs.
 """
 
+from time import sleep
+
 from wptools.query import WPToolsQuery
 
 from . import request
@@ -17,6 +19,9 @@ class WPTools(object):
     """
     WPtools (abstract) core class
     """
+
+    REQUEST_DELAY = 0
+    REQUEST_LIMIT = 10
 
     cache = None
     data = None
@@ -32,7 +37,7 @@ class WPTools(object):
         - wptools.wikidata
         """
         self.cache = {}
-        self.data = {}
+        self.data = {'requests': 0}
 
         self.flags = {
             'silent': kwargs.get('silent') or False,
@@ -59,10 +64,17 @@ class WPTools(object):
         """
         make HTTP request and cache response
         """
+        if self.data['requests'] >= self.REQUEST_LIMIT:
+            raise StandardError("REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
+
+        if self.data['requests'] and self.REQUEST_DELAY:
+            print("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
+            sleep(self.REQUEST_DELAY)
+
         silent = self.flags['silent']
 
         if action in self.cache:
-            if action != 'imageinfo':
+            if action != 'imageinfo' and action != 'labels':
                 utils.stderr("+ %s results in cache" % action, silent)
                 return
         else:
@@ -82,10 +94,13 @@ class WPTools(object):
 
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)
+
         self.cache[action]['response'] = response
         self.cache[action]['info'] = req.info
 
         self._set_data(action)
+
+        self.data['requests'] += 1
 
         if show:
             self.show()

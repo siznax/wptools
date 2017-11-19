@@ -132,8 +132,8 @@ class WPToolsPage(WPToolsRESTBase,
             qstr = qobj.parse(title, pageid)
         elif action == 'imageinfo':
             qstr = qobj.imageinfo(self.__get_image_files())
-        elif action == 'claims':
-            qstr = qobj.claims(self.data['claims'].keys())
+        elif action == 'labels':
+            qstr = qobj.labels(self._pop_entities())
         elif action == 'wikidata':
             qstr = qobj.wikidata(title, wikibase)
         elif action == 'restbase':
@@ -156,12 +156,11 @@ class WPToolsPage(WPToolsRESTBase,
             self._set_parse_data()
         elif action == 'random':
             self._set_random_data()
-        elif action == 'claims':
-            self._set_claims_data()
+        elif action == 'labels':
+            self._set_labels()
         elif action == 'wikidata':
             self._set_wikidata()
-            if self.data.get('claims'):
-                self.get_claims(show=False)
+            self.get_labels()
         elif action == 'restbase':
             self._set_restbase_data()
 
