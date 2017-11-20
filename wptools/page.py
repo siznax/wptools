@@ -500,6 +500,7 @@ class WPToolsPage(WPToolsRESTBase,
         - iwlinks: <list> interwiki links
         - pageid: <int> Wikipedia database ID
         - parsetree: <str> XML parse tree
+        - requests: list of request actions made
         - wikibase: <str> Wikidata entity ID or wikidata URL
         - wikitext: <str> raw wikitext URL
         """
@@ -533,6 +534,7 @@ class WPToolsPage(WPToolsRESTBase,
         - modified (page): <str> ISO8601 date and time
         - pageid: <int> Wikipedia database ID
         - random: <str> a random article title with every request!
+        - requests: list of request actions made
         - url: <str> the canonical wiki URL
         - url_raw: <str> ostensible raw wikitext URL
         - watchers: <int> number of people watching this page
