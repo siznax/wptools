@@ -248,6 +248,12 @@ class WPToolsWikidata(core.WPTools):
         """
         set what this thing is! "instance of (P31)"
         """
+        if 'P31' not in self.data['claims']:  # missing Wikidata
+            msg = ("Note: Wikidata item %s" % self.data['wikibase'],
+                   "missing 'instance of' (P31)")
+            utils.stderr(" ".join(msg))
+            return
+
         instance_of = self.data['claims']['P31'][0]
         labels = self.data['labels']
 
@@ -287,17 +293,18 @@ class WPToolsWikidata(core.WPTools):
         GET Wikidata:API (action=wbgetentities) for claims labels
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
 
-        Required {data}: entities
-            e.g. data['entities']: [u'P31', u'Q5']
+        Required {data}: entities, claims
+            data['claims']: {'P17': ['Q17'], 'P910': ['Q8854938'], ...}
+            data['entities']: ['P17', 'Q17', 'P910', 'Q8854938', ...]
 
         Data captured:
-            labels: {'P17': 'country', ...}
-            wikidata: {'country (P17)': 'Chile (Q298)'}
+            labels: {'P17': 'country', 'Q17': 'Japan', ...}
+            wikidata: {'country (P17)': 'Japan (Q17)', ...}
 
         Use get_wikidata() to populate data['entities']
         """
         if 'entities' not in self.data:
-            print("No entities found.")
+            utils.stderr("No entities found.")
             return
 
         skip_flag = False
@@ -336,17 +343,18 @@ class WPToolsWikidata(core.WPTools):
 
         Data captured:
         - aliases: <list> list of "also known as"
-        - claims: <dict> Wikidata claims (see get_labels())
+        - claims: <dict> intermediate Wikidata claims (compare to cache)
         - description: <str> Wikidata description
         - image: <dict> {wikidata-image} Wikidata Property:P18
         - label: <str> Wikidata label
+        - labels: <str> list of resolved labels
         - modified (wikidata): <str> ISO8601 date and time
         - pageid: <int> Wikipedia database ID
-        - properties: <dict> Wikidata properties
+        - requests: list of request actions made
         - title: <str> article title
         - what: <str> Wikidata Property:P31 "instance of"
         - wikibase: <str> Wikidata item ID
-        - wikidata: <dict> resolved Wikidata properties
+        - wikidata: <dict> resolved Wikidata claims
         - wikidata_url: <str> Wikidata URL
         """
         title = self.params.get('title')
