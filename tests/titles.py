@@ -6,6 +6,8 @@ selected titles by language for WPTools tests
 
 # animals
 #     https://www.worldwildlife.org/species/directory?direction=desc&sort=extinction_status
+# art
+#     https://en.wikipedia.org/wiki/Category:Lists_of_works_of_art
 # books
 #     https://en.wikipedia.org/wiki/Man_Booker_Prize
 #     https://en.wikipedia.org/wiki/Man_Booker_International_Prize
@@ -65,7 +67,10 @@ class WPToolsTestTitles(object):
             "Guennol Lioness",
             "Portrait of Dr. Gachet",
             "The Great Wave off Kanagawa",
-            "The Scream"
+            "The Scream",
+            "The Sea Monster",
+            "Knight, Death and the Devil",
+            "Melencolia I",
         }
     }
 
@@ -150,6 +155,8 @@ class WPToolsTestTitles(object):
             "Malala Yousafzai",
             "Malcolm X",
             "Stephen Fry",
+            "Simone de Beauvoir",
+            "Shakespeare",
         },
         "ja": {
             "三島由紀夫",  # Yukio Mishima

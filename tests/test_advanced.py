@@ -166,6 +166,14 @@ class WPToolsWikidataTest(unittest.TestCase):
     """
     Wikidata Tests
     """
+    def test_wikidata_random(self):
+        title = titles.title()
+        page = wptools.page(title['title'], lang=title['lang'])
+        from pprint import pprint
+        page.get_query(show=False).get_wikidata()
+        self.assertTrue(len(page.data['claims']) > 5)
+        self.assertTrue(len(page.data['labels']) > 5)
+        self.assertTrue(len(page.data['wikidata']) > 5)
 
 
 if __name__ == '__main__':
