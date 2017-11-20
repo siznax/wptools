@@ -79,9 +79,9 @@ class WPTools(object):
             return
 
         if 'requests' not in self.data:
-            self.data['requests'] = 0
+            self.data['requests'] = []
 
-        if self.data['requests'] >= self.REQUEST_LIMIT:
+        if len(self.data['requests']) >= self.REQUEST_LIMIT:
             raise StopIteration("Hit REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
 
         if self.data['requests'] and self.REQUEST_DELAY:
@@ -100,9 +100,9 @@ class WPTools(object):
         self.cache[action]['response'] = response
         self.cache[action]['info'] = req.info
 
-        self._set_data(action)
+        self.data['requests'].append(action)
 
-        self.data['requests'] += 1
+        self._set_data(action)
 
         if show:
             self.show()
