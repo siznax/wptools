@@ -70,7 +70,6 @@ class WPToolsWikidata(core.WPTools):
 
         entities = set()
         for eid in claims:
-
             if self.WANTED:
                 if eid in self.WANTED or eid == 'P31':
                     entities.add(eid)  # P (property)
@@ -86,10 +85,20 @@ class WPToolsWikidata(core.WPTools):
         self.data['entities'] = list(entities)
 
     def _pop_entities(self, limit=50):
-        """returns up to limit entities and pops them off the list"""
-        out = self.data['entities'][:limit]
+        """
+        returns up to limit entities and pops them off the list
+        """
+        pop = self.data['entities'][:limit]
         del self.data['entities'][:limit]
-        return out
+        return pop
+
+    def _post_labels_updates(self):
+        """
+        updates possible after getting labels
+        """
+        self._update_wikidata()
+        self._update_images()
+        self._update_what()
 
     def _query(self, action, qobj):
         """
@@ -153,7 +162,7 @@ class WPToolsWikidata(core.WPTools):
         set entity labels from get_labels()
         """
         data = self._load_response('labels')
-        entities = data.get('entities')
+        entities = data.get('entities') or []
 
         for ent in entities:
             label = self._get_entity_prop(entities[ent], 'labels')
@@ -214,44 +223,36 @@ class WPToolsWikidata(core.WPTools):
         self._marshal_claims(item.get('claims'))
         self._set_title(item)
 
-        image = self.data['wikidata'].get('image')
-        if image:
-            if 'image' not in self.data:
-                self.data['image'] = []
-            if not isinstance(image, list):
-                image = [image]
-            for img in image:
-                self.data['image'].append({
-                    'kind': 'wikidata-image',
-                    'file': img})
-
     def _update_images(self):
         """
         add images from Wikidata
         """
-        images = {}
-        for item in self.data['wikidata']:
-            if '(P18)' in item:  # P18 image property
-                images[item] = self.data['wikidata'][item]
+        wd_images = self.data['wikidata'].get('image (P18)')
 
-        if images:
-            img_files = []
+        if wd_images:
+            if not isinstance(wd_images, list):
+                wd_images = [wd_images]
+
+            now_files = []  # extant image files
             if 'image' in self.data:
-                img_files = [x.get('file') for x in self.data['image']]
+                now_files = [x.get('file') for x in self.data['image']]
             else:
                 self.data['image'] = []
 
-            for img in images:
-                if img not in img_files:
-                    self.data['image'].append({'file': images[img],
-                                               'kind': img})
+            for img_file in wd_images:
+                if img_file not in now_files:
+                    self.data['image'].append({'file': img_file,
+                                               'kind': 'wikidata-image'})
 
     def _update_what(self):
         """
         set what this thing is! "instance of (P31)"
         """
-        p31 = self.data['claims']['P31'][0]
-        self.data['what'] = self.data['labels'][p31]
+        instance_of = self.data['claims']['P31'][0]
+        labels = self.data['labels']
+
+        if instance_of in labels:
+            self.data['what'] = labels[instance_of]
 
     def _update_wikidata(self):
         """
@@ -299,14 +300,19 @@ class WPToolsWikidata(core.WPTools):
             print("No entities found.")
             return
 
-        while self.data['entities']:
+        skip_flag = False
+        if 'skip' in self.flags and 'labels' in self.flags['skip']:
+            skip_flag = True
+
+        while 'entities' in self.data and self.data['entities']:
+            if skip_flag:
+                break
             self._get('labels', False, proxy, timeout)
 
-        del self.data['entities']
+        if 'entities' in self.data:
+            del self.data['entities']
 
-        self._update_wikidata()
-        self._update_images()
-        self._update_what()
+        self._post_labels_updates()
 
         return self
 

@@ -21,7 +21,7 @@ class WPTools(object):
     """
 
     REQUEST_DELAY = 0
-    REQUEST_LIMIT = 10
+    REQUEST_LIMIT = 25
 
     cache = None
     data = None
@@ -37,7 +37,7 @@ class WPTools(object):
         - wptools.wikidata
         """
         self.cache = {}
-        self.data = {'requests': 0}
+        self.data = {}
 
         self.flags = {
             'silent': kwargs.get('silent') or False,
@@ -64,13 +64,6 @@ class WPTools(object):
         """
         make HTTP request and cache response
         """
-        if self.data['requests'] >= self.REQUEST_LIMIT:
-            raise StandardError("REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
-
-        if self.data['requests'] and self.REQUEST_DELAY:
-            print("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
-            sleep(self.REQUEST_DELAY)
-
         silent = self.flags['silent']
 
         if action in self.cache:
@@ -85,16 +78,25 @@ class WPTools(object):
                 utils.stderr("+ skipping %s" % action)
             return
 
+        if 'requests' not in self.data:
+            self.data['requests'] = 0
+
+        if self.data['requests'] >= self.REQUEST_LIMIT:
+            raise StopIteration("Hit REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
+
+        if self.data['requests'] and self.REQUEST_DELAY:
+            print("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
+            sleep(self.REQUEST_DELAY)
+
         # make the request
         qobj = WPToolsQuery(lang=self.params['lang'],
                             variant=self.params.get('variant'),
                             wiki=self.params.get('wiki'))
         qstr = self._query(action, qobj)
-        self.cache[action]['query'] = qstr
-
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)
 
+        self.cache[action]['query'] = qstr
         self.cache[action]['response'] = response
         self.cache[action]['info'] = req.info
 
