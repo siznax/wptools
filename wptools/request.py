@@ -24,6 +24,8 @@ class WPToolsRequest(object):
     WPToolsRequest class
     """
 
+    DISABLED = False  # disable requests when testing
+
     info = None
     silent = False
 
@@ -68,7 +70,10 @@ class WPToolsRequest(object):
         if not self.silent:
             print(status, file=sys.stderr)
 
-        return self.curl_perform(crl)
+        if self.DISABLED:
+            print("Requests DISABLED", file=sys.stderr)
+        else:
+            return self.curl_perform(crl)
 
     def curl_perform(self, crl):
         """
