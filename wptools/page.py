@@ -434,7 +434,7 @@ class WPToolsPage(WPToolsRESTBase,
             self.get_parse(False, proxy, timeout)
 
             if not self.data.get('wikibase'):
-                self.flags['skip'] = ['wikidata']
+                self.flags['skip'].append('wikidata')
 
             self.get_wikidata(False, proxy, timeout)
 
