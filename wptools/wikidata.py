@@ -21,8 +21,6 @@ class WPToolsWikidata(core.WPTools):
     WPToolsWikidata class
     """
 
-    WANTED = None
-
     def __init__(self, *args, **kwargs):
         """
         Returns a WPToolsWikidata object
@@ -46,6 +44,8 @@ class WPToolsWikidata(core.WPTools):
         if wikibase:
             self.params.update({'wikibase': wikibase})
 
+        self.user_labels = None
+
     def _get_entity_prop(self, entity, prop):
         """
         returns Wikidata entity property value
@@ -64,14 +64,14 @@ class WPToolsWikidata(core.WPTools):
         """
         set Wikidata entities from query claims
         """
-        claims = self._reduce_claims(query_claims)
+        claims = reduce_claims(query_claims)
         # self.data['claimq'] = query_claims
         self.data['claims'] = claims
 
         entities = set()
         for eid in claims:
-            if self.WANTED:
-                if eid in self.WANTED or eid == 'P31':
+            if self.user_labels:
+                if eid in self.user_labels or eid == 'P31':
                     entities.add(eid)  # P (property)
                 else:
                     continue  # get only wanted entities
@@ -109,42 +109,6 @@ class WPToolsWikidata(core.WPTools):
         elif action == 'wikidata':
             return qobj.wikidata(self.params.get('title'),
                                  self.params.get('wikibase'))
-
-    def _reduce_claims(self, query_claims):
-        """
-        returns claims as reduced dict {P: [Q's or values]}
-            P = property
-            Q = item
-        """
-        claims = collections.defaultdict(list)
-
-        for claim in query_claims:
-
-            for ent in query_claims.get(claim):
-
-                try:
-                    snak = ent.get('mainsnak').get('datavalue').get('value')
-                except AttributeError:
-                    claims[claim] = []
-
-                try:
-                    if snak.get('id'):
-                        val = snak.get('id')
-                    elif snak.get('text'):
-                        val = snak.get('text')
-                    elif snak.get('time'):
-                        val = snak.get('time')
-                    else:
-                        val = snak
-                except AttributeError:
-                    val = snak
-
-                if not val or not [x for x in val if x]:
-                    raise ValueError("%s %s" % (claim, ent))
-
-                claims[claim].append(val)
-
-        return dict(claims)
 
     def _set_data(self, action):
         """
@@ -288,7 +252,7 @@ class WPToolsWikidata(core.WPTools):
             if plabel and ilabel:
                 self.data['wikidata'][plabel] = claim
 
-    def get_labels(self, show=True, proxy=None, timeout=0):
+    def get_labels(self, show=False, proxy=None, timeout=0):
         """
         GET Wikidata:API (action=wbgetentities) for claims labels
         https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
@@ -314,7 +278,7 @@ class WPToolsWikidata(core.WPTools):
         while 'entities' in self.data and self.data['entities']:
             if skip_flag:
                 break
-            self._get('labels', False, proxy, timeout)
+            self._get('labels', show, proxy, timeout)
 
         if 'entities' in self.data:
             del self.data['entities']
@@ -379,6 +343,46 @@ class WPToolsWikidata(core.WPTools):
           page.wanted_labels(['P18', 'P31'])
         """
         if not isinstance(labels, list):
-            return ValueError("wanted must be a list.")
+            raise ValueError("Input labels must be a list.")
 
-        self.WANTED = labels
+        self.user_labels = labels
+
+
+################################################################
+
+
+def reduce_claims(query_claims):
+    """
+    returns claims as reduced dict {P: [Q's or values]}
+        P = property
+        Q = item
+    """
+    claims = collections.defaultdict(list)
+
+    for claim in query_claims:
+
+        for ent in query_claims.get(claim):
+
+            try:
+                snak = ent.get('mainsnak').get('datavalue').get('value')
+            except AttributeError:
+                claims[claim] = []
+
+            try:
+                if snak.get('id'):
+                    val = snak.get('id')
+                elif snak.get('text'):
+                    val = snak.get('text')
+                elif snak.get('time'):
+                    val = snak.get('time')
+                else:
+                    val = snak
+            except AttributeError:
+                val = snak
+
+            if not val or not [x for x in val if x]:
+                raise ValueError("%s %s" % (claim, ent))
+
+            claims[claim].append(val)
+
+    return dict(claims)
