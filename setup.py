@@ -10,7 +10,7 @@ with open('HISTORY.rst') as f:
 
 setup(
     name='wptools',
-    version='0.4.1',
+    version='0.4.2',
     description='Wikipedia tools (for Humans)',
     long_description=readme + '\n\n' + history,
     url='https://github.com/siznax/wptools/',
