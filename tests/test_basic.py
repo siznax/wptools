@@ -14,9 +14,11 @@ from . import imageinfo
 from . import labels_1
 from . import labels_2
 from . import labels_3
+from . import labels_wanted
 from . import parse
 from . import query
 from . import querymore
+from . import random_query
 from . import redirect
 from . import rest_html
 from . import rest_lead
@@ -50,9 +52,22 @@ class WPToolsCategoryTestCase(unittest.TestCase):
     def test_category_init(self):
         self.assertRaises(ValueError, wptools.category, pageid='TEST')
         self.assertRaises(ValueError, wptools.category, 'TEST', pageid=123)
+
         cat = wptools.category('TEST')
         self.assertEqual(cat.params, {'lang': 'en', 'title': 'TEST'})
         self.assertTrue('requests' not in cat.data)
+
+        try:
+            cat = wptools.category(namespace='NOTINT')
+            self.fail("failed to raise ValueError")
+        except ValueError:
+            pass
+
+    def test_category_random(self):
+        cat = wptools.category('TEST')
+        cat.cache = {'random': random_query.cache}
+        cat._set_data('random')
+        self.assertEqual(cat.data['title'], 'RANDOM TEST TITLE')
 
     def test_category_caching(self):
         cat = wptools.category('TEST', silent=SILENT_FLAG)
@@ -90,6 +105,26 @@ class WPToolsCategoryTestCase(unittest.TestCase):
 
 
 class WPToolsCoreTestCase(unittest.TestCase):
+
+    def test_core_not_implemented(self):
+
+        class TEST(wptools.core.WPTools):
+            def __init__(self):
+                pass
+
+        page = TEST()
+
+        try:
+            page._query(None, None)
+            self.fail("failed to raise NotImplementedError")
+        except NotImplementedError:
+            pass
+
+        try:
+            page._set_data(None)
+            self.fail("failed to raise NotImplementedError")
+        except NotImplementedError:
+            pass
 
     def test_core_load_missing(self):
         page = wptools.page('TEST')
@@ -167,6 +202,37 @@ class WPToolsCoreTestCase(unittest.TestCase):
         self.assertEqual(wptools.core.safestr(None), None)
         self.assertEqual(wptools.core.safestr(1), '1')
         self.assertTrue(isinstance(wptools.core.safestr(u'ü'), str))
+
+    def test_core_get(self):
+        page = wptools.page('TEST')
+        try:
+            page._get('TEST', False, None, 0)
+            self.fail("failed to raise ValueError")
+        except ValueError:
+            pass
+
+    def test_core_request_limit(self):
+        page = wptools.page('TEST')
+        page.REQUEST_LIMIT = 0
+        page.data['requests'] = ['TEST']
+        try:
+            page._get('TEST', False, None, 0)
+            self.fail("failed to raise StopIteration")
+        except StopIteration:
+            pass
+
+    def test_core_show(self):
+        page = wptools.page('TEST')
+        page.data['TEST1'] = None
+        page.data['TEST2'] = tuple(range(3))
+        page.show()
+
+    def test_core_get_random(self):
+        # MAKE ACTUAL REQUEST! (for to maximize coverage)
+        page = wptools.page('TEST')
+        page._get('random', True, None, 0)
+        self.assertTrue('random' in page.cache)
+        self.assertTrue('pageid' in page.data)
 
 
 class WPToolsPageTestCase(unittest.TestCase):
@@ -258,6 +324,19 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue('api/rest' in qstr)
 
         self.assertTrue('requests' not in page.data)
+
+    def test_page_get(self):
+        """
+        test page.get() without making any requests, is for coverage
+        """
+        wptools.request.WPToolsRequest.DISABLED = True
+        skip = ['parse', 'query', 'restbase', 'wikiata']
+
+        page = wptools.page('TEST', skip=skip)
+        page.get()
+
+        page = wptools.page('TEST', wikibase='TEST', skip=skip)
+        page.get()
 
     def test_page_get_parse(self):
         page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
@@ -668,8 +747,8 @@ class WPToolsRequestTestCase(unittest.TestCase):
         self.assertTrue('wptools' in info.get('user-agent'))
 
     def test_request_curl_setup(self):
-        req = wptools.request.WPToolsRequest()
-        req.curl_setup()
+        req = wptools.request.WPToolsRequest(verbose=True)
+        req.curl_setup(proxy='TEST_PROXY', timeout=666)
         info = req.cobj.getinfo(wptools.request.pycurl.EFFECTIVE_URL)
         self.assertEqual(info, '')
         info = req.cobj.getinfo(wptools.request.pycurl.RESPONSE_CODE)
@@ -679,6 +758,14 @@ class WPToolsRequestTestCase(unittest.TestCase):
         agent = wptools.request.user_agent()
         self.assertTrue(agent.startswith('wptools'))
         self.assertTrue('(https://github.com/siznax/wptools)' in agent)
+
+    def test_request_get(self):
+        req = wptools.request.WPToolsRequest()
+        try:
+            req.get('TEST_URL', 'TEST_STATUS')
+            self.fail("failed to raise pycurl error")
+        except:
+            pass
 
 
 class WPToolsSiteTestCase(unittest.TestCase):
@@ -763,6 +850,19 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         page = wptools.wikidata(wikibase='Q42', silent=SILENT_FLAG)
         self.assertEqual(page.params, {'lang': 'en', 'wikibase': 'Q42'})
 
+        page = wptools.wikidata()
+        try:
+            page.get_wikidata()
+            self.fail("failed to raise LookupError")
+        except LookupError:
+            pass
+
+        try:
+            page.wanted_labels('TEST')
+            self.fail("failed to raise ValueError")
+        except ValueError:
+            pass
+
         self.assertTrue('requests' not in page.data)
 
     def test_wikidata_get_labels(self):
@@ -780,21 +880,20 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         self.assertEqual(len(data['labels']), 50)
         self.assertEqual(len(data['wikidata']), 27)
 
+        page.get_labels()  # No entities found
+
         self.assertTrue('requests' not in page.data)
 
     def test_wikidata_get_wikidata(self):
-        page = wptools.wikidata(skip=SKIP_FLAG,
-                                silent=SILENT_FLAG)
+        page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
 
         page.cache = {'wikidata': wikidata.cache}
         page._set_data('wikidata')
 
         page.cache['labels'] = labels_1.cache
         page._set_data('labels')
-
         page.cache['labels'] = labels_2.cache
         page._set_data('labels')
-
         page.cache['labels'] = labels_3.cache
         page._set_data('labels')
 
@@ -830,6 +929,74 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         self.assertEqual(str(page.params['title']), 'Douglas_Adams')
 
         self.assertTrue('requests' not in page.data)
+
+    def test_wikidata_get_wanted(self):
+        page = wptools.wikidata('TEST', skip=SKIP_FLAG)
+        page.wanted_labels(['P31', 'Q5'])
+
+        page.cache = {'wikidata': wikidata.cache}
+        page._set_data('wikidata')
+
+        page.cache['labels'] = labels_wanted.cache
+        page._set_data('labels')
+
+        page._post_labels_updates()
+
+        data = page.data
+        self.assertEqual(len(data['wikidata']), 1)
+        self.assertTrue('instance of (P31)' in data['wikidata'])
+
+    def test_wikidata_query(self):
+        page = wptools.wikidata('TEST')
+        qobj = wptools.query.WPToolsQuery()
+
+        page.data['entities'] = ['TEST']
+        qry = page._query('labels', qobj)
+        self.assertTrue(qry.endswith('TEST'))
+
+        qry = page._query('wikidata', qobj)
+        self.assertTrue(qry.endswith('TEST'))
+
+    def test_wikidata_image(self):
+        """
+        ensure we don't add wikidata-image if file info extant
+        """
+        page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
+
+        page.cache = {'wikidata': wikidata.cache}
+        page._set_data('wikidata')
+
+        page.data['image'] = [
+            {'file': 'Douglas adams portrait cropped.jpg'}]
+
+        page.cache['labels'] = labels_2.cache  # P18 in here
+        page._set_data('labels')
+        page._post_labels_updates()
+
+        self.assertTrue('requests' not in page.data)
+
+        data = page.data
+        self.assertTrue(len(data['image']), 1)
+        self.assertTrue('wikidata-image' not in data['image'])
+
+    def test_wikidata_missing(self):
+        page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
+
+        page.cache = {'wikidata': wikidata.cache}
+        page._set_data('wikidata')
+
+        del page.data['claims']['P31']
+
+        page.cache['labels'] = labels_wanted.cache
+        page._set_data('labels')
+        page._post_labels_updates()
+
+        self.assertTrue('requests' not in page.data)
+
+        data = page.data
+        self.assertTrue('what' not in data['wikidata'])
+
+
 
 
 class WPToolsToolTestCase(unittest.TestCase):
