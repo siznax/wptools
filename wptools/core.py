@@ -7,6 +7,8 @@ WPTools core module
 Support for accessing Wikimedia foundation APIs.
 """
 
+from time import sleep
+
 from wptools.query import WPToolsQuery
 
 from . import request
@@ -17,6 +19,9 @@ class WPTools(object):
     """
     WPtools (abstract) core class
     """
+
+    REQUEST_DELAY = 0
+    REQUEST_LIMIT = 25
 
     cache = None
     data = None
@@ -62,7 +67,7 @@ class WPTools(object):
         silent = self.flags['silent']
 
         if action in self.cache:
-            if action != 'imageinfo':
+            if action != 'imageinfo' and action != 'labels':
                 utils.stderr("+ %s results in cache" % action, silent)
                 return
         else:
@@ -73,17 +78,29 @@ class WPTools(object):
                 utils.stderr("+ skipping %s" % action)
             return
 
+        if 'requests' not in self.data:
+            self.data['requests'] = []
+
+        if len(self.data['requests']) >= self.REQUEST_LIMIT:
+            raise StopIteration("Hit REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
+
+        if self.data['requests'] and self.REQUEST_DELAY:
+            print("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
+            sleep(self.REQUEST_DELAY)
+
         # make the request
         qobj = WPToolsQuery(lang=self.params['lang'],
                             variant=self.params.get('variant'),
                             wiki=self.params.get('wiki'))
         qstr = self._query(action, qobj)
-        self.cache[action]['query'] = qstr
-
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)
+
+        self.cache[action]['query'] = qstr
         self.cache[action]['response'] = response
         self.cache[action]['info'] = req.info
+
+        self.data['requests'].append(action)
 
         self._set_data(action)
 

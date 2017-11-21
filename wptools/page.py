@@ -132,8 +132,8 @@ class WPToolsPage(WPToolsRESTBase,
             qstr = qobj.parse(title, pageid)
         elif action == 'imageinfo':
             qstr = qobj.imageinfo(self.__get_image_files())
-        elif action == 'claims':
-            qstr = qobj.claims(self.data['claims'].keys())
+        elif action == 'labels':
+            qstr = qobj.labels(self._pop_entities())
         elif action == 'wikidata':
             qstr = qobj.wikidata(title, wikibase)
         elif action == 'restbase':
@@ -156,12 +156,11 @@ class WPToolsPage(WPToolsRESTBase,
             self._set_parse_data()
         elif action == 'random':
             self._set_random_data()
-        elif action == 'claims':
-            self._set_claims_data()
+        elif action == 'labels':
+            self._set_labels()
         elif action == 'wikidata':
             self._set_wikidata()
-            if self.data.get('claims'):
-                self.get_claims(show=False)
+            self.get_labels()
         elif action == 'restbase':
             self._set_restbase_data()
 
@@ -435,7 +434,7 @@ class WPToolsPage(WPToolsRESTBase,
             self.get_parse(False, proxy, timeout)
 
             if not self.data.get('wikibase'):
-                self.flags['skip'] = ['wikidata']
+                self.flags['skip'].append('wikidata')
 
             self.get_wikidata(False, proxy, timeout)
 
@@ -501,6 +500,7 @@ class WPToolsPage(WPToolsRESTBase,
         - iwlinks: <list> interwiki links
         - pageid: <int> Wikipedia database ID
         - parsetree: <str> XML parse tree
+        - requests: list of request actions made
         - wikibase: <str> Wikidata entity ID or wikidata URL
         - wikitext: <str> raw wikitext URL
         """
@@ -534,6 +534,7 @@ class WPToolsPage(WPToolsRESTBase,
         - modified (page): <str> ISO8601 date and time
         - pageid: <int> Wikipedia database ID
         - random: <str> a random article title with every request!
+        - requests: list of request actions made
         - url: <str> the canonical wiki URL
         - url_raw: <str> ostensible raw wikitext URL
         - watchers: <int> number of people watching this page
