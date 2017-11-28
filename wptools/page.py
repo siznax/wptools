@@ -77,39 +77,49 @@ class WPToolsPage(WPToolsRESTBase,
         else:
             self.show()
 
-    def __get_image_files(self):
+    def __update_imagedata(self, title, _from, info):
         """
-        returns normalized list of image filenames
-        """
-        files = []
-        image = self.data['image']
+        Update page images with get_imageinfo() data
 
-        for item in (x['file'] for x in image if x.get('file')):
-            fname = item.replace('_', ' ')
-            if (not fname.startswith('File')
-                    and not fname.startswith('Image')):
-                fname = 'File:' + fname
-            if fname not in files:
-                files.append(fname)
-        return files
-
-    def __update_imageinfo(self, title, info):
+        We make one imageinfo request containing only unique
+        image['file'] names. We match the API response data to an
+        image['file'] by API title/file match or API
+        normalized["from"]/file match. So, some imageinfo data will be
+        applied to more than one image['kind'].
         """
-        update page imageinfos with get_imageinfo data
-        """
-        for i, image in enumerate(self.data['image']):
-            if image.get('file'):
-                fname = image.get('file').replace('_', ' ')
-                if fname.lower() in title.lower():
-                    if image.get('kind') != 'query-thumbnail':
-                        self.data['image'][i].update(info)
+        for img in self.data['image']:
+            if 'url' not in img:
+                if title == img['file']:  # matching title/file
+                    img.update(info)
+                elif _from == img['file']:  # matching from/file
+                    img.update(info)
 
     def _missing_imageinfo(self):
         """
-        returns page images missing info
+        returns list of image filenames that are missing info
         """
-        if 'image' in self.data:
-            return [x for x in self.data['image'] if not x.get('url')]
+        if 'image' not in self.data:
+            return
+        missing = []
+        for img in self.data['image']:
+            if 'url' not in img:
+                missing.append(img['file'])
+        return list(set(missing))
+
+    def _normalize_images(self):
+        """
+        normalizes image filenames by prepending 'File:' if needed
+        """
+        if 'image' not in self.data:
+            return
+        for img in self.data['image']:
+            fname = img['file'].replace('_', ' ')
+            fstart = fname.startswith('File:')
+            istart = fname.startswith('Image:')
+            if not fstart and not istart:
+                fname = 'File:' + fname
+                img['orig'] = img['file']
+                img['file'] = fname
 
     def _query(self, action, qobj):
         """
@@ -131,7 +141,7 @@ class WPToolsPage(WPToolsRESTBase,
         elif action == 'parse':
             qstr = qobj.parse(title, pageid)
         elif action == 'imageinfo':
-            qstr = qobj.imageinfo(self.__get_image_files())
+            qstr = qobj.imageinfo(self._missing_imageinfo())
         elif action == 'labels':
             qstr = qobj.labels(self._pop_entities())
         elif action == 'wikidata':
@@ -173,12 +183,26 @@ class WPToolsPage(WPToolsRESTBase,
         """
         data = self._load_response('imageinfo')
         pages = data['query'].get('pages')
+
+        normalized = []
+        if 'normalized' in data['query']:
+            normalized = data['query']['normalized']
+
         for page in pages:
             title = page.get('title')
             if page.get('imageinfo'):
                 for info in page['imageinfo']:
-                    info.update({'file': title})
-                    self.__update_imageinfo(title, info)
+                    info.update({'title': title})
+                    _from = None  # normalized filename
+                    for norm in normalized:
+                        if title == norm['to']:
+                            _from = norm['from']
+                    self.__update_imagedata(title, _from, info)
+
+        # Mark missing imageinfo to prevent duplicate requests
+        for img in self.data['image']:
+            if 'url' not in img:
+                img['url'] = 'MISSED'
 
     def _set_parse_data(self):
         """
@@ -470,6 +494,7 @@ class WPToolsPage(WPToolsRESTBase,
             utils.stderr("complete imageinfo in cache", self.flags['silent'])
             return
 
+        self._normalize_images()
         self._get('imageinfo', show, proxy, timeout)
 
         return self
@@ -598,17 +623,48 @@ class WPToolsPage(WPToolsRESTBase,
 
         return self
 
-    def pageimage(self, token=None):
+    def images(self, fields=None, token=None):
         """
-        returns first pageimage info with kind containing token
-        or list of pageimage kinds
+        Returns image info keys for kind containing token
+
+        Args:
+        - fields: <list> image info values wanted
+        - token: <str> substring to match image kind
+
+        EXAMPLES
+
+        Get all available image info:
+        >>> page.images()
+
+        Get all image kinds:
+        >>> page.images('kind')
+
+        Get only "query" (kind) image info
+        >>> page.images(token='query')
+
+        Get only file, url fields from "wikidata" images
+        >>> page.images(['file', 'url'], token='wikidata')
         """
+
         if 'image' not in self.data:
             return
 
-        if not token:
-            return [x['kind'] for x in self.data['image']]
-
+        out = []
         for img in self.data['image']:
-            if token in img.get('kind'):
-                return img
+            if token and token not in img['kind']:
+                continue
+            info = {}
+            for key in img:
+                if fields and key not in fields:
+                    continue
+                info.update({key: img[key]})
+            if info:
+                out.append(info)
+
+        return out
+
+    def pageimage(self, token=None):
+        """
+        DEPRECATED see page.images()
+        """
+        return self.images(token=token)
