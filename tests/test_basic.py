@@ -353,7 +353,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue('satire' in data['infobox']['genre'])
         self.assertTrue(data['wikidata_url'].startswith('http'))
         self.assertEqual(str(data['image'][0]['file']),
-                         'Douglas adams portrait cropped.jpg')
+                         'File:Douglas adams portrait cropped.jpg')
 
         self.assertTrue('requests' not in page.data)
 
@@ -394,7 +394,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
     def test_page_get_imageinfo(self):
-        page = wptools.page('test_get_imageinfo', silent=SILENT_FLAG)
+        page = wptools.page('TEST', silent=SILENT_FLAG)
 
         self.assertRaises(ValueError, page.get_imageinfo)
 
@@ -402,6 +402,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.data['image'] = [{'kind': 'parse-image',
                                'file': 'Douglas adams portrait cropped.jpg'}]
 
+        page._normalize_images()
         query = page._query('imageinfo', wptools.query.WPToolsQuery())
         self.assertTrue('File%3ADouglas' in query)
 

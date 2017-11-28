@@ -113,11 +113,14 @@ class WPToolsSiteTest(unittest.TestCase):
         Get info about a random site
         """
         site = wptools.site(silent=True)
+
         site.get_sites()
         self.assertTrue(site.data['random'] is not None)
+
         site.get_info(site.data['random'])
         self.assertTrue(site.data['visitors'] >= 0)
-        site.top(limit=10)
+
+        site.top()
 
 
 class WPToolsToolTest(unittest.TestCase):
