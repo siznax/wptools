@@ -197,16 +197,12 @@ class WPToolsWikidata(core.WPTools):
             if not isinstance(wd_images, list):
                 wd_images = [wd_images]
 
-            now_files = []  # extant image files
-            if 'image' in self.data:
-                now_files = [x.get('file') for x in self.data['image']]
-            else:
+            if 'image' not in self.data:
                 self.data['image'] = []
 
             for img_file in wd_images:
-                if img_file not in now_files:
-                    self.data['image'].append({'file': img_file,
-                                               'kind': 'wikidata-image'})
+                self.data['image'].append({'file': img_file,
+                                           'kind': 'wikidata-image'})
 
     def _update_what(self):
         """
