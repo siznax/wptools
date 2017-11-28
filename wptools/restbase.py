@@ -162,24 +162,30 @@ class WPToolsRESTBase(core.WPTools):
             if 'image' not in self.data:
                 self.data['image'] = []
 
+        def file_url(info):
+            """
+            put image source in url and set file key
+            """
+            if 'source' in info:
+                info['url'] = info['source']
+                info['file'] = info['source'].split('/')[-1]
+                del info['source']
+            return info
+
         if image:
             img = {'kind': 'restbase-image'}
             img.update(image)
-            self.data['image'].append(img)
+            self.data['image'].append(file_url(img))
 
         if originalimage:
             img = {'kind': 'restbase-original'}
             img.update(originalimage)
-            if originalimage.get('source'):
-                img.update({'url': originalimage.get('source')})
-            self.data['image'].append(img)
+            self.data['image'].append(file_url(img))
 
         if thumbnail:
             img = {'kind': 'restbase-thumb'}
             img.update(thumbnail)
-            if thumbnail.get('source'):
-                img.update({'url': thumbnail.get('source')})
-            self.data['image'].append(img)
+            self.data['image'].append(file_url(img))
 
     def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
         """
