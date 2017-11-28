@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4.2 (2017-11-20)
+0.4.3 (2017-11-27)
 ++++++++++++++++++
 
+* Fixed get_imageinfo() issue (#93)
 * Getting ALL Wikidata (#56)
 * Surfaced redirects, disambiguation links (#25)
 * Increased test coverage to 95%, pylint score 10.0
