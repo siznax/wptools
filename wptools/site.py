@@ -59,7 +59,11 @@ class WPToolsSite(core.WPTools):
         """
         data = self._load_response('siteinfo').get('query')
 
-        self.data['mostviewed'] = data.get('mostviewed')
+        mostviewed = data.get('mostviewed')
+        self.data['mostviewed'] = []
+        for item in mostviewed[1:]:
+            if item['ns'] == 0:
+                self.data['mostviewed'].append(item)
 
         general = data.get('general')
 

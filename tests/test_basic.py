@@ -832,7 +832,7 @@ class WPToolsSiteTestCase(unittest.TestCase):
         self.assertEqual(data['site'], 'enwiki')
         self.assertEqual(data['users'], 31786628)
 
-        self.assertEqual(len(data['mostviewed']), 500)
+        self.assertEqual(len(data['mostviewed']), 478)
         self.assertEqual(data['siteviews'], 233991363)
         self.assertEqual(data['visitors'], 63079969)
 
