@@ -7,6 +7,7 @@ Command line interface to wptools.
 from __future__ import print_function
 
 import argparse
+import re
 import sys
 import time
 import textwrap
@@ -48,8 +49,9 @@ def _image(page):
     """
     returns (preferred) image from wptools object
     """
-    if page.pageimage('pageimage'):
-        return page.pageimage('pageimage')['url']
+    pageimage = page.images(token='pageimage')
+    if pageimage:
+        return pageimage[0]['url']
 
 
 def _page_html(page):
@@ -59,7 +61,7 @@ def _page_html(page):
     out = []
     out.append(_html_title(page))
     out.append(_html_image(page))
-    out.append(page.extract)
+    out.append(page.data.get('extract'))
     return "\n".join([x for x in out if x])
 
 
@@ -67,36 +69,45 @@ def _page_text(page, nowrap=False):
     """
     returns assembled text output
     """
-    title = page.data['title'].upper()
+    title = page.data['title']
+    title = "%s\n%s" % (title, "=" * len(title))
+
     desc = page.data.get('description')
     if desc:
-        title += u'\u2014' + "%s" % desc
-    title = "\n".join(textwrap.wrap(title))
+        desc = "_%s_" % desc
 
     img = _text_image(page)
 
-    text = page.data.get('extext')
+    pars = page.data.get('extext')
 
-    if nowrap:
-        pars = text
-    else:
+    if pars:
+        # pars = pars.replace(' * ', '\n * ')
+        pars = re.sub(r'[ ]+\*[ ]+', '* ', pars)
+
+    if pars and not nowrap:
         parlist = []
-        for par in text.split("\n\n"):
+        for par in pars.split("\n\n"):
             parlist.append("\n".join(textwrap.wrap(par)))
+
+        disambiguation = page.data.get('disambiguation')
+        if disambiguation:
+            parlist.append(' * ' + "\n * ".join(page.data.get('links')))
+
         pars = "\n\n".join(parlist)
+
+    url = '<%s>' % page.data['url']
 
     txt = []
     txt.append(title)
-    txt.append(img)
+    txt.append(desc)
+    txt.append(url)
     txt.append(pars)
+    txt.append(img)
 
-    head = "\n\n".join([x for x in txt if x])
-    tail = "\n\n<%s>\n" % page.data['url']
-
-    return head + tail
+    return "\n\n".join([x for x in txt if x])
 
 
-def _safe_exit(output):
+def _safe_exit(start, output):
     """
     exit without breaking pipes
     """
@@ -108,6 +119,9 @@ def _safe_exit(output):
         sys.stdout.flush()
     except IOError:
         pass
+
+    seconds = time.time() - start
+    print("\n\n%5.3f seconds" % (seconds), file=sys.stderr)
 
 
 def _text_image(page):
@@ -136,8 +150,6 @@ def get(args):
     verbose = args.v
     wiki = args.w
 
-    start = time.time()
-
     if query:
         qobj = WPToolsQuery(lang=lang, wiki=wiki)
         if title:
@@ -158,8 +170,6 @@ def get(args):
     out = _page_text(page, nowrap)
     if html:
         out = _page_html(page)
-
-    print("%5.3f seconds" % (time.time() - start), file=sys.stderr)
 
     try:
         return out.encode('utf-8')
@@ -190,7 +200,7 @@ def parse_args():
                       help="do not wrap text")
     argp.add_argument("-q", "-query", action='store_true',
                       help="show query and exit")
-    argp.add_argument("-s", "-shh", action='store_true',
+    argp.add_argument("-s", "-silent", action='store_true',
                       help="quiet output to stderr")
     argp.add_argument("-t", "-title", help="get a specific title")
     argp.add_argument("-v", "-verbose", action='store_true',
@@ -204,7 +214,9 @@ def main(args):
     """
     invoke wptools and exit safely
     """
-    _safe_exit(get(args))
+    start = time.time()
+    output = get(args)
+    _safe_exit(start, output)
 
 
 if __name__ == "__main__":
