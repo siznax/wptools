@@ -458,6 +458,8 @@ class WPToolsPage(WPToolsRESTBase,
             self.get_parse(False, proxy, timeout)
 
             if not self.data.get('wikibase'):
+                if 'skip' not in self.flags:
+                    self.flags['skip'] = []
                 self.flags['skip'].append('wikidata')
 
             self.get_wikidata(False, proxy, timeout)
