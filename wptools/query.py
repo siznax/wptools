@@ -258,7 +258,7 @@ class WPToolsQuery(object):
         """
         Returns RESTBase query string
         """
-        endpoint = safequote(endpoint)
+        endpoint = safequote(endpoint, 'restbase')
 
         self.set_status('restbase', endpoint)
 
@@ -354,12 +354,14 @@ def domain_name(wiki):
     return wiki.split('/')[0]
 
 
-def safequote(string):
+def safequote(string, caller=None):
     """
     Try to UTF-8 encode and urllib quote string
     """
     if string is None:
         return
+    if caller == 'restbase' and '%' in string:
+        return string
     try:
         return quote(string.encode('utf-8'))
     except UnicodeDecodeError:

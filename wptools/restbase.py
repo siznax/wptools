@@ -74,6 +74,9 @@ class WPToolsRESTBase(core.WPTools):
         """
         parse input endpoint
         """
+        if title and '/' in title:
+            title = title.replace('/', '%2F')
+
         if not endpoint:
             return '/page/'
 
