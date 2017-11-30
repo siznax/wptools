@@ -357,6 +357,14 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         self.assertTrue('requests' not in page.data)
 
+    def test_page_get_parse_boxterm(self):
+        page = wptools.page('TEST', boxterm='TEST',
+                            skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse.cache}
+        page._set_data('parse')
+        self.assertTrue(page.data['infobox'] is None)
+        self.assertTrue('requests' not in page.data)
+
     def test_page_get_query(self):
         page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
         page.cache = {'query': query.cache}

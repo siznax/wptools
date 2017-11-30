@@ -19,12 +19,13 @@ import lxml.html
 from lxml.etree import tostring
 
 
-def get_infobox(ptree):
+def get_infobox(ptree, boxterm="box"):
     """
     returns infobox <type 'dict'> from get_parse:parsetreee
     """
     for item in lxml.etree.fromstring(ptree).xpath("//template"):
-        if "box" in item.find('title').text:
+        title = item.find('title').text
+        if title and boxterm in title:
             return template_to_dict(item)
 
 

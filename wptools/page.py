@@ -43,6 +43,7 @@ class WPToolsPage(WPToolsRESTBase,
         - [title]: <str> Mediawiki page title, file, category, etc.
 
         Optional keyword {params}:
+        - [boxterm]: <str> Infobox title name or substring
         - [endpoint]: <str> RESTBase entry point (default=summary)
         - [lang]: <str> Mediawiki language code (default=en)
         - [pageid]: <int> Mediawiki pageid
@@ -58,6 +59,10 @@ class WPToolsPage(WPToolsRESTBase,
         super(WPToolsPage, self).__init__(*args, **kwargs)
 
         title = self.params.get('title')
+
+        boxterm = kwargs.get('boxterm')
+        if boxterm:
+            self.params.update({'boxterm': boxterm})
 
         endpoint = kwargs.get('endpoint')
         if endpoint:
@@ -209,15 +214,20 @@ class WPToolsPage(WPToolsRESTBase,
         set attributes derived from MediaWiki (action=parse)
         """
         pdata = self._load_response('parse')['parse']
-        parsetree = pdata.get('parsetree')
 
+        self.data['iwlinks'] = utils.get_links(pdata.get('iwlinks'))
         self.data['pageid'] = pdata.get('pageid')
-        self.data['parsetree'] = parsetree
         self.data['wikitext'] = pdata.get('wikitext')
 
-        infobox = utils.get_infobox(parsetree)
+        parsetree = pdata.get('parsetree')
+        self.data['parsetree'] = parsetree
+
+        boxterm = self.params.get('boxterm')
+        if boxterm:
+            infobox = utils.get_infobox(parsetree, boxterm)
+        else:
+            infobox = utils.get_infobox(parsetree)
         self.data['infobox'] = infobox
-        self.data['iwlinks'] = utils.get_links(pdata.get('iwlinks'))
 
         title = pdata.get('title')
         if title:
