@@ -42,6 +42,57 @@ WIKIS = [
 ]
 
 
+class WPToolsBreakTest(unittest.TestCase):
+    """
+    test formerly breaking issues
+    """
+    def slash_in_title(self):
+        """
+        Slash in title causes LookupError in get_restbase() Issue #94
+        """
+        rest = wptools.restbase('/dev/null')
+        rest.get_restbase('/page/summary/', show=False)
+        self.assertTrue('exrest' in rest.data)
+        self.assertEqual(page.data['title'], 'Null_device')
+
+    def test_boxterm(self):
+        """
+        Spanish taxobox not captured. Issue #91
+        """
+        page = wptools.page('Okapi', lang='es', boxterm='Ficha',
+                            skip=['imageinfo'])
+        page.get_parse(show=False)
+        self.assertTrue(len(page.data['infobox']) > 0)
+
+    def test_normalized_filename(self):
+        """
+        Ensure parse-image does not cause infinite loop. The
+        normalized API result image title did not match orginal
+        parse-image file name... Issue #93
+        """
+        page = wptools.page('Aphra Behn')
+        page.get_parse(show=False)
+        self.assertTrue(len(page.data['requests']) < 3)
+
+    def test_infobox_subelements(self):
+        """
+        Get infobox data with sub-elements. Issue #66
+        """
+        page = wptools.page("ONE OK ROCK", lang='ja')
+        page.get_parse(show=False)
+        infobox = page.data['infobox']
+        self.assertGreater(len(infobox['Genre'].split('<br')), 5)
+
+    def test_infobox_children(self):
+        """
+        Get infobox data with list values. Issue #62
+        """
+        page = wptools.page('Lewisit', lang='de')
+        page.get_parse(show=False)
+        infobox = page.data['infobox']
+        self.assertGreater(len(infobox['Dichte'].split('*')), 1)
+
+
 class WPToolsPickTest(unittest.TestCase):
     """
     SELECTED (cherry-picked) TESTS
@@ -146,25 +197,6 @@ class WPToolsUtilsTest(unittest.TestCase):
     Utils Tests
     """
 
-    def test_infobox_subelements(self):
-        """
-        Get infobox data with sub-elements. Issue #66
-        """
-        page = wptools.page("ONE OK ROCK", lang='ja', silent=True)
-        page.get_parse(show=False)
-        infobox = page.data['infobox']
-        self.assertGreater(len(infobox['Genre'].split('<br')), 5)
-
-    def test_infobox_children(self):
-        """
-        Get infobox data with list values. Issue #62
-        """
-        page = wptools.page('Lewisit', lang='de', silent=True)
-        page.get_parse(show=False)
-        infobox = page.data['infobox']
-        self.assertGreater(len(infobox['Dichte'].split('*')), 1)
-
-
 class WPToolsWikidataTest(unittest.TestCase):
     """
     Wikidata Tests
@@ -184,6 +216,7 @@ if __name__ == '__main__':
 
     from unittest import TestLoader
     suites = {
+        'break': TestLoader().loadTestsFromTestCase(WPToolsBreakTest),
         'pick': TestLoader().loadTestsFromTestCase(WPToolsPickTest),
         'rand': TestLoader().loadTestsFromTestCase(WPToolsRandomTest),
         'restbase': TestLoader().loadTestsFromTestCase(WPToolsRestBaseTest),
