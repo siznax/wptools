@@ -90,7 +90,7 @@ def main(args):
     GET top pages or random pages forever
     """
     delay = args.delay
-    lang = args.lang or 'en'
+    lang = args.lang
     top = args.top
 
     start = int(time.time())
@@ -108,6 +108,9 @@ def main(args):
 
         while len(pages) > 0:
             language = lang or random.choice(languages())
+            if top and not lang:
+                language = 'en'
+
             page = wptools.page(lang=language, silent=True)
             if top:
                 page = wptools.page(pages.pop(0), lang=language, silent=True)
