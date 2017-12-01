@@ -20,6 +20,7 @@ from . import query
 from . import querymore
 from . import random_query
 from . import redirect
+from . import rest_page
 from . import rest_html
 from . import rest_lead
 from . import rest_summary
@@ -30,6 +31,7 @@ from . import wikidata
 
 SILENT_FLAG = True
 SKIP_FLAG = ['imageinfo', 'labels']
+
 
 class WPToolsTestCase(unittest.TestCase):
 
@@ -244,34 +246,22 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         page = wptools.page('TEST', variant='VARIANT')
         self.assertEqual(page.params,
-                         {'endpoint': '/page/', 'lang': 'en',
-                          'title': 'TEST', 'variant': 'VARIANT'})
+                         {'lang': 'en', 'title': 'TEST', 'variant': 'VARIANT'})
 
         page = wptools.page('TEST', wiki='WIKI')
         self.assertEqual(page.params,
-                         {'endpoint': '/page/', 'lang': 'en',
-                          'title': 'TEST', 'wiki': 'WIKI'})
+                         {'lang': 'en', 'title': 'TEST', 'wiki': 'WIKI'})
 
     def test_page_init(self):
         page = wptools.page('TEST', silent=True)
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/', 'lang': 'en', 'title': 'TEST'})
+        self.assertEqual(page.params, {'lang': 'en', 'title': 'TEST'})
         self.assertEqual(page.flags, {'silent': True, 'verbose': False})
 
-        page = wptools.page('TEST', endpoint='ENDPOINT', silent=SILENT_FLAG)
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/ENDPOINT/TEST',
-                          'lang': 'en', 'title': 'TEST'})
-
         page = wptools.page(pageid=123, silent=SILENT_FLAG)
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/', 'lang': 'en',
-                          'pageid': 123})
+        self.assertEqual(page.params, {'lang': 'en', 'pageid': 123})
 
         page = wptools.page(wikibase='Q42', silent=SILENT_FLAG)
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/', 'lang': 'en',
-                          'wikibase': 'Q42'})
+        self.assertEqual(page.params, {'lang': 'en', 'wikibase': 'Q42'})
 
         self.assertTrue('requests' not in page.data)
 
@@ -293,7 +283,6 @@ class WPToolsPageTestCase(unittest.TestCase):
 
     def test_page_query(self):
         page = wptools.page('TEST')
-
         qobj = wptools.query.WPToolsQuery()
 
         qstr = page._query('random', qobj)
@@ -320,6 +309,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         qstr = page._query('wikidata', qobj)
         self.assertTrue('action=wbgetentities' in qstr)
 
+        page.params.update({'endpoint': '/page/summary/'})
         qstr = page._query('restbase', qobj)
         self.assertTrue('api/rest' in qstr)
 
@@ -608,11 +598,11 @@ class WPToolsQueryTestCase(unittest.TestCase):
 
     def test_query_rest(self):
         qobj = wptools.query.WPToolsQuery()
-        qstr = qobj.restbase(endpoint='/TEST/')
+        qstr = qobj.restbase(endpoint='/TEST/', title='TEST')
         self.assertTrue(qstr.startswith('https://en.wikipedia.org'))
         self.assertTrue('/api/rest' in qstr)
-        self.assertTrue(qstr.endswith('/TEST/'))
-        self.assertEqual(qobj.status, 'en.wikipedia.org (restbase) /TEST/')
+        self.assertTrue(qstr.endswith('/TEST/TEST'))
+        self.assertEqual(qobj.status, 'en.wikipedia.org (restbase) /TEST/TEST')
 
     def test_query_set_status(self):
         qobj = wptools.query.WPToolsQuery()
@@ -666,29 +656,18 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
 
     def test_restbase_init(self):
         page = wptools.restbase()
-        self.assertEqual(page.params, {'endpoint': '/page/', 'lang': 'en'})
+        self.assertEqual(page.params, {'lang': 'en'})
+        self.assertTrue('requests' not in page.data)
 
-        page = wptools.restbase('TEST', endpoint='html')
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/html/TEST',
-                          'lang': 'en',
-                          'title': 'TEST'})
-
-        page = wptools.restbase(endpoint='summary/TEST')
-        self.assertEqual(page.params,
-                         {'endpoint': '/page/summary/TEST',
-                          'lang': 'en',
-                          'title': 'TEST'})
-
-        self.assertRaises(ValueError, wptools.restbase, endpoint='TEST')
-
-        self.assertRaises(ValueError, wptools.restbase,
-                          'TEST', endpoint='summary/TEST_TEST')
-
+    def test_get_restbase_page(self):
+        page = wptools.restbase(silent=SILENT_FLAG)
+        page.params.update({'endpoint': '/page/'})
+        page.cache['restbase'] = rest_page.cache
+        page._set_data('restbase')
         self.assertTrue('requests' not in page.data)
 
     def test_get_restbase_html(self):
-        page = wptools.restbase(endpoint='html/TEST', silent=SILENT_FLAG)
+        page = wptools.restbase('TEST', silent=SILENT_FLAG)
         page.cache['restbase'] = rest_html.cache
         page._set_data('restbase')
 
@@ -701,8 +680,7 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
     def test_get_restbase_lead(self):
-        endpoint = 'mobile-sections-lead/TEST'
-        page = wptools.restbase(endpoint=endpoint, silent=SILENT_FLAG)
+        page = wptools.restbase('TEST', silent=SILENT_FLAG)
         page.cache['restbase'] = rest_lead.cache
         page._set_data('restbase')
 
@@ -722,7 +700,8 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
     def test_get_restbase_summary(self):
-        page = wptools.restbase(endpoint='summary/TEST', silent=SILENT_FLAG)
+        page = wptools.restbase('TEST', silent=SILENT_FLAG)
+        page.params.update({'endpoint': '/page/summary/'})
         page.cache['restbase'] = rest_summary.cache
         page._set_data('restbase')
 
@@ -738,6 +717,7 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue(data['exrest'].startswith('Douglas'))
 
         self.assertTrue('requests' not in page.data)
+
 
 class WPToolsRequestTestCase(unittest.TestCase):
 
@@ -927,7 +907,6 @@ class WPToolsWikidataTestCase(unittest.TestCase):
 
         self.assertTrue('requests' not in page.data)
 
-
     def test_wikidata_disambig(self):
         """
         Ensure title param is set given only wikibase
@@ -1004,8 +983,6 @@ class WPToolsWikidataTestCase(unittest.TestCase):
 
         data = page.data
         self.assertTrue('what' not in data['wikidata'])
-
-
 
 
 class WPToolsToolTestCase(unittest.TestCase):

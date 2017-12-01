@@ -29,7 +29,6 @@ class WPToolsRESTBase(core.WPTools):
         - [title]: <str> Mediawiki page title, file, category, etc.
 
         Optional keyword {params}:
-        - [endpoint]: the RESTBase entry point (default=/page/)
         - [lang]: <str> Mediawiki language code (default=en)
 
         Optional keyword {flags}:
@@ -38,11 +37,6 @@ class WPToolsRESTBase(core.WPTools):
         - [verbose]: <bool> verbose output to stderr if True
         """
         super(WPToolsRESTBase, self).__init__(*args, **kwargs)
-
-        endpoint = self._parse_endpoint(kwargs.get('endpoint'),
-                                        self.params.get('title'))
-
-        self.params.update({'endpoint': endpoint})
 
     def _handle_response(self):
         """
@@ -70,42 +64,11 @@ class WPToolsRESTBase(core.WPTools):
 
         return response
 
-    def _parse_endpoint(self, endpoint, title):
-        """
-        parse input endpoint
-        """
-        if title and '/' in title:
-            title = title.replace('/', '%2F')
-
-        if not endpoint:
-            return '/page/'
-
-        parts = endpoint.split('/')
-        parts = [x for x in parts if x]
-
-        if not parts[0] == 'page':
-            parts.insert(0, 'page')
-
-        if len(parts) == 2:
-            if title:
-                parts.append(title)
-            else:
-                raise ValueError("need a title.")
-
-        if len(parts) == 3:
-            if title:  # check title
-                if title != parts[2]:
-                    raise ValueError("titles conflict.")
-            else:
-                self.params['title'] = parts[-1]
-
-        return '/' + '/'.join(parts)
-
     def _query(self, action, qobj):
         """
         returns WPToolsQuery string from action
         """
-        return qobj.restbase(self.params['endpoint'])
+        return qobj.restbase(self.params['endpoint'], self.params.get('title'))
 
     def _set_data(self, action):
         """
@@ -190,12 +153,14 @@ class WPToolsRESTBase(core.WPTools):
             img.update(thumbnail)
             self.data['image'].append(file_url(img))
 
-    def get_restbase(self, endpoint=None, show=True, proxy=None, timeout=0):
+    def get_restbase(self, endpoint='/page/',
+                     show=True, proxy=None, timeout=0):
         """
         GET RESTBase /page/ endpoints needing only {title}
         https://en.wikipedia.org/api/rest_v1/
 
         for example:
+            /page/
             /page/html/{title}
             /page/summary/{title}
             /page/mobile-sections-lead/{title}
@@ -209,7 +174,7 @@ class WPToolsRESTBase(core.WPTools):
         - [lang]: <str> Mediawiki language code (default=en)
 
         Optional arguments:
-        - [endpoint]: the RESTBase entry point (default=/page/)
+        - [endpoint]: RESTBase entry point (default=/page/)
         - [show]: <bool> echo page data if true
         - [proxy]: <str> use this HTTP proxy
         - [timeout]: <int> timeout in seconds (0=wait forever)
@@ -227,9 +192,10 @@ class WPToolsRESTBase(core.WPTools):
         - wikibase: <str> Wikidata item ID
         - wikidata_url: <str> Wikidata URL
         """
-        if endpoint:
-            endpoint = self._parse_endpoint(endpoint, self.params.get('title'))
-            self.params.update({'endpoint': endpoint})
+        if endpoint != '/page/' and not self.params.get('title'):
+            raise StandardError("endpoint %s needs a title" % endpoint)
+
+        self.params.update({'endpoint': endpoint})
 
         self._get('restbase', show, proxy, timeout)
 

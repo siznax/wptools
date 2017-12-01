@@ -44,7 +44,6 @@ class WPToolsPage(WPToolsRESTBase,
 
         Optional keyword {params}:
         - [boxterm]: <str> Infobox title name or substring
-        - [endpoint]: <str> RESTBase entry point (default=summary)
         - [lang]: <str> Mediawiki language code (default=en)
         - [pageid]: <int> Mediawiki pageid
         - [variant]: <str> Mediawiki language variant
@@ -64,11 +63,6 @@ class WPToolsPage(WPToolsRESTBase,
         if boxterm:
             self.params.update({'boxterm': boxterm})
 
-        endpoint = kwargs.get('endpoint')
-        if endpoint:
-            endpoint = self._parse_endpoint(endpoint, title)
-            self.params.update({'endpoint': endpoint})
-
         pageid = kwargs.get('pageid')
         if pageid:
             self.params.update({'pageid': pageid})
@@ -77,7 +71,7 @@ class WPToolsPage(WPToolsRESTBase,
         if wikibase:
             self.params.update({'wikibase': wikibase})
 
-        if not title and not endpoint and not pageid and not wikibase:
+        if not title and not pageid and not wikibase:
             self.get_random()
         else:
             self.show()
@@ -152,7 +146,7 @@ class WPToolsPage(WPToolsRESTBase,
         elif action == 'wikidata':
             qstr = qobj.wikidata(title, wikibase)
         elif action == 'restbase':
-            qstr = qobj.restbase(endpoint)
+            qstr = qobj.restbase(endpoint, title)
 
         if qstr is None:
             raise ValueError("Unknown action: %s" % action)
@@ -455,7 +449,7 @@ class WPToolsPage(WPToolsRESTBase,
 
             self.flags['defer_imageinfo'] = False
 
-            self.get_restbase('summary', False, proxy, timeout)
+            self.get_restbase('/page/summary/', False, proxy, timeout)
 
             if show:
                 self.show()
@@ -476,7 +470,7 @@ class WPToolsPage(WPToolsRESTBase,
 
             self.flags['defer_imageinfo'] = False
 
-            self.get_restbase('summary', False, proxy, timeout)
+            self.get_restbase('/page/summary/', False, proxy, timeout)
 
             if show:
                 self.show()

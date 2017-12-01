@@ -254,15 +254,20 @@ class WPToolsQuery(object):
 
         return query
 
-    def restbase(self, endpoint):
+    def restbase(self, endpoint, title):
         """
         Returns RESTBase query string
         """
-        endpoint = safequote(endpoint, 'restbase')
+        if not endpoint:
+            raise ValueError("invalid endpoint: %s" % endpoint)
 
-        self.set_status('restbase', endpoint)
+        route = endpoint
+        if title and endpoint != '/page/':
+            route = endpoint + safequote_restbase(title)
 
-        return "%s/api/rest_v1%s" % (self.uri, endpoint)
+        self.set_status('restbase', route)
+
+        return "%s/api/rest_v1/%s" % (self.uri, route[1:])
 
     def set_status(self, action, target):
         """
@@ -354,15 +359,23 @@ def domain_name(wiki):
     return wiki.split('/')[0]
 
 
-def safequote(string, caller=None):
+def safequote(string):
     """
-    Try to UTF-8 encode and urllib quote string
+    Try to UTF-8 encode and percent-quote string
     """
     if string is None:
         return
-    if caller == 'restbase' and '%' in string:
-        return string
     try:
         return quote(string.encode('utf-8'))
     except UnicodeDecodeError:
         return quote(string)
+
+
+def safequote_restbase(title):
+    """
+    Safequote restbase title possibly having slash in title
+    """
+    try:
+        return quote(title.encode('utf-8'), safe='')
+    except UnicodeDecodeError:
+        return quote(title, safe='')
