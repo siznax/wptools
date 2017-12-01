@@ -3,9 +3,12 @@
 Release History
 ---------------
 
-0.4.3 (2017-11-27)
+0.4.4 (2017-12-01)
 ++++++++++++++++++
 
+* Fixed RESTBase LookupError on slash titles (#94)
+* Added boxterm param for more Infobox reach (#91)
+* Improved stress tests, wptool CLI script output
 * Fixed get_imageinfo() issue (#93)
 * Getting ALL Wikidata (#56)
 * Surfaced redirects, disambiguation links (#25)
