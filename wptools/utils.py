@@ -70,9 +70,12 @@ def isfilename(name):
 
 def json_loads(data):
     """
-    python-version safe json.loads
+    python-version-safe json.loads
     """
-    return json.loads(data, encoding='utf-8')
+    try:
+        return json.loads(data, encoding='utf-8')
+    except TypeError:
+        return json.loads(data.decode('utf-8'))
 
 
 def pretty(data):
