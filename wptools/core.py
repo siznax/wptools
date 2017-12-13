@@ -85,7 +85,7 @@ class WPTools(object):
             raise StopIteration("Hit REQUEST_LIMIT = %d" % self.REQUEST_LIMIT)
 
         if self.data['requests'] and self.REQUEST_DELAY:
-            print("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
+            utils.stderr("REQUEST_DELAY = %d seconds" % self.REQUEST_DELAY)
             sleep(self.REQUEST_DELAY)
 
         # make the request
