@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4.4 (2017-12-01)
+0.4.5 (2017-12-13)
 ++++++++++++++++++
 
+* Fixed TypeError on Windows 10 (#95)
 * Fixed RESTBase LookupError on slash titles (#94)
 * Added boxterm param for more Infobox reach (#91)
 * Improved stress tests, wptool CLI script output
