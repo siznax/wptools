@@ -144,7 +144,7 @@ class WPTools(object):
             elif '-1' in entities:
                 raise LookupError(_query)
             else:
-                item = entities.values()[0]
+                item = list(entities.values())[0]
                 if 'missing' in item:
                     errmsg = "wikidata item %s has been deleted" % item['id']
                     raise LookupError(errmsg)
