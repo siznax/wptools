@@ -28,6 +28,7 @@ from . import siteinfo
 from . import sitematrix
 from . import siteviews
 from . import wikidata
+from . import wikidata_deleted
 
 SILENT_FLAG = True
 SKIP_FLAG = ['imageinfo', 'labels']
@@ -983,6 +984,19 @@ class WPToolsWikidataTestCase(unittest.TestCase):
 
         data = page.data
         self.assertTrue('what' not in data['wikidata'])
+
+    def test_wikidata_deleted(self):
+        page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
+
+        page.cache = {'wikidata': wikidata_deleted.cache}
+
+        try:
+            page._set_data('wikidata')
+            self.fail("failed to raise LookupError")
+        except LookupError:
+            pass
+
+        self.assertTrue('requests' not in page.data)
 
 
 class WPToolsToolTestCase(unittest.TestCase):
