@@ -138,16 +138,8 @@ class WPTools(object):
             raise LookupError(_query)
 
         if action == 'wikidata':
-            entities = data.get('entities')
-            if not entities:
-                raise LookupError(_query)
-            elif '-1' in entities:
-                raise LookupError(_query)
-            else:
-                item = list(entities.values())[0]
-                if 'missing' in item:
-                    errmsg = "wikidata item %s has been deleted" % item['id']
-                    raise LookupError(errmsg)
+            handle_wikidata_errors(data, _query)
+
         return data
 
     def _query(self, action, qobj):
@@ -251,6 +243,23 @@ class WPTools(object):
         output.append('}')
 
         prettyprint(output)
+
+
+def handle_wikidata_errors(data, query):
+    """
+    Raises LookupError if wikidata error found
+    """
+    entities = data.get('entities')
+
+    if not entities:
+        raise LookupError(query)
+    elif '-1' in entities:
+        raise LookupError(query)
+    else:
+        item = list(entities.values())[0]
+        if 'missing' in item:
+            errmsg = "wikidata item %s has been deleted" % item['id']
+            raise LookupError(errmsg)
 
 
 def prettyprint(datastr):
