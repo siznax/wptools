@@ -29,6 +29,7 @@ from . import sitematrix
 from . import siteviews
 from . import wikidata
 from . import wikidata_deleted
+from . import wikidata_novalue_snak
 
 SILENT_FLAG = True
 SKIP_FLAG = ['imageinfo', 'labels']
@@ -997,6 +998,12 @@ class WPToolsWikidataTestCase(unittest.TestCase):
             pass
 
         self.assertTrue('requests' not in page.data)
+
+    def test_wikidata_no_value_snak(self):
+        page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'wikidata': wikidata_novalue_snak.cache}
+        page._set_data('wikidata')
+        self.assertEqual(len(page.data['claims']), 1)
 
 
 class WPToolsToolTestCase(unittest.TestCase):

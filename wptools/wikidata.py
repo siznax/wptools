@@ -355,14 +355,14 @@ def reduce_claims(query_claims):
     """
     claims = collections.defaultdict(list)
 
-    for claim in query_claims:
+    for claim, entities in query_claims.items():
 
-        for ent in query_claims.get(claim):
+        for ent in entities:
 
             try:
                 snak = ent.get('mainsnak').get('datavalue').get('value')
             except AttributeError:
-                claims[claim] = []
+                continue
 
             try:
                 if snak.get('id'):
