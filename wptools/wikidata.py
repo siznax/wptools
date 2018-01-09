@@ -355,26 +355,30 @@ def reduce_claims(query_claims):
     """
     claims = collections.defaultdict(list)
 
-    for claim in query_claims:
+    for claim, entities in query_claims.items():
 
-        for ent in query_claims.get(claim):
+        for ent in entities:
 
             try:
-                snak = ent.get('mainsnak').get('datavalue').get('value')
+                snak = ent.get('mainsnak')
+                snaktype = snak.get('snaktype')
+                value = snak.get('datavalue').get('value')
             except AttributeError:
                 claims[claim] = []
 
             try:
-                if snak.get('id'):
-                    val = snak.get('id')
-                elif snak.get('text'):
-                    val = snak.get('text')
-                elif snak.get('time'):
-                    val = snak.get('time')
+                if snaktype != 'value':
+                    val = snaktype
+                elif value.get('id'):
+                    val = value.get('id')
+                elif value.get('text'):
+                    val = value.get('text')
+                elif value.get('time'):
+                    val = value.get('time')
                 else:
-                    val = snak
+                    val = value
             except AttributeError:
-                val = snak
+                val = value
 
             if not val or not [x for x in val if x]:
                 raise ValueError("%s %s" % (claim, ent))
