@@ -1003,7 +1003,7 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         page = wptools.wikidata(skip=SKIP_FLAG, silent=SILENT_FLAG)
         page.cache = {'wikidata': wikidata_novalue_snak.cache}
         page._set_data('wikidata')
-        self.assertEqual(len(page.data['claims']), 1)
+        self.assertEqual(len(page.data['claims']), 2)
 
 
 class WPToolsToolTestCase(unittest.TestCase):
