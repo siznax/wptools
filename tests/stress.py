@@ -11,6 +11,7 @@ from __future__ import print_function
 
 import argparse
 import random
+import sys
 import time
 
 import wptools
@@ -77,12 +78,17 @@ def print_header(delay, lang, pages):
     msg.append("delay: %d lang: %s pages: %s" % (delay, langstr, pagestr))
     msgstr = " ".join(msg)
 
+    header = [msgstr]
+    header.append("=" * len(msgstr))
+    header.append("Python " + sys.version)
+    header.append('-' * len(msgstr))
+
     if len(pages) > 1:
         print("Getting top %s.wikipedia.org pages" % lang)
         for i, title in enumerate(pages[:10]):
             print(" %d. %s" % (i + 1, title))
 
-    print("%s\n%s" % (msgstr, "=" * len(msgstr)))
+    print("\n".join(header))
 
 
 def main(args):
