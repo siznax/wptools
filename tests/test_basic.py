@@ -9,6 +9,7 @@ import unittest
 import wptools
 
 from . import category
+from . import category_cmcontinue
 from . import disambiguation
 from . import imageinfo
 from . import labels_1
@@ -84,15 +85,32 @@ class WPToolsCategoryTestCase(unittest.TestCase):
         cat = wptools.category('TEST')
         cat.cache['category'] = category.cache
         cat._set_data('category')
-        self.assertTrue(len(cat.data['members']), 92)
+        self.assertEqual(len(cat.data['members']), 68)
+        self.assertEqual(len(cat.data['subcategories']), 24)
         self.assertTrue('requests' not in cat.data)
 
     def test_category_get_members_namespace(self):
         cat = wptools.category('TEST', namespace=0)
         cat.cache['category'] = category.cache
         cat._set_data('category')
-        self.assertTrue(len(cat.data['members']), 92)
+        self.assertEqual(len(cat.data['members']), 68)
         self.assertTrue('requests' not in cat.data)
+
+    def test_category_get_members_continue(self):
+        cat = wptools.category('TEST')
+        cat.cache['category'] = category_cmcontinue.cache
+        cat._set_data('category')
+        self.assertTrue('cmcontinue' in cat.data)
+        self.assertEqual(len(cat.data['members']), 1)
+
+        qry = cat._query('category', wptools.query.WPToolsQuery())
+        self.assertTrue('&cmcontinue=page|' in qry)
+        self.assertTrue(qry.endswith('|42525291'))
+
+        cat.cache['category'] = category.cache
+        cat._set_data('category')
+        self.assertTrue('cmcontinue' not in cat.data)
+        self.assertEqual(len(cat.data['members']), 69)
 
     def test_category_query(self):
         cat = wptools.category('TEST')
