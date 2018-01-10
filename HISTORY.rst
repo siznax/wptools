@@ -3,10 +3,12 @@
 Release History
 ---------------
 
-0.4.6 (2017-12-22)
+0.4.7 (2018-01-10)
 ++++++++++++++++++
 
-* Merged deleted Wikidata item PR by @seansay (#97)
+* Added support for category continuations, subcategories (#99)
+* Merged @RobbieClarken fix for non-value Wikidata snaktypes (#98)
+* Merged @seansay fix for deleted Wikidata item (#97)
 * Fixed TypeError on Windows 10 (#95)
 * Fixed RESTBase LookupError on slash titles (#94)
 * Added boxterm param for more Infobox reach (#91)
