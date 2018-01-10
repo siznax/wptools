@@ -66,6 +66,24 @@ class WPToolsCategory(core.WPTools):
         if not pageid and not title:
             self.get_random()
 
+    def _add_members(self, catmembers):
+        """
+        Adds category members and subcategories to data
+        """
+        members = [x for x in catmembers if x['ns'] == 0]
+        subcats = [x for x in catmembers if x['ns'] == 14]
+
+        if 'members' in self.data:
+            self.data['members'].extend(members)
+        else:
+            self.data.update({'members': members})
+
+        if subcats:
+            if 'subcategories' in self.data:
+                self.data['subcategories'].extend(subcats)
+            else:
+                self.data.update({'subcategories': subcats})
+
     def _query(self, action, qobj):
         """
         Form query to enumerate category
@@ -76,7 +94,10 @@ class WPToolsCategory(core.WPTools):
         if action == 'random':
             return qobj.random(namespace=14)
         elif action == 'category':
-            return qobj.category(title=title, pageid=pageid)
+            qry = qobj.category(title=title, pageid=pageid)
+            if self.data.get('cmcontinue'):
+                qry += "&cmcontinue=%s" % self.data['cmcontinue']
+            return qry
 
     def _set_data(self, action):
         """
@@ -84,9 +105,19 @@ class WPToolsCategory(core.WPTools):
         """
         data = self._load_response(action)
 
+        try:
+            cmcontinue = data.get('continue').get('cmcontinue')
+            if cmcontinue:
+                self.data['cmcontinue'] = cmcontinue
+                del self.cache['category']
+        except AttributeError:
+            if 'cmcontinue' in self.data:
+                del self.data['cmcontinue']
+
         if action == 'category':
             members = data.get('query').get('categorymembers')
-            self.data.update({'members': members})
+            if members:
+                self._add_members(members)
 
         if action == 'random':
             rand = data['query']['random'][0]
@@ -119,6 +150,10 @@ class WPToolsCategory(core.WPTools):
             raise LookupError("needs category title or pageid")
 
         self._get('category', show, proxy, timeout)
+
+        if self.data.get('cmcontinue'):
+            while self.data.get('cmcontinue'):
+                self._get('category', show, proxy, timeout)
 
         return self
 
