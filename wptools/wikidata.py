@@ -163,7 +163,7 @@ class WPToolsWikidata(core.WPTools):
         entities = data.get('entities')
         item = entities.get(next(iter(entities)))
 
-        self.data['pageid'] = item.get('pageid')
+        self.data['wikidata_pageid'] = item.get('pageid')
 
         aliases = item.get('aliases')
         if aliases:
