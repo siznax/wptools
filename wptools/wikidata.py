@@ -191,7 +191,7 @@ class WPToolsWikidata(core.WPTools):
         """
         add images from Wikidata
         """
-        wd_images = self.data['wikidata'].get('image (P18)')
+        wd_images = self.data['claims'].get('P18')  # image
 
         if wd_images:
             if not isinstance(wd_images, list):
