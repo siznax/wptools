@@ -37,7 +37,7 @@ class WPToolsQuery(object):
         "${WIKI}/w/api.php?action=query"
         "&format=json"
         "&formatversion=2"
-        "&iiprop=size|url|timestamp"
+        "&iiprop=size|url|timestamp|extmetadata"
         "&prop=imageinfo"
         "&titles=${FILES}"))
 

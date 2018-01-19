@@ -76,15 +76,18 @@ class WPToolsPage(WPToolsRESTBase,
         else:
             self.show()
 
-    def __update_imagedata(self, title, _from, info):
+    def __insert_image_info(self, title, _from, info):
         """
-        Update page images with get_imageinfo() data
+        Insert API image INFO into matching image dict
 
-        We make one imageinfo request containing only unique
-        image['file'] names. We match the API response data to an
-        image['file'] by API title/file match or API
-        normalized["from"]/file match. So, some imageinfo data will be
-        applied to more than one image['kind'].
+        We make one imageinfo request containing only unique image
+        filenames. We reduce duplication by asking for image data per
+        file, instead of per "kind" or source (Wikipedia, Wikidata,
+        etc.), because some sources reference the same image file. We
+        match API imageinfo response data to existing image filenames
+        by API title or normalized "from" title. So, some imageinfo
+        data will be applied to more than one image "kind" (source) if
+        they share the same filename.
         """
         for img in self.data['image']:
             if 'url' not in img:
@@ -92,6 +95,28 @@ class WPToolsPage(WPToolsRESTBase,
                     img.update(info)
                 elif _from == img['file']:  # matching from/file
                     img.update(info)
+
+    def __pull_image_info(self, title, imageinfo, normalized):
+        """
+        Pull image INFO from API response and insert
+        """
+        for info in imageinfo:
+            info.update({'title': title})
+
+            # get API normalized "from" filename for matching
+            _from = None
+            for norm in normalized:
+                if title == norm['to']:
+                    _from = norm['from']
+
+            # let's put all "metadata" in one member
+            info['metadata'] = {}
+            extmetadata = info.get('extmetadata')
+            if extmetadata:
+                info['metadata'].update(extmetadata)
+                del info['extmetadata']
+
+            self.__insert_image_info(title, _from, info)
 
     def _missing_imageinfo(self):
         """
@@ -189,14 +214,9 @@ class WPToolsPage(WPToolsRESTBase,
 
         for page in pages:
             title = page.get('title')
-            if page.get('imageinfo'):
-                for info in page['imageinfo']:
-                    info.update({'title': title})
-                    _from = None  # normalized filename
-                    for norm in normalized:
-                        if title == norm['to']:
-                            _from = norm['from']
-                    self.__update_imagedata(title, _from, info)
+            imageinfo = page.get('imageinfo')
+            if imageinfo:
+                self.__pull_image_info(title, imageinfo, normalized)
 
         # Mark missing imageinfo to prevent duplicate requests
         for img in self.data['image']:
