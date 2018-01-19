@@ -3,9 +3,11 @@
 Release History
 ---------------
 
-0.4.7 (2018-01-10)
+0.4.8 (2018-01-19)
 ++++++++++++++++++
 
+* Added image (license, assessment) metadata (#104, #105)
+* Fixed Wikidata pageid, image bugs (#101, #102)
 * Added support for category continuations, subcategories (#99)
 * Merged @RobbieClarken fix for non-value Wikidata snaktypes (#98)
 * Merged @seansay fix for deleted Wikidata item (#97)
