@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4.8 (2018-01-19)
+0.4.9 (2018-01-26)
 ++++++++++++++++++
 
+* Improved infobox parsing (#109)
 * Added image (license, assessment) metadata (#104, #105)
 * Fixed Wikidata pageid, image bugs (#101, #102)
 * Added support for category continuations, subcategories (#99)
