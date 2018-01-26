@@ -96,26 +96,42 @@ def stderr(msg, silent=False):
         print(msg, file=sys.stderr)
 
 
-def template_to_dict(tree):
+def template_to_dict(tree, debug=0, find=False):
     """
-    returns wikitext template as dict (one deep)
+    returns wikitext template as dict
+
+    debug = 1
+        prints minimal debug info to stdout
+    debug > 1
+        compares _iter() versus _find() results
+    find = True
+        sets values from _find() algorithm (default _iter())
     """
 
-    # https://en.wikipedia.org/wiki/Abraham_Lincoln?action=raw&section=0
+    # you can compare (most) raw Infobox wikitext like this:
+    # https://en.wikipedia.org/wiki/TITLE?action=raw&section=0
 
     obj = defaultdict(str)
     errors = []
     for item in tree:
         try:
             name = item.findtext('name').strip()
-            tmpl = item.find('value').find('template')
-            if tmpl is not None:
-                value = template_to_text(tmpl)
-            else:
-                value = text_with_children(item.find('value'))
+
+            if debug:
+                template_to_dict_debug(name, item, debug)
+
+            find_val = template_to_dict_find(item, debug)  # DEPRECATED
+            iter_val = template_to_dict_iter(item, debug)
+
+            value = iter_val
+            if find:
+                value = find_val
+
             if name and value:
                 obj[name] = value.strip()
+
         except AttributeError:
+
             if isinstance(item, lxml.etree.ElementBase):
                 name = item.tag.strip()
                 text = item.text.strip()
@@ -123,18 +139,138 @@ def template_to_dict(tree):
                     obj['infobox'] = text
                 else:
                     obj[name] = text
+
         except:
             errors.append(lxml.etree.tostring(item))
+
     if errors:
         obj['errors'] = errors
+
     return dict(obj)
 
 
-def text_with_children(node):
+def template_to_dict_debug(name, item, debug):
     """
-    return text content with children (#62), sub-elements (#66)
-    https://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml
+    Print debug statements to compare algorithms
     """
+    if debug == 1:
+        print("\n%s = " % name)
+    elif debug > 1:
+        print("\n%s" % name)
+        print("=" * 64)
+        print(lxml.etree.tostring(item))
+        print()
+
+
+def template_to_dict_find(item, debug=0):
+    """
+    DEPRECATED: Returns infobox parsetree value using etree.find()
+
+    Older template_to_dict() algorithm, uses etree.xpath() to "lookup"
+    or find specific elements, but fails to include tail text in the
+    order it is found, and does not _exclude_ <ext> tags (references,
+    etc.). Compare to template_to_dict_iter().
+    """
+    if debug > 1:
+        print("template_to_dict_find:")
+
+    tmpl = item.find('value').find('template')
+
+    if tmpl is not None:
+        value = template_to_text(tmpl, debug)
+    else:
+        value = text_with_children(item.find('value'), debug)
+
+    if debug:
+        print("  find: %s" % value)
+
+    return value
+
+
+def template_to_dict_iter(item, debug=0):
+    """
+    Returns infobox parsetree value using etree.iter()
+
+    Preferred template_to_dict() algorithm, uses etree.iter() to
+    iterate over elements, accumulating tail text in order, but not
+    preserving `<ext>` tags (references, etc.). The advantage is that
+    it picks up MORE templates and links that may be mixed in with
+    `<ext>` tags, and keeps the result focused on the data. Compare to
+    template_to_dict_find().
+    """
+    valarr = []
+    found_template = False
+
+    if debug > 1:
+        print("template_to_dict_iter:")
+
+    for elm in item.iter():
+
+        if debug > 1:
+            template_to_dict_iter_debug(elm)
+
+        if elm.tag == 'value' and not found_template:
+            valarr.append(elm.text.strip())
+
+        if elm.tag == 'template':
+            found_template = True
+            valarr.append(template_to_text(elm, debug).strip())
+
+        if elm.tail:
+            valarr.append(elm.tail.strip())
+
+    value = " ".join([x for x in valarr if x])
+
+    if debug:
+        print("  iter: %s" % value)
+
+    return value
+
+
+def template_to_dict_iter_debug(elm):
+    """
+    Print expanded element on stdout for debugging
+    """
+    if elm.text is not None:
+        print("    <%s>%s</%s>" % (elm.tag, elm.text, elm.tag), end='')
+        if elm.tail is not None:
+            print(elm.tail)
+        else:
+            print()
+    else:
+        if elm.tail is not None:
+            print("    <%s>%s" % (elm.tag, elm.tail))
+        else:
+            print("    <%s>" % elm.tag)
+
+
+def template_to_text(tmpl, debug=0):
+    """
+    convert parse tree template to text
+    """
+    tarr = []
+    for item in tmpl.itertext():
+        tarr.append(item)
+
+    text = "{{%s}}" % "|".join(tarr).strip()
+
+    if debug > 1:
+        print("+ template_to_text:")
+        print("  %s" % text)
+
+    return text
+
+
+def text_with_children(node, debug=0):
+    """
+    DEPRECATED: return text content with children (#62), sub-elements (#66)
+
+    Only used by deprecated template_to_dict_find(), and suffers from
+    copypasta code smell.
+    """
+
+    # https://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml
+
     if sys.version.startswith('3'):  # py3 needs encoding=str
         parts = ([node.text] +
                  list(chain(
@@ -147,17 +283,14 @@ def text_with_children(node):
                      *([tostring(c, with_tail=False),
                         c.tail] for c in node.getchildren())))
                  + [node.tail])
-    return ''.join(filter(lambda x: x or isinstance(x, str), parts))
 
+    value = ''.join(filter(lambda x: x or isinstance(x, str), parts)).strip()
 
-def template_to_text(tmpl):
-    """
-    convert parse tree template to text
-    """
-    text = []
-    for item in tmpl.itertext():
-        text.append(item)
-    return "{{%s}}" % "|".join(text)
+    if debug > 1:
+        print("+ text_with_children:")
+        print("  %s" % value)
+
+    return value
 
 
 def wikidata_url(wikibase):

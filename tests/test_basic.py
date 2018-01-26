@@ -17,6 +17,9 @@ from . import labels_2
 from . import labels_3
 from . import labels_wanted
 from . import parse
+from . import parse_62
+from . import parse_66
+from . import parse_109
 from . import query
 from . import querymore
 from . import random_query
@@ -354,7 +357,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         page._set_data('parse')
         data = page.data
         self.assertEqual(data['pageid'], 8091)
-        self.assertEqual(len(data['infobox']), 15)
+        self.assertEqual(len(data['infobox']), 13)
         self.assertEqual(len(data['iwlinks']), 2)
         self.assertEqual(len(data['parsetree']), 78594)
         self.assertEqual(len(data['wikitext']), 65836)
@@ -365,6 +368,51 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(str(data['image'][0]['file']),
                          'File:Douglas adams portrait cropped.jpg')
 
+        self.assertTrue('requests' not in page.data)
+
+    def test_page_get_parse_62(self):
+        """
+        Get infobox data with list values. Issue #62
+        """
+        page = wptools.page('Lewisit', lang='de',
+                            skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse_62.cache}
+        page._set_data('parse')
+        infobox = page.data['infobox']
+        self.assertEqual(len(infobox['Dichte'].split('*')), 3)
+        self.assertEqual(len(infobox['Schmelzpunkt'].split('*')), 3)
+        self.assertEqual(len(infobox['Siedepunkt'].split('*')), 3)
+        self.assertEqual(len(infobox['Brechungsindex'].split('*')), 3)
+        self.assertEqual(len(infobox['ToxDaten'].split('*')), 3)
+        self.assertEqual(len(infobox['Andere Namen'].split('*')), 6)
+        self.assertTrue('requests' not in page.data)
+
+    def test_page_get_parse_66(self):
+        """
+        Get infobox data with sub-elements. Issue #66
+        """
+        page = wptools.page("ONE OK ROCK", lang='ja',
+                            skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse_66.cache}
+        page._set_data('parse')
+        infobox = page.data['infobox']
+        self.assertEqual(len(infobox['Genre'].split('<br')), 8)
+        self.assertTrue('requests' not in page.data)
+
+    def test_page_get_parse_109(self):
+        """
+        Get infobox data with mix of links, templates, tail text
+        """
+        page = wptools.page('Orléans-cléry', lang='fr',
+                            skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse_109.cache}
+        page._set_data('parse')
+        infobox = page.data['infobox']
+        self.assertTrue('[[cabernet franc]]' in infobox[u'cépages'])
+        self.assertEqual(infobox[u'volproduction'],
+                         u'{{unité|848|hectolitres}} en [[2009]]')
+        self.assertEqual(infobox[u'densité'],
+                         u'minimum de {{unité|5000|pieds}} par hectare')
         self.assertTrue('requests' not in page.data)
 
     def test_page_get_parse_boxterm(self):
