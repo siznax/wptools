@@ -74,24 +74,6 @@ class WPToolsBreakTest(unittest.TestCase):
         page.get_parse(show=False)
         self.assertTrue(len(page.data['requests']) < 3)
 
-    def test_infobox_subelements(self):
-        """
-        Get infobox data with sub-elements. Issue #66
-        """
-        page = wptools.page("ONE OK ROCK", lang='ja')
-        page.get_parse(show=False)
-        infobox = page.data['infobox']
-        self.assertGreater(len(infobox['Genre'].split('<br')), 5)
-
-    def test_infobox_children(self):
-        """
-        Get infobox data with list values. Issue #62
-        """
-        page = wptools.page('Lewisit', lang='de')
-        page.get_parse(show=False)
-        infobox = page.data['infobox']
-        self.assertGreater(len(infobox['Dichte'].split('*')), 1)
-
 
 class WPToolsPickTest(unittest.TestCase):
     """
