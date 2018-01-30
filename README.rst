@@ -106,7 +106,7 @@ Get `API:Parse`_ data:
     }
 
 
-Get Wikidata_
+Get Wikidata_:
 
 .. _Wikidata: https://www.wikidata.org/w/api.php
 
@@ -228,6 +228,36 @@ Get more (expensive) data:
       requests: <list(1)> querymore
       title: Mahatma Gandhi
       views: 19,242
+    }
+
+
+Get data in `another language`_:
+
+.. _`another language`: https://github.com/siznax/wptools/wiki/Language-Codes
+
+.. code-block:: python
+
+    >>> page = wptools.page(lang='zh')
+    zh.wikipedia.org (random) 🍰
+    哈莉特·塔布曼 (zh) data
+    {
+      pageid: 211070
+      title: 哈莉特·塔布曼
+    }
+
+
+Get data from `another wiki`_:
+
+.. _`another wiki`: https://meta.wikimedia.org/wiki/List_of_Wikipedias
+
+.. code-block:: python
+
+    >>> page = wptools.page(wiki='en.wikiquote.org')
+    en.wikiquote.org (random) 🍪
+    Malala_Yousafzai (en)
+    {
+      pageid: 146817
+      title: Malala_Yousafzai
     }
 
 
