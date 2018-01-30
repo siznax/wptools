@@ -19,6 +19,7 @@ from . import labels_wanted
 from . import parse
 from . import parse_62
 from . import parse_66
+from . import parse_91
 from . import parse_109
 from . import query
 from . import querymore
@@ -397,6 +398,20 @@ class WPToolsPageTestCase(unittest.TestCase):
         page._set_data('parse')
         infobox = page.data['infobox']
         self.assertEqual(len(infobox['Genre'].split('<br')), 8)
+        self.assertTrue('requests' not in page.data)
+
+    def test_page_get_parse_91(self):
+        """
+        Get infobox data with unusual wikitext syntax
+        """
+        page = wptools.page('Okapi', lang='fr',
+                            skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse_91.cache}
+        page._set_data('parse')
+        infobox = page.data['infobox']
+        self.assertEqual(len(infobox['boxes']), 13)
+        self.assertTrue(u'Taxobox début' in page.data['infobox']['boxes'][0])
+        self.assertEqual(list(infobox['boxes'][9].keys()), ['Taxobox UICN'])
         self.assertTrue('requests' not in page.data)
 
     def test_page_get_parse_109(self):

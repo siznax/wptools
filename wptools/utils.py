@@ -21,12 +21,31 @@ from lxml.etree import tostring
 
 def get_infobox(ptree, boxterm="box"):
     """
-    returns infobox <type 'dict'> from get_parse:parsetreee
+    Returns parse tree template with title containing <boxterm> as dict:
+
+        <box> = {<name>: <value>, ...}
+
+    If simple transform fails, attempts more general assembly:
+
+        <box> = {'boxes': [{<title>: <parts>}, ...],
+                 'count': <len(boxes)>}
     """
+    boxes = []
     for item in lxml.etree.fromstring(ptree).xpath("//template"):
+
         title = item.find('title').text
         if title and boxterm in title:
-            return template_to_dict(item)
+
+            box = template_to_dict(item)
+            if box:
+                return box
+
+            alt = template_to_dict_alt(item, title)
+            if alt:
+                boxes.append(alt)
+
+    if boxes:
+        return {'boxes': boxes, 'count': len(boxes)}
 
 
 def get_links(rlinks):
@@ -147,6 +166,37 @@ def template_to_dict(tree, debug=0, find=False):
         obj['errors'] = errors
 
     return dict(obj)
+
+
+def template_to_dict_alt(tree, title):
+    """
+    Returns parse tree template as {<title>: <parts>}
+    This is a more general parse tree infobox template parser.
+    """
+    box = []
+    part = []
+
+    for item in tree.iter():
+
+        if item.tag == 'part':
+            if part:
+                box.append(part)
+            part = []
+
+        if item.tag == 'name' or item.tag == 'value':
+            for attr in item.keys():
+                part.append({attr: item.get(attr)})
+
+            if item.text:
+                part.append(item.text.strip())
+
+            if item.tail:
+                part.append(item.tail.strip())
+
+    if part:
+        box.append(part)
+
+    return {title.strip(): box}
 
 
 def template_to_dict_debug(name, item, debug):
