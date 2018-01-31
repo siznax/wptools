@@ -445,11 +445,12 @@ class WPToolsPageTestCase(unittest.TestCase):
         data = page.data
         self.assertEqual(data['description'], 'English writer and humorist')
         self.assertEqual(data['label'], 'Douglas Adams')
-        self.assertEqual(data['length'], 60137)
+        self.assertEqual(data['length'], 60360)
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(data['watchers'], 452)
+        self.assertEqual(len(data['alias']), 4)
         self.assertEqual(len(data['image']), 2)
-        self.assertEqual(len(data['links']), 373)
+        self.assertEqual(len(data['links']), 371)
         self.assertEqual(str(data['wikibase']), 'Q42')
         self.assertTrue('page' in data['modified'])
         self.assertTrue(data['extext'].startswith('**Douglas'))
@@ -503,8 +504,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'random': query.cache}
         page._set_data('random')
         page.get_random()
-        self.assertEqual(page.data['pageid'], 1158197)
-        self.assertEqual(page.data['title'], 'Hope Bay')
+        self.assertEqual(page.data['pageid'], 5902235)
+        self.assertEqual(page.data['title'], 'Just Deal')
 
         self.assertTrue('requests' not in page.data)
 

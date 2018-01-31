@@ -1,13 +1,12 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms&redirects&rnlimit=1&rnnamespace=0&titles=Douglas%20Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects&redirects&rdlimit=500&rnlimit=1&rnnamespace=0&titles=Douglas%20Adams'
 
-response = r"""
-{
+response = r"""{
     "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.855352545904|0.8553532323190001|23584133|0",
-        "continue": "-||extracts|info|links|pageimages|pageprops|pageterms"
+        "rncontinue": "0.828806594464|0.828806677039|8483307|0",
+        "continue": "-||extracts|info|links|pageimages|pageprops|pageterms|redirects"
     },
     "query": {
         "pages": [
@@ -20,9 +19,9 @@ response = r"""
                 "pagelanguage": "en",
                 "pagelanguagehtmlcode": "en",
                 "pagelanguagedir": "ltr",
-                "touched": "2017-11-15T08:35:40Z",
-                "lastrevid": 810162769,
-                "length": 60137,
+                "touched": "2018-01-28T22:54:01Z",
+                "lastrevid": 821940617,
+                "length": 60360,
                 "watchers": 452,
                 "fullurl": "https://en.wikipedia.org/wiki/Douglas_Adams",
                 "editurl": "https://en.wikipedia.org/w/index.php?title=Douglas_Adams&action=edit",
@@ -654,10 +653,6 @@ response = r"""
                     },
                     {
                         "ns": 0,
-                        "title": "Institute for Advanced Technology in the Humanities"
-                    },
-                    {
-                        "ns": 0,
                         "title": "Integrated Authority File"
                     },
                     {
@@ -774,7 +769,7 @@ response = r"""
                     },
                     {
                         "ns": 0,
-                        "title": "List of Doctor Who serials"
+                        "title": "List of Doctor Who episodes (1963–1989)"
                     },
                     {
                         "ns": 0,
@@ -818,7 +813,7 @@ response = r"""
                     },
                     {
                         "ns": 0,
-                        "title": "Marvin (character)"
+                        "title": "Marvin the Paranoid Android"
                     },
                     {
                         "ns": 0,
@@ -1042,6 +1037,10 @@ response = r"""
                     },
                     {
                         "ns": 0,
+                        "title": "SNAC"
+                    },
+                    {
+                        "ns": 0,
                         "title": "Sally Emerson"
                     },
                     {
@@ -1059,14 +1058,6 @@ response = r"""
                     {
                         "ns": 0,
                         "title": "Save the Rhino"
-                    },
-                    {
-                        "ns": 0,
-                        "title": "Science fiction writer"
-                    },
-                    {
-                        "ns": 0,
-                        "title": "Screenwriter"
                     },
                     {
                         "ns": 0,
@@ -1242,10 +1233,6 @@ response = r"""
                     },
                     {
                         "ns": 0,
-                        "title": "The Five Doctors"
-                    },
-                    {
-                        "ns": 0,
                         "title": "The God Delusion"
                     },
                     {
@@ -1407,6 +1394,10 @@ response = r"""
                     {
                         "ns": 0,
                         "title": "USENET"
+                    },
+                    {
+                        "ns": 0,
+                        "title": "University of Cambridge"
                     },
                     {
                         "ns": 0,
@@ -1573,10 +1564,6 @@ response = r"""
                         "title": "Help:Authority control"
                     },
                     {
-                        "ns": 12,
-                        "title": "Help:CS1 errors"
-                    },
-                    {
                         "ns": 14,
                         "title": "Category:CS1 maint: Extra text: authors list"
                     },
@@ -1621,20 +1608,82 @@ response = r"""
                         "Douglas N. Adams",
                         "DNA"
                     ],
-                    "description": [
-                        "English writer and humorist"
-                    ],
                     "label": [
                         "Douglas Adams"
+                    ],
+                    "description": [
+                        "English writer and humorist"
                     ]
-                }
+                },
+                "redirects": [
+                    {
+                        "pageid": 421613,
+                        "ns": 0,
+                        "title": "Douglas Noël Adams"
+                    },
+                    {
+                        "pageid": 442167,
+                        "ns": 0,
+                        "title": "Douglas Adams Biography"
+                    },
+                    {
+                        "pageid": 555606,
+                        "ns": 0,
+                        "title": "Douglas Noel Adams"
+                    },
+                    {
+                        "pageid": 697699,
+                        "ns": 0,
+                        "title": "Bop Ad"
+                    },
+                    {
+                        "pageid": 742979,
+                        "ns": 0,
+                        "title": "Adams, Douglas"
+                    },
+                    {
+                        "pageid": 799056,
+                        "ns": 0,
+                        "title": "Adams, Douglas Noel"
+                    },
+                    {
+                        "pageid": 911959,
+                        "ns": 0,
+                        "title": "Douglas adams"
+                    },
+                    {
+                        "pageid": 944266,
+                        "ns": 0,
+                        "title": "Douglass adams"
+                    },
+                    {
+                        "pageid": 19511273,
+                        "ns": 0,
+                        "title": "Jane Belson"
+                    },
+                    {
+                        "pageid": 31976318,
+                        "ns": 0,
+                        "title": "Douglas Adams bibliography"
+                    },
+                    {
+                        "pageid": 35473253,
+                        "ns": 0,
+                        "title": "Adams, Douglas Noël"
+                    },
+                    {
+                        "pageid": 41687224,
+                        "ns": 0,
+                        "title": "Adamsian"
+                    }
+                ]
             }
         ],
         "random": [
             {
-                "id": 1158197,
+                "id": 5902235,
                 "ns": 0,
-                "title": "Hope Bay"
+                "title": "Just Deal"
             }
         ]
     }
