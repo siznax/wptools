@@ -297,6 +297,10 @@ class WPToolsPage(WPToolsRESTBase,
         """
         self.data['pageid'] = page.get('pageid')
 
+        assessments = page.get('pageassessments')
+        if assessments:
+            self.data['assessments'] = assessments
+
         extract = page.get('extract')
         if extract:
             self.data['extract'] = extract
