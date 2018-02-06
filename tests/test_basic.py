@@ -448,7 +448,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(data['length'], 60360)
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(data['watchers'], 452)
-        self.assertEqual(len(data['alias']), 4)
+        self.assertEqual(len(data['alias']), 3)
+        self.assertEqual(len(data['assessments']), 10)
         self.assertEqual(len(data['image']), 2)
         self.assertEqual(len(data['links']), 371)
         self.assertEqual(str(data['wikibase']), 'Q42')
@@ -504,8 +505,9 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'random': query.cache}
         page._set_data('random')
         page.get_random()
-        self.assertEqual(page.data['pageid'], 5902235)
-        self.assertEqual(page.data['title'], 'Just Deal')
+        self.assertEqual(page.data['pageid'], 33867401)
+        self.assertEqual(page.data['title'], 
+                         u'Finnish prohibition referendum, 1931')
 
         self.assertTrue('requests' not in page.data)
 

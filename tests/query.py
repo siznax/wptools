@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 
-query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageimages|pageprops|pageterms|redirects&redirects&rdlimit=500&rnlimit=1&rnnamespace=0&titles=Douglas%20Adams'
+query = 'https://en.wikipedia.org/w/api.php?action=query&exintro&formatversion=2&inprop=url|watchers&list=random&pithumbsize=240&pllimit=500&ppprop=disambiguation|wikibase_item&prop=extracts|info|links|pageassessments|pageimages|pageprops|pageterms|redirects&redirects&rdlimit=500&rnlimit=1&rnnamespace=0&titles=Douglas%20Adams'
 
-response = r"""{
+response = r"""
+{
     "batchcomplete": true,
     "continue": {
-        "rncontinue": "0.828806594464|0.828806677039|8483307|0",
-        "continue": "-||extracts|info|links|pageimages|pageprops|pageterms|redirects"
+        "rncontinue": "0.050379956901|0.050380219435|2107564|0",
+        "continue": "-||extracts|info|links|pageassessments|pageimages|pageprops|pageterms|redirects"
     },
     "query": {
         "pages": [
@@ -14,12 +15,12 @@ response = r"""{
                 "pageid": 8091,
                 "ns": 0,
                 "title": "Douglas Adams",
-                "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>",
+                "extract": "<p><b>Douglas Noel Adams</b> (11 March 1952 – 11 May 2001) was an English author, scriptwriter, essayist, humorist, satirist and dramatist.</p>\n<p>Adams is best known as the author of <i>The Hitchhiker's Guide to the Galaxy</i>, which originated in 1978 as a BBC radio comedy before developing into a \"trilogy\" of five books that sold more than 15 million copies in his lifetime and generated a television series, several stage plays, comics, a computer game, and in 2005 a feature film. Adams's contribution to UK radio is commemorated in The Radio Academy's Hall of Fame.</p>\n<p>Adams also wrote <i>Dirk Gently's Holistic Detective Agency</i> (1987) and <i>The Long Dark Tea-Time of the Soul</i> (1988), and co-wrote <i>The Meaning of Liff</i> (1983), <i>The Deeper Meaning of Liff</i> (1990), <i>Last Chance to See</i> (1990), and three stories for the television series <i>Doctor Who</i>; he also served as script editor for the show's seventeenth season in 1979. A posthumous collection of his works, including an unfinished novel, was published as <i>The Salmon of Doubt</i> in 2002.</p>\n<p>Adams was known as an advocate for environmentalism and conservation, as a lover of fast cars, cameras, technological innovation and the Apple Macintosh, and as a \"devout atheist\".</p>\n<p></p>",
                 "contentmodel": "wikitext",
                 "pagelanguage": "en",
                 "pagelanguagehtmlcode": "en",
                 "pagelanguagedir": "ltr",
-                "touched": "2018-01-28T22:54:01Z",
+                "touched": "2018-02-03T15:01:39Z",
                 "lastrevid": 821940617,
                 "length": 60360,
                 "watchers": 452,
@@ -1592,6 +1593,48 @@ response = r"""{
                         "title": "Portal:Hitchhiker's"
                     }
                 ],
+                "pageassessments": {
+                    "Biography": {
+                        "class": "B",
+                        "importance": ""
+                    },
+                    "Wikipedia 1.0": {
+                        "class": "C",
+                        "importance": "Mid"
+                    },
+                    "Science Fiction": {
+                        "class": "C",
+                        "importance": "Mid"
+                    },
+                    "Comedy": {
+                        "class": "B",
+                        "importance": "Mid"
+                    },
+                    "London": {
+                        "class": "B",
+                        "importance": "Low"
+                    },
+                    "Atheism": {
+                        "class": "B",
+                        "importance": "Low"
+                    },
+                    "BBC": {
+                        "class": "B",
+                        "importance": "Low"
+                    },
+                    "Monty Python": {
+                        "class": "B",
+                        "importance": "Mid"
+                    },
+                    "Hitchhiker's Guide to the Galaxy": {
+                        "class": "",
+                        "importance": ""
+                    },
+                    "Doctor Who": {
+                        "class": "B",
+                        "importance": "Low"
+                    }
+                },
                 "thumbnail": {
                     "source": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Douglas_adams_portrait_cropped.jpg/207px-Douglas_adams_portrait_cropped.jpg",
                     "width": 207,
@@ -1605,8 +1648,7 @@ response = r"""{
                     "alias": [
                         "Douglas Noël Adams",
                         "Douglas Noel Adams",
-                        "Douglas N. Adams",
-                        "DNA"
+                        "Douglas N. Adams"
                     ],
                     "label": [
                         "Douglas Adams"
@@ -1681,9 +1723,9 @@ response = r"""{
         ],
         "random": [
             {
-                "id": 5902235,
+                "id": 33867401,
                 "ns": 0,
-                "title": "Just Deal"
+                "title": "Finnish prohibition referendum, 1931"
             }
         ]
     }
