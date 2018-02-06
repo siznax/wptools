@@ -448,7 +448,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(data['length'], 60360)
         self.assertEqual(data['pageid'], 8091)
         self.assertEqual(data['watchers'], 452)
-        self.assertEqual(len(data['alias']), 3)
+        self.assertEqual(len(data['aliases']), 3)
         self.assertEqual(len(data['assessments']), 10)
         self.assertEqual(len(data['image']), 2)
         self.assertEqual(len(data['links']), 371)

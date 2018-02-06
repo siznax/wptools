@@ -350,7 +350,7 @@ class WPToolsPage(WPToolsRESTBase,
         terms = page.get('terms')
         if terms:
             if terms.get('alias'):
-                self.data['alias'] = terms['alias']
+                self.data['aliases'] = terms['alias']
 
             if terms.get('description'):
                 self.data['description'] = next(iter(terms['description']),
