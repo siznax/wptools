@@ -104,7 +104,7 @@ class WPTools(object):
 
         self._set_data(action)
 
-        if show:
+        if show and not self.flags.get('silent'):
             self.show()
 
     def _load_response(self, action):
@@ -122,7 +122,7 @@ class WPTools(object):
         except ValueError:
             raise ValueError(_query)
 
-        if data.get('warnings'):
+        if data.get('warnings') and not self.flags.get('silent'):
             utils.stderr("API warning: %s" % data.get('warnings'))
 
         if data.get('error'):
@@ -193,7 +193,7 @@ class WPTools(object):
         """
         Pretty-print instance data
         """
-        if self.flags.get('silent') or not self.data:
+        if not self.data:
             return
 
         ptitle = self.params.get('title')

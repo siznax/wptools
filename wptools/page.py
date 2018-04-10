@@ -478,7 +478,7 @@ class WPToolsPage(WPToolsRESTBase,
 
             self.get_restbase('/page/summary/', False, proxy, timeout)
 
-            if show:
+            if show and not self.flags.get('silent'):
                 self.show()
 
         else:
@@ -499,7 +499,7 @@ class WPToolsPage(WPToolsRESTBase,
 
             self.get_restbase('/page/summary/', False, proxy, timeout)
 
-            if show:
+            if show and not self.flags.get('silent'):
                 self.show()
 
         return self
