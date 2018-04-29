@@ -18,7 +18,7 @@ __author__ = "siznax"
 __contact__ = "https://github.com/siznax/wptools"
 __license__ = "MIT"
 __title__ = "wptools"
-__version__ = "0.4.11"
+__version__ = "0.4.12"
 
 from . import core
 from . import query

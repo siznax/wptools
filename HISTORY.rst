@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4.11 (2018-03-05)
+0.4.12 (2018-04-29)
 +++++++++++++++++++
 
+* Always respect silent flag (#118)
 * Improved infobox parsing (#91, #109)
 * Added image (license, assessment) metadata (#104, #105)
 * Fixed Wikidata pageid, image bugs (#101, #102)
