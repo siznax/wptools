@@ -443,15 +443,16 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'query': query.cache}
         page._set_data('query')
         data = page.data
-        self.assertEqual(data['description'], 'English writer and humorist')
+        self.assertEqual(data['description'], u'author')
         self.assertEqual(data['label'], 'Douglas Adams')
-        self.assertEqual(data['length'], 60360)
+        self.assertEqual(data['length'], 60460)
         self.assertEqual(data['pageid'], 8091)
-        self.assertEqual(data['watchers'], 452)
+        self.assertEqual(data['watchers'], 463)
         self.assertEqual(len(data['aliases']), 3)
         self.assertEqual(len(data['assessments']), 10)
+        self.assertEqual(len(data['backlinks']), 500)
         self.assertEqual(len(data['image']), 2)
-        self.assertEqual(len(data['links']), 371)
+        self.assertEqual(len(data['links']), 374)
         self.assertEqual(str(data['wikibase']), 'Q42')
         self.assertTrue('page' in data['modified'])
         self.assertTrue(data['extext'].startswith('**Douglas'))
@@ -505,9 +506,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'random': query.cache}
         page._set_data('random')
         page.get_random()
-        self.assertEqual(page.data['pageid'], 33867401)
-        self.assertEqual(page.data['title'], 
-                         u'Finnish prohibition referendum, 1931')
+        self.assertEqual(page.data['pageid'], 38647742)
+        self.assertEqual(page.data['title'], u'Deh-e Sukhteh, Manj')
 
         self.assertTrue('requests' not in page.data)
 
@@ -980,7 +980,7 @@ class WPToolsWikidataTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
         data = page.data
-        self.assertEqual(data['description'], 'English writer and humorist')
+        self.assertEqual(data['description'], u'English writer and humorist')
         self.assertEqual(data['label'], 'Douglas Adams')
         self.assertEqual(len(data['claims']), 102)
         self.assertEqual(len(data['labels']), 147)
