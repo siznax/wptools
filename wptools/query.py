@@ -61,11 +61,13 @@ class WPToolsQuery(object):
 
     QUERY = Template((
         "${WIKI}/w/api.php?action=query"
+        "&bltitle=${TITLES}"
+        "&bllimit=500"
         "&exintro"
         "&format=json"
         "&formatversion=2"
         "&inprop=url|watchers"
-        "&list=random"
+        "&list=random|backlinks"
         "&pithumbsize=240"
         "&pllimit=500"
         "&ppprop=disambiguation|wikibase_item"

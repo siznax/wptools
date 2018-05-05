@@ -284,8 +284,8 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
 
-        if 'redirects' in data['query']:
-            self.data['redirected'] = data['query']['redirects']
+        self.data['backlinks'] = data['query'].get('backlinks')
+        self.data['redirected'] = data['query'].get('redirects')
 
         self._set_query_data_fast_1(page)  # avoid pylint too-many-branches
         self._set_query_data_fast_2(page)
