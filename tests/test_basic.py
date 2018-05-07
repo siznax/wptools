@@ -22,6 +22,7 @@ from . import parse_66
 from . import parse_91
 from . import parse_109
 from . import query
+from . import query_blcontinue
 from . import querymore
 from . import random_query
 from . import redirect
@@ -463,6 +464,22 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue(wptools.utils.is_text(page.data['random']))
 
         self.assertTrue('requests' not in page.data)
+
+    def test_page_get_query_continue(self):
+        page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
+
+        page.cache['query'] = query.cache
+        page._set_data('query')
+        self.assertEqual(len(page.data['backlinks']), 500)
+        self.assertEqual(page.data['continue'], {'blcontinue': u'0|2062757'})
+
+        page.cache = {'query': query_blcontinue.cache}
+        page._set_data('query')
+        self.assertTrue('continue' in page.data)
+        self.assertEqual(len(page.data['backlinks']), 501)
+
+        qry = page._query('query', wptools.query.WPToolsQuery())
+        self.assertTrue(qry.endswith('&blcontinue=0|2062757'))
 
     def test_page_get_more(self):
         page = wptools.page('TEST', silent=SILENT_FLAG)
