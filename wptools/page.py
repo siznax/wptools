@@ -159,7 +159,7 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'random':
             qstr = qobj.random()
         elif action == 'query':
-            qstr = qobj.query(title, pageid)
+            qstr = qobj.query(title, pageid, self._continue_params())
         elif action == 'querymore':
             qstr = qobj.querymore(title, pageid)
         elif action == 'parse':
@@ -281,10 +281,18 @@ class WPToolsPage(WPToolsRESTBase,
         data = self._load_response(action)
         page = data['query']['pages'][0]
 
+        self._handle_continuations(data, 'query')
+
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
 
-        self.data['backlinks'] = data['query'].get('backlinks')
+        backlinks = data['query'].get('backlinks')
+        if backlinks:
+            if 'backlinks' in self.data:
+                self.data['backlinks'].extend(backlinks)
+            else:
+                self.data['backlinks'] = backlinks
+
         self.data['redirected'] = data['query'].get('redirects')
 
         self._set_query_data_fast_1(page)  # avoid pylint too-many-branches
@@ -441,7 +449,11 @@ class WPToolsPage(WPToolsRESTBase,
         """
         calls get_imageinfo() if data image missing info
         """
-        if self._missing_imageinfo() and not self.flags.get('defer_imageinfo'):
+        missing = self._missing_imageinfo()
+        deferred = self.flags.get('defer_imageinfo')
+        continuing = self.data.get('continue')
+
+        if missing and not deferred and not continuing:
             self.get_imageinfo(show=False)
 
     def _update_params(self):
@@ -601,6 +613,9 @@ class WPToolsPage(WPToolsRESTBase,
             raise ValueError("get_query needs title or pageid")
 
         self._get('query', show, proxy, timeout)
+
+        while self.data.get('continue'):
+            self._get('query', show, proxy, timeout)
 
         return self
 

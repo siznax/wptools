@@ -195,20 +195,25 @@ class WPToolsQuery(object):
 
         return qry
 
-    def query(self, titles, pageids=None):
+    def query(self, titles, pageids=None, cparams=None):
         """
         Returns MediaWiki action=query query string
         """
         query = self.QUERY.substitute(WIKI=self.uri,
                                       TITLES=safequote(titles) or pageids)
+        status = titles or pageids
 
         if pageids and not titles:
             query = query.replace('&titles=', '&pageids=')
 
+        if cparams:
+            query += cparams
+            status += " (%s)" % cparams
+
         if self.variant:
             query += '&variant=' + self.variant
 
-        self.set_status('query', titles or pageids)
+        self.set_status('query', status)
 
         return query
 

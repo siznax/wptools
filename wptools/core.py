@@ -60,6 +60,83 @@ class WPTools(object):
         if kwargs.get('wiki'):
             self.params.update({'wiki': kwargs.get('wiki')})
 
+    def _build_showstr(self, seed):
+        """
+        Returns show() display string for data attribute
+        """
+        output = ["%s (%s) data" % (seed, self.params['lang'])]
+
+        output.append('{')
+
+        maxwidth = WPToolsQuery.MAXWIDTH
+
+        for item in sorted(self.data):
+
+            if self.data[item] is None:
+                continue
+
+            prefix = item
+            value = self.data[item]
+
+            if isinstance(value, dict):
+                prefix = "%s: <dict(%d)>" % (prefix, len(value))
+                value = ', '.join(value.keys())
+            elif isinstance(value, int):
+                prefix = "%s:" % prefix
+                if 'pageid' not in prefix:
+                    value = "{:,}".format(value)
+            elif isinstance(value, list):
+                prefix = "%s: <list(%d)>" % (prefix, len(value))
+                value = ', '.join((safestr(x) for x in value if x))
+            elif isinstance(value, tuple):
+                prefix = "%s: <tuple(%d)>" % (prefix, len(value))
+                value = ', '.join((safestr(x) for x in value if x))
+            elif utils.is_text(value):
+                value = value.strip().replace('\n', '')
+                if len(value) > (maxwidth - len(prefix)):
+                    prefix = "%s: <str(%d)>" % (prefix, len(value))
+                else:
+                    prefix = "%s:" % prefix
+
+            output.append("  %s %s" % (prefix, value))
+
+        output.append('}')
+
+        return output
+
+    def _continue_params(self):
+        """
+        Returns query string fragment continue parameters
+        """
+        if not self.data.get('continue'):
+            return
+
+        params = []
+        for item in self.data['continue']:
+            params.append("&%s=%s" % (item, self.data['continue'][item]))
+
+        return ''.join(params)
+
+    def _handle_continuations(self, response, cache_key):
+        """
+        Select continue params and clear cache or last continue params
+        """
+        rcontinue = response.get('continue')
+        listen = ['blcontinue', 'cmcontinue']
+        cparams = {}
+
+        if rcontinue:
+            for flag in listen:
+                if rcontinue.get(flag):
+                    cparams[flag] = rcontinue.get(flag)
+
+        if cparams:
+            self.data['continue'] = cparams
+            del self.cache[cache_key]
+        else:  # no more continuations
+            if 'continue' in self.data:
+                del self.data['continue']
+
     def _get(self, action, show, proxy, timeout):
         """
         make HTTP request and cache response
@@ -196,6 +273,9 @@ class WPTools(object):
         if not self.data:
             return
 
+        if self.data.get('continue'):
+            return
+
         ptitle = self.params.get('title')
         dtitle = self.data.get('title')
         pageid = self.params.get('pageid')
@@ -204,45 +284,7 @@ class WPTools(object):
         if utils.is_text(seed):
             seed = seed.replace('_', ' ')
 
-        output = ["%s (%s) data" % (seed, self.params['lang'])]
-
-        output.append('{')
-
-        maxwidth = WPToolsQuery.MAXWIDTH
-
-        for item in sorted(self.data):
-
-            if self.data[item] is None:
-                continue
-
-            prefix = item
-            value = self.data[item]
-
-            if isinstance(value, dict):
-                prefix = "%s: <dict(%d)>" % (prefix, len(value))
-                value = ', '.join(value.keys())
-            elif isinstance(value, int):
-                prefix = "%s:" % prefix
-                if 'pageid' not in prefix:
-                    value = "{:,}".format(value)
-            elif isinstance(value, list):
-                prefix = "%s: <list(%d)>" % (prefix, len(value))
-                value = ', '.join((safestr(x) for x in value if x))
-            elif isinstance(value, tuple):
-                prefix = "%s: <tuple(%d)>" % (prefix, len(value))
-                value = ', '.join((safestr(x) for x in value if x))
-            elif utils.is_text(value):
-                value = value.strip().replace('\n', '')
-                if len(value) > (maxwidth - len(prefix)):
-                    prefix = "%s: <str(%d)>" % (prefix, len(value))
-                else:
-                    prefix = "%s:" % prefix
-
-            output.append("  %s %s" % (prefix, value))
-
-        output.append('}')
-
-        prettyprint(output)
+        prettyprint(self._build_showstr(seed))
 
 
 def handle_wikidata_errors(data, query):
