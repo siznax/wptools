@@ -94,10 +94,7 @@ class WPToolsCategory(core.WPTools):
         if action == 'random':
             return qobj.random(namespace=14)
         elif action == 'category':
-            qry = qobj.category(title=title, pageid=pageid)
-            if self.data.get('cmcontinue'):
-                qry += "&cmcontinue=%s" % self.data['cmcontinue']
-            return qry
+            return qobj.category(title, pageid, self._continue_params())
 
     def _set_data(self, action):
         """
@@ -105,14 +102,7 @@ class WPToolsCategory(core.WPTools):
         """
         data = self._load_response(action)
 
-        try:
-            cmcontinue = data.get('continue').get('cmcontinue')
-            if cmcontinue:
-                self.data['cmcontinue'] = cmcontinue
-                del self.cache['category']
-        except AttributeError:
-            if 'cmcontinue' in self.data:
-                del self.data['cmcontinue']
+        self._handle_continuations(data, 'category')
 
         if action == 'category':
             members = data.get('query').get('categorymembers')
@@ -151,9 +141,8 @@ class WPToolsCategory(core.WPTools):
 
         self._get('category', show, proxy, timeout)
 
-        if self.data.get('cmcontinue'):
-            while self.data.get('cmcontinue'):
-                self._get('category', show, proxy, timeout)
+        while self.data.get('continue'):
+            self._get('category', show, proxy, timeout)
 
         return self
 

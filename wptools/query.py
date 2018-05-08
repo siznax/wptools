@@ -121,14 +121,14 @@ class WPToolsQuery(object):
         self.domain = domain_name(self.wiki)
         self.uri = self.wiki_uri(self.wiki)
 
-    def category(self, title, pageid=None, limit=500, namespace=None):
+    def category(self, title, pageid=None, cparams=None, namespace=None):
         """
         Returns category query string
         """
         query = self.LIST.substitute(WIKI=self.uri, LIST='categorymembers')
+        status = pageid or title
 
-        if limit:
-            query += "&cmlimit=%d" % limit
+        query += "&cmlimit=500"
 
         if namespace is not None:
             query += "&cmnamespace=%d" % namespace
@@ -142,7 +142,11 @@ class WPToolsQuery(object):
         if pageid:
             query += "&cmpageid=%d" % pageid
 
-        self.set_status('categorymembers', pageid or title)
+        if cparams:
+            query += cparams
+            status += ' (%s)' % cparams
+
+        self.set_status('categorymembers', status)
 
         return query
 

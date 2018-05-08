@@ -105,7 +105,7 @@ class WPToolsCategoryTestCase(unittest.TestCase):
         cat = wptools.category('TEST')
         cat.cache['category'] = category_cmcontinue.cache
         cat._set_data('category')
-        self.assertTrue('cmcontinue' in cat.data)
+        self.assertTrue('continue' in cat.data)
         self.assertEqual(len(cat.data['members']), 1)
 
         qry = cat._query('category', wptools.query.WPToolsQuery())
