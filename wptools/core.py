@@ -199,8 +199,11 @@ class WPTools(object):
         except ValueError:
             raise ValueError(_query)
 
-        if data.get('warnings') and not self.flags.get('silent'):
-            utils.stderr("API warning: %s" % data.get('warnings'))
+        if data.get('warnings'):
+            if 'WARNINGS' in self.data:
+                self.data['WARNINGS'].update(data['warnings'])
+            else:
+                self.data['WARNINGS'] = data['warnings']
 
         if data.get('error'):
             utils.stderr("API error: %s" % data.get('error'))
