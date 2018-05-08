@@ -3,9 +3,11 @@
 Release History
 ---------------
 
-0.4.12 (2018-04-29)
+0.4.13 (2018-05-07)
 +++++++++++++++++++
 
+* Put API warnings in data attribute (#120)
+* Support getting backlinks w/continuations (#119)
 * Always respect silent flag (#118)
 * Improved infobox parsing (#91, #109)
 * Added image (license, assessment) metadata (#104, #105)
