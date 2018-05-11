@@ -17,6 +17,7 @@ from . import labels_2
 from . import labels_3
 from . import labels_wanted
 from . import parse
+from . import parse_infobox
 from . import parse_62
 from . import parse_66
 from . import parse_91
@@ -371,6 +372,24 @@ class WPToolsPageTestCase(unittest.TestCase):
                          'File:Douglas adams portrait cropped.jpg')
 
         self.assertTrue('requests' not in page.data)
+
+
+    def test_page_get_parse_infobox(self):
+        """
+        Ensure cover images are captured from infobox
+        """
+        page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
+        page.cache = {'parse': parse_infobox.cache}
+        page._set_data('parse')
+        data = page.data
+        self.assertEqual(len(data['infobox']), 16)
+        self.assertEqual(len(page.images()), 1)
+        self.assertEqual(page.images('kind'),
+                         [{'kind': 'parse-cover'}])
+        self.assertEqual(page.images()[0]['file'],
+                         u'File:John Coltrane - Blue Train.jpg')
+        self.assertTrue('requests' not in page.data)
+
 
     def test_page_get_parse_62(self):
         """

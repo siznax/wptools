@@ -262,7 +262,7 @@ class WPToolsPage(WPToolsRESTBase,
         set image data from action=parse response
         """
         image = infobox.get('image')
-        cover = infobox.get('Cover')
+        cover = infobox.get('Cover') or infobox.get('cover')
 
         if image or cover:
             if 'image' not in self.data:
