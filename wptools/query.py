@@ -61,13 +61,11 @@ class WPToolsQuery(object):
 
     QUERY = Template((
         "${WIKI}/w/api.php?action=query"
-        "&bltitle=${TITLES}"
-        "&bllimit=500"
         "&exintro"
         "&format=json"
         "&formatversion=2"
         "&inprop=url|watchers"
-        "&list=random|backlinks"
+        "&list=random"
         "&pithumbsize=240"
         "&pllimit=500"
         "&ppprop=disambiguation|wikibase_item"
@@ -81,11 +79,14 @@ class WPToolsQuery(object):
 
     QUERYMORE = Template((
         "${WIKI}/w/api.php?action=query"
+        "&bllimit=500"
+        "&bltitle=${TITLES}"
         "&cllimit=500"
         "&clshow=!hidden"
         "&format=json"
         "&formatversion=2"
         "&imlimit=500"
+        "&list=backlinks"
         "&lllimit=500"
         "&pclimit=500"
         "&prop=categories|contributors|images|langlinks|pageviews"
@@ -199,13 +200,34 @@ class WPToolsQuery(object):
 
         return qry
 
-    def query(self, titles, pageids=None, cparams=None):
+    def query(self, titles, pageids=None):
         """
         Returns MediaWiki action=query query string
         """
         query = self.QUERY.substitute(WIKI=self.uri,
                                       TITLES=safequote(titles) or pageids)
         status = titles or pageids
+
+        if pageids and not titles:
+            query = query.replace('&titles=', '&pageids=')
+
+        if self.variant:
+            query += '&variant=' + self.variant
+
+        self.set_status('query', status)
+
+        return query
+
+    def querymore(self, titles, pageids=None, cparams=None):
+        """
+        Returns MediaWiki action=query query string (for MORE)
+        A much more expensive query for popular pages
+        """
+        query = self.QUERYMORE.substitute(
+            WIKI=self.uri,
+            TITLES=safequote(titles) or pageids)
+
+        status = "%s" % (pageids or titles)
 
         if pageids and not titles:
             query = query.replace('&titles=', '&pageids=')
@@ -217,26 +239,7 @@ class WPToolsQuery(object):
         if self.variant:
             query += '&variant=' + self.variant
 
-        self.set_status('query', status)
-
-        return query
-
-    def querymore(self, titles, pageids=None):
-        """
-        Returns MediaWiki action=query query string (for MORE)
-        A much more expensive query for popular pages
-        """
-        query = self.QUERYMORE.substitute(
-            WIKI=self.uri,
-            TITLES=safequote(titles) or pageids)
-
-        if pageids and not titles:
-            query = query.replace('&titles=', '&pageids=')
-
-        if self.variant:
-            query += '&variant=' + self.variant
-
-        self.set_status('querymore', pageids or titles)
+        self.set_status('querymore', status)
 
         return query
 
