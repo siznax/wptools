@@ -23,8 +23,8 @@ from . import parse_66
 from . import parse_91
 from . import parse_109
 from . import query
-from . import query_blcontinue
 from . import querymore
+from . import querymore_blcontinue
 from . import random_query
 from . import redirect
 from . import rest_page
@@ -320,8 +320,11 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         qstr = page._query('querymore', qobj)
         self.assertTrue('action=query' in qstr)
+        self.assertTrue('&bllimit=500' in qstr)
         self.assertTrue('&cllimit=500' in qstr)
-        self.assertTrue('&imlimit=500&lllimit=500&pclimit=500' in qstr)
+        self.assertTrue('&imlimit=500' in qstr)
+        self.assertTrue('&lllimit=500&' in qstr)
+        self.assertTrue('&pclimit=500' in qstr)
 
         qstr = page._query('parse', qobj)
         self.assertTrue('action=parse' in qstr)
@@ -465,14 +468,13 @@ class WPToolsPageTestCase(unittest.TestCase):
         data = page.data
         self.assertEqual(data['description'], u'author')
         self.assertEqual(data['label'], 'Douglas Adams')
-        self.assertEqual(data['length'], 60460)
+        self.assertEqual(data['length'], 62123)
         self.assertEqual(data['pageid'], 8091)
-        self.assertEqual(data['watchers'], 463)
+        self.assertEqual(data['watchers'], 460)
         self.assertEqual(len(data['aliases']), 3)
         self.assertEqual(len(data['assessments']), 10)
-        self.assertEqual(len(data['backlinks']), 500)
         self.assertEqual(len(data['image']), 2)
-        self.assertEqual(len(data['links']), 374)
+        self.assertEqual(len(data['links']), 384)
         self.assertEqual(str(data['wikibase']), 'Q42')
         self.assertTrue('page' in data['modified'])
         self.assertTrue(data['extext'].startswith('**Douglas'))
@@ -484,27 +486,12 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         self.assertTrue('requests' not in page.data)
 
-    def test_page_get_query_continue(self):
-        page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
-
-        page.cache['query'] = query.cache
-        page._set_data('query')
-        self.assertEqual(len(page.data['backlinks']), 500)
-        self.assertEqual(page.data['continue'], {'blcontinue': u'0|2062757'})
-
-        page.cache = {'query': query_blcontinue.cache}
-        page._set_data('query')
-        self.assertTrue('continue' in page.data)
-        self.assertEqual(len(page.data['backlinks']), 501)
-
-        qry = page._query('query', wptools.query.WPToolsQuery())
-        self.assertTrue(qry.endswith('&blcontinue=0|2062757'))
-
     def test_page_get_more(self):
         page = wptools.page('TEST', silent=SILENT_FLAG)
         page.cache = {'querymore': querymore.cache}
         page.get_more()
         page._set_data('querymore')
+        self.assertEqual(len(page.data['backlinks']), 500)
         self.assertTrue(len(page.data['categories']), 29)
         self.assertTrue(len(page.data['files']), 12)
         self.assertTrue(len(page.data['languages']), 70)
@@ -512,6 +499,23 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue(page.data['views'], 1398)
 
         self.assertTrue('requests' not in page.data)
+
+    def test_page_get_more_continue(self):
+        page = wptools.page('TEST', silent=SILENT_FLAG)
+
+        page.cache['querymore'] = querymore.cache
+        page._set_data('querymore')
+        self.assertEqual(len(page.data['backlinks']), 500)
+        self.assertEqual(page.data['continue'], {'blcontinue': u'4|2028922'})
+
+        page.cache = {'querymore': querymore_blcontinue.cache}
+        page._set_data('querymore')
+        self.assertTrue('continue' in page.data)
+        self.assertEqual(len(page.data['backlinks']), 501)
+
+        qry = page._query('querymore', wptools.query.WPToolsQuery())
+        print("\n\n>>>\n%s\n<<<\n\n" % qry)
+        self.assertTrue(qry.endswith('&blcontinue=0|2062757'))
 
     def test_page_get_imageinfo(self):
         page = wptools.page('TEST', silent=SILENT_FLAG)
@@ -542,8 +546,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         page.cache = {'random': query.cache}
         page._set_data('random')
         page.get_random()
-        self.assertEqual(page.data['pageid'], 38647742)
-        self.assertEqual(page.data['title'], u'Deh-e Sukhteh, Manj')
+        self.assertEqual(page.data['pageid'], 7614573)
+        self.assertEqual(page.data['title'], u'Aidenbachstraße (Munich U-Bahn)')
 
         self.assertTrue('requests' not in page.data)
 
