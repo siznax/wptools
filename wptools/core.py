@@ -21,7 +21,7 @@ class WPTools(object):
     """
 
     REQUEST_DELAY = 0
-    REQUEST_LIMIT = 25
+    REQUEST_LIMIT = 50
 
     cache = None
     data = None
