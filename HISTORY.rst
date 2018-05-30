@@ -3,9 +3,10 @@
 Release History
 ---------------
 
-0.4.14 (2018-05-22)
+0.4.15 (2018-05-30)
 +++++++++++++++++++
 
+* Merged @mcepl update to package tests (#125)
 * Put API warnings in data attribute (#120)
 * Support getting backlinks w/continuations (#119, #122)
 * Always respect silent flag (#118)
