@@ -168,7 +168,8 @@ class WPTools(object):
         # make the request
         qobj = WPToolsQuery(lang=self.params['lang'],
                             variant=self.params.get('variant'),
-                            wiki=self.params.get('wiki'))
+                            wiki=self.params.get('wiki'),
+                            endpoint=self.params.get('endpoint'))
         qstr = self._query(action, qobj)
         req = self._request(proxy, timeout)
         response = req.get(qstr, qobj.status)

@@ -26,6 +26,7 @@ class WPToolsSite(core.WPTools):
         Returns a WPToolsSite object.
 
         Optional keyword {params}:
+        - [endpoint]: <str> alternative API endpoint (default=/w/api.php)
         - [lang]: <str> Mediawiki language code (default=en)
         - [wiki]: <str> alternative wiki site (default=wikipedia.org)
 
@@ -35,6 +36,10 @@ class WPToolsSite(core.WPTools):
         - [verbose]: <bool> verbose output to stderr if True
         """
         super(WPToolsSite, self).__init__(*args, **kwargs)
+
+        endpoint = kwargs.get('endpoint')
+        if endpoint:
+            self.params.update({'endpoint': endpoint})
 
     def _query(self, action, qobj):
         """

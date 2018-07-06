@@ -30,11 +30,12 @@ class WPToolsQuery(object):
     WPToolsQuery class
     """
 
+    DEFAULT_ENDPOINT = '/w/api.php'
     MAXWIDTH = 72
     RPAD = 4
 
     IMAGEINFO = Template((
-        "${WIKI}/w/api.php?action=query"
+        "${WIKI}${ENDPOINT}?action=query"
         "&format=json"
         "&formatversion=2"
         "&iiprop=size|url|timestamp|extmetadata"
@@ -42,13 +43,13 @@ class WPToolsQuery(object):
         "&titles=${FILES}"))
 
     LIST = Template((
-        "${WIKI}/w/api.php?action=query"
+        "${WIKI}${ENDPOINT}?action=query"
         "&format=json"
         "&formatversion=2"
         "&list=${LIST}"))
 
     PARSE = Template((
-        "${WIKI}/w/api.php?action=parse"
+        "${WIKI}${ENDPOINT}?action=parse"
         "&format=json"
         "&formatversion=2"
         "&contentmodel=text"
@@ -60,7 +61,7 @@ class WPToolsQuery(object):
         "&page=${PAGE}"))
 
     QUERY = Template((
-        "${WIKI}/w/api.php?action=query"
+        "${WIKI}${ENDPOINT}?action=query"
         "&exintro"
         "&format=json"
         "&formatversion=2"
@@ -78,7 +79,7 @@ class WPToolsQuery(object):
         "&titles=${TITLES}"))
 
     QUERYMORE = Template((
-        "${WIKI}/w/api.php?action=query"
+        "${WIKI}${ENDPOINT}?action=query"
         "&bllimit=500"
         "&bltitle=${TITLES}"
         "&cllimit=500"
@@ -94,19 +95,20 @@ class WPToolsQuery(object):
         "&titles=${TITLES}"))
 
     WIKIDATA = Template((
-        "${WIKI}/w/api.php?action=wbgetentities"
+        "${WIKI}${ENDPOINT}?action=wbgetentities"
         "&format=json"
         "&formatversion=2"
         "&languages=${LANG}"
         "&props=${PROPS}"
         "&redirects=yes"))
 
+    endpoint = None
     lang = None
     status = None
     variant = None
     wiki = None
 
-    def __init__(self, lang='en', variant=None, wiki=None):
+    def __init__(self, lang='en', variant=None, wiki=None, endpoint=None):
         """
         Returns a WPToolsQuery object
 
@@ -114,19 +116,24 @@ class WPToolsQuery(object):
         - [lang=en]: <str> Mediawiki language code
         - [variant=None]: <str> language variant
         - [wiki=None]: <str> alternative wiki site
+        - [endpoint=None]: <str> alternative API endoint
         """
         self.lang = lang
         self.variant = variant
 
         self.wiki = wiki or "%s.wikipedia.org" % self.lang
         self.domain = domain_name(self.wiki)
+        self.endpoint = endpoint or self.DEFAULT_ENDPOINT
         self.uri = self.wiki_uri(self.wiki)
 
     def category(self, title, pageid=None, cparams=None, namespace=None):
         """
         Returns category query string
         """
-        query = self.LIST.substitute(WIKI=self.uri, LIST='categorymembers')
+        query = self.LIST.substitute(
+            WIKI=self.uri,
+            ENDPOINT=self.endpoint,
+            LIST='categorymembers')
         status = pageid or title
 
         query += "&cmlimit=500"
@@ -163,6 +170,7 @@ class WPToolsQuery(object):
 
         query = self.WIKIDATA.substitute(
             WIKI=self.uri,
+            ENDPOINT=self.endpoint,
             LANG=self.variant or self.lang,
             PROPS='labels')
 
@@ -181,14 +189,19 @@ class WPToolsQuery(object):
 
         self.set_status('imageinfo', files)
 
-        return self.IMAGEINFO.substitute(WIKI=self.uri, FILES=files)
+        return self.IMAGEINFO.substitute(
+            WIKI=self.uri,
+            ENDPOINT=self.endpoint,
+            FILES=files)
 
     def parse(self, title, pageid=None):
         """
         Returns Mediawiki action=parse query string
         """
-        qry = self.PARSE.substitute(WIKI=self.uri,
-                                    PAGE=safequote(title) or pageid)
+        qry = self.PARSE.substitute(
+            WIKI=self.uri,
+            ENDPOINT=self.endpoint,
+            PAGE=safequote(title) or pageid)
 
         if pageid and not title:
             qry = qry.replace('&page=', '&pageid=').replace('&redirects', '')
@@ -204,8 +217,10 @@ class WPToolsQuery(object):
         """
         Returns MediaWiki action=query query string
         """
-        query = self.QUERY.substitute(WIKI=self.uri,
-                                      TITLES=safequote(titles) or pageids)
+        query = self.QUERY.substitute(
+            WIKI=self.uri,
+            ENDPOINT=self.endpoint,
+            TITLES=safequote(titles) or pageids)
         status = titles or pageids
 
         if pageids and not titles:
@@ -225,6 +240,7 @@ class WPToolsQuery(object):
         """
         query = self.QUERYMORE.substitute(
             WIKI=self.uri,
+            ENDPOINT=self.endpoint,
             TITLES=safequote(titles) or pageids)
 
         status = "%s" % (pageids or titles)
@@ -247,7 +263,10 @@ class WPToolsQuery(object):
         """
         Returns query string for random page
         """
-        query = self.LIST.substitute(WIKI=self.uri, LIST='random')
+        query = self.LIST.substitute(
+            WIKI=self.uri,
+            ENDPOINT=self.endpoint,
+            LIST='random')
         query += "&rnlimit=1&rnnamespace=%d" % namespace
 
         emoji = [
@@ -309,27 +328,30 @@ class WPToolsQuery(object):
         """
         query = None
         viewdays = 7
+        hostpath = self.uri + self.endpoint
 
         if action == 'siteinfo':
-            query = self.uri + ('/w/api.php?action=query'
-                                '&meta=siteinfo|siteviews'
-                                '&siprop=general|statistics'
-                                '&list=mostviewed&pvimlimit=max')
+            query = hostpath + (
+                '?action=query'
+                '&meta=siteinfo|siteviews'
+                '&siprop=general|statistics'
+                '&list=mostviewed&pvimlimit=max')
             query += '&pvisdays=%d' % viewdays  # meta=siteviews
             self.set_status('query', 'siteinfo|siteviews|mostviewed')
         elif action == 'sitematrix':
-            query = self.uri + '/w/api.php?action=sitematrix'
+            query = hostpath + '?action=sitematrix'
             self.set_status('sitematrix', 'all')
         elif action == 'sitevisitors':
-            query = self.uri + ('/w/api.php?action=query'
-                                '&meta=siteviews&pvismetric=uniques')
+            query = hostpath + (
+                '?action=query'
+                '&meta=siteviews&pvismetric=uniques')
             query += '&pvisdays=%d' % viewdays  # meta=siteviews
             self.set_status('query', 'siteviews:uniques')
 
-        query += '&format=json&formatversion=2'
-
         if not query:
             raise ValueError("Could not form query")
+
+        query += '&format=json&formatversion=2'
 
         return query
 
@@ -350,6 +372,7 @@ class WPToolsQuery(object):
 
         query = self.WIKIDATA.substitute(
             WIKI=self.uri,
+            ENDPOINT=self.endpoint,
             LANG=self.variant or self.lang,
             PROPS="aliases|info|claims|descriptions|labels|sitelinks")
 

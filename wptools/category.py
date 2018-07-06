@@ -25,6 +25,7 @@ class WPToolsCategory(core.WPTools):
         - [title]: <str> category title
 
         Optional keyword {params}:
+        - [endpoint]: <str> alternative API endpoint (default=/w/api.php)
         - [lang]: <str> Mediawiki language code (default=en)
         - [namespace]: <int> filter members (0=article, 14=category)
         - [pageid]: <int> category pageid
@@ -41,6 +42,7 @@ class WPToolsCategory(core.WPTools):
         """
         super(WPToolsCategory, self).__init__(**kwargs)
 
+        endpoint = kwargs.get('endpoint')
         pageid = kwargs.get('pageid')
         namespace = kwargs.get('namespace')
 
@@ -48,6 +50,9 @@ class WPToolsCategory(core.WPTools):
         if len(args) > 0:
             title = args[0]
             self.params.update({'title': title})
+
+        if endpoint:
+            self.params.update({'endpoint': endpoint})
 
         if pageid:
             try:

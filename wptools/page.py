@@ -44,6 +44,7 @@ class WPToolsPage(WPToolsRESTBase,
 
         Optional keyword {params}:
         - [boxterm]: <str> Infobox title name or substring
+        - [endpoint]: <str> alternative API endpoint (default=/w/api.php)
         - [lang]: <str> Mediawiki language code (default=en)
         - [pageid]: <int> Mediawiki pageid
         - [variant]: <str> Mediawiki language variant
@@ -62,6 +63,10 @@ class WPToolsPage(WPToolsRESTBase,
         boxterm = kwargs.get('boxterm')
         if boxterm:
             self.params.update({'boxterm': boxterm})
+
+        endpoint = kwargs.get('endpoint')
+        if endpoint:
+            self.params.update({'endpoint': endpoint})
 
         pageid = kwargs.get('pageid')
         if pageid:

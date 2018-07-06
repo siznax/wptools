@@ -637,6 +637,19 @@ class WPToolsQueryTestCase(unittest.TestCase):
         self.assertEqual(qobj.domain, 'example.com')
         self.assertEqual(qobj.uri, 'http://example.com')
 
+    def test_query_init_endpoint(self):
+        qobj = wptools.query.WPToolsQuery(endpoint='ENDPOINT')
+        self.assertEqual(qobj.endpoint, 'ENDPOINT')
+        self.assertEqual(qobj.uri, 'https://en.wikipedia.org')
+        self.assertTrue('.orgENDPOINT?' in qobj.category('CAT'))
+        self.assertTrue('.orgENDPOINT?' in qobj.labels(['QID']))
+        self.assertTrue('.orgENDPOINT?' in qobj.imageinfo(['FILE']))
+        self.assertTrue('.orgENDPOINT?' in qobj.parse('TITLE'))
+        self.assertTrue('.orgENDPOINT?' in qobj.query('TITLE'))
+        self.assertTrue('.orgENDPOINT?' in qobj.querymore('TITLE'))
+        self.assertTrue('.orgENDPOINT?' in qobj.site('siteinfo'))
+        self.assertTrue('.orgENDPOINT?' in qobj.wikidata('TITLE'))
+
     def test_query_init_lang(self):
         qobj = wptools.query.WPToolsQuery(lang='zz')
         self.assertEqual(qobj.lang, 'zz')
