@@ -338,7 +338,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         qstr = page._query('wikidata', qobj)
         self.assertTrue('action=wbgetentities' in qstr)
 
-        page.params.update({'endpoint': '/page/summary/'})
+        page.params.update({'rest_endpoint': '/page/summary/'})
         qstr = page._query('restbase', qobj)
         self.assertTrue('api/rest' in qstr)
 
@@ -552,7 +552,8 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
     def test_page_get_restbase(self):
-        page = wptools.page('TEST', endpoint='summary', silent=SILENT_FLAG)
+        page = wptools.page('TEST', silent=SILENT_FLAG)
+        page.params.update({'rest_endpoint': 'summary'})
         page.cache = {'restbase': rest_summary.cache}
         page._set_data('restbase')
         data = page.data
@@ -799,8 +800,7 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
         self.assertTrue('requests' not in page.data)
 
     def test_get_restbase_page(self):
-        page = wptools.restbase(silent=SILENT_FLAG)
-        page.params.update({'endpoint': '/page/'})
+        page = wptools.restbase('/page/', silent=SILENT_FLAG)
         page.cache['restbase'] = rest_page.cache
         page._set_data('restbase')
         self.assertTrue('requests' not in page.data)
@@ -840,7 +840,7 @@ class WPToolsRESTBaseTestCase(unittest.TestCase):
 
     def test_get_restbase_summary(self):
         page = wptools.restbase('TEST', silent=SILENT_FLAG)
-        page.params.update({'endpoint': '/page/summary/'})
+        page.params.update({'rest_endpoint': '/page/summary/'})
         page.cache['restbase'] = rest_summary.cache
         page._set_data('restbase')
 

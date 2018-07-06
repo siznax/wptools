@@ -68,7 +68,8 @@ class WPToolsRESTBase(core.WPTools):
         """
         returns WPToolsQuery string from action
         """
-        return qobj.restbase(self.params['endpoint'], self.params.get('title'))
+        return qobj.restbase(self.params['rest_endpoint'],
+                             self.params.get('title'))
 
     def _set_data(self, action):
         """
@@ -170,7 +171,6 @@ class WPToolsRESTBase(core.WPTools):
 
         Optional {params}:
         - [title]: <str> Mediawiki page title, file, category, etc.
-        - [endpoint]: the RESTBase entry point (default=/page/)
         - [lang]: <str> Mediawiki language code (default=en)
 
         Optional arguments:
@@ -195,7 +195,7 @@ class WPToolsRESTBase(core.WPTools):
         if endpoint != '/page/' and not self.params.get('title'):
             raise StandardError("endpoint %s needs a title" % endpoint)
 
-        self.params.update({'endpoint': endpoint})
+        self.params.update({'rest_endpoint': endpoint})
 
         self._get('restbase', show, proxy, timeout)
 

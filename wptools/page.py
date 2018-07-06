@@ -157,7 +157,6 @@ class WPToolsPage(WPToolsRESTBase,
         title = self.params.get('title')
         pageid = self.params.get('pageid')
         wikibase = self.params.get('wikibase')
-        endpoint = self.params.get('endpoint')
 
         qstr = None
 
@@ -176,7 +175,7 @@ class WPToolsPage(WPToolsRESTBase,
         elif action == 'wikidata':
             qstr = qobj.wikidata(title, wikibase)
         elif action == 'restbase':
-            qstr = qobj.restbase(endpoint, title)
+            qstr = qobj.restbase(self.params.get('rest_endpoint'), title)
 
         if qstr is None:
             raise ValueError("Unknown action: %s" % action)
