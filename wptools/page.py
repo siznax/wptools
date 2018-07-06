@@ -472,6 +472,14 @@ class WPToolsPage(WPToolsRESTBase,
         if self.data.get('wikibase'):
             self.params['wikibase'] = self.data.get('wikibase')
 
+    def skip_action(self, action):
+        """
+        append action to skip flag
+        """
+        if 'skip' not in self.flags:
+            self.flags['skip'] = []
+        self.flags['skip'].append(action)
+
     def get(self, show=True, proxy=None, timeout=0):
         """
         Make Mediawiki, RESTBase, and Wikidata requests for page data
@@ -506,13 +514,15 @@ class WPToolsPage(WPToolsRESTBase,
             self.get_parse(False, proxy, timeout)
 
             if not self.data.get('wikibase'):
-                if 'skip' not in self.flags:
-                    self.flags['skip'] = []
-                self.flags['skip'].append('wikidata')
+                self.skip_action('wikidata')
 
             self.get_wikidata(False, proxy, timeout)
 
             self.flags['defer_imageinfo'] = False
+
+            wiki = self.params.get('wiki')
+            if wiki and 'wikipedia.org' not in wiki:
+                self.skip_action('restbase')
 
             self.get_restbase('/page/summary/', False, proxy, timeout)
 
