@@ -390,8 +390,8 @@ By Douglas Adams</th></tr><tr><td class="plainlist" style="padding:0 0.1em 0.4em
 <span about="#mwt237" typeof="mw:Transclusion" data-mw='{"parts":[{"template":{"target":{"wt":"s-start","href":"./Template:S-start"},"params":{},"i":0}},"\n",{"template":{"target":{"wt":"s-bef","href":"./Template:S-bef"},"params":{"before":{"wt":"[[Anthony Read]]"}},"i":1}}," \n",{"template":{"target":{"wt":"s-ttl","href":"./Template:S-ttl"},"params":{"title":{"wt":"&#39;&#39;[[Doctor Who]]&#39;&#39; script editor"},"years":{"wt":"1979–80"}},"i":2}}," \n",{"template":{"target":{"wt":"s-aft","href":"./Template:S-aft"},"params":{"after":{"wt":"[[Christopher H. Bidmead]]"}},"i":3}},"\n",{"template":{"target":{"wt":"s-end","href":"./Template:S-end"},"params":{},"i":4}}]}' id="mwA_k">
 </span><table class="wikitable succession-box" style="margin:0.5em auto; font-size:95%;clear:both;" about="#mwt237">
 <tbody><tr style="text-align:center;">
-<td style="width:30%;" rowspan="1">Preceded<span typeof="mw:Entity"> </span>by<br/><span style="font-weight: bold"><a rel="mw:WikiLink" href="./Anthony_Read" title="Anthony Read">Anthony Read</a></span></td> 
-<td style="width: 40%; text-align: center;" rowspan="1"><b><i><a rel="mw:WikiLink" href="./Doctor_Who" title="Doctor Who">Doctor Who</a></i> script editor</b><br/>1979–80        </td> 
+<td style="width:30%;" rowspan="1">Preceded<span typeof="mw:Entity"> </span>by<br/><span style="font-weight: bold"><a rel="mw:WikiLink" href="./Anthony_Read" title="Anthony Read">Anthony Read</a></span></td>
+<td style="width: 40%; text-align: center;" rowspan="1"><b><i><a rel="mw:WikiLink" href="./Doctor_Who" title="Doctor Who">Doctor Who</a></i> script editor</b><br/>1979–80        </td>
 <td style="width: 30%; text-align: center;" rowspan="1"> Succeeded<span typeof="mw:Entity"> </span>by<br/><span style="font-weight: bold"><a rel="mw:WikiLink" href="./Christopher_H._Bidmead" title="Christopher H. Bidmead">Christopher H. Bidmead</a></span></td></tr>
 
 </tbody></table>
@@ -615,7 +615,7 @@ By Douglas Adams</th></tr><tr><td class="plainlist" style="padding:0 0.1em 0.4em
 <link rel="mw:PageProp/Category" href="./Category:Douglas_Adams#%20" id="mwBAA"/>
 <link rel="mw:PageProp/Category" href="./Category:1952_births" id="mwBAE"/>
 <link rel="mw:PageProp/Category" href="./Category:2001_deaths" id="mwBAI"/>
-<link rel="mw:PageProp/Category" href="./Category:20th-century_atheists" id="mwBAM"/>  
+<link rel="mw:PageProp/Category" href="./Category:20th-century_atheists" id="mwBAM"/>
 <link rel="mw:PageProp/Category" href="./Category:21st-century_atheists" id="mwBAQ"/>
 <link rel="mw:PageProp/Category" href="./Category:Alumni_of_St_John's_College,_Cambridge" id="mwBAU"/>
 <link rel="mw:PageProp/Category" href="./Category:British_atheism_activists" id="mwBAY"/>
@@ -642,5 +642,5 @@ By Douglas Adams</th></tr><tr><td class="plainlist" style="padding:0 0.1em 0.4em
 <link rel="mw:PageProp/Category" href="./Category:20th-century_English_novelists" id="mwBBs"/>
 <link rel="mw:PageProp/Category" href="./Category:21st-century_British_novelists" id="mwBBw"/></body></html>"""
 
-info = {'content': 'text/html', 'status': 200}
+info = {'content-type': 'text/html', 'status': 200}
 cache = {'query': query, 'response': response, 'info': info}

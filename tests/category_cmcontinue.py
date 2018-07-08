@@ -19,6 +19,6 @@ response = r"""{
     }
 }"""
 
-cache = {'query': query, 
-         'response': response, 
-         'info': {'content': 'TEST', 'status': 200}}
+cache = {'query': query,
+         'response': response,
+         'info': {'content-type': 'TEST', 'status': 200}}
