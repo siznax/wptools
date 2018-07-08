@@ -120,9 +120,16 @@ def curl_info(crl):
     kbps = crl.getinfo(crl.SPEED_DOWNLOAD) / 1000.0
     url = crl.getinfo(crl.EFFECTIVE_URL)
     url = url.replace("&format=json", '').replace("&formatversion=2", '')
+
+    # https://travis-ci.org/siznax/wptools/jobs/401109410
+    try:
+        content_type = crl.getinfo(crl.CONTENT_TYPE)
+    except TypeError:
+        content_type = None
+
     return {"url": url,
             "user-agent": user_agent(),
-            "content": crl.getinfo(crl.CONTENT_TYPE),
+            "content-type": content_type,
             "status": crl.getinfo(crl.RESPONSE_CODE),
             "bytes": crl.getinfo(crl.SIZE_DOWNLOAD),
             "seconds": "%5.3f" % crl.getinfo(crl.TOTAL_TIME),

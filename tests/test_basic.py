@@ -514,7 +514,6 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(len(page.data['backlinks']), 501)
 
         qry = page._query('querymore', wptools.query.WPToolsQuery())
-        print("\n\n>>>\n%s\n<<<\n\n" % qry)
         self.assertTrue(qry.endswith('&blcontinue=0|2062757'))
 
     def test_page_get_imageinfo(self):
@@ -871,7 +870,7 @@ class WPToolsRequestTestCase(unittest.TestCase):
         info = wptools.request.curl_info(req.cobj)
         self.assertEqual(info.get('status'), 0)
         self.assertEqual(info.get('bytes'), 0.0)
-        self.assertEqual(info.get('content'), None)
+        self.assertEqual(info.get('content-type'), None)
         self.assertTrue('wptools' in info.get('user-agent'))
 
     def test_request_curl_setup(self):
