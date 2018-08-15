@@ -125,7 +125,7 @@ class WPToolsPage(WPToolsRESTBase,
 
     def _extend_data(self, datapoint, new_data):
         """
-        assigns or extends datapoint with new data
+        extend or assign new data to datapoint
         """
         if new_data:
             try:
@@ -336,16 +336,10 @@ class WPToolsPage(WPToolsRESTBase,
 
         self._extend_data('links', utils.get_links(page.get('links')))
 
-        modified = page.get('touched')
-        if modified:
-            if 'modified' in self.data:
-                self.data['modified'].update({'page': modified})
-            else:
-                self.data['modified'] = {'page': modified}
+        self._update_data('modified', 'page', page.get('touched'))
 
         pageprops = page.get('pageprops')
         if pageprops:
-
             wikibase = pageprops.get('wikibase_item')
             if wikibase:
                 self.data['wikibase'] = wikibase
@@ -453,6 +447,16 @@ class WPToolsPage(WPToolsRESTBase,
 
         self.data.update({'pageid': pageid,
                           'title': title})
+
+    def _update_data(self, datapoint, key, new_data):
+        """
+        update or assign new data to datapoint
+        """
+        if new_data:
+            try:
+                self.data[datapoint].update({key: new_data})
+            except KeyError:
+                self.data[datapoint] = {key: new_data}
 
     def _update_imageinfo(self):
         """
