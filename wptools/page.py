@@ -173,7 +173,7 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'random':
             qstr = qobj.random()
         elif action == 'query':
-            qstr = qobj.query(title, pageid)
+            qstr = qobj.query(title, pageid, self._continue_params())
         elif action == 'querymore':
             qstr = qobj.querymore(title, pageid, self._continue_params())
         elif action == 'parse':
@@ -295,7 +295,7 @@ class WPToolsPage(WPToolsRESTBase,
         data = self._load_response(action)
         page = data['query']['pages'][0]
 
-        self._handle_continuations(data, 'querymore')
+        self._handle_continuations(data, action)
 
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
@@ -636,6 +636,9 @@ class WPToolsPage(WPToolsRESTBase,
             raise ValueError("get_query needs title or pageid")
 
         self._get('query', show, proxy, timeout)
+
+        while self.data.get('continue'):
+            self._get('query', show, proxy, timeout)
 
         return self
 

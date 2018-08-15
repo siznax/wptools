@@ -122,7 +122,7 @@ class WPTools(object):
         Select continue params and clear cache or last continue params
         """
         rcontinue = response.get('continue')
-        listen = ['blcontinue', 'cmcontinue']
+        listen = ['blcontinue', 'cmcontinue', 'plcontinue']
         cparams = {}
 
         if rcontinue:

@@ -213,7 +213,7 @@ class WPToolsQuery(object):
 
         return qry
 
-    def query(self, titles, pageids=None):
+    def query(self, titles, pageids=None, cparams=None):
         """
         Returns MediaWiki action=query query string
         """
@@ -225,6 +225,10 @@ class WPToolsQuery(object):
 
         if pageids and not titles:
             query = query.replace('&titles=', '&pageids=')
+
+        if cparams:
+            query += cparams
+            status += " (%s)" % cparams
 
         if self.variant:
             query += '&variant=' + self.variant
