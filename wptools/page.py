@@ -123,6 +123,16 @@ class WPToolsPage(WPToolsRESTBase,
 
             self.__insert_image_info(title, _from, info)
 
+    def _extend_data(self, datapoint, new_data):
+        """
+        assigns or extends datapoint with new data
+        """
+        if new_data:
+            try:
+                self.data[datapoint].extend(new_data)
+            except KeyError:
+                self.data[datapoint] = new_data
+
     def _missing_imageinfo(self):
         """
         returns list of image filenames that are missing info
@@ -290,12 +300,7 @@ class WPToolsPage(WPToolsRESTBase,
         if action == 'query':
             self.data['random'] = data['query']['random'][0]["title"]
 
-        backlinks = data['query'].get('backlinks')
-        if backlinks:
-            if 'backlinks' in self.data:
-                self.data['backlinks'].extend(backlinks)
-            else:
-                self.data['backlinks'] = backlinks
+        self._extend_data('backlinks', data['query'].get('backlinks'))
 
         self.data['redirected'] = data['query'].get('redirects')
 
@@ -329,7 +334,7 @@ class WPToolsPage(WPToolsRESTBase,
         if length:
             self.data['length'] = length
 
-        self.data['links'] = utils.get_links(page.get('links'))
+        self._extend_data('links', utils.get_links(page.get('links')))
 
         modified = page.get('touched')
         if modified:
