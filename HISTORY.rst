@@ -3,9 +3,11 @@
 Release History
 ---------------
 
-0.4.16 (2018-07-08)
+0.4.17 (2018-08-16)
 +++++++++++++++++++
 
+* Support proxy authentication (#130)
+* Support page links continuations (#129)
 * Support alternate API endpoints (#127)
 * Merged @mcepl update to package tests (#125)
 * Put API warnings in data attribute (#120)
