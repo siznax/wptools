@@ -23,6 +23,7 @@ from . import parse_66
 from . import parse_91
 from . import parse_109
 from . import query
+from . import query_plcontinue
 from . import querymore
 from . import querymore_blcontinue
 from . import random_query
@@ -500,8 +501,25 @@ class WPToolsPageTestCase(unittest.TestCase):
 
         self.assertTrue('requests' not in page.data)
 
+    def test_page_get_query_continue(self):
+        page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
+
+        page.cache['query'] = query.cache
+        page._set_data('query')
+        self.assertEqual(len(page.data['links']), 384)
+
+        page.cache = {'query': query_plcontinue.cache}
+        page._set_data('query')
+        self.assertTrue('continue' in page.data)
+        self.assertEqual(page.data['continue'],
+                         {'plcontinue': u'144146|0|Perl_Data_Language'})
+        self.assertEqual(len(page.data['links']), 385)
+
+        qry = page._query('query', wptools.query.WPToolsQuery())
+        self.assertTrue(qry.endswith('&plcontinue=144146|0|Perl_Data_Language'))
+
     def test_page_get_more_continue(self):
-        page = wptools.page('TEST', silent=SILENT_FLAG)
+        page = wptools.page('TEST', skip=SKIP_FLAG, silent=SILENT_FLAG)
 
         page.cache['querymore'] = querymore.cache
         page._set_data('querymore')
