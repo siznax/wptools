@@ -899,6 +899,15 @@ class WPToolsRequestTestCase(unittest.TestCase):
         info = req.cobj.getinfo(wptools.request.pycurl.RESPONSE_CODE)
         self.assertEqual(info, 0)
 
+    def test_request_curl_proxy_setup(self):
+        req = wptools.request.WPToolsRequest(verbose=True)
+        test_proxy = {
+            'PROXY': 'TEST_PROXY',
+            'PORT': 0,
+            'USERPWD': 'TEST_USER:PWD'
+        }
+        req.curl_setup(proxy=test_proxy)
+
     def test_request_user_agent(self):
         agent = wptools.request.user_agent()
         self.assertTrue(agent.startswith('wptools'))
