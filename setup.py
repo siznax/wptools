@@ -23,7 +23,7 @@ setup(
     install_requires=['certifi', 'html2text', 'lxml', 'pycurl'],
     include_package_data=True,
     entry_points={
-        'console_scripts': ['wptool=scripts.wptool:main'],
+        'console_scripts': ['wptool=wptools.wptool:main'],
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

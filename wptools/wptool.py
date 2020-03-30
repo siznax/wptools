@@ -210,10 +210,12 @@ def parse_args():
     return argp.parse_args()
 
 
-def main(args):
+def main(args=None):
     """
     invoke wptools and exit safely
     """
+    if not args:
+        args = parse_args()
     start = time.time()
     output = get(args)
     _safe_exit(start, output)
