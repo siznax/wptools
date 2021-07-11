@@ -22,7 +22,7 @@ __version__ = "0.4.17"
 
 from . import core
 from . import query
-from . import request
+#from . import request
 from . import site
 from . import utils
 

@@ -12,10 +12,9 @@ import urllib.parse
 
 from wptools.query import WPToolsQuery
 
-from . import request
 from . import utils
 
-
+import requests
 class WPTools(object):
     """
     WPtools (abstract) core class
@@ -172,12 +171,9 @@ class WPTools(object):
                             wiki=self.params.get('wiki'),
                             endpoint=self.params.get('endpoint'))
         qstr = self._query(action, qobj)
-        req = self._request(proxy, timeout)
-        response = req.get(qstr, qobj.status)
-
+        response = requests.get(qstr, qobj.status)
         self.cache[action]['query'] = qstr
-        self.cache[action]['response'] = response
-        self.cache[action]['info'] = req.info
+        self.cache[action]['response'] = response.json()
 
         self.data['requests'].append(action)
 
@@ -196,10 +192,7 @@ class WPTools(object):
         if not response:
             raise ValueError("Empty response: %s" % self.params)
 
-        try:
-            data = utils.json_loads(response)
-        except ValueError:
-            raise ValueError(_query)
+        data = response
 
         if data.get('warnings'):
             if 'WARNINGS' in self.data:
@@ -229,14 +222,6 @@ class WPTools(object):
         Abstract method that returns WPToolsQuery string
         """
         raise NotImplementedError("A subclass must implement this method.")
-
-    def _request(self, proxy, timeout):
-        """
-        Returns WPToolsRequest object
-        """
-        return request.WPToolsRequest(self.flags['silent'],
-                                      self.flags['verbose'],
-                                      proxy, timeout)
 
     def _set_data(self, action):
         """
@@ -268,7 +253,7 @@ class WPTools(object):
         or list of cached actions
         """
         if action in self.cache:
-            return utils.json_loads(self.cache[action]['response'])
+            return self.cache[action]['response']
         return self.cache.keys() or None
 
     def show(self):
