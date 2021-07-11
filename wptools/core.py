@@ -8,6 +8,7 @@ Support for accessing Wikimedia foundation APIs.
 """
 
 from time import sleep
+import urllib.parse
 
 from wptools.query import WPToolsQuery
 
@@ -113,7 +114,7 @@ class WPTools(object):
 
         params = []
         for item in self.data['continue']:
-            params.append("&%s=%s" % (item, self.data['continue'][item]))
+            params.append("&%s=%s" % (item, urllib.parse.quote_plus(self.data['continue'][item])))
 
         return ''.join(params)
 
