@@ -64,6 +64,10 @@ class WPToolsPage(WPToolsRESTBase,
         if boxterm:
             self.params.update({'boxterm': boxterm})
 
+        boxtag = kwargs.get('boxtag')
+        if boxtag:
+            self.params.update({'boxtag':boxtag})
+
         endpoint = kwargs.get('endpoint')
         if endpoint:
             self.params.update({'endpoint': endpoint})
@@ -250,11 +254,15 @@ class WPToolsPage(WPToolsRESTBase,
         parsetree = pdata.get('parsetree')
         self.data['parsetree'] = parsetree
 
-        boxterm = self.params.get('boxterm')
-        if boxterm:
-            infobox = utils.get_infobox(parsetree, boxterm)
+        boxtag = self.params.get('boxtag')
+        if boxtag:
+            infobox = utils.get_infobox_withtag(pdata['text'],parsetree,boxtag)
         else:
-            infobox = utils.get_infobox(parsetree)
+            boxterm = self.params.get('boxterm')
+            if boxterm:
+                infobox = utils.get_infobox(parsetree, boxterm)
+            else:
+                infobox = utils.get_infobox(parsetree)
         self.data['infobox'] = infobox
 
         title = pdata.get('title')
