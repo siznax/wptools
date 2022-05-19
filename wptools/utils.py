@@ -18,6 +18,44 @@ import lxml.html
 
 from lxml.etree import tostring
 
+from bs4 import BeautifulSoup
+
+
+def get_infobox_withtag(pagetxt, ptree, boxtag='infobox') :
+    soup = BeautifulSoup(pagetxt)
+    # here not ensure all infobox items are tables
+    ptree_soup = BeautifulSoup(ptree)
+
+    table_first_string = soup.find('table', class_=boxtag).find('th').text.strip()
+
+    boxes = []
+
+    def order_keep_same(text1, text2) :
+        for i in text1 :
+            try :
+                text2 = text2[text2.index(i) + 1 :]
+            except :
+                return False
+        return True
+
+    # for ptree_soup.findAll('template')
+    for temp_item in ptree_soup.findAll('template') :
+        if order_keep_same(table_first_string, temp_item.find('value').text.strip()) :
+
+            title = temp_item.find('title').text
+            item = lxml.etree.fromstring(str(temp_item))
+            box = template_to_dict(item)
+
+            if box :
+                return box
+
+            alt = template_to_dict_alt(item, title)
+            if alt :
+                boxes.append(alt)
+
+        if boxes :
+            return {'boxes' : boxes, 'count' : len(boxes)}
+
 
 def get_infobox(ptree, boxterm="box"):
     """
