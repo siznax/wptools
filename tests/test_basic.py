@@ -424,6 +424,7 @@ class WPToolsPageTestCase(unittest.TestCase):
         self.assertEqual(len(infobox['Genre'].split('<br')), 8)
         self.assertTrue('requests' not in page.data)
 
+
     def test_page_get_parse_91(self):
         """
         Get infobox data with unusual wikitext syntax

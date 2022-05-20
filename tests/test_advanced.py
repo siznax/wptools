@@ -99,6 +99,12 @@ class WPToolsPickTest(unittest.TestCase):
         except LookupError as detail:
             pass
 
+    def test_finding_infobox_with_tag(self) :
+        page = wptools.page("秋田県民会館", lang='ja', boxtag='infobox')
+        page.get_parse(show=False)
+        infobox = page.data['infobox']
+        self.assertTrue(infobox is not None)
+
     def test_lookup_unicode_error(self):
         """
         Raise LookupError without UnicodeDecodeError. Issue #29
