@@ -21,40 +21,54 @@ from lxml.etree import tostring
 from bs4 import BeautifulSoup
 
 
-def get_infobox_withtag(pagetxt, ptree, boxtag='infobox') :
+def get_boxterm_with_boxtag(pagetxt,ptree,boxtag='infobox'):
     soup = BeautifulSoup(pagetxt)
     # here not ensure all infobox items are tables
     ptree_soup = BeautifulSoup(ptree)
 
     table_first_string = soup.find('table', class_=boxtag).find('th').text.strip()
 
+
+
+def order_keep_same(text1, text2) :
+    for i in text1 :
+        try :
+            text2 = text2[text2.index(i) + 1 :]
+        except :
+            return False
+    return True
+
+def get_infoboxes_withtag(pagetxt, ptree, boxtag='infobox', multi=True) :
+    soup = BeautifulSoup(pagetxt)
+    # here not ensure all infobox items are tables, still some items cannot be acquires.
+    ptree_soup = BeautifulSoup(ptree)
+
+    table_first_string = soup.find('table', class_=boxtag).find('th').text.strip()
+
     boxes = []
 
-    def order_keep_same(text1, text2) :
-        for i in text1 :
-            try :
-                text2 = text2[text2.index(i) + 1 :]
-            except :
-                return False
-        return True
-
-    # for ptree_soup.findAll('template')
+    # this function will get all infoboxes, and match them to all templates, distinguish with box titles;
     for temp_item in ptree_soup.findAll('template') :
-        if order_keep_same(table_first_string, temp_item.find('value').text.strip()) :
+        try:
+            if order_keep_same(table_first_string, temp_item.text.strip()) :
 
-            title = temp_item.find('title').text
-            item = lxml.etree.fromstring(str(temp_item))
-            box = template_to_dict(item)
+                title = temp_item.find('title').text
+                item = lxml.etree.fromstring(str(temp_item))
+                box = template_to_dict(item)
 
-            if box :
-                return box
+                if box :
+                    if not multi:
+                        return box
 
-            alt = template_to_dict_alt(item, title)
-            if alt :
-                boxes.append(alt)
+                alt = template_to_dict_alt(item, title)
+                if alt :
+                    boxes.append(alt)
 
-        if boxes :
-            return {'boxes' : boxes, 'count' : len(boxes)}
+        except:
+            pass
+
+    if boxes :
+        return {'boxes' : boxes, 'count' : len(boxes)}
 
 
 def get_infobox(ptree, boxterm="box"):

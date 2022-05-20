@@ -256,7 +256,7 @@ class WPToolsPage(WPToolsRESTBase,
 
         boxtag = self.params.get('boxtag')
         if boxtag:
-            infobox = utils.get_infobox_withtag(pdata['text'],parsetree,boxtag)
+            infobox = utils.get_infoboxes_withtag(pdata['text'], parsetree, boxtag)
         else:
             boxterm = self.params.get('boxterm')
             if boxterm:
