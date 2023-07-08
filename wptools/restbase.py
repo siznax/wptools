@@ -42,6 +42,9 @@ class WPToolsRESTBase(core.WPTools):
         """
         returns RESTBase response if appropriate
         """
+        if not self.cache['restbase'].get('info'):
+            return
+            
         content = self.cache['restbase']['info']['content-type']
         if content.startswith('text/html'):
             html = self.cache['restbase']['response']
