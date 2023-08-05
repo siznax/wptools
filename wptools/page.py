@@ -504,12 +504,14 @@ class WPToolsPage(WPToolsRESTBase,
             self.flags['defer_imageinfo'] = True
 
             self.get_wikidata(False, proxy, timeout)
-            self.get_query(False, proxy, timeout)
-            self.get_parse(False, proxy, timeout)
+            if self.params.get('title'):
+                self.get_query(False, proxy, timeout)
+                self.get_parse(False, proxy, timeout)
 
             self.flags['defer_imageinfo'] = False
 
-            self.get_restbase('/page/summary/', False, proxy, timeout)
+            if self.params.get('title'):
+                self.get_restbase('/page/summary/', False, proxy, timeout)
 
             if show and not self.flags.get('silent'):
                 self.show()
